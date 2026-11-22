@@ -54,7 +54,7 @@ public static class GuardPosts
         return -1;
     }
 
-    /// <summary>Whether the guards are called out now: a ward breach, or (when DefenceSettings says so) a corruption night.</summary>
+    /// <summary>Whether the guards are called out now: a ward breach, (when DefenceSettings says so) a corruption night, or the horn.</summary>
     public static bool CalledOut(out bool night)
     {
         night = false;
@@ -64,7 +64,7 @@ public static class GuardPosts
         }
 
         night = DefenceSettings.Current.CorruptionNights && CorruptionNights.Current != null && CorruptionNights.Current.IsActive;
-        return night;
+        return night || HavenHorn.IsSounding;
     }
 
     /// <summary>How many of the Haven's people keep guard.</summary>

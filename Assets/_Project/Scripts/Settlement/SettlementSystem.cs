@@ -69,6 +69,8 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
         settlement.Workshops.AwayFromHome = !atHome;
         ResidentDefinition along = GameSession.ActiveRaid != null ? GameSession.ActiveRaid.Companion : null;
         settlement.Workshops.WorkerAbsentAt = along != null ? WorkerProduction.QueueOf(settlement, settlement.Find(along))?.StationId : null;
+        // Those out on a party to a held land (LandParties) work nowhere while the player is away either.
+        NoteParties(settlement, atHome, along);
         settlement.Workshops.Tick(Time.deltaTime, GameSession.Stash.Resources, OnCrafted);
         // Rain at home waters the fields (Fields), looked at now and then.
         if (atHome && Time.time >= nextRainLook)
@@ -116,6 +118,39 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
             // Made at the altar, as a station makes its work: a quest to purify counts it (Craft Item, the Purified Essence).
             GameEvents.Raise(new GameEvent(GameEventKind.Crafted, settings.PurifiedEssence, made));
             GameMessages.Post($"The altar purified {made} {settings.PurifiedEssence.DisplayName} into storage.", MessageKind.Gain);
+        }
+    }
+
+    private float nextPartyLook;
+
+    // The stations of those out on a party, looked at once a second while away (a party changes only from the Lands tab, at home).
+    private void NoteParties(SettlementState settlement, bool atHome, ResidentDefinition along)
+    {
+        HashSet<string> absent = settlement.Workshops.PartyAbsentAt;
+        if (atHome || settlement.Parties.Count == 0)
+        {
+            absent.Clear();
+            return;
+        }
+
+        if (Time.unscaledTime < nextPartyLook)
+        {
+            return;
+        }
+
+        nextPartyLook = Time.unscaledTime + 1f;
+        absent.Clear();
+        TerritorySettings lands = TerritorySettings.Current;
+        foreach (ResidentRecord record in settlement.Residents)
+        {
+            if (LandParties.IsOut(settlement, record, along, lands))
+            {
+                string station = WorkerProduction.QueueOf(settlement, record)?.StationId;
+                if (station != null)
+                {
+                    absent.Add(station);
+                }
+            }
         }
     }
 

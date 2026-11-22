@@ -18,3 +18,7 @@ MonoBehaviour:
   corruptionNights: 1
   nightPostDistance: 14
   nightPostSpread: 25
+  nightPostSide: 60
+  hornKeeper: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
+  hornSeconds: 150
+  hornSound: {fileID: 11400000, guid: d97657b0fc02de74889e233c5cddef21, type: 2}

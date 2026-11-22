@@ -175,4 +175,24 @@ public sealed class FarmingTests
         Assert.IsNotNull(again, "an empty plot with water is kept");
         Assert.AreEqual(123f, again.Water, 1e-3f);
     }
+
+    [Test]
+    public void ACropWithALookOfItsOwn_GrowsAModelOnly_FromAFarmRecipe()
+    {
+        FarmSettings settings = FarmSettings.Current;
+        Assert.GreaterOrEqual(settings.CropLooks.Count, 4, "barley, flax and the herbs look like themselves");
+        var recipes = new HashSet<RecipeDefinition>();
+        foreach (FarmSettings.CropLook look in settings.CropLooks)
+        {
+            Assert.IsNotNull(look.recipe);
+            Assert.AreEqual(CraftingStationType.Farm, look.recipe.Station, $"{look.recipe.name} is sown on a Farm Plot");
+            Assert.IsTrue(recipes.Add(look.recipe), $"{look.recipe.name} has one look");
+            Assert.IsNotNull(look.model, $"{look.recipe.name} has a model");
+            Assert.IsEmpty(look.model.GetComponentsInChildren<MonoBehaviour>(true), $"{look.model.name}: a model only, nothing to gather on the bed");
+            Assert.IsEmpty(look.model.GetComponentsInChildren<Collider>(true), $"{look.model.name}: nothing to walk into");
+            Assert.AreSame(look, settings.LookFor(look.recipe));
+        }
+
+        Assert.IsNull(settings.LookFor(null), "nothing sown: the plot's own plants");
+    }
 }

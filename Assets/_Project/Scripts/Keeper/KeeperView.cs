@@ -55,12 +55,15 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
     private Vector3 dragAnchor;
     // Drawing a ring for the woodcutters (RingWork): its radius, and the lines on the ground.
     private bool ringPlacing;
+    private RingKind ringKind;
     private float ringRadius;
     private KeeperRings ringLines;
     // Setting a guard post (GuardPosts): its marks on the ground.
     private const float PostMarkRadius = 1.6f;
     private bool postPlacing;
     private KeeperRings postLines;
+    private KeeperRings laneLines;
+    private readonly System.Collections.Generic.List<Vector3[]> laneRoads = new System.Collections.Generic.List<Vector3[]>();
     private System.Func<bool> back;
 
     // ----- IOverview: what the player's camera frames while open -----
@@ -182,6 +185,11 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
         if (postLines != null)
         {
             postLines.Hide();
+        }
+
+        if (laneLines != null)
+        {
+            laneLines.Hide();
         }
 
         picker.Clear();
@@ -480,14 +488,17 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
     // ----- Rings for the woodcutters (RingWork) -----
 
     /// <summary>Starts drawing a ring for the woodcutters to fell, or says why not (no woodcutter, too many rings, a friend's Haven).</summary>
-    public void BeginRing()
+    public void BeginRing() => BeginRing(RingKind.Fell);
+
+    /// <summary>Starts drawing a ring of <paramref name="kind"/> (trees for the woodcutters, stone for the masons), or says why not.</summary>
+    public void BeginRing(RingKind kind)
     {
         if (!open)
         {
             return;
         }
 
-        string why = WhyNoRing();
+        string why = WhyNoRing(kind);
         if (why != null)
         {
             GameMessages.Post(why, MessageKind.Warning);
@@ -495,12 +506,14 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
         }
 
         ringPlacing = true;
+        ringKind = kind;
         postPlacing = false;
         ringRadius = WorkerSettings.Current.RingRadius;
+        string what = kind == RingKind.Quarry ? "the masons should break stone" : "the woodcutters should fell";
         GameMessages.Post(InputDevices.UsingGamepad
-            ? $"{GameInput.KeyLabel(GameInput.KeeperSelect)} lays the ring where the woodcutters should fell; zooming makes it larger or smaller. " +
+            ? $"{GameInput.KeyLabel(GameInput.KeeperSelect)} lays the ring where {what}; zooming makes it larger or smaller. " +
               $"{GameInput.KeyLabel(GameInput.Back)} stops."
-            : "Click where the woodcutters should fell; the wheel makes the ring larger or smaller. Right-click to stop.");
+            : $"Click where {what}; the wheel makes the ring larger or smaller. Right-click to stop.");
     }
 
     /// <summary>Takes every ring away (the woodcutters go back to their own work).</summary>
@@ -518,34 +531,54 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
         }
     }
 
-    /// <summary>Why no ring can be drawn now, or null.</summary>
-    public static string WhyNoRing()
+    /// <summary>Why no felling ring can be drawn now, or null.</summary>
+    public static string WhyNoRing() => WhyNoRing(RingKind.Fell);
+
+    /// <summary>Why no ring of <paramref name="kind"/> can be drawn now, or null.</summary>
+    public static string WhyNoRing(RingKind kind)
     {
         if (HavenVisit.IsVisiting)
         {
             return "Rings are drawn in your own Haven.";
         }
 
-        bool feller = false;
+        bool worker = false;
         foreach (ResidentRecord record in GameSession.Home.Residents)
         {
-            feller |= RingWork.Fells(record, WorkerSettings.Current);
+            worker |= RingWork.Works(record, kind, WorkerSettings.Current);
         }
 
-        if (!feller)
+        if (!worker)
         {
-            return "Nobody here fells trees yet: a woodcutter's work at the Woodcutter's Lodge.";
+            return kind == RingKind.Quarry
+                ? "Nobody here breaks stone yet: a mason's work."
+                : "Nobody here fells trees yet: a woodcutter's work at the Woodcutter's Lodge.";
         }
 
-        return GameSession.Home.Rings.Count >= WorkerSettings.Current.MostRings ? $"At most {WorkerSettings.Current.MostRings} rings at once." : null;
+        return RingsOf(kind) >= WorkerSettings.Current.MostRings ? $"At most {WorkerSettings.Current.MostRings} rings of a kind at once." : null;
     }
 
-    /// <summary>A few words of why no ring can be drawn, for a button (null when one can).</summary>
-    public static string ShortWhyNoRing()
+    /// <summary>A few words of why no felling ring can be drawn, for a button (null when one can).</summary>
+    public static string ShortWhyNoRing() => ShortWhyNoRing(RingKind.Fell);
+
+    /// <summary>A few words of why no ring of <paramref name="kind"/> can be drawn, for a button (null when one can).</summary>
+    public static string ShortWhyNoRing(RingKind kind)
     {
-        string why = WhyNoRing();
-        return why == null ? null : HavenVisit.IsVisiting ? "your Haven only" : why.StartsWith("Nobody") ? "no woodcutter yet" : "at most "
-            + WorkerSettings.Current.MostRings;
+        string why = WhyNoRing(kind);
+        return why == null ? null : HavenVisit.IsVisiting ? "your Haven only" : why.StartsWith("Nobody")
+            ? kind == RingKind.Quarry ? "no mason yet" : "no woodcutter yet" : "at most " + WorkerSettings.Current.MostRings;
+    }
+
+    /// <summary>How many rings of <paramref name="kind"/> stand in the Haven one is in.</summary>
+    public static int RingsOf(RingKind kind)
+    {
+        int count = 0;
+        foreach (RingOrder ring in GameSession.Here.Rings)
+        {
+            count += ring.Kind == kind ? 1 : 0;
+        }
+
+        return count;
     }
 
     private bool RingSpot(out Vector3 at)
@@ -557,28 +590,33 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
     private void LayRing(Vector3 at)
     {
         ringPlacing = false;
-        var ring = new RingOrder(at, ringRadius);
-        // Rings never share ground: a tree in two would be felled twice over while away.
+        var ring = new RingOrder(at, ringRadius, ringKind);
+        // Rings of a kind never share ground: a tree or rock in two would be worked twice over while away.
         foreach (RingOrder other in GameSession.Home.Rings)
         {
-            if (other.Overlaps(ring))
+            if (other.Kind == ring.Kind && other.Overlaps(ring))
             {
-                GameMessages.Post("That ring would cross another: draw it beside it, or clear the rings first.", MessageKind.Warning);
+                GameMessages.Post("That ring would cross another of its kind: draw it beside it, or clear the rings first.", MessageKind.Warning);
                 return;
             }
         }
 
-        int trees = RingWork.Standing(ring);
-        if (trees == 0)
+        int found = RingWork.Standing(ring);
+        if (found == 0)
         {
-            GameMessages.Post("No grown trees stand in that ring.", MessageKind.Warning);
+            GameMessages.Post(ring.Kind == RingKind.Quarry
+                ? $"No rock a mason can break stands in that ring (boulders and stone, a Tier {Tiers.ToRoman(WorkerSettings.Current.QuarryPickTier)} pickaxe's)."
+                : "No grown trees stand in that ring.", MessageKind.Warning);
             return;
         }
 
-        ring.StandingSeen = trees;
+        ring.StandingSeen = found;
         GameSession.Home.AddRing(ring);
-        GameMessages.Post($"A ring of {trees} tree{(trees == 1 ? "" : "s")} for the woodcutters: in working hours, when their bench has nothing " +
-            "to work on, they fell it, take the logs to the chests and plant saplings where there is room.", MessageKind.Info);
+        GameMessages.Post(ring.Kind == RingKind.Quarry
+            ? $"A quarry ring of {found} rock{(found == 1 ? "" : "s")} for the masons: in working hours, when their bench has nothing to work on, " +
+              (RingWork.Regrows(ring) ? "they break it and take the stone to the chests, and come back as the stone grows back." : "they break it and take the stone to the chests.")
+            : $"A ring of {found} tree{(found == 1 ? "" : "s")} for the woodcutters: in working hours, when their bench has nothing " +
+              "to work on, they fell it, take the logs to the chests and plant saplings where there is room.", MessageKind.Info);
     }
 
     private void DrawRings(bool hidden)
@@ -587,12 +625,25 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
         {
             ringLines = new KeeperRings(transform);
             postLines = new KeeperRings(transform, UIStyle.Current.Danger, "Keeper's View Posts");
+            laneLines = new KeeperRings(transform, UIStyle.Current.Warning, "Keeper's View Lanes");
         }
 
         Vector3 ghost = default;
         bool ghostShown = (ringPlacing || postPlacing) && !hidden && RingSpot(out ghost);
-        ringLines.Show(GameSession.Here.Rings, ghost, ghostShown && ringPlacing ? ringRadius : 0f);
+        ringLines.Show(GameSession.Here.Rings, ghost, ghostShown && ringPlacing ? ringRadius : 0f, ringKind);
         postLines.ShowPoints(GameSession.Here.Posts, PostMarkRadius, ghost, ghostShown && postPlacing);
+        // A ward breach coming or under way: the roads its creatures will take (WardBreachDirector's lanes), so posts can be set on them.
+        laneRoads.Clear();
+        WardBreachDirector breach = WardBreachDirector.Current;
+        if (breach != null && (breach.IsPending || breach.IsActive))
+        {
+            foreach (BreachLane lane in breach.Lanes)
+            {
+                laneRoads.Add(lane.Road);
+            }
+        }
+
+        laneLines.ShowRoads(laneRoads);
     }
 
     // ----- Guard posts (GuardPosts) -----
@@ -626,6 +677,19 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
         if (!HavenVisit.IsVisiting)
         {
             GameSession.Home.ClearPosts();
+        }
+    }
+
+    /// <summary>The horn (HavenHorn): sounds it, or stands everyone down while it holds.</summary>
+    public void SoundHorn()
+    {
+        if (HavenHorn.IsSounding)
+        {
+            HavenHorn.StandDown();
+        }
+        else
+        {
+            HavenHorn.Sound();
         }
     }
 

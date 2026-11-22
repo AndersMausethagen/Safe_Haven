@@ -94,12 +94,14 @@ public sealed class ResidentRecord
 /// <summary>Someone who went along on a raid and didn't come home. The forest has them: they can be found again, and won't know the player.</summary>
 public sealed class FallenRecord
 {
-    public FallenRecord(ResidentDefinition resident, string where, int atExtraction, int raidsAlong = 0, IEnumerable<CompanionMemory> forgotten = null)
+    public FallenRecord(ResidentDefinition resident, string where, int atExtraction, int raidsAlong = 0, IEnumerable<CompanionMemory> forgotten = null,
+        string home = null)
     {
         Resident = resident;
         Where = where;
         AtExtraction = atExtraction;
         RaidsAlong = raidsAlong;
+        Home = home ?? "";
         if (forgotten != null)
         {
             Forgotten.AddRange(forgotten);
@@ -115,6 +117,9 @@ public sealed class FallenRecord
     public int AtExtraction { get; }
     /// <summary>Raids they had come back from with the player.</summary>
     public int RaidsAlong { get; }
+    /// <summary>The house they lived in (its building id; empty for none): it keeps their bed and stands dark until they are found
+    /// (EmptyHouses), and is theirs again when they come home.</summary>
+    public string Home { get; }
 }
 
 /// <summary>
@@ -588,6 +593,34 @@ public sealed class SettlementState : IHavenView
         if (posts.Count > 0)
         {
             posts.Clear();
+            Changed?.Invoke();
+        }
+    }
+
+    private readonly Dictionary<LandPartyKind, string> parties = new Dictionary<LandPartyKind, string>();
+
+    /// <summary>The held land each kind of party goes out to on a raid (LandParties), at most one land a kind.</summary>
+    public IReadOnlyDictionary<LandPartyKind, string> Parties => parties;
+
+    /// <summary>The land a party of <paramref name="kind"/> goes out to, or null.</summary>
+    public string PartyOn(LandPartyKind kind) => parties.TryGetValue(kind, out string region) ? region : null;
+
+    /// <summary>Sends a party of <paramref name="kind"/> to <paramref name="region"/> on raids from now (null or empty: calls it home).</summary>
+    public void SetParty(LandPartyKind kind, string region)
+    {
+        Borrowed();
+        string before = PartyOn(kind);
+        if (string.IsNullOrEmpty(region))
+        {
+            parties.Remove(kind);
+        }
+        else
+        {
+            parties[kind] = region;
+        }
+
+        if (before != PartyOn(kind))
+        {
             Changed?.Invoke();
         }
     }
@@ -1071,7 +1104,8 @@ public sealed class SettlementState : IHavenView
         }
 
         residents.Remove(record);
-        fallen.Add(new FallenRecord(resident, where, SuccessfulExtractions, record.RaidsAlong, CompanionBond.WhatIsForgotten(record.Remembers, record.Forgotten)));
+        fallen.Add(new FallenRecord(resident, where, SuccessfulExtractions, record.RaidsAlong, CompanionBond.WhatIsForgotten(record.Remembers, record.Forgotten),
+            record.Home));
         if (record.Job != null && !vacantJobs.Contains(record.Job) && !IsHeld(record.Job))
         {
             vacantJobs.Add(record.Job);
@@ -1096,17 +1130,20 @@ public sealed class SettlementState : IHavenView
         fallen.Remove(lost);
         var found = new ResidentRecord(resident) { IsStranger = true };
         found.Forgotten.AddRange(lost.Forgotten);
+        // Their house waited for them (HavenHomes kept their bed): it is theirs again.
+        found.Home = lost.Home;
         residents.Add(found);
         Changed?.Invoke();
         return true;
     }
 
     /// <summary>Puts someone lost back on the list when loading a save.</summary>
-    public void RestoreFallen(ResidentDefinition resident, string where, int atExtraction, int raidsAlong = 0, IEnumerable<CompanionMemory> forgotten = null)
+    public void RestoreFallen(ResidentDefinition resident, string where, int atExtraction, int raidsAlong = 0, IEnumerable<CompanionMemory> forgotten = null,
+        string home = null)
     {
         if (resident != null && !IsFallen(resident))
         {
-            fallen.Add(new FallenRecord(resident, where, atExtraction, raidsAlong, forgotten));
+            fallen.Add(new FallenRecord(resident, where, atExtraction, raidsAlong, forgotten, home));
         }
     }
 

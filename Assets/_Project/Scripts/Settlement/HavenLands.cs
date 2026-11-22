@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 /// <summary>
 /// The Haven's lands for the Haven window's Lands tab (Territory): the regions held, how firmly, the one the forest is pushing on,
@@ -97,7 +98,48 @@ public static class HavenLands
                 ? "Not yet: its boundary stone is cold. The portal knows what the stones are."
                 : $"Find one of its places, then light its boundary stone{(state.ClaimNeedsRune(settings) ? " with a Pact Rune" : " (the first is free)")}."));
         }
+        else
+        {
+            AddParties(entry, region, settings);
+        }
 
         return entry;
+    }
+
+    // The parties (LandParties): who goes out to this land on raids, what they bring, and the orders to send or call them home. Only the
+    // kinds someone here can lead are offered.
+    private static void AddParties(HavenEntry entry, string region, TerritorySettings settings)
+    {
+        IHavenView home = GameSession.Here;
+        bool visiting = HavenVisit.IsVisiting;
+        foreach (LandPartyKind kind in LandParties.All)
+        {
+            TerritorySettings.PartyInfo info = settings.PartyOf(kind);
+            ResidentRecord who = LandParties.WhoGoes(home, kind, null, settings);
+            if (info == null || info.job == null || who == null)
+            {
+                continue;
+            }
+
+            string doing = LandParties.Doing(kind);
+            string name = who.Resident.DisplayName;
+            string there = home.PartyOn(kind);
+            if (there == region)
+            {
+                entry.Details.Add(new HavenDetail($"{name}, {doing} here", $"Each raid: {LandParties.Odds(kind, who, settings)}. {name}'s own work waits meanwhile."));
+                entry.Actions.Add(new HavenAction($"Call the {doing} party home", () => GameSession.Home.SetParty(kind, null), !visiting,
+                    closesWindow: false, primary: false));
+                continue;
+            }
+
+            string why = LandParties.WhyNot(kind, region, visiting, home, settings);
+            string label = there != null ? $"Send the {doing} party here" : $"Send {name} {doing}";
+            entry.Actions.Add(new HavenAction(label, () => GameSession.Home.SetParty(kind, region), why == null, closesWindow: false, primary: false));
+            if (why == null)
+            {
+                entry.Details.Add(new HavenDetail($"If {name} went {doing}", $"Each raid: {LandParties.Odds(kind, who, settings)}" +
+                    (there != null ? $" (now in {there})." : ".")));
+            }
+        }
     }
 }

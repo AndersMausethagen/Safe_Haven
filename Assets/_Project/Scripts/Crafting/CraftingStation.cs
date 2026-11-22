@@ -186,7 +186,7 @@ public sealed class CraftingStation : MonoBehaviour
         }
 
         float own = WorkerSettings.Current.WorkerSpeed + (GameSession.Here.HasBed(worker) ? BedSpeedBonus : 0f) + HomeLife.WorkBonus(worker)
-            + (worker.WorkGear != null ? worker.WorkGear.WorkerSpeed : 0f);
+            + (worker.WorkGear != null ? worker.WorkGear.WorkerSpeed : 0f) + SmallScenes.CheerOf(worker.Resident) * WorkerSettings.Current.WorkerSpeed;
         return own * GameSession.Here.WorkerSpeed(Id, type);
     }
 

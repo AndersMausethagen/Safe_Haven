@@ -27,19 +27,20 @@ public sealed class KeeperRings
         root = holder.transform;
     }
 
-    /// <summary>Draws <paramref name="rings"/> and, when <paramref name="ghostRadius"/> is above 0, the one being drawn at <paramref name="ghost"/>.</summary>
-    public void Show(IReadOnlyList<RingOrder> rings, Vector3 ghost, float ghostRadius)
+    /// <summary>Draws <paramref name="rings"/> and, when <paramref name="ghostRadius"/> is above 0, the one being drawn at <paramref name="ghost"/>
+    /// (of <paramref name="ghostKind"/>): felling rings gold, quarry rings the pale of stone.</summary>
+    public void Show(IReadOnlyList<RingOrder> rings, Vector3 ghost, float ghostRadius, RingKind ghostKind = RingKind.Fell)
     {
         int used = 0;
-        Color gold = tint ?? UIStyle.Current.Accent;
         for (int i = 0; rings != null && i < rings.Count; i++)
         {
-            Draw(Line(used++), rings[i].Centre, rings[i].Radius, gold);
+            Draw(Line(used++), rings[i].Centre, rings[i].Radius, ColourOf(rings[i].Kind));
         }
 
         if (ghostRadius > 0f)
         {
-            Draw(Line(used++), ghost, ghostRadius, new Color(gold.r, gold.g, gold.b, 0.6f));
+            Color colour = ColourOf(ghostKind);
+            Draw(Line(used++), ghost, ghostRadius, new Color(colour.r, colour.g, colour.b, 0.6f));
         }
 
         for (int i = used; i < lines.Count; i++)
@@ -68,6 +69,8 @@ public sealed class KeeperRings
             lines[i].enabled = false;
         }
     }
+
+    private Color ColourOf(RingKind kind) => tint ?? (kind == RingKind.Quarry ? UIStyle.Current.Text : UIStyle.Current.Accent);
 
     /// <summary>Hides every line (the view closing).</summary>
     public void Hide()
@@ -104,8 +107,42 @@ public sealed class KeeperRings
         return lines[index];
     }
 
+    /// <summary>Draws each of <paramref name="roads"/> as a line over the ground, from its first point to its last (a breach's lanes),
+    /// after the rings and points last shown; every line past them is hidden.</summary>
+    public void ShowRoads(IReadOnlyList<Vector3[]> roads)
+    {
+        int used = 0;
+        Color colour = tint ?? UIStyle.Current.Danger;
+        for (int r = 0; roads != null && r < roads.Count; r++)
+        {
+            Vector3[] road = roads[r];
+            if (road == null || road.Length < 2)
+            {
+                continue;
+            }
+
+            LineRenderer line = Line(used++);
+            line.loop = false;
+            line.positionCount = road.Length;
+            line.startColor = line.endColor = colour;
+            for (int i = 0; i < road.Length; i++)
+            {
+                Vector3 point = KeeperView.Ground(road[i]);
+                point.y += Lift;
+                line.SetPosition(i, point);
+            }
+        }
+
+        for (int i = used; i < lines.Count; i++)
+        {
+            lines[i].enabled = false;
+        }
+    }
+
     private static void Draw(LineRenderer line, Vector3 centre, float radius, Color colour)
     {
+        line.loop = true;
+        line.positionCount = Points;
         line.startColor = line.endColor = colour;
         for (int i = 0; i < Points; i++)
         {

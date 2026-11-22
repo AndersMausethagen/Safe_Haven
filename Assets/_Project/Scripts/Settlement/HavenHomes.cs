@@ -117,9 +117,14 @@ public sealed class HavenHomes : MonoBehaviour
             string id = building.Id;
             if (beds > 0 && id != null)
             {
-                Vector3 door = building.Door(out _);
-                houses.Add(new HomeRules.House(id, Flat(door), beds));
                 seenHouses[id] = building;
+                // A bed kept for someone lost on a raid (EmptyHouses): nobody else is given it while the forest has them.
+                beds -= EmptyHouses.BedsKept(GameSession.Here, id);
+                if (beds > 0)
+                {
+                    Vector3 door = building.Door(out _);
+                    houses.Add(new HomeRules.House(id, Flat(door), beds));
+                }
             }
         }
 

@@ -257,5 +257,7 @@ public static class GameSession
         Homecoming.ForgetGame();
         WorkerProduction.ForgetGame();
         RingWork.ForgetGame();
+        HavenHorn.ForgetGame();
+        SmallScenes.ForgetGame();
     }
 }

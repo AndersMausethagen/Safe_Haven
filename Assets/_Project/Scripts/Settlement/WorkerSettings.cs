@@ -83,6 +83,27 @@ public sealed class WorkerSettings : GameSettings<WorkerSettings>
     [Tooltip("What a woodcutter holds while felling (shown in hand; any axe).")]
     [SerializeField] private ItemDefinition fellingTool;
 
+    [Header("Quarry rings")]
+    [Tooltip("Jobs whose holders break the stone in the quarry rings drawn in the Keeper's view (the Mason's).")]
+    [SerializeField] private JobDefinition[] quarriers = System.Array.Empty<JobDefinition>();
+    [Tooltip("Seconds of breaking a rock takes a quarrier at work speed 1.")]
+    [SerializeField, Min(1f)] private float quarrySeconds = 14f;
+    [Tooltip("The pickaxe tier a quarrier breaks with: rocks needing more are left for the player.")]
+    [SerializeField, Range(1, 5)] private int quarryPickTier = 1;
+    [Tooltip("What a rock broken while the player is away gives (an average one), straight to the chests.")]
+    [SerializeField] private System.Collections.Generic.List<ItemAmount> awayRockYield = new System.Collections.Generic.List<ItemAmount>();
+    [Tooltip("The share of the time away a quarrier breaks stone (working hours only, and scaffolds and their bench first).")]
+    [SerializeField, Range(0f, 1f)] private float awayQuarryShare = 0.4f;
+    [Tooltip("What a quarrier holds while breaking stone (shown in hand; any pickaxe).")]
+    [SerializeField] private ItemDefinition quarryTool;
+
+    public System.Collections.Generic.IReadOnlyList<JobDefinition> Quarriers => quarriers;
+    public float QuarrySeconds => quarrySeconds;
+    public int QuarryPickTier => quarryPickTier;
+    public System.Collections.Generic.IReadOnlyList<ItemAmount> AwayRockYield => awayRockYield;
+    public float AwayQuarryShare => awayQuarryShare;
+    public ItemDefinition QuarryTool => quarryTool;
+
     public System.Collections.Generic.IReadOnlyList<JobDefinition> Fellers => fellers;
     public float ChopSeconds => chopSeconds;
     public float FellWalkSeconds => fellWalkSeconds;

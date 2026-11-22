@@ -37,6 +37,9 @@ public static class ContentAudit
         "EssenceSettings.inscription",
         // What someone at home made while the player was away, put in the chests on coming home (AwayGifts).
         "HomecomingSettings.gifts[].item",
+        // What a party to a held land brings home from a raid (LandParties), and a rock a mason broke while the player was away
+        // (RingWork's quarry rings).
+        "TerritorySettings.parties[].yields[].item", "WorkerSettings.awayRockYield[].item",
     };
 
     private static readonly string[] ItemUses =
@@ -65,6 +68,8 @@ public static class ContentAudit
         "TradeSettings.sales", "RaidRumourDefinition.teaches",
         // Only shown in a resident's hand: the woodcutter's axe at a ring, the Farmer's water on the way back (nothing made or spent).
         "WorkerSettings.fellingTool", "FarmSettings.waterCarried",
+        // Only shown in a mason's hand at a quarry ring.
+        "WorkerSettings.quarryTool",
     };
 
     private static readonly string[] RecipeTeachers =
@@ -74,7 +79,8 @@ public static class ContentAudit
     };
 
     // A thrifty variant names the recipe it beats where its module is fitted (RecipeVariants): it neither teaches nor asks for it.
-    private static readonly string[] RecipeNeither = { "RecipeBook.recipes", "JobDefinition.workOrders", "RecipeDefinition.replaces" };
+    // A crop's look on the farm bed (FarmPlotLook) only names the recipe that sows it.
+    private static readonly string[] RecipeNeither = { "RecipeBook.recipes", "JobDefinition.workOrders", "RecipeDefinition.replaces", "FarmSettings.cropLooks[].recipe" };
 
     // A quest's Unlocks Buildings teaches them as it starts (BuildingGate, the quest flow review's C2).
     private static readonly string[] BuildingTeachers = { "ItemDefinition.teachesBuildings", "JobDefinition.teachesBuildings", "QuestDefinition.unlocksBuildings" };

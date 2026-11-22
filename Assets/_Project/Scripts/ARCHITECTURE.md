@@ -2259,8 +2259,46 @@ Palworld's plots (sow, water, grow, harvest, haul) on the Farm Plot's queue, so 
   Guards get up by themselves, so nobody dies.
 - **The Watch Post archer** shoots on a corruption night at its band (not prowlers or game), as in a breach. A guard talking with
   the player finishes first.
-- The horn (everyone in, the posts out, before it comes) and hunting, quarry and scouting parties are still to do. Tests:
-  `GuardPostsTests`.
+- Tests: `GuardPostsTests`.
+
+### The rest of the plan (phase 8, 2026-11-22)
+
+- **Quarry rings.** A ring is a `RingKind`: Fell (as phase 4) or Quarry ("Quarry a ring of stone" in the view; pale lines). A mason
+  (`WorkerSettings` › Quarriers: the Mason) breaks the rocks in it that a pickaxe of Quarry Pick Tier gathers (`RingWork.Quarries`:
+  scene `ResourceNode`s, found through `ResourceNode.Active`; not a painted rock's stand-in, which isn't saved when gathered), their
+  yield and burst into the chests (`RingWork.Stone`), carried to the nearest chest for Strength. A ring with rocks that grow back
+  (Grey Stone) stays a quarry for good (`RingWork.Regrows`, `IsDone`); one of boulders is done when they are gone. Away: Away Quarry
+  Share of the time, Away Rock Yield a rock. `RingTarget` is a tree or a rock; claims for both; `ResidentLife` works either. Rings of
+  a kind never overlap; at most Most Rings of each. Ring workers away now skip time with a scaffold waiting (as at home). Saved:
+  `RingSaveData.kind` (older saves: felling).
+- **Parties to the held lands** (`LandParties`, `TerritorySettings` › Parties; Docs/Territory.md "Not yet"): in the Lands tab, "Send
+  Gunnar hunting" (the Hunter), fishing (the Fisher) or scouting (the Tracker) to a held land, one land a kind (`SettlementState`
+  › Parties, saved). On every raid of Party Min Seconds or more the first holder of the job (not the one along, not paused) goes:
+  hunting and fishing bring a rolled yield to the chests (the range shown first, Party Rank Bonus more a rank) and that turn's wear
+  on the land is Party Wear Share of it; scouting adds Scout Warning Turns when the forest gathers against the land. Settled in
+  `Territory.Turn(false, raidSeconds)`, told on coming home. Meanwhile their station isn't worked (`StationQueue.PartyAbsentAt`,
+  `WorkerProduction`): a party costs a station's raid. Never a raise in hold; nobody is hurt.
+- **The horn** (`HavenHorn`, `DefenceSettings` › Horn Keeper (Sigrid), Seconds, Sound): "Sound the horn" in the view, once Sigrid
+  lives here. For Horn Seconds the guards are called out (`GuardPosts.CalledOut`, to their posts, capped as ever) and everyone else
+  shelters at the portal (`ResidentLife.InDanger`; those asleep indoors stay in); sounding it again stands them down. Not saved.
+- **An empty house** (`EmptyHouses`): someone lost on a raid keeps their house (`FallenRecord.Home`, saved): `HavenHomes` gives
+  their bed to nobody else, the house's torches stay out while nobody else lives there (`NightFlame`), the view's tag says
+  "Tor's, empty · lost in Misty Woods", and found again (`FindAgain`) the house is theirs.
+- **Small scenes** (`SmallScenes` on the portal, `SmallSceneSettings`: nine written pairs): now and then, in free time at the fire,
+  two who are both content with their homes meet by a fire or the water and laugh, sing or tell a story. Heard when the player is
+  within Hear Reach, or by clicking its mark over them in the view (`KeeperHud.ShowScene`); its lines are barks in turn. Run to its
+  end, everyone within Cheer Reach is a little quicker at work for Cheer Seconds (`SmallScenes.CheerOf`: Cheer Speed of a worker's
+  own speed at a bench, and on a builder's rate). One at a time, each once a day, nothing saved.
+- **Crop looks** (`FarmSettings` › Crop Looks): barley, flax, healing herb, cloudberries and chanterelles grow their wild plant's
+  model (Art/Gathering, model-only LOD prefabs) in the bed's 15 places (`FarmPlotLook`); turnips and the rest keep the plot's own.
+  Looked at in Play (barley 0.85, flax 0.8 read as full fields when grown).
+- **Breach lanes in the view**: while a ward breach is coming or under way its lanes' roads are drawn on the ground
+  (`KeeperRings.ShowRoads`), so posts can be set on them.
+- Probed in Play (2026-11-22): Hild quarried a 5-rock ring 20 m out (a rock about every 22 s, 4 Grey Stone each, the ring kept for
+  its outcrops); the horn called Gunnar to guard and Hild to the portal, and stood them down; Tor and Hild's scene placed, heard and
+  cheered; a hunting party brought Boar Meat home; a Hut kept dark for Tor and Hild while lost and lit again once found. Tests:
+  `RingWorkTests`, `LandPartiesTests`, `EmptyHousesTests`, `SmallScenesTests`, `FarmingTests`. Not built: patrols (cut, the user may
+  want them later) and companion signatures (after the playtest, as decided 2026-11-13).
 
 ## Going along, set-pieces and bosses
 

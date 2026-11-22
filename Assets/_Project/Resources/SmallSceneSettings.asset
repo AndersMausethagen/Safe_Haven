@@ -1,0 +1,103 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bca15d42303d61b4885e253ca747cbfd, type: 3}
+  m_Name: SmallSceneSettings
+  m_EditorClassIdentifier: SafeHaven::SmallSceneSettings
+  scenes:
+  - first: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
+    second: {fileID: 11400000, guid: f8b63bb3e2db2fb44947d33b612f80f3, type: 2}
+    doing: Laughing
+    at: 0
+    lines:
+    - Your wall leans.
+    - My wall is the only straight thing in this valley. Your roof leans.
+    - My roof leans on purpose. The snow slides off.
+    - Then the snow and I agree on something.
+  - first: {fileID: 11400000, guid: ec38b2d8e58d6d84899dfeda6a4f8aeb, type: 2}
+    second: {fileID: 11400000, guid: 15e2a45207d23dd49a4a3a93e8bb8161, type: 2}
+    doing: Talking
+    at: 0
+    lines:
+    - The barley came up thick on the east bed.
+    - Then I'll bake till my arms ache. Bring me the first sheaf.
+    - The first sheaf goes back in the ground. The second is yours.
+    - A farmer who counts. I like you less already.
+  - first: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
+    second: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
+    doing: Telling a story
+    at: 0
+    lines:
+    - Seven went in. You still count us every night.
+    - I count the ones at the fire. Then I count the empty places.
+    - Fewer empty places this winter.
+    - Fewer. Not none.
+  - first: {fileID: 11400000, guid: 9f83966b2e3c8fe42a58fd9d130cb08e, type: 2}
+    second: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
+    doing: Talking
+    at: 1
+    lines:
+    - Something walked past the lodge last night. Big, and quiet.
+    - An elk. An old bull, lame in the left hind.
+    - You didn't see it.
+    - I saw where it stopped to rest. Twice.
+  - first: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
+    second: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
+    doing: Singing
+    at: 0
+    lines:
+    - Strike once for the iron, strike twice for the blade!
+    - Strike three for the roof that keeps them dry! That's not how it goes.
+    - It is now. I'm the one with the hammer.
+    - We both have hammers, Bjarne.
+  - first: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
+    second: {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}
+    doing: Talking
+    at: 1
+    lines:
+    - The ward hums louder after dark. Have you noticed?
+    - It hums the way a kettle does before it sings. Or cracks.
+    - That isn't comforting.
+    - No. But it's honest.
+  - first: {fileID: 11400000, guid: 9f83966b2e3c8fe42a58fd9d130cb08e, type: 2}
+    second: {fileID: 11400000, guid: 15e2a45207d23dd49a4a3a93e8bb8161, type: 2}
+    doing: Laughing
+    at: 0
+    lines:
+    - Boar again?
+    - Bring me something that isn't boar and I'll cook something that isn't boar.
+    - Fair.
+    - I cooked for a jarl once. He never once complained about the boar.
+  - first: {fileID: 11400000, guid: ec38b2d8e58d6d84899dfeda6a4f8aeb, type: 2}
+    second: {fileID: 11400000, guid: f8b63bb3e2db2fb44947d33b612f80f3, type: 2}
+    doing: Singing
+    at: 1
+    lines:
+    - My mother sang this at the sowing. I've forgotten half the words.
+    - Sing the half you have. The ground won't mind.
+    - And the rain came home to the furrow, and the furrow came home to me.
+    - There. Now the ground knows your voice.
+  - first: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
+    second: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
+    doing: Talking
+    at: 0
+    lines:
+    - There's a path past the north stones I don't like.
+    - Then I'll stand at the end of it tonight.
+    - Not alone.
+    - Never alone. That's the whole point of a wall.
+  restSeconds: 300
+  lineSeconds: 4.5
+  lingerSeconds: 25
+  hearReach: 16
+  cheerReach: 14
+  cheerSeconds: 900
+  cheerSpeed: 0.1

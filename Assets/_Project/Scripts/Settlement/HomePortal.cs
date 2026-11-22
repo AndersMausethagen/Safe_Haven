@@ -263,6 +263,12 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
             gameObject.AddComponent<HomeWishes>();
         }
 
+        // Small scenes between friends in their free time (the Keeper's view, the people).
+        if (!TryGetComponent(out SmallScenes _))
+        {
+            gameObject.AddComponent<SmallScenes>();
+        }
+
         interactable = GetComponent<Interactable>();
         raid = GetComponent<RaidPortal>();
         station = GetComponent<CraftingStation>();

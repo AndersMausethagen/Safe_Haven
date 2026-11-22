@@ -28,6 +28,8 @@ public sealed class SaveCoverageTests
         // Rings are only kept while they hold a radius the probe's filler doesn't give; the round trip is its own test.
         ["Settlement.rings"] = "RingWorkTests.Rings_AreSaved",
         ["Settlement.posts"] = "GuardPostsTests.Posts_AreSaved",
+        // Parties are kept only for real kinds, by the land's name: the probe's filler gives neither.
+        ["Settlement.parties"] = "LandPartiesTests.Parties_AreSaved",
         // Only real perks and skills are kept on loading, and ranks to the deepest there is: a probe can't invent them.
         ["Progress.perks"] = "ProgressionTests, TechniqueTests (perks a save keeps)",
         ["Progress.skillRanks"] = "EssenceTests (skill ranks)",
@@ -270,7 +272,7 @@ public sealed class SaveCoverageTests
         List<ResidentDefinition> people = Assets<ResidentDefinition>().Where(person => !string.IsNullOrEmpty(person.Id)).Take(2).ToList();
         Assert.AreEqual(2, people.Count, "two residents to probe with");
         settlement.AddResident(people[0]);
-        settlement.RestoreFallen(people[1], "probe", 1, 1, null);
+        settlement.RestoreFallen(people[1], "probe", 1, 1, null, "probe-house");
         JobDefinition job = Assets<JobDefinition>().First(found => !string.IsNullOrEmpty(found.Id));
         typeof(SettlementState).GetField("vacantJobs", Fields).FieldType.GetMethod("Add")
             .Invoke(typeof(SettlementState).GetField("vacantJobs", Fields).GetValue(settlement), new object[] { job });

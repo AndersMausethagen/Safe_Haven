@@ -181,3 +181,29 @@ MonoBehaviour:
       amount: 1
     - item: {fileID: 11400000, guid: acb3416df6dae1b439a8b3945c3f098e, type: 2}
       amount: 2
+  parties:
+  - kind: 0
+    job: {fileID: 11400000, guid: 9d8e9d72cc07d544c975b891d5c740e6, type: 2}
+    yields:
+    - item: {fileID: 11400000, guid: 8dbb4db9361b13f4d9df890da55ab723, type: 2}
+      least: 2
+      most: 4
+    - item: {fileID: 11400000, guid: 5022422f3d793b34dab4ad85e9581321, type: 2}
+      least: 1
+      most: 2
+  - kind: 1
+    job: {fileID: 11400000, guid: e9647a52d2bdeec478f332bf63b64731, type: 2}
+    yields:
+    - item: {fileID: 11400000, guid: 1deba4cfdd0cc854ba9f9d3fa96aacd9, type: 2}
+      least: 2
+      most: 4
+    - item: {fileID: 11400000, guid: 0318e752045b5e54f87bb7ba2814fb8e, type: 2}
+      least: 0
+      most: 2
+  - kind: 2
+    job: {fileID: 11400000, guid: 6af8ca180b22423448d6e1e307037eb6, type: 2}
+    yields: []
+  partyMinSeconds: 180
+  partyWearShare: 0.5
+  scoutWarningTurns: 1
+  partyRankBonus: 1

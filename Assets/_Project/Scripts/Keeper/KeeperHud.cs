@@ -24,6 +24,12 @@ public sealed class KeeperHud : MonoBehaviour
     private TMP_Text ringLabel;
     private string shownNoRing = "-";
     private int shownRings = -1;
+    private TMP_Text quarryLabel;
+    private string shownNoQuarry = "-";
+    private TMP_Text hornLabel;
+    private string shownHorn = "-";
+    private TMP_Text sceneLabel;
+    private Button sceneButton;
     private TMP_Text postLabel;
     private TMP_Text clearPostsLabel;
     private Button clearPostsButton;
@@ -106,6 +112,7 @@ public sealed class KeeperHud : MonoBehaviour
     /// <summary>Puts a small label over each station with work ready and each plan in view (a few times a second).</summary>
     public void ShowMarks(Camera camera, bool show)
     {
+        ShowScene(camera, show);
         if (!show || camera == null)
         {
             foreach (TMP_Text mark in marks)
@@ -150,6 +157,37 @@ public sealed class KeeperHud : MonoBehaviour
                 && RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, camera.ViewportToScreenPoint(viewport), null, out Vector2 local)
                 && PutAt(marks[i], local);
             box.SetActive(shown);
+        }
+    }
+
+    // The small scene's mark (SmallScenes) over the two friends, every frame so it keeps over them as the view moves.
+    private void ShowScene(Camera camera, bool show)
+    {
+        if (sceneButton == null)
+        {
+            return;
+        }
+
+        bool shown = false;
+        if (show && camera != null && SmallScenes.Running(out Vector3 at, out string doing))
+        {
+            Vector3 viewport = camera.WorldToViewportPoint(at + Vector3.up * 2.6f);
+            if (viewport.z > 0f && viewport.x >= 0f && viewport.x <= 1f && viewport.y >= 0f && viewport.y <= 1f
+                && RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, camera.ViewportToScreenPoint(viewport), null, out Vector2 local))
+            {
+                ((RectTransform)sceneButton.transform).anchoredPosition = local;
+                if (sceneLabel.text != doing)
+                {
+                    sceneLabel.text = doing;
+                }
+
+                shown = true;
+            }
+        }
+
+        if (sceneButton.gameObject.activeSelf != shown)
+        {
+            sceneButton.gameObject.SetActive(shown);
         }
     }
 
@@ -268,6 +306,12 @@ public sealed class KeeperHud : MonoBehaviour
                     return $"Tier {Tiers.ToRoman(construction.Level)} · home of {who}";
                 }
 
+                // Kept for someone lost on a raid (EmptyHouses): dark until a rumour leads to them.
+                if (EmptyHouses.StandsEmpty(building))
+                {
+                    return EmptyHouses.Tell(EmptyHouses.WaitingFor(GameSession.Here, building.Id));
+                }
+
                 if (building.TryGetComponent(out CraftingStation station) && station.Queue != null)
                 {
                     StationQueue queue = station.Queue;
@@ -291,7 +335,7 @@ public sealed class KeeperHud : MonoBehaviour
 
     private static string Doing(ResidentLife life) => life.Activity switch
     {
-        ResidentActivity.Work => life.IsBuilding ? "building" : life.IsFelling ? "felling the ring" : life.IsTakingWorkBack ? "taking work to the chests" : life.IsFetchingWater ? "fetching water" : life.IsHauling ? "fetching for work" : "at work",
+        ResidentActivity.Work => life.IsBuilding ? "building" : life.IsQuarrying ? "quarrying stone" : life.IsFelling ? "felling the ring" : life.IsTakingWorkBack ? "taking work to the chests" : life.IsFetchingWater ? "fetching water" : life.IsHauling ? "fetching for work" : "at work",
         ResidentActivity.Meal => "eating",
         ResidentActivity.Fire => "by the fire",
         ResidentActivity.Sleep => life.IsIndoors ? "asleep at home" : "going to bed",
@@ -340,17 +384,24 @@ public sealed class KeeperHud : MonoBehaviour
         // Back to the player's own feet.
         RectTransform corner = Box("Back", root, new Vector2(1f, 0f), new Vector2(330f, 46f), new Vector2(-24f, 24f));
         corner.pivot = new Vector2(1f, 0f);
-        // The guards' posts (GuardPosts): set one, or clear them.
-        RectTransform postCorner = Box("Posts", root, new Vector2(1f, 0f), new Vector2(330f, 102f), new Vector2(-24f, 190f));
+        // The guards' posts (GuardPosts): set one, or clear them; and the horn (HavenHorn).
+        RectTransform postCorner = Box("Posts", root, new Vector2(1f, 0f), new Vector2(330f, 154f), new Vector2(-24f, 244f));
         postCorner.pivot = new Vector2(1f, 0f);
-        postLabel = AddButton("Post Button", postCorner, 0f, 0f, 330f, UIRole.Kind.Button, () =>
+        hornLabel = AddButton("Horn Button", postCorner, 0f, 0f, 330f, UIRole.Kind.Button, () =>
+        {
+            if (KeeperView.Current != null)
+            {
+                KeeperView.Current.SoundHorn();
+            }
+        }, out _);
+        postLabel = AddButton("Post Button", postCorner, 0f, 52f, 330f, UIRole.Kind.Button, () =>
         {
             if (KeeperView.Current != null)
             {
                 KeeperView.Current.BeginPost();
             }
         }, out _);
-        clearPostsLabel = AddButton("Clear Posts Button", postCorner, 0f, 52f, 330f, UIRole.Kind.Button, () =>
+        clearPostsLabel = AddButton("Clear Posts Button", postCorner, 0f, 104f, 330f, UIRole.Kind.Button, () =>
         {
             if (KeeperView.Current != null)
             {
@@ -358,23 +409,43 @@ public sealed class KeeperHud : MonoBehaviour
             }
         }, out clearPostsButton);
 
-        // The woodcutters' rings (RingWork): draw one, or clear them.
-        RectTransform ringCorner = Box("Rings", root, new Vector2(1f, 0f), new Vector2(330f, 102f), new Vector2(-24f, 78f));
+        // The rings (RingWork): one for the woodcutters or the masons, or clear them.
+        RectTransform ringCorner = Box("Rings", root, new Vector2(1f, 0f), new Vector2(330f, 154f), new Vector2(-24f, 78f));
         ringCorner.pivot = new Vector2(1f, 0f);
         ringLabel = AddButton("Ring Button", ringCorner, 0f, 0f, 330f, UIRole.Kind.Button, () =>
         {
             if (KeeperView.Current != null)
             {
-                KeeperView.Current.BeginRing();
+                KeeperView.Current.BeginRing(RingKind.Fell);
             }
         }, out _);
-        clearLabel = AddButton("Clear Rings Button", ringCorner, 0f, 52f, 330f, UIRole.Kind.Button, () =>
+        quarryLabel = AddButton("Quarry Button", ringCorner, 0f, 52f, 330f, UIRole.Kind.Button, () =>
+        {
+            if (KeeperView.Current != null)
+            {
+                KeeperView.Current.BeginRing(RingKind.Quarry);
+            }
+        }, out _);
+        clearLabel = AddButton("Clear Rings Button", ringCorner, 0f, 104f, 330f, UIRole.Kind.Button, () =>
         {
             if (KeeperView.Current != null)
             {
                 KeeperView.Current.ClearRings();
             }
         }, out clearButton);
+
+        // A small scene under way (SmallScenes): its mark over the two, clicked to hear them.
+        sceneLabel = AddButton("Scene Mark", root, 0f, 0f, 200f, UIRole.Kind.Button, () =>
+        {
+            if (SmallScenes.Current != null)
+            {
+                SmallScenes.Current.Tell();
+            }
+        }, out sceneButton);
+        var sceneRect = (RectTransform)sceneButton.transform;
+        sceneRect.anchorMin = sceneRect.anchorMax = new Vector2(0.5f, 0.5f);
+        sceneRect.pivot = new Vector2(0.5f, 0f);
+        sceneButton.gameObject.SetActive(false);
 
         backLabel = AddButton("Back Button", corner, 0f, 0f, 330f, UIRole.Kind.Button, () =>
         {
@@ -397,13 +468,16 @@ public sealed class KeeperHud : MonoBehaviour
         }
 
         // The ring buttons, written again only when what they say changes.
-        string noRing = KeeperView.WhyNoRing();
+        string noRing = KeeperView.WhyNoRing(RingKind.Fell);
+        string noQuarry = KeeperView.WhyNoRing(RingKind.Quarry);
         int rings = GameSession.Here.Rings.Count;
-        if (noRing != shownNoRing || rings != shownRings)
+        if (noRing != shownNoRing || noQuarry != shownNoQuarry || rings != shownRings)
         {
             shownNoRing = noRing;
+            shownNoQuarry = noQuarry;
             shownRings = rings;
-            ringLabel.text = noRing == null ? "Fell a ring of trees" : $"Fell a ring ({KeeperView.ShortWhyNoRing()})";
+            ringLabel.text = noRing == null ? "Fell a ring of trees" : $"Fell a ring ({KeeperView.ShortWhyNoRing(RingKind.Fell)})";
+            quarryLabel.text = noQuarry == null ? "Quarry a ring of stone" : $"Quarry a ring ({KeeperView.ShortWhyNoRing(RingKind.Quarry)})";
             clearButton.gameObject.SetActive(rings > 0 && !HavenVisit.IsVisiting);
             clearLabel.text = $"Clear the ring{(rings == 1 ? "" : "s")} ({rings})";
         }
@@ -421,6 +495,13 @@ public sealed class KeeperHud : MonoBehaviour
                 postLabel.text = noPost == null ? "Set a guard post" : $"Set a post ({noPost})";
                 clearPostsButton.gameObject.SetActive(posts > 0 && !HavenVisit.IsVisiting);
                 clearPostsLabel.text = $"Clear the post{(posts == 1 ? "" : "s")} ({posts})";
+            }
+
+            string horn = HavenHorn.IsSounding ? "Stand them down" : HavenHorn.ShortWhyNot() is string noHorn ? $"Sound the horn ({noHorn})" : "Sound the horn";
+            if (horn != shownHorn)
+            {
+                shownHorn = horn;
+                hornLabel.text = horn;
             }
         }
 

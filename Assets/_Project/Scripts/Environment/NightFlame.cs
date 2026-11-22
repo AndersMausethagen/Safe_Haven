@@ -4,7 +4,8 @@ using UnityEngine;
 /// A fire that is lit at dusk and put out at dawn: a building's wall torch. Its Lit child (the flame and its light) shows
 /// while the Haven is dark (NightSettings.Darkness), each torch at its own moment, so they come on one by one as if
 /// someone went round lighting them, not all in one frame. A building still going up or lying in ruin keeps its torches
-/// out. Unlit it costs nothing: no light, no flame, no fog slot (AtmosphereLight follows its light).
+/// out, and so does a house standing empty for someone lost on a raid (EmptyHouses). Unlit it costs nothing: no light, no flame, no fog
+/// slot (AtmosphereLight follows its light).
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class NightFlame : MonoBehaviour
@@ -22,6 +23,7 @@ public sealed class NightFlame : MonoBehaviour
     private float threshold;
     private float nextCheck;
     private Construction building;
+    private BuildingObject house;
 
     public bool IsLit => lit != null && lit.activeSelf;
 
@@ -30,6 +32,7 @@ public sealed class NightFlame : MonoBehaviour
     private void Awake()
     {
         building = GetComponentInParent<Construction>();
+        house = GetComponentInParent<BuildingObject>();
         threshold = Mathf.Clamp01(lightAt + Random.value * spread);
         nextCheck = Time.time + Random.value * CheckSeconds;
         Show(Wanted(false));
@@ -48,7 +51,7 @@ public sealed class NightFlame : MonoBehaviour
 
     private bool Wanted(bool now)
     {
-        if (building != null && !building.IsStanding)
+        if ((building != null && !building.IsStanding) || (house != null && house.Beds > 0 && EmptyHouses.StandsEmpty(house)))
         {
             return false;
         }

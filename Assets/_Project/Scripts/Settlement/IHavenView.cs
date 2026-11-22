@@ -53,6 +53,9 @@ public interface IHavenView
 
     /// <summary>Guard posts set in the Keeper's view (GuardPosts), in order.</summary>
     IReadOnlyList<UnityEngine.Vector3> Posts { get; }
+
+    /// <summary>The land a party of <paramref name="kind"/> goes out to on raids (LandParties), or null.</summary>
+    string PartyOn(LandPartyKind kind);
     ResidentRecord Find(ResidentDefinition resident);
     bool HasResident(ResidentDefinition resident);
     ResidentRecord WorkerAt(CraftingStationType station);

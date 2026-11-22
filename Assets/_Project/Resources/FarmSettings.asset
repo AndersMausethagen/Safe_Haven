@@ -22,3 +22,19 @@ MonoBehaviour:
   waterCarried: {fileID: 11400000, guid: 79744f7a29634cb408f4829b51ec5918, type: 2}
   sownScale: 0.2
   wetDarkening: 0.35
+  cropLooks:
+  - recipe: {fileID: 11400000, guid: ae0af55f6c50f174a9bc095ab2588807, type: 2}
+    model: {fileID: 8308825940633616636, guid: 9f6398c5179cde947ab36c9d1e317c62, type: 3}
+    scale: 0.85
+  - recipe: {fileID: 11400000, guid: 99095c7d08ca13b4190fe94e1fd84e3a, type: 2}
+    model: {fileID: 8395888005095677213, guid: ee2bd07e7771e9740ba9dd479ecd16a2, type: 3}
+    scale: 0.8
+  - recipe: {fileID: 11400000, guid: 19ab29d4a0af458499dfc09c9b8b369d, type: 2}
+    model: {fileID: 4751426296312730729, guid: aa91f01dc1c2fd64e99b6025e70cee13, type: 3}
+    scale: 0.85
+  - recipe: {fileID: 11400000, guid: ee8a1860a8f3b384287f92dca17cd914, type: 2}
+    model: {fileID: 1234706434433045093, guid: 4268c77234bd67248b239f4670867241, type: 3}
+    scale: 0.7
+  - recipe: {fileID: 11400000, guid: 466df799c2a5c37438a20301ef25d70b, type: 2}
+    model: {fileID: 4970878249646912477, guid: 4acf2b1eb0d14f4488874047c3005a57, type: 3}
+    scale: 0.95

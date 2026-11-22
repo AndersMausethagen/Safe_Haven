@@ -112,8 +112,14 @@ minimap (`RegionTitleHud`), the world map (held lands in the accent colour, a pu
 known). The raid side: `RaidRumourDefinition` › Forest Pushing, `WeakenIncursionOutcome`, the Rot's Heart rumour and event.
 Tests: `TerritoryTests`.
 
+## Parties (2026-11-22)
+
+Residents go out to work a held region while the player raids (`LandParties`; the Lands tab's "Send Gunnar hunting"): the Hunter
+hunts, the Fisher fishes, the Tracker scouts, one land a kind. Each raid of three minutes or more, a hunting or fishing party brings a
+small yield home and the land's hold wears half as much that turn; scouts see the forest gathering against it a turn sooner. Never a
+raise in hold. Meanwhile the one who goes isn't at their station, so a party costs that station's raid.
+
 ## Not yet
 
-- Residents sent out to work a held region (hunting in Eastwood, fishing Stillwater) while the player raids.
 - A region's own weather and music; creature pages saying where each is found, from the atlas.
 - Spreading blight shown on the map as a tint, region by region.

@@ -46,9 +46,10 @@ its phase sections) has the details.
 | 5 | Fields: water (rain, a Waterskin, the Farmer's water trips), dry soil slower but never dead, crops that grow visibly | a4ff54d1 |
 | 6 | People: wishes met (thanks and a gift), the raid in passing, ranks and homes in the view | 4b9883af |
 | 7 | Guard posts set in the view, capped by the Watch Posts; guards and the archer on corruption nights | b1bb58fd |
+| 8 | Quarry rings for the masons; hunting, fishing and scouting parties to held lands; the horn; an empty house for someone lost; small scenes between friends; crops that look like themselves; breach lanes in the view | (this batch) |
 
-Not built yet: hunting, fishing, quarry and scouting parties; the horn; small scenes; the empty house; companion signatures
-(decided for after the playtest); patrols (cut for now, the user may want them later); a well or water barrel near the fields.
+Not built: companion signatures (decided for after the playtest) and patrols (cut for now, the user may want them later). A Well
+already counts as water for the Farmer, so one built by the fields shortens the trips.
 
 ## 0. Summary
 

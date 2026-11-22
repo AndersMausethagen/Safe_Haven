@@ -140,14 +140,25 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
         }
     }
 
+    private static readonly List<ResourceNode> active = new List<ResourceNode>();
+
+    /// <summary>Every node in the loaded scenes, gathered or not (a quarry ring's rocks: RingWork).</summary>
+    public static IReadOnlyList<ResourceNode> Active => active;
+
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => active.Clear();
+
     private void OnEnable()
     {
         interactable.Completed.AddListener(OnGathered);
         WatchTimers();
+        active.Add(this);
     }
 
     private void OnDisable()
     {
+        active.Remove(this);
         interactable.Completed.RemoveListener(OnGathered);
         if (countdown != null)
         {

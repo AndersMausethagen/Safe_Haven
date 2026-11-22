@@ -135,6 +135,8 @@ public sealed class SettlementSaveData
     public List<PostSaveData> posts = new List<PostSaveData>();
     /// <summary>The wishes already met are marked (HomeWishes). Missing in older saves: not yet, so they are marked quietly.</summary>
     public bool wishesSeeded;
+    /// <summary>The held lands the parties go out to (LandParties). Missing in older saves: none.</summary>
+    public List<PartySaveData> parties = new List<PartySaveData>();
     public int purificationQueued;
     public float purificationProgress;
     /// <summary>Share faster the altar works for its upgrades. Missing in older saves; the altar sets it again at home.</summary>
@@ -201,6 +203,8 @@ public sealed class FallenSaveData
     public int raidsAlong;
     /// <summary>What they will have to get back, as CompanionMemory. Missing in older saves: nothing to come back.</summary>
     public List<int> forgotten = new List<int>();
+    /// <summary>The house kept for them (a building id). Missing in older saves: none, so their bed went to whoever needed it.</summary>
+    public string home;
 }
 
 [Serializable]
@@ -541,6 +545,14 @@ public sealed class PostSaveData
     public float z;
 }
 
+[Serializable]
+public sealed class PartySaveData
+{
+    /// <summary>LandPartyKind: 0 hunting, 1 fishing, 2 scouting.</summary>
+    public int kind;
+    public string region;
+}
+
 [System.Serializable]
 public sealed class RingSaveData
 {
@@ -550,4 +562,6 @@ public sealed class RingSaveData
     public float radius;
     public int pendingFells;
     public int standingSeen = -1;
+    /// <summary>What the ring is for (RingKind: 0 felling, 1 quarry); saves from before quarry rings read 0.</summary>
+    public int kind;
 }

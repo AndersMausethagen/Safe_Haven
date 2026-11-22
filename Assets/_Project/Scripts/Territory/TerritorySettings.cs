@@ -150,6 +150,57 @@ public sealed class TerritorySettings : GameSettings<TerritorySettings>
     [Header("Regions")]
     [SerializeField] private List<RegionInfo> regions = new List<RegionInfo>();
 
+    /// <summary>A kind of party sent out to a held land on raids (LandParties): who goes and what they bring.</summary>
+    [Serializable]
+    public sealed class PartyInfo
+    {
+        public LandPartyKind kind;
+        [Tooltip("The job whose holder goes (the first who lives in the Haven and isn't along on the raid).")]
+        public JobDefinition job;
+        [Tooltip("What they bring home from a raid's time out, each a range; nothing for a scouting party.")]
+        public List<PartyYield> yields = new List<PartyYield>();
+    }
+
+    /// <summary>Between <see cref="least"/> and <see cref="most"/> of an item.</summary>
+    [Serializable]
+    public sealed class PartyYield
+    {
+        public ItemDefinition item;
+        [Min(0)] public int least = 1;
+        [Min(0)] public int most = 3;
+    }
+
+    [Header("Parties to held lands (residents out while the player raids)")]
+    [SerializeField] private List<PartyInfo> parties = new List<PartyInfo>();
+    [Tooltip("A party goes only on a raid at least this long (seconds): a quick in-and-out isn't a day's hunting.")]
+    [SerializeField, Min(0f)] private float partyMinSeconds = 180f;
+    [Tooltip("Of the wear a land would take that turn, the share it takes while a hunting or fishing party works it: tended land holds.")]
+    [SerializeField, Range(0f, 1f)] private float partyWearShare = 0.5f;
+    [Tooltip("More turns of warning when the forest gathers against a land being scouted: it is seen coming.")]
+    [SerializeField, Min(0)] private int scoutWarningTurns = 1;
+    [Tooltip("More of each yield (least and most) for each worker rank the one who goes has above the first: a practised hand.")]
+    [SerializeField, Min(0)] private int partyRankBonus = 1;
+
+    public IReadOnlyList<PartyInfo> Parties => parties;
+    public float PartyMinSeconds => partyMinSeconds;
+    public float PartyWearShare => partyWearShare;
+    public int ScoutWarningTurns => scoutWarningTurns;
+    public int PartyRankBonus => partyRankBonus;
+
+    /// <summary>What is written of a kind of party, or null when there is none.</summary>
+    public PartyInfo PartyOf(LandPartyKind kind)
+    {
+        foreach (PartyInfo info in parties)
+        {
+            if (info != null && info.kind == kind)
+            {
+                return info;
+            }
+        }
+
+        return null;
+    }
+
     public QuestDefinition UnlockedBy => unlockedBy;
     public GameEventDefinition UnlockedWhen => unlockedWhen;
     public int StonesObjective => stonesObjective;

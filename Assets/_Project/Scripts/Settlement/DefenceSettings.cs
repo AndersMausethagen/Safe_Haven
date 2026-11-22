@@ -23,6 +23,18 @@ public sealed class DefenceSettings : GameSettings<DefenceSettings>
     [Tooltip("On a corruption night, posts within this many degrees of its side (seen from the portal) are taken; the rest wait.")]
     [SerializeField, Range(10f, 180f)] private float nightPostSide = 60f;
 
+    [Header("The horn")]
+    [Tooltip("Who brings the horn (HavenHorn): it can be sounded once they live in the Haven. Empty: from the start.")]
+    [SerializeField] private ResidentDefinition hornKeeper;
+    [Tooltip("Seconds a sounding holds: the guards at their posts, everyone else at the portal. Sounding it again stands them down.")]
+    [SerializeField, Min(10f)] private float hornSeconds = 150f;
+    [Tooltip("What the horn sounds like, at the portal.")]
+    [SerializeField] private SoundDefinition hornSound;
+
+    public ResidentDefinition HornKeeper => hornKeeper;
+    public float HornSeconds => hornSeconds;
+    public SoundDefinition HornSound => hornSound;
+
     public int BasePosts => basePosts;
     public int PostsPerWatchPostTier => postsPerWatchPostTier;
     public int MostPosts => mostPosts;

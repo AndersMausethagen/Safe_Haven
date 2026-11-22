@@ -279,7 +279,7 @@ public static class SaveMapper
         into.heldQuestsStarted = settlement.HeldQuestsStarted;
         foreach (FallenRecord record in settlement.Fallen)
         {
-            into.fallen.Add(new FallenSaveData { id = record.Resident.Id, where = record.Where, atExtraction = record.AtExtraction, raidsAlong = record.RaidsAlong, forgotten = ToSaved(record.Forgotten) });
+            into.fallen.Add(new FallenSaveData { id = record.Resident.Id, where = record.Where, atExtraction = record.AtExtraction, raidsAlong = record.RaidsAlong, forgotten = ToSaved(record.Forgotten), home = record.Home });
         }
 
         foreach (JobDefinition job in settlement.VacantJobs)
@@ -293,11 +293,15 @@ public static class SaveMapper
         }
 
         into.wishesSeeded = settlement.WishesSeeded;
+        foreach (KeyValuePair<LandPartyKind, string> party in settlement.Parties)
+        {
+            into.parties.Add(new PartySaveData { kind = (int)party.Key, region = party.Value });
+        }
 
         foreach (RingOrder ring in settlement.Rings)
         {
             into.rings.Add(new RingSaveData { x = ring.Centre.x, y = ring.Centre.y, z = ring.Centre.z, radius = ring.Radius,
-                pendingFells = ring.PendingFells, standingSeen = ring.StandingSeen });
+                pendingFells = ring.PendingFells, standingSeen = ring.StandingSeen, kind = (int)ring.Kind });
         }
 
         foreach (StationQueue queue in settlement.Workshops.Queues)
@@ -426,7 +430,7 @@ public static class SaveMapper
         settlement.RestoreHeldQuests(saved.heldQuestsHomecoming, saved.heldQuestsStarted);
         foreach (FallenSaveData entry in saved.fallen ?? new List<FallenSaveData>())
         {
-            settlement.RestoreFallen(Resolve(content.FindResident(entry?.id), "resident", entry?.id, missing), entry?.where, entry != null ? entry.atExtraction : 0, entry != null ? entry.raidsAlong : 0, FromSaved(entry?.forgotten));
+            settlement.RestoreFallen(Resolve(content.FindResident(entry?.id), "resident", entry?.id, missing), entry?.where, entry != null ? entry.atExtraction : 0, entry != null ? entry.raidsAlong : 0, FromSaved(entry?.forgotten), entry?.home);
         }
 
         foreach (string job in saved.vacantJobs ?? new List<string>())
@@ -437,6 +441,14 @@ public static class SaveMapper
         if (saved.wishesSeeded)
         {
             settlement.SeedWishes();
+        }
+
+        foreach (PartySaveData party in saved.parties ?? new List<PartySaveData>())
+        {
+            if (party != null && !string.IsNullOrEmpty(party.region) && System.Enum.IsDefined(typeof(LandPartyKind), party.kind))
+            {
+                settlement.SetParty((LandPartyKind)party.kind, party.region);
+            }
         }
 
         foreach (PostSaveData post in saved.posts ?? new List<PostSaveData>())
@@ -451,7 +463,8 @@ public static class SaveMapper
         {
             if (ring != null)
             {
-                settlement.AddRing(new RingOrder(new UnityEngine.Vector3(ring.x, ring.y, ring.z), ring.radius) { PendingFells = ring.pendingFells, StandingSeen = ring.standingSeen });
+                settlement.AddRing(new RingOrder(new UnityEngine.Vector3(ring.x, ring.y, ring.z), ring.radius, ring.kind == (int)RingKind.Quarry ? RingKind.Quarry : RingKind.Fell)
+                    { PendingFells = ring.pendingFells, StandingSeen = ring.standingSeen });
             }
         }
 

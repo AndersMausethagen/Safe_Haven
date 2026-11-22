@@ -133,9 +133,11 @@ public sealed class TerritoryState
         }
     }
 
-    /// <summary>One turn: every held region wears a little, a push due comes, and the forest may gather for the next. Returns what
+    /// <summary>One turn: every held region wears a little (less where a party works it: <paramref name="tended"/>), a push due comes,
+    /// and the forest may gather for the next (seen a turn sooner where a party scouts: <paramref name="scouted"/>). Returns what
     /// happened, in words, and how much the blight spread (the caller spreads it).</summary>
-    public List<string> AdvanceTurn(TerritorySettings settings, float blight, Func<float> roll, out float blightSpread)
+    public List<string> AdvanceTurn(TerritorySettings settings, float blight, Func<float> roll, out float blightSpread,
+        ICollection<string> tended = null, ICollection<string> scouted = null)
     {
         Borrowed();
         Turn++;
@@ -144,7 +146,7 @@ public sealed class TerritoryState
         float wear = settings.ErosionAt(blight);
         foreach (Hold hold in holds.Values.Where(h => h.Claimed).ToList())
         {
-            hold.Value -= wear;
+            hold.Value -= tended != null && tended.Contains(hold.Region) ? wear * settings.PartyWearShare : wear;
             if (hold.Value <= 0f)
             {
                 Lose(hold, settings, news, ref blightSpread);
@@ -188,9 +190,12 @@ public sealed class TerritoryState
                 strength *= settings.SecureShare;
             }
 
-            Incursion = new Push { Region = target.Region, DueTurn = Turn + settings.WarningTurns, Strength = strength };
-            news.Add($"The forest is gathering against {target.Region}. In {settings.WarningTurns} turns it will push in: stand watch at its " +
-                     "boundary stone, or burn the rot's heart on a raid.");
+            // Scouts out there see it gathering sooner: more turns to answer it.
+            bool seen = scouted != null && scouted.Contains(target.Region);
+            int warning = settings.WarningTurns + (seen ? settings.ScoutWarningTurns : 0);
+            Incursion = new Push { Region = target.Region, DueTurn = Turn + warning, Strength = strength };
+            news.Add((seen ? "The scouts saw it first: the forest" : "The forest") + $" is gathering against {target.Region}. In {warning} turns it will " +
+                     "push in: stand watch at its boundary stone, or burn the rot's heart on a raid.");
         }
 
         return news;

@@ -33,6 +33,21 @@ public sealed class FarmSettings : GameSettings<FarmSettings>
     [Tooltip("How much darker watered soil looks.")]
     [SerializeField, Range(0f, 0.8f)] private float wetDarkening = 0.35f;
 
+    /// <summary>What a crop looks like on the bed (FarmPlotLook): its model in each of the plot's places, at a size.</summary>
+    [System.Serializable]
+    public sealed class CropLook
+    {
+        [Tooltip("The Farm Plot recipe that sows it.")]
+        public RecipeDefinition recipe;
+        [Tooltip("A model only (no scripts or colliders): the wild plant's, a level-of-detail group.")]
+        public GameObject model;
+        [Tooltip("Its size in each place on the bed, grown.")]
+        [Min(0.05f)] public float scale = 0.7f;
+    }
+
+    [Tooltip("Crops with a look of their own; any other shows the plot's own plants.")]
+    [SerializeField] private System.Collections.Generic.List<CropLook> cropLooks = new System.Collections.Generic.List<CropLook>();
+
     public float WateredSeconds => wateredSeconds;
     public float DrySpeed => drySpeed;
     public float RainWaters => rainWaters;
@@ -43,4 +58,24 @@ public sealed class FarmSettings : GameSettings<FarmSettings>
     public ItemDefinition WaterCarried => waterCarried;
     public float SownScale => sownScale;
     public float WetDarkening => wetDarkening;
+    public System.Collections.Generic.IReadOnlyList<CropLook> CropLooks => cropLooks;
+
+    /// <summary>The look of the crop <paramref name="recipe"/> sows, or null for the plot's own plants.</summary>
+    public CropLook LookFor(RecipeDefinition recipe)
+    {
+        if (recipe == null)
+        {
+            return null;
+        }
+
+        foreach (CropLook look in cropLooks)
+        {
+            if (look != null && look.recipe == recipe && look.model != null)
+            {
+                return look;
+            }
+        }
+
+        return null;
+    }
 }

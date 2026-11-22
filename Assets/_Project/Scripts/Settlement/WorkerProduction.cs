@@ -67,8 +67,9 @@ public static class WorkerProduction
             }
 
             Claimed.Add(queue);
-            // The one along on the raid works nowhere meanwhile.
-            if (record.Resident != null && record.Resident == away)
+            // The one along on the raid works nowhere meanwhile, nor those out on a party to a held land (LandParties).
+            if ((record.Resident != null && record.Resident == away)
+                || (!atHome && LandParties.IsOut(settlement, record, away, TerritorySettings.Current)))
             {
                 continue;
             }

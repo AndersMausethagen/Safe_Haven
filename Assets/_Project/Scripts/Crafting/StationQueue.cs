@@ -577,6 +577,11 @@ public sealed class WorkshopState
     [field: NotSaved("the raid companion's station, set by SettlementSystem every frame")]
     public string WorkerAbsentAt { get; set; }
 
+    /// <summary>The stations whose workers are out on a party to a held land meanwhile (their ids; SettlementSystem, LandParties): not
+    /// worked while the player is away.</summary>
+    [field: NotSaved("the parties' stations, set by SettlementSystem while the player is away")]
+    public HashSet<string> PartyAbsentAt { get; } = new HashSet<string>();
+
     /// <summary>
     /// Works every queue for the given seconds, delivering every craft that finishes. Resources go to storage first (may be null).
     /// Calls finished once per delivered craft. Returns how many crafts were delivered.
@@ -588,7 +593,7 @@ public sealed class WorkshopState
         {
             if (AwayFromHome)
             {
-                queue.WorkerHere = queue.WorkerSpeed > 0f && queue.StationId != WorkerAbsentAt;
+                queue.WorkerHere = queue.WorkerSpeed > 0f && queue.StationId != WorkerAbsentAt && !PartyAbsentAt.Contains(queue.StationId);
                 queue.PlayerHere = false;
             }
 

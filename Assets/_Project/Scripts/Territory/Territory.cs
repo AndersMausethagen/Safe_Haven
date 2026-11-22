@@ -475,8 +475,9 @@ public static class Territory
 
     // ----- Turns -----
 
-    /// <summary>A turn has passed: a dawn at home, or a raid ended. What it brings is told now at home, or on coming home.</summary>
-    public static void Turn(bool atDawn)
+    /// <summary>A turn has passed: a dawn at home, or a raid ended (<paramref name="raidSeconds"/> long: the parties out to the held lands
+    /// meanwhile, LandParties). What it brings is told now at home, or on coming home.</summary>
+    public static void Turn(bool atDawn, float raidSeconds = 0f)
     {
         if (HavenVisit.IsVisiting || Atlas == null)
         {
@@ -486,7 +487,19 @@ public static class Territory
         // Only off a visit (above), where one's own Haven is the one here.
         SettlementState settlement = GameSession.Home;
         bool pushComing = State.Incursion != null;
-        List<string> news = State.AdvanceTurn(Settings, settlement.Blight, () => UnityEngine.Random.value, out float spread);
+        RaidReport report = GameSession.PendingReport;
+        List<(LandPartyKind kind, string region, ResidentRecord who)> parties = atDawn
+            ? new List<(LandPartyKind, string, ResidentRecord)>()
+            : LandParties.Going(settlement, raidSeconds, report != null ? report.Companion : null, Settings);
+        var tended = new HashSet<string>();
+        var scouted = new HashSet<string>();
+        foreach ((LandPartyKind kind, string region, ResidentRecord _) in parties)
+        {
+            (kind == LandPartyKind.Scout ? scouted : tended).Add(region);
+        }
+
+        List<string> news = State.AdvanceTurn(Settings, settlement.Blight, () => UnityEngine.Random.value, out float spread, tended, scouted);
+        news.AddRange(PartiesHome(parties));
         if (!pushComing && State.Incursion != null)
         {
             Tell(Settings.ForestGathers);
@@ -513,6 +526,39 @@ public static class Territory
         }
 
         Changed?.Invoke();
+    }
+
+    // What the hunting and fishing parties bring home, into the chests, and what the scouts saw; in words, one line a party.
+    private static List<string> PartiesHome(List<(LandPartyKind kind, string region, ResidentRecord who)> parties)
+    {
+        var told = new List<string>();
+        foreach ((LandPartyKind kind, string region, ResidentRecord who) in parties)
+        {
+            string name = who.Resident.DisplayName;
+            if (kind == LandPartyKind.Scout)
+            {
+                told.Add($"{name} scouted {region} while you were away" + (PushOn(region) ? ", and has seen the forest gathering there." : ": all quiet."));
+                continue;
+            }
+
+            var sent = new List<string>();
+            foreach (ItemAmount brought in LandParties.Roll(kind, who, Settings, (least, most) => UnityEngine.Random.Range(least, most + 1)))
+            {
+                int added = GameSession.Stash.Items.Add(brought.Item, brought.Amount);
+                if (added > 0)
+                {
+                    sent.Add($"{added} {brought.Item.DisplayName}");
+                }
+            }
+
+            bool worn = Settings.ErosionAt(GameSession.Home.Blight) > 0f;
+            told.Add((sent.Count > 0
+                ? $"{name}'s {LandParties.Doing(kind)} party in {region} brought {string.Join(", ", sent)} to the chests"
+                : $"{name}'s {LandParties.Doing(kind)} party in {region} came back with nothing the chests had room for")
+                + (worn ? ", and the land wore less for being tended." : "."));
+        }
+
+        return told;
     }
 
     /// <summary>Tells what happened to the land while the player was away (on arriving home).</summary>
@@ -594,7 +640,7 @@ public static class Territory
     {
         if (happened.Kind == GameEventKind.RaidFinished)
         {
-            Turn(false);
+            Turn(false, happened.Seconds);
             return;
         }
 
