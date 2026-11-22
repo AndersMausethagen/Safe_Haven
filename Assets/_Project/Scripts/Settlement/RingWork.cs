@@ -557,7 +557,8 @@ public static class RingWork
                 {
                     if (given.Item != null && given.Amount > 0)
                     {
-                        stash.Items.Add(given.Item, given.Amount);
+                        int added = stash.Items.Add(given.Item, given.Amount);
+                        PlaytestLogger.Note(PlaytestLog.CameHome, kind == RingKind.Quarry ? "QuarryAway" : "FellAway", added, given.Item.Id);
                     }
                 }
             }

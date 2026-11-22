@@ -136,6 +136,11 @@ public static class ResidentMeals
             }
         }
 
+        foreach (ItemDefinition food in order)
+        {
+            PlaytestLogger.Note(PlaytestLog.Eaten, food.Id, eaten[food], $"hungry {hungry.Count}");
+        }
+
         var said = new StringBuilder();
         if (order.Count > 0)
         {

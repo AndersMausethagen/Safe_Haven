@@ -500,6 +500,31 @@ public static class Territory
 
         List<string> news = State.AdvanceTurn(Settings, settlement.Blight, () => UnityEngine.Random.value, out float spread, tended, scouted);
         news.AddRange(PartiesHome(parties));
+        if (!atDawn)
+        {
+            news.AddRange(OutpostsHome(settlement, raidSeconds, report != null ? report.Companion : null));
+        }
+
+        // An outpost on a land the forest has taken back is given up (Outposts).
+        foreach (string region in new List<string>(settlement.Outposts.Keys))
+        {
+            if (!State.IsClaimed(region))
+            {
+                settlement.SetOutpost(region, null);
+                news.Add($"The outpost on {region} is given up: the land is no longer the Haven's.");
+            }
+        }
+
+        // Every land Secure at once: the ring holds, and the safe pocket has a slot more from then on (TerritorySettings › Ring Pocket Slots).
+        if (!settlement.RingHeld && AllSecure())
+        {
+            settlement.HoldRing();
+            news.Add("Every land round the Haven is Secure at once: the boundary stones hold a ring. Your safe pocket has room for one more.");
+            if (Player.Current != null && Player.Current.TryGetComponent(out ItemInventory inventory))
+            {
+                inventory.RefreshPocket();
+            }
+        }
         // A party on a land the forest has taken back comes home for good.
         foreach (LandPartyKind kind in LandParties.All)
         {
@@ -538,6 +563,51 @@ public static class Territory
         Changed?.Invoke();
     }
 
+    /// <summary>True when every land in the atlas is held Secure.</summary>
+    public static bool AllSecure()
+    {
+        if (Settings == null || Settings.Regions.Count == 0)
+        {
+            return false;
+        }
+
+        foreach (TerritorySettings.RegionInfo region in Settings.Regions)
+        {
+            if (region == null || State.StandingOf(region.region, Settings) != RegionStanding.Secure)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // What the outposts send home for a raid, into the chests (Outposts); in words, one line an outpost.
+    private static List<string> OutpostsHome(SettlementState settlement, float raidSeconds, ResidentDefinition along)
+    {
+        var told = new List<string>();
+        foreach ((string region, ResidentRecord keeper) in Outposts.Working(settlement, raidSeconds, along, Settings))
+        {
+            var sent = new List<string>();
+            foreach (ItemAmount brought in Outposts.Roll(region, Settings, (least, most) => UnityEngine.Random.Range(least, most + 1)))
+            {
+                int added = GameSession.Stash.Items.Add(brought.Item, brought.Amount);
+                PlaytestLogger.Note(PlaytestLog.CameHome, "Outpost", added, brought.Item.Id);
+                if (added > 0)
+                {
+                    sent.Add($"{added} {brought.Item.DisplayName}");
+                }
+            }
+
+            if (sent.Count > 0)
+            {
+                told.Add($"From the outpost on {region}, {keeper.Resident.DisplayName} sent {string.Join(", ", sent)} home.");
+            }
+        }
+
+        return told;
+    }
+
     // What the hunting and fishing parties bring home, into the chests, and what the scouts saw; in words, one line a party.
     private static List<string> PartiesHome(List<(LandPartyKind kind, string region, ResidentRecord who)> parties)
     {
@@ -555,6 +625,7 @@ public static class Territory
             foreach (ItemAmount brought in LandParties.Roll(kind, who, Settings, (least, most) => UnityEngine.Random.Range(least, most + 1)))
             {
                 int added = GameSession.Stash.Items.Add(brought.Item, brought.Amount);
+                PlaytestLogger.Note(PlaytestLog.CameHome, $"Party:{kind}", added, brought.Item.Id);
                 if (added > 0)
                 {
                     sent.Add($"{added} {brought.Item.DisplayName}");
@@ -604,6 +675,7 @@ public static class Territory
 
                 // What fitted: a full stash took fewer (or none), and the line named the whole gift.
                 int added = GameSession.Stash.Items.Add(gift.Item, gift.Amount);
+                PlaytestLogger.Note(PlaytestLog.CameHome, "Tithe", added, gift.Item.Id);
                 if (added > 0)
                 {
                     sent.Add($"{added} {gift.Item.DisplayName}");

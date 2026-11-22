@@ -137,6 +137,10 @@ public sealed class SettlementSaveData
     public bool wishesSeeded;
     /// <summary>The held lands the parties go out to (LandParties). Missing in older saves: none.</summary>
     public List<PartySaveData> parties = new List<PartySaveData>();
+    /// <summary>The outposts at the Secure lands (Outposts). Missing in older saves: none.</summary>
+    public List<OutpostSaveData> outposts = new List<OutpostSaveData>();
+    /// <summary>Every land has been Secure at once (the ring held). Missing in older saves: not yet.</summary>
+    public bool ringHeld;
     public int purificationQueued;
     public float purificationProgress;
     /// <summary>Share faster the altar works for its upgrades. Missing in older saves; the altar sets it again at home.</summary>
@@ -545,6 +549,14 @@ public sealed class PostSaveData
     public float x;
     public float y;
     public float z;
+}
+
+[Serializable]
+public sealed class OutpostSaveData
+{
+    public string region;
+    /// <summary>The keeper's resident id.</summary>
+    public string keeper;
 }
 
 [Serializable]

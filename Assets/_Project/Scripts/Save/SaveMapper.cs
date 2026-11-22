@@ -298,6 +298,13 @@ public static class SaveMapper
             into.parties.Add(new PartySaveData { kind = (int)party.Key, region = party.Value });
         }
 
+        foreach (KeyValuePair<string, string> outpost in settlement.Outposts)
+        {
+            into.outposts.Add(new OutpostSaveData { region = outpost.Key, keeper = outpost.Value });
+        }
+
+        into.ringHeld = settlement.RingHeld;
+
         foreach (RingOrder ring in settlement.Rings)
         {
             into.rings.Add(new RingSaveData { x = ring.Centre.x, y = ring.Centre.y, z = ring.Centre.z, radius = ring.Radius,
@@ -444,6 +451,15 @@ public static class SaveMapper
             settlement.SeedWishes();
         }
 
+        foreach (OutpostSaveData outpost in saved.outposts ?? new List<OutpostSaveData>())
+        {
+            if (outpost != null && !string.IsNullOrEmpty(outpost.region) && !string.IsNullOrEmpty(outpost.keeper))
+            {
+                settlement.SetOutpost(outpost.region, outpost.keeper);
+            }
+        }
+
+        settlement.RestoreRing(saved.ringHeld);
         foreach (PartySaveData party in saved.parties ?? new List<PartySaveData>())
         {
             if (party != null && !string.IsNullOrEmpty(party.region) && System.Enum.IsDefined(typeof(LandPartyKind), party.kind))

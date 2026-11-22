@@ -73,6 +73,10 @@ MonoBehaviour:
       amount: 4
     - item: {fileID: 11400000, guid: d799dc8161ff2854dae1eedf4b74fb09, type: 2}
       amount: 2
+    outpost:
+    - item: {fileID: 11400000, guid: 03656529f70038c47baa4a9103025a81, type: 2}
+      least: 1
+      most: 1
   - region: Eastwood
     description: Open woods between the lake and the hills, crossed by trappers' paths. The old quarries are here.
     danger: 1
@@ -84,6 +88,7 @@ MonoBehaviour:
       amount: 3
     - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
       amount: 3
+    outpost: []
   - region: The Hollow Pines
     description: Tall, dead-straight pines south of the Haven with nothing growing under them. Sound carries strangely here.
     danger: 2
@@ -95,6 +100,10 @@ MonoBehaviour:
       amount: 2
     - item: {fileID: 11400000, guid: 15d1c587fc1b8f34696d9b01c733b94e, type: 2}
       amount: 2
+    outpost:
+    - item: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
+      least: 2
+      most: 3
   - region: The Wolfwood
     description: 'Where the cursed packs den: the Wolf Den is here, and the Old Barrow. Few go in, and fewer come out the same.'
     danger: 2
@@ -106,6 +115,10 @@ MonoBehaviour:
       amount: 1
     - item: {fileID: 11400000, guid: 5022422f3d793b34dab4ad85e9581321, type: 2}
       amount: 2
+    outpost:
+    - item: {fileID: 11400000, guid: 8f121a970bae6f54dbcc8ff5e2c2a48e, type: 2}
+      least: 1
+      most: 2
   - region: Westwood
     description: Quiet cedar woods west of the meadows, with the old watchtowers on their ridges and the mere among them.
     danger: 1
@@ -117,6 +130,7 @@ MonoBehaviour:
       amount: 2
     - item: {fileID: 11400000, guid: 7e57bf86766de2341bd9c47b5830cf76, type: 2}
       amount: 2
+    outpost: []
   - region: The Grey Pines
     description: A thin strip of pines under Greyfell's cliffs, littered with fallen stone and the stumps of old cuttings.
     danger: 1
@@ -128,6 +142,7 @@ MonoBehaviour:
       amount: 3
     - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
       amount: 2
+    outpost: []
   - region: Greyfell
     description: 'The mountain: bare benches of rock climbing to the highest ground in the land. Ore in the cliffs, and the wind.'
     danger: 1
@@ -139,6 +154,13 @@ MonoBehaviour:
       amount: 4
     - item: {fileID: 11400000, guid: a9f806359436036488427616ef8b8c44, type: 2}
       amount: 2
+    outpost:
+    - item: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
+      least: 3
+      most: 5
+    - item: {fileID: 11400000, guid: 4c7e3b0b4de138843be249872ebf3393, type: 2}
+      least: 2
+      most: 3
   - region: The Drowning Fen
     description: 'The bog: black pools between hummocks, and a causeway to the Drowned Stones at its heart. It keeps what it takes.'
     danger: 3
@@ -150,6 +172,10 @@ MonoBehaviour:
       amount: 1
     - item: {fileID: 11400000, guid: bb670a5310dbb494296de3c93180cebd, type: 2}
       amount: 2
+    outpost:
+    - item: {fileID: 11400000, guid: 54e1b03f55c96d14c96beff689a77318, type: 2}
+      least: 1
+      most: 2
   - region: Stillwater
     description: The great lake below the Haven, with the Island Stones out on the water and the landing on its shore.
     danger: 0
@@ -161,6 +187,7 @@ MonoBehaviour:
       amount: 2
     - item: {fileID: 11400000, guid: acb3416df6dae1b439a8b3945c3f098e, type: 2}
       amount: 2
+    outpost: []
   - region: Hightarn
     description: A cold tarn in the northern hills, its water black and very still. The fish there are old and wary.
     danger: 1
@@ -170,6 +197,7 @@ MonoBehaviour:
     tithe:
     - item: {fileID: 11400000, guid: c21953f6b8b2a344fab83a50731723fa, type: 2}
       amount: 1
+    outpost: []
   - region: Alder Mere
     description: A reedy mere in the south-west woods, ringed with alders and quiet as a held breath.
     danger: 0
@@ -181,6 +209,7 @@ MonoBehaviour:
       amount: 1
     - item: {fileID: 11400000, guid: acb3416df6dae1b439a8b3945c3f098e, type: 2}
       amount: 2
+    outpost: []
   parties:
   - kind: 0
     job: {fileID: 11400000, guid: 9d8e9d72cc07d544c975b891d5c740e6, type: 2}
@@ -207,3 +236,13 @@ MonoBehaviour:
   partyWearShare: 0.5
   scoutWarningTurns: 1
   partyRankBonus: 1
+  outpostCost:
+  - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+    amount: 30
+  - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+    amount: 20
+  - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+    amount: 6
+  - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+    amount: 4
+  ringPocketSlots: 1

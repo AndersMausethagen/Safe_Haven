@@ -44,6 +44,9 @@ public sealed class TerritorySettings : GameSettings<TerritorySettings>
         [Min(1)] public int taskCount = 6;
         [Tooltip("What it sends home each dawn while it is Secure.")]
         public List<ItemAmount> tithe = new List<ItemAmount>();
+        [Tooltip("What an outpost here sends home each raid while the land is Secure (Outposts): its own material, a small capped share " +
+                 "of the tier's need, the one home source allowed above tier II. Empty: no outpost can be raised here.")]
+        public List<PartyYield> outpost = new List<PartyYield>();
     }
 
     [Header("Claiming")]
@@ -181,11 +184,19 @@ public sealed class TerritorySettings : GameSettings<TerritorySettings>
     [Tooltip("More of each yield (least and most) for each worker rank the one who goes has above the first: a practised hand.")]
     [SerializeField, Min(0)] private int partyRankBonus = 1;
 
+    [Header("Outposts at Secure lands (Outposts)")]
+    [Tooltip("What raising an outpost costs, from the bag and the chests.")]
+    [SerializeField] private List<ItemAmount> outpostCost = new List<ItemAmount>();
+    [Tooltip("Safe pocket slots added once every land has been Secure at once (the ring held): kept from then on.")]
+    [SerializeField, Min(0)] private int ringPocketSlots = 1;
+
     public IReadOnlyList<PartyInfo> Parties => parties;
     public float PartyMinSeconds => partyMinSeconds;
     public float PartyWearShare => partyWearShare;
     public int ScoutWarningTurns => scoutWarningTurns;
     public int PartyRankBonus => partyRankBonus;
+    public IReadOnlyList<ItemAmount> OutpostCost => outpostCost;
+    public int RingPocketSlots => ringPocketSlots;
 
     /// <summary>What is written of a kind of party, or null when there is none.</summary>
     public PartyInfo PartyOf(LandPartyKind kind)

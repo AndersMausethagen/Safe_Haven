@@ -92,6 +92,7 @@ public static class AwayGifts
             }
 
             int given = stash.Items.Add(gift.item, gift.amount);
+            PlaytestLogger.Note(PlaytestLog.CameHome, "Gift", given, gift.item.Id);
             if (given <= 0)
             {
                 return null;

@@ -2328,6 +2328,34 @@ Palworld's plots (sow, water, grow, harvest, haul) on the Farm Plot's queue, so 
   `RingWorkTests`, `LandPartiesTests`, `EmptyHousesTests`, `SmallScenesTests`, `FarmingTests`. Not built: patrols (cut, the user may
   want them later) and companion signatures (after the playtest, as decided 2026-11-13).
 
+### Playtest fixes and the economy answers (2026-11-22)
+
+- **Work kept, shown kept.** `Interactable.ShownProgress` (cleared on End) lets the hammering bar show `Construction.Share`, so a
+  scaffold started again carries on visibly (the work was always kept; the bar restarted at 0). `Interactable.Elapsed` replaces
+  Progress × Duration in Construction's shortened bar.
+- **Helpers at scaffolds.** `ResidentBuilders.Helps`/`ShareOf`: anyone at home and not paused who isn't a builder lends a hand at
+  HomeLifeSettings › Helper Share of a builder's pace once their own bench and ring have nothing for them (`ResidentLife.ScaffoldToBuild`),
+  and while the player is away (`WorkAway`, with `FreeToHelp`).
+- **Tap or hold.** `IInteractionHold` (on an Interactable's object): `PlayerInteractor` waits on the press, a release before HoldSeconds
+  (0.35 s) runs the tap, a hold runs `Held`. The tamed horse: tap its menu, hold to ride; the prompt shows "Hold [E] Ride".
+- **Riding camera.** `PlayerCameraController.SetSteadyAnchor` (PlayerRiding sets the horse): the focus follows the horse's body and the
+  rider's place on it smoothed (`FollowPoint`, PlayerCameraSettings › Riding Steady Time); the lead along the horse's facing is Gallop
+  Lead / Canter Lead.
+- **Horse sleep.** `Horse.controller`: Sleeping (H_Sleep_Start, the lie-down) → Sleep Loop → Sleep End → Move; `HorseMotion` holds
+  sleep through a shuffle and doesn't fidget asleep.
+- **Runtime thriftier recipes.** `BuildingModuleDefinition` › One Fewer: `RecipeVariants.ThriftierOf` makes a copy of each recipe at the
+  module's stations that needs two or more of a listed item (`RecipeDefinition.MakeThriftierCopy`, `IsThriftierCopy`), id
+  "<recipe>+<module>" (`ContentDatabase.FindRecipe` makes it again on load); `StationCrafting.KnownRecipesFor` shows it in place;
+  `PlayerCrafting.IsKnown` knows it as its recipe. The Herb Rack: Healing Herb and Chanterelle. Healing that comes partly at once:
+  `ItemDefinition` Heal At Once, Heal Seconds (`PlayerEating`; the Mending Draught 30 + 40 over 10 s).
+- **Meals.** `ResidentMeals` (+ `HavenDawn.Pass`, which both dawn paths call): once HomeLifeSettings › Meals From stands, each dawn
+  every resident eats Daily Hunger from the chests, cooked and prepared food first, then raw, never above Most Meal Tier nor the
+  Uneaten (raw meat and fish). Well fed (cooked only) / fed / hungry is `ResidentRecord.Meal` (saved), counted in `HomeLife.WorkBonus`.
+- **Limits and caps.** `BuildingDefinition` › Limit By Rank (`BuildingUnlocks.HasRoom`, in IsOpen and Missing): the Farm Plot
+  2/3/4/6/8. `TreeChoppingSettings` › Home Max Wood Tier: off a raid, logs no better than Hardwood (`ChoppableTree.Roll`).
+- **Outposts** (`Outposts`, Docs/Territory.md). **Measurement**: `PlaytestLog` CameHome, Eaten, HomeStay, Stock, RaidNodes rows
+  (`PlaytestLogger.TrackHome`). The rule "home makes plain, raids make tier" is `EconomyRulesTests`.
+
 ## Going along, set-pieces and bosses
 
 **Raid companions (GDD §8.4, §15.5).** `ResidentDefinition` › Raid Companion says how someone fights; the raid planner offers everyone who has one and lives in the Haven, one per raid (`RaidLauncher.CanGoAlong`, `RaidSession.Companion`). `RaidDirector.BringCompanion` spawns them beside the player from `SettlementSettings` › Raid Companion Prefab with their own model (`Companion.SpawnAs`), scaled by the raid's multipliers the other way round: enemy power makes them tougher and enemy health makes them hit harder, so they stay as much help at any tier. On a raid they don't get up by themselves: `CompanionDefinition` › Bleed Out Seconds (45) to help them up, or they are gone. Down when the raid ends counts the same, because nobody went back. Alive but elsewhere, they find their own way home. `SettlementState.LoseResident` takes them off the list: raids don't seek them as a new face (`HasResident`). A `FallenCairn` goes up near the portal for as long as they are out there, `ResidentNpc` speaks of it for `GriefRaids` raids, and their job goes on `VacantJobs`, open to anyone (`JobsOpenTo`), so a loss never blocks crafting (GDD §7). A crash brings them back, like everything else in a raid that never came home.

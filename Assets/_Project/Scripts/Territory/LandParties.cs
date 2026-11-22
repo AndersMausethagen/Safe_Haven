@@ -62,6 +62,12 @@ public static class LandParties
     /// <summary>Whether <paramref name="record"/> is out on a party while the player is away (their station unworked meanwhile).</summary>
     public static bool IsOut(SettlementState home, ResidentRecord record, ResidentDefinition along, TerritorySettings settings)
     {
+        // An outpost's keeper goes out to it as a party does (Outposts).
+        if (Outposts.IsOut(home, record, along, settings))
+        {
+            return true;
+        }
+
         if (record == null || home.Parties.Count == 0)
         {
             return false;

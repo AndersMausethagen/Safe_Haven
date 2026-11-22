@@ -101,9 +101,75 @@ public static class HavenLands
         else
         {
             AddParties(entry, region, settings);
+            AddOutpost(entry, region, settings);
         }
 
         return entry;
+    }
+
+    // The outpost (Outposts): who keeps it and what it sends home, or what raising one would bring and cost. Only on a land that has
+    // something worth one.
+    private static void AddOutpost(HavenEntry entry, string region, TerritorySettings settings)
+    {
+        TerritorySettings.RegionInfo info = settings.Info(region);
+        if (info == null || info.outpost.Count == 0)
+        {
+            return;
+        }
+
+        IHavenView home = GameSession.Here;
+        bool visiting = HavenVisit.IsVisiting;
+        string odds = Outposts.Odds(region, settings);
+        if (!string.IsNullOrEmpty(home.OutpostKeeper(region)))
+        {
+            ResidentRecord keeper = Outposts.KeeperOf(home, region);
+            string paused = Outposts.Paused(home, region, settings);
+            string name = keeper != null ? keeper.Resident.DisplayName : null;
+            entry.Details.Add(new HavenDetail("The outpost", name == null ? $"Nobody keeps it now. Kept, it sends {odds} a raid."
+                : $"{name} keeps it. {EachRaid(settings)}: {odds}." + (paused != null ? " " + paused : $" {name}'s own work waits meanwhile.")));
+            ResidentRecord next = Outposts.Candidate(home, settings, keeper);
+            if (next != null)
+            {
+                entry.Actions.Add(new HavenAction($"Send {next.Resident.DisplayName} to keep the outpost", () => GameSession.Home.SetOutpost(region, next.Resident.Id),
+                    !visiting, closesWindow: false, primary: false));
+            }
+
+            entry.Actions.Add(new HavenAction("Give the outpost up", () => GameSession.Home.SetOutpost(region, null), !visiting, closesWindow: false, primary: false));
+            return;
+        }
+
+        string why = Outposts.WhyNot(region, visiting, home, settings);
+        ResidentRecord who = Outposts.Candidate(home, settings);
+        entry.Details.Add(new HavenDetail("An outpost", $"{EachRaid(settings)}: {odds}, kept by {(who != null ? who.Resident.DisplayName : "someone free")}. " +
+            $"Costs {AmountText.Describe(settings.OutpostCost)}." + (why != null ? $" {why}" : "")));
+        entry.Actions.Add(new HavenAction("Raise an outpost", () => RaiseOutpost(region, settings), why == null, closesWindow: false, primary: false));
+    }
+
+    private static void RaiseOutpost(string region, TerritorySettings settings)
+    {
+        IHavenView home = GameSession.Here;
+        string why = Outposts.WhyNot(region, HavenVisit.IsVisiting, home, settings);
+        ResidentRecord who = Outposts.Candidate(home, settings);
+        Player player = Player.Current;
+        if (why != null || who == null || player == null)
+        {
+            GameMessages.Post(why ?? "Nobody is free to keep it.", MessageKind.Warning);
+            return;
+        }
+
+        MaterialPool pool = MaterialPool.For(player.gameObject);
+        var none = new List<ResourceAmount>();
+        if (!pool.CanAfford(none, settings.OutpostCost, out string missing))
+        {
+            GameMessages.Post($"An outpost takes {AmountText.Describe(settings.OutpostCost)}. Missing {missing}", MessageKind.Warning);
+            return;
+        }
+
+        if (pool.TrySpend(none, settings.OutpostCost))
+        {
+            GameSession.Home.SetOutpost(region, who.Resident.Id);
+            GameMessages.Post($"An outpost stands on {region}. {who.Resident.DisplayName} goes out to keep it on your raids.", MessageKind.Gain);
+        }
     }
 
     // "Each raid of 3 minutes or more": shorter ones are no day's hunting.

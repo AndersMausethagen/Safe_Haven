@@ -40,6 +40,8 @@ public static class ContentAudit
         // What a party to a held land brings home from a raid (LandParties), and a rock a mason broke while the player was away
         // (RingWork's quarry rings).
         "TerritorySettings.parties[].yields[].item", "WorkerSettings.awayRockYield[].item",
+        // What an outpost at a Secure land sends home each raid (Outposts).
+        "TerritorySettings.regions[].outpost[].item",
     };
 
     private static readonly string[] ItemUses =
@@ -47,6 +49,8 @@ public static class ContentAudit
         "RecipeDefinition.itemCost", "BuildingDefinition.constructionItems", "BuildingDefinition.upgrades[].cost",
         "RaidEventDefinition.choices[].cost", "HavenRequestDefinition.wanted", "SettlementSettings.portalLevels",
         "QuestDefinition.objectives", "FishingSettings.bait", "LanternDefinition.refill", "JobDefinition.workTool", "TerritorySettings.pactRune",
+        // Raising an outpost (Outposts).
+        "TerritorySettings.outpostCost",
         "HorseDefinition.lasso", "HorseDefinition.barley",
         // A carved stone's rubbing uses one up (CarvedStone).
         "EssenceSettings.blankParchment",

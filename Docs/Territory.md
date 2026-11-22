@@ -119,7 +119,22 @@ hunts, the Fisher fishes, the Tracker scouts, one land a kind. Each raid of thre
 small yield home and the land's hold wears half as much that turn; scouts see the forest gathering against it a turn sooner. Never a
 raise in hold. Meanwhile the one who goes isn't at their station, so a party costs that station's raid.
 
+## Outposts, and the ring held (2026-11-22)
+
+At a land held Secure, the Lands tab offers "Raise an outpost" (`Outposts`; cost `TerritorySettings` › Outpost Cost: 30 Fine Planks,
+20 Fine Stone Blocks, 6 Linen, 4 Iron Ingots). A free resident keeps it (not a builder, not a party's leader, one outpost each; "Send
+X to keep the outpost" hands it on) and goes out to it on each raid of three minutes or more, as a party does, so their own station
+waits that raid. It sends home the land's own material (`RegionInfo` › Outpost): Greyfell 3-5 Iron Ore and 2-3 Granite, the Hollow
+Pines 2-3 Iron Ore, the Wolfwood 1-2 Thick Hide, Ravenwood 1 Deepstone, the Drowning Fen 1-2 Bog Venom. It is the one home source
+allowed above tier II, kept small (at most 5 of a thing a raid). It waits while the land isn't Secure or the forest gathers against it;
+the land lost, it is given up. The calmer lands have none: their tithe is their flavour. Elderwood stays a raid wood.
+
+Once every land is Secure at once the ring holds: the safe pocket gets a slot more (Ring Pocket Slots), kept from then on.
+The Wolfwood's tithe is now Rough Hide (its Thick Hide comes from its outpost): home makes plain goods (`EconomyRulesTests`).
+
 ## Not yet
+
+- An outpost's raid hook (a forward camp, an extra exit or a rumour in the land's raid), and a model at its boundary stone.
 
 - A region's own weather and music; creature pages saying where each is found, from the atlas.
 - Spreading blight shown on the map as a tint, region by region.

@@ -90,6 +90,19 @@ public static class PlaytestLog
     public const string Kill = "Kill";
     /// <summary>A playtester wrote a report (F8): subject its kind (bug, idea, confusing, liked), detail the report's id (Reports/&lt;id&gt;.json).</summary>
     public const string Report = "Report";
+    // The economy in numbers (Docs/EconomyAndPhases_2026-11-22.md §4.5, measured before anything early is changed):
+    /// <summary>Goods that came home from a source not the player's own hands: subject the source (Tithe, Party:Hunt, Gift, FellAway,
+    /// QuarryAway, Farm, Dock, Beehive), amount how many, detail the item's id.</summary>
+    public const string CameHome = "CameHome";
+    /// <summary>The Haven's breakfast at dawn (ResidentMeals): subject the food's id, amount how many were eaten, detail "hungry N".</summary>
+    public const string Eaten = "Eaten";
+    /// <summary>A stay at home ended (a raid began): subject what the player was doing (build, craft, gather, walk, idle, window, keeper),
+    /// amount the seconds spent at it.</summary>
+    public const string HomeStay = "HomeStay";
+    /// <summary>The chests on leaving for a raid: subject an item's id (the Keeper's view's stores), amount how many.</summary>
+    public const string Stock = "Stock";
+    /// <summary>The gathering nodes standing a few seconds into a raid: subject the node's id, amount how many.</summary>
+    public const string RaidNodes = "RaidNodes";
 
     public static string Folder => Path.Combine(Application.persistentDataPath, "Playtests");
 

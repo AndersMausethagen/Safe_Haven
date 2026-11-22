@@ -229,6 +229,125 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
             nextXpRow = current.PlayedSeconds + 60f;
             FlushSkillXp();
         }
+
+        TrackHome();
+    }
+
+    // ----- The economy in numbers: home time, the stock on leaving, raid nodes (PlaytestLog.HomeStay, Stock, RaidNodes) -----
+
+    private readonly System.Collections.Generic.Dictionary<string, float> homeSeconds = new System.Collections.Generic.Dictionary<string, float>();
+    private bool wasRaid;
+    private float countNodesAt = -1f;
+    private Vector3 lastAt;
+    private PlayerInteractor interactor;
+
+    private void TrackHome()
+    {
+        bool raid = RaidDirector.Current != null;
+        if (raid && !wasRaid)
+        {
+            FlushHome();
+            countNodesAt = Time.unscaledTime + 8f;
+        }
+
+        wasRaid = raid;
+        if (raid)
+        {
+            if (countNodesAt > 0f && Time.unscaledTime >= countNodesAt)
+            {
+                countNodesAt = -1f;
+                CountNodes();
+            }
+
+            return;
+        }
+
+        Player player = Player.Current;
+        // One's own Haven: a portal stands here (not the prologue's camp), no raid, no visit.
+        if (GamePause.IsPaused || player == null || !Place.InAHaven || !Place.AtHome)
+        {
+            return;
+        }
+
+        string doing = Doing(player);
+        homeSeconds.TryGetValue(doing, out float seconds);
+        homeSeconds[doing] = seconds + Time.unscaledDeltaTime;
+    }
+
+    private string Doing(Player player)
+    {
+        Vector3 at = player.transform.position;
+        float moved = (at - lastAt).sqrMagnitude;
+        lastAt = at;
+        if (KeeperView.IsOpen)
+        {
+            return "keeper";
+        }
+
+        if (UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen)
+        {
+            return "window";
+        }
+
+        if (interactor == null || interactor.gameObject != player.gameObject)
+        {
+            interactor = player.GetComponent<PlayerInteractor>();
+        }
+
+        Interactable working = interactor != null ? interactor.Current : null;
+        if (working != null)
+        {
+            return working.GetComponentInParent<Construction>() != null ? "build" : working.GetComponentInParent<CraftingStation>() != null ? "craft" : "gather";
+        }
+
+        float speed = Time.unscaledDeltaTime > 0f ? Mathf.Sqrt(moved) / Time.unscaledDeltaTime : 0f;
+        return speed > 0.6f ? "walk" : "idle";
+    }
+
+    // A stay at home is over (a raid began): the seconds at each thing, and the plain stock taken along in the chests.
+    private void FlushHome()
+    {
+        foreach (var spent in homeSeconds)
+        {
+            if (spent.Value >= 1f)
+            {
+                Write(PlaytestLog.HomeStay, spent.Key, Mathf.RoundToInt(spent.Value));
+            }
+        }
+
+        homeSeconds.Clear();
+        KeeperViewSettings view = KeeperViewSettings.Current;
+        if (view == null || GameSession.Stash == null)
+        {
+            return;
+        }
+
+        foreach (ItemDefinition item in view.Stores)
+        {
+            if (item != null)
+            {
+                Write(PlaytestLog.Stock, item.Id, GameSession.Stash.Items.Count(item));
+            }
+        }
+    }
+
+    // What a raid holds: every gathering node standing a few seconds in, by kind.
+    private void CountNodes()
+    {
+        var counts = new System.Collections.Generic.Dictionary<string, int>();
+        foreach (ResourceNode node in ResourceNode.Active)
+        {
+            if (node != null && node.Definition != null)
+            {
+                counts.TryGetValue(node.Definition.name, out int n);
+                counts[node.Definition.name] = n + 1;
+            }
+        }
+
+        foreach (var kind in counts)
+        {
+            Write(PlaytestLog.RaidNodes, kind.Key, kind.Value, RaidDirector.Current != null ? RaidDirector.Current.Session.Definition.Id : "");
+        }
     }
 
     private void OnGameEvent(GameEvent gameEvent)

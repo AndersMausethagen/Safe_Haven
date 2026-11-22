@@ -70,9 +70,9 @@ public sealed class ItemInventory : MonoBehaviour
             if (safePocket == null && safePocketSlots > 0)
             {
                 // Laid out at its full size, so improving the portal only has to unlock slots.
-                int most = safePocketSlots + SettlementSettings.Current.ExtraPocketSlotsAt(int.MaxValue);
+                int most = safePocketSlots + SettlementSettings.Current.ExtraPocketSlotsAt(int.MaxValue) + TerritorySettings.Current.RingPocketSlots;
                 safePocket = new ItemContainer(most, 1);
-                safePocket.SetUnlockedSlots(safePocketSlots + SettlementSettings.Current.ExtraPocketSlotsAt(GameSession.Home.PortalLevel));
+                safePocket.SetUnlockedSlots(safePocketSlots + SettlementSettings.Current.ExtraPocketSlotsAt(GameSession.Home.PortalLevel) + RingSlots());
             }
 
             return safePocket;
@@ -83,8 +83,11 @@ public sealed class ItemInventory : MonoBehaviour
     /// raid followed from a friend's Haven, where Here is the host's and a guest's pocket grew or shrank to theirs.</summary>
     public void RefreshPocket()
     {
-        SafePocket?.SetUnlockedSlots(safePocketSlots + SettlementSettings.Current.ExtraPocketSlotsAt(GameSession.Home.PortalLevel));
+        SafePocket?.SetUnlockedSlots(safePocketSlots + SettlementSettings.Current.ExtraPocketSlotsAt(GameSession.Home.PortalLevel) + RingSlots());
     }
+
+    // A slot more once every land has been Secure at once (Territory: the ring held), kept from then on.
+    private static int RingSlots() => GameSession.Home.RingHeld ? TerritorySettings.Current.RingPocketSlots : 0;
 
     public float CarryWeight => carryWeight;
 

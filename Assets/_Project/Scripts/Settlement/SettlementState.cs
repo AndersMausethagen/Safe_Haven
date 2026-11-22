@@ -628,6 +628,53 @@ public sealed class SettlementState : IHavenView
         }
     }
 
+    private readonly Dictionary<string, string> outposts = new Dictionary<string, string>();
+
+    /// <summary>The outposts at the Secure lands (Outposts): each land and its keeper's resident id.</summary>
+    public IReadOnlyDictionary<string, string> Outposts => outposts;
+
+    public string OutpostKeeper(string region) => region != null && outposts.TryGetValue(region, out string keeper) ? keeper : null;
+
+    /// <summary>Raises (or hands over) the outpost on <paramref name="region"/>, kept by <paramref name="keeperId"/>; null or empty gives it up.</summary>
+    public void SetOutpost(string region, string keeperId)
+    {
+        if (string.IsNullOrEmpty(region))
+        {
+            return;
+        }
+
+        Borrowed();
+        string before = OutpostKeeper(region);
+        if (string.IsNullOrEmpty(keeperId))
+        {
+            outposts.Remove(region);
+        }
+        else
+        {
+            outposts[region] = keeperId;
+        }
+
+        if (before != OutpostKeeper(region))
+        {
+            Changed?.Invoke();
+        }
+    }
+
+    /// <summary>True once every land has been Secure at once (Territory): a safe pocket slot more, kept.</summary>
+    public bool RingHeld { get; private set; }
+
+    public void HoldRing()
+    {
+        if (!RingHeld)
+        {
+            Borrowed();
+            RingHeld = true;
+            Changed?.Invoke();
+        }
+    }
+
+    public void RestoreRing(bool held) => RingHeld = held;
+
     [NotSaved("the plans standing at home, noted again by BuildPlans every few seconds there")]
     private readonly List<BuildingDefinition> plans = new List<BuildingDefinition>();
 

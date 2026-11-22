@@ -294,6 +294,7 @@ public static class WorkerProduction
 
         int fits = WorkerCarry.CanTake(item, queue.OutputAmount, limits);
         int moved = fits > 0 ? queue.TakeOutput(stash.Items.Add(item, fits)) : 0;
+        NoteGrown(queue, item, moved);
         float weight = moved * Mathf.Max(0f, item.Weight);
         if (record != null && weight > 0f)
         {
@@ -455,7 +456,17 @@ public static class WorkerProduction
     {
         if (queue.Output is ItemDefinition item && queue.OutputAmount > 0 && !item.KeepsCondition && !item.HasDurability)
         {
-            queue.TakeOutput(stash.Items.Add(item, queue.OutputAmount));
+            NoteGrown(queue, item, queue.TakeOutput(stash.Items.Add(item, queue.OutputAmount)));
+        }
+    }
+
+    // What grows or is caught at home, for the playtest log (PlaytestLog.CameHome): a farm, a dock, a hive. Stations that turn one
+    // thing into another make nothing new and aren't written.
+    private static void NoteGrown(StationQueue queue, ItemDefinition item, int amount)
+    {
+        if (amount > 0 && (queue.Type == CraftingStationType.Farm || queue.Type == CraftingStationType.Dock || queue.Type == CraftingStationType.Beehive))
+        {
+            PlaytestLogger.Note(PlaytestLog.CameHome, queue.Type.ToString(), amount, item.Id);
         }
     }
 }

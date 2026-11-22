@@ -56,6 +56,12 @@ public interface IHavenView
 
     /// <summary>The land a party of <paramref name="kind"/> goes out to on raids (LandParties), or null.</summary>
     string PartyOn(LandPartyKind kind);
+    /// <summary>The outposts (Outposts): each land's keeper's resident id.</summary>
+    IReadOnlyDictionary<string, string> Outposts { get; }
+    /// <summary>The resident id keeping the outpost on <paramref name="region"/>, or null.</summary>
+    string OutpostKeeper(string region);
+    /// <summary>True once every land has been Secure at once (the ring held): a safe pocket slot more from then on.</summary>
+    bool RingHeld { get; }
     ResidentRecord Find(ResidentDefinition resident);
     bool HasResident(ResidentDefinition resident);
     ResidentRecord WorkerAt(CraftingStationType station);
