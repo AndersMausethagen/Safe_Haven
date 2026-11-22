@@ -38,6 +38,8 @@ public static class AttackResolver
             GroundHazard.Meet(attack.DamageType == DamageType.Fire ? HazardElement.Fire : HazardElement.Frost, middle, attack.Range * 0.6f, attacker);
         }
 
+        // Every blow throws the mist the way it goes.
+        MistWakes.Strike(origin, direction, attack.Range, attack.Arc, attacker);
         List<HitDetector.Hit> hits = spareLists.Count > 0 ? spareLists.Pop() : new List<HitDetector.Hit>(8);
         try
         {

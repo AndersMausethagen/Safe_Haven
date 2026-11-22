@@ -27839,6 +27839,13 @@ MonoBehaviour:
   poolingDepth: 2
   waterBoost: 2
   edgeFade: 5
+  clumps: 1
+  clumpSize: 4.5
+  clumpHeight: 1.1
+  underShade: 0.5
+  creep: 0.1
+  billowDensity: 12
+  veil: 0.45
   baseAmount: 0
   weatherAmount: 1
   goldenHourAmount: 1
@@ -109213,6 +109220,13 @@ MonoBehaviour:
   poolingDepth: 2
   waterBoost: 2
   edgeFade: 5
+  clumps: 1
+  clumpSize: 4.5
+  clumpHeight: 1.1
+  underShade: 0.5
+  creep: 0.1
+  billowDensity: 12
+  veil: 0.45
   baseAmount: 0
   weatherAmount: 1
   goldenHourAmount: 1

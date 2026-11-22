@@ -415,6 +415,12 @@ public sealed partial class PlayerCombat
             hitPending = false;
             int hits = LandSwing();
             landedThisSwing = hits;
+            // The blow throws the mist the way it was aimed as it landed (a throw or a cast strikes from afar, not here).
+            if (activeAttack != null && activeMotion != ArtMotion.Throw && activeAttack.CastProjectile == null)
+            {
+                MistWakes.Strike(transform.position, activeDirection, activeAttack.Range, activeAttack.Arc, this);
+            }
+
             SwingLanded?.Invoke(current, hits);
         }
 

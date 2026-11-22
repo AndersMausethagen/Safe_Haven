@@ -20,6 +20,26 @@ public sealed class MistVolume : MonoBehaviour
     [SerializeField, Range(0f, 0.5f)] private float density = 0.22f;
     [Tooltip("Horizontal edge fade in local metres.")]
     [SerializeField, Min(0.1f)] private float edgeFade = 2f;
+    [Header("Clumps")]
+    [Tooltip("0: the drifting sheet. 1: a blanket of mist on the ground, a thin veil swelling into soft billows, creeping slowly round what stands in its way " +
+             "(the user's reference, 2026-11-22: \"more like clumpy clouds instead of a thin, varying shimmer\"; \"it should slowly creep " +
+             "along the terrain\"). In between, a blend.")]
+    [SerializeField, Range(0f, 1f)] private float clumps = 1f;
+    [Tooltip("Metres across a billow.")]
+    [SerializeField, Min(0.5f)] private float clumpSize = 4.5f;
+    [Tooltip("How high the tallest billows rise, in metres (about knee to waist high on a person).")]
+    [SerializeField, Min(0.1f)] private float clumpHeight = 1.1f;
+    [Tooltip("How much darker a billow is at its foot than at its top (its own shade; 0: lit evenly).")]
+    [SerializeField, Range(0f, 0.9f)] private float underShade = 0.5f;
+    [Tooltip("How fast the billows creep, as a share of the drift (Wind × Drift Speed): slowly along the ground, not sailing like clouds. " +
+             "The mist's wake field flows at the same speed, round trees and rocks.")]
+    [SerializeField, Range(0f, 0.5f)] private float creep = 0.1f;
+    [Tooltip("How thick a billow is, times Density: billows are white and nearly opaque where the sheet is a veil.")]
+    [SerializeField, Min(0f)] private float billowDensity = 12f;
+    [Tooltip("The thin veil that lies between the billows and joins them over most of the ground, as a share of a billow's thickness " +
+             "(the user, 2026-11-22: \"less clumpy and more connected through thin veils. most of the ground should be filled with mist\"). " +
+             "0: billows with clear ground between.")]
+    [SerializeField, Range(0f, 1f)] private float veil = 0.45f;
     [SerializeField] private Color tint = new Color(0.8f, 0.87f, 0.94f);
     [SerializeField, Range(0f, 1f)] private float skyLight = 0.2f;
 
@@ -55,12 +75,19 @@ public sealed class MistVolume : MonoBehaviour
     public float Erosion => erosion;
     public float FlowStretch => Mathf.Max(1f, flowStretch);
     public Vector2 Wind => wind * Mathf.Max(0f, driftSpeed);
+    /// <summary>The clumps' shape for the march: amount, 1 / billow size, height (m), under-shade.</summary>
+    public Vector4 Clumps => new Vector4(clumps, 1f / Mathf.Max(0.5f, clumpSize), Mathf.Max(0.1f, clumpHeight), underShade);
+    /// <summary>The billows' creep (share of the drift), thickness (times Density) and the veil between them (share), for the march.</summary>
+    public Vector4 Billows => new Vector4(creep, billowDensity, veil, 0f);
+    /// <summary>The billows' creep, as a share of <see cref="Wind"/>.</summary>
+    public float Creep => creep;
     public Vector4 Waves => new Vector4(Mathf.Max(0f, waveAmplitude), Mathf.Max(1f, waveLength),
         Mathf.Max(0f, waveSpeed) * Mathf.Max(0f, driftSpeed), 0f);
     public float WeatherWindInfluence => weatherWindInfluence;
 
     private void OnEnable()
     {
+        MistWakes.Ensure();
         if (!active.Contains(this))
             active.Add(this);
     }

@@ -132,6 +132,11 @@ public sealed class WeaponTrail : MonoBehaviour
         tips[count] = model.TransformPoint(localTip);
         times[count] = Time.time;
         count++;
+        // The blade's path stirs the mist it sweeps through.
+        if (count >= 2 && times[count - 1] > times[count - 2])
+        {
+            MistWakes.Blade(tips[count - 1], (tips[count - 1] - tips[count - 2]) / (times[count - 1] - times[count - 2]));
+        }
     }
 
     private void DropOld(float seconds)

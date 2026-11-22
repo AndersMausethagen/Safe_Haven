@@ -50,6 +50,8 @@ Shader "Hidden/Safe Haven/Atmosphere"
         float4 _TerrainMistTints[MAX_TERRAIN_MISTS]; // linear tint, sky fill
         float4 _TerrainMistWaves[MAX_TERRAIN_MISTS]; // amplitude, wavelength, travel speed
         float4 _TerrainMistPooling[MAX_TERRAIN_MISTS]; // lowland boost, depression depth, water boost
+        float4 _TerrainMistClumps[MAX_TERRAIN_MISTS];  // amount, 1 / billow size, height (m), under-shade
+        float4 _TerrainMistBillows[MAX_TERRAIN_MISTS]; // creep (share of the drift), thickness (times density), veil (share)
         int _TerrainMistRegionIndex;                 // which mist has a region map (-1: none)
         float _TerrainMistRegionDensity;             // its density where the map is white
         TEXTURE2D(_TerrainMistRegionTex);            // white where its mist always lies
@@ -62,7 +64,13 @@ Shader "Hidden/Safe Haven/Atmosphere"
         float4 _MistVolumeWinds[MAX_MIST_VOLUMES];
         float4 _MistVolumeTints[MAX_MIST_VOLUMES];
         float4 _MistVolumeWaves[MAX_MIST_VOLUMES];
+        float4 _MistVolumeClumps[MAX_MIST_VOLUMES];
+        float4 _MistVolumeBillows[MAX_MIST_VOLUMES];
         float _HasMistHabitat;
+        // The mist's wake field (MistWakes): r parted, gb pushed (metres). Rect: min x, min z, 1 / size. Params: parting, swirl, reach, on.
+        TEXTURE2D(_MistWakeTex);
+        float4 _MistWakeRect;
+        float4 _MistWakeParams;
         float _FogLightCount;
         float4 _FogLightPositions[MAX_FOG_LIGHTS];   // xyz, range
         float4 _FogLightColors[MAX_FOG_LIGHTS];      // linear rgb × intensity
@@ -214,7 +222,73 @@ Shader "Hidden/Safe Haven/Atmosphere"
                 return density;
             }
 
-            float MistCloudDensity(float2 horizontal, float height, float edge,
+            float2 PuffHash(float2 cell)
+            {
+                float2 p = float2(dot(cell, float2(127.1, 311.7)), dot(cell, float2(269.5, 183.3)));
+                return frac(sin(p) * 43758.5453);
+            }
+
+            // 1 at the heart of a billow, falling to 0 between them: cellular noise whose points wander slowly.
+            float Puffs(float2 q, float time)
+            {
+                float2 cell = floor(q);
+                float2 local = q - cell;
+                float nearest = 8.0;
+                for (int y = -1; y <= 1; y++)
+                {
+                    for (int x = -1; x <= 1; x++)
+                    {
+                        float2 offset = float2(x, y);
+                        float2 seed = PuffHash(cell + offset);
+                        float2 centre = offset + 0.5 + 0.38 * sin(time * 0.25 + 6.2831 * seed);
+                        float2 d = centre - local;
+                        nearest = min(nearest, dot(d, d));
+                    }
+                }
+
+                return 1.0 - saturate(sqrt(nearest));
+            }
+
+            // A blanket of mist on the ground (TerrainMist › Clumps), not a cloud layer: a thin, wispy veil over most of the ground (Billows.z
+            // of a billow's thickness), and out of it soft, broad billows heaped up, joined to one another by the veil rather than standing
+            // apart; it thins to the ground only here and there (Coverage). It creeps slowly (Billows.x of the drift; MistWakes' flow moves
+            // at the same speed, round what stands in its way), and its tops boil and fray where they stand. Lit at the tops, shaded at the
+            // feet (lit: 1 - under-shade at the ground, 1 at a billow's top).
+            float ClumpDensity(float2 horizontal, float height, float4 shape, float4 cloud, float4 wind, float4 clumps, float4 billows,
+                out float lit)
+            {
+                lit = 1.0;
+                float rel = height - shape.y;
+                float tallest = clumps.z;
+                if (rel <= 0.0 || rel >= tallest * 1.6)
+                    return 0.0;
+                float windTime = _Time.y + wind.z;
+                float2 q = (horizontal - windTime * wind.xy * billows.x) * clumps.y;
+                // Warped, so the billows aren't round cells laid out in a grid.
+                float2 warp = float2(ValueNoise(float3(q * 0.43, windTime * 0.03)), ValueNoise(float3(q.yx * 0.43 + 11.3, windTime * 0.03 + 5.1))) - 0.5;
+                q += warp * 1.6;
+                // Broad billows, slowly boiling in place (a little of a smaller size in them).
+                float puff = smoothstep(0.15, 0.95, Puffs(q, windTime * 0.5) * 0.8 + Puffs(q * 2.17 + 7.31, windTime * 0.8) * 0.2);
+                // Where the blanket lies deep and where it thins to the ground: most of the ground is covered.
+                float lay = ValueNoise(float3(q * 0.17 + 3.1, windTime * 0.008)) * 0.75 + puff * 0.25;
+                float cover = smoothstep(0.55 - cloud.y * 0.6, 0.85 - cloud.y * 0.4, lay);
+                float rise01 = rel / max(0.2, tallest);
+                float fray = (FogNoise(float3(q * 3.1, rise01 * 2.0 + windTime * 0.1)) - 0.5) * tallest * (0.22 + 0.3 * cloud.z);
+                // One surface: a low, wispy veil (streaked along the creep) that swells into a heap over each billow, so the billows are
+                // joined by it rather than standing apart. The veil is thinner than a heap (Billows.z of its thickness).
+                float wisps = FogNoise(float3(q * float2(0.9, 1.7) + 21.7, windTime * 0.05));
+                float heap = smoothstep(0.2, 0.85, puff);
+                float veilTop = tallest * (0.3 + 0.3 * wisps);
+                float heapTop = tallest * (0.45 + 0.55 * puff);
+                float top = lerp(veilTop, heapTop, heap) * smoothstep(0.0, 0.35, cover + 0.15);
+                float surface = top + fray * (0.3 + rise01);
+                float inside = 1.0 - smoothstep(surface - tallest * (0.12 + 0.1 * heap), surface + tallest * 0.05, rel);
+                float thickness = lerp(billows.z * (0.6 + 0.4 * wisps), 1.0, heap);
+                lit = lerp(1.0 - clumps.w, 1.0, pow(saturate(rel / max(0.15, surface)), 0.7));
+                return shape.x * billows.y * inside * thickness * smoothstep(0.0, 0.05, rel);
+            }
+
+            float MistSheetDensity(float2 horizontal, float height, float edge,
                 float4 shape, float4 cloud, float4 wind, float4 waves, float pooled)
             {
                 if (shape.x <= 0.0 || edge <= 0.0 || height <= shape.y)
@@ -260,11 +334,46 @@ Shader "Hidden/Safe Haven/Atmosphere"
                 return shape.x * coverage * vertical * waveDensity * pooled * smoothstep(0.0, shape.w, edge);
             }
 
+            float MistCloudDensity(float2 horizontal, float height, float edge,
+                float4 shape, float4 cloud, float4 wind, float4 waves, float pooled, float4 clumps, float4 billows, out float lit)
+            {
+                lit = 1.0;
+                if (shape.x <= 0.0 || edge <= 0.0 || height <= shape.y)
+                    return 0.0;
+                float edgeFade = smoothstep(0.0, shape.w, edge);
+                float clumped = 0.0;
+                if (clumps.x > 0.0)
+                {
+                    clumped = ClumpDensity(horizontal, height, shape, cloud, wind, clumps, billows, lit) * pooled * edgeFade;
+                    if (clumps.x >= 0.999)
+                        return clumped;
+                }
+
+                float sheet = MistSheetDensity(horizontal, height, edge, shape, cloud, wind, waves, pooled);
+                lit = lerp(1.0, lit, clumps.x);
+                return lerp(sheet, clumped, clumps.x);
+            }
+
+            // What has moved through the mist here (MistWakes): how much it is parted (x) and how far its pattern is pushed (yz, metres).
+            float3 MistWake(float2 xz)
+            {
+                if (_MistWakeParams.w <= 0.0)
+                    return 0.0;
+                float2 uv = (xz - _MistWakeRect.xy) * _MistWakeRect.z;
+                if (any(uv <= 0.0) || any(uv >= 1.0))
+                    return 0.0;
+                float4 wake = SAMPLE_TEXTURE2D_LOD(_MistWakeTex, sampler_LinearClamp, uv, 0);
+                // Faded out toward the square's edge, so its end is never a line in the mist.
+                float edge = saturate(min(min(uv.x, uv.y), min(1.0 - uv.x, 1.0 - uv.y)) * 8.0);
+                return float3(wake.r, wake.g, wake.b) * edge;
+            }
+
             float MistDensity(float3 p, out float3 tintDensity, out float3 skyDensity)
             {
                 tintDensity = 0.0;
                 skyDensity = 0.0;
                 float density = 0.0;
+                float3 wake = MistWake(p.xz);
                 if (_TerrainMistCount > 0)
                 {
                     float4 habitat = 0.0;
@@ -285,11 +394,16 @@ Shader "Hidden/Safe Haven/Atmosphere"
                         if (i == _TerrainMistRegionIndex)
                             shape.x = max(shape.x, _TerrainMistRegionDensity
                                 * SAMPLE_TEXTURE2D_LOD(_TerrainMistRegionTex, sampler_LinearClamp, saturate(local / rect.zw), 0).r);
-                        float cloudDensity = MistCloudDensity(p.xz, p.y - supportHeight, edge, shape,
-                            _TerrainMistClouds[i], _TerrainMistWinds[i], _TerrainMistWaves[i], pooled);
+                        // Low over the ground the wake parts the mist and curls its pattern aside; above Reach it drifts on.
+                        float low = 1.0 - smoothstep(_MistWakeParams.z * 0.4, _MistWakeParams.z, p.y - supportHeight);
+                        float lit;
+                        float cloudDensity = MistCloudDensity(p.xz - wake.yz * (_MistWakeParams.y * low), p.y - supportHeight, edge, shape,
+                            _TerrainMistClouds[i], _TerrainMistWinds[i], _TerrainMistWaves[i], pooled, _TerrainMistClumps[i], _TerrainMistBillows[i], lit);
+                        cloudDensity *= 1.0 - saturate(wake.x * _MistWakeParams.x * low);
                         density += cloudDensity;
-                        tintDensity += _TerrainMistTints[i].rgb * cloudDensity;
-                        skyDensity += _TerrainMistTints[i].rgb * (_TerrainMistTints[i].w * cloudDensity);
+                        // A billow's foot is in its own shade: less of the sun, and somewhat less of the sky.
+                        tintDensity += _TerrainMistTints[i].rgb * (cloudDensity * lit);
+                        skyDensity += _TerrainMistTints[i].rgb * (_TerrainMistTints[i].w * cloudDensity * lerp(lit, 1.0, 0.4));
                     }
                 }
                 for (int i = 0; i < _MistVolumeCount; i++)
@@ -299,12 +413,16 @@ Shader "Hidden/Safe Haven/Atmosphere"
                     if (local.y >= size.y)
                         continue;
                     float edge = min(min(local.x, local.z), min(size.x - local.x, size.z - local.z));
-                    float cloudDensity = MistCloudDensity(local.xz, local.y, edge, _MistVolumeShapes[i],
-                        _MistVolumeClouds[i], _MistVolumeWinds[i], _MistVolumeWaves[i], 1.0);
+                    float lowHere = 1.0 - smoothstep(_MistWakeParams.z * 0.4, _MistWakeParams.z, local.y);
+                    float2 pushed = mul((float3x3)_MistVolumeWorldToLocal[i], float3(wake.y, 0.0, wake.z)).xz;
+                    float lit;
+                    float cloudDensity = MistCloudDensity(local.xz - pushed * (_MistWakeParams.y * lowHere), local.y, edge, _MistVolumeShapes[i],
+                        _MistVolumeClouds[i], _MistVolumeWinds[i], _MistVolumeWaves[i], 1.0, _MistVolumeClumps[i], _MistVolumeBillows[i], lit);
+                    cloudDensity *= 1.0 - saturate(wake.x * _MistWakeParams.x * lowHere);
                     cloudDensity *= smoothstep(0.0, size.y * 0.1, size.y - local.y);
                     density += cloudDensity;
-                    tintDensity += _MistVolumeTints[i].rgb * cloudDensity;
-                    skyDensity += _MistVolumeTints[i].rgb * (_MistVolumeTints[i].w * cloudDensity);
+                    tintDensity += _MistVolumeTints[i].rgb * (cloudDensity * lit);
+                    skyDensity += _MistVolumeTints[i].rgb * (_MistVolumeTints[i].w * cloudDensity * lerp(lit, 1.0, 0.4));
                 }
                 return density;
             }

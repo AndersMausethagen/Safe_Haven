@@ -198,6 +198,8 @@ public sealed class FelledTree : MonoBehaviour
             AudioManager.Play(TreeChoppingSettings.Current.RushSound, transform.TransformPoint(parts.Crown.center), size);
         }
 
+        // Its trunk sweeps the mist aside where it comes low (MistWakes).
+        MistWakes.TreeFalling(transform, parts.Height, body, size);
         if (Time.time - startedAt >= FallTimeout)
         {
             Land(transform.position);
@@ -216,6 +218,8 @@ public sealed class FelledTree : MonoBehaviour
     {
         stage = Stage.Settling;
         landedAt = Time.time;
+        // And blows it out along its length where it lands.
+        MistWakes.TreeLanded(transform.position, transform.up, parts.Height, size);
         if (impacts != null)
         {
             impacts.End();

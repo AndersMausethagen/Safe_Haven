@@ -138,6 +138,33 @@ Preview in **Game view**, not Scene view.
 | Flow Stretch | Elongates cloud pockets along the wind into flowing veils; default 3.5, 1 gives round pockets |
 | Wind / Drift Speed | World X/Z direction and base speed, multiplied by Drift Speed (default 3.5) and Weather Wind Influence |
 | Edge Fade | Soft perimeter on the terrain tile, in metres |
+| Clumps | 1 (the default since 2026-11-22): a **blanket** on the ground, a thin veil swelling into soft billows; 0: the older drifting sheet; between, a blend |
+| Clump Size / Clump Height | Metres across a billow (4.5) / how high the tallest rise (1.1 m: knee to waist high) |
+| Under Shade | How much darker a billow is at its foot than its top |
+| Creep | How fast the billows creep, as a share of the drift (0.1: slowly along the ground, not sailing like clouds) |
+| Billow Density | A billow's thickness, times Density (12: white and nearly opaque, where the sheet is a veil) |
+| Veil | The thin veil between the billows that joins them over most of the ground, as a share of a billow's thickness (0.45; 0: billows with clear ground between) |
+
+#### Billows that answer what moves through them (2026-11-22)
+
+The user's reference was an Ocarina of Time style ground fog ("Stable Fluids + Stir"): puffy white billows on the ground
+that part round a body, swirl behind it and fill back in. **MistWakes** (made by the first mist in Play) runs Stable Fluids
+(Stam; keijiro/StableFluids as the guide) on a 48 m square that follows the player (**Resources/MistWakeSettings**):
+
+- **Bodies**: the player, friends, creatures, residents, companions and horses part the mist and push it aside, harder
+  the faster they go. A felled tree sweeps it as it falls and blows it out where it lands.
+- **Blows**: every melee blow (`AttackResolver.Execute`: creatures, companions, skills, the shoulder barge) and the
+  player's swing throw a short gust the way they go across their arc (a spin throws it round); the player's blade also
+  stirs it along its path (`WeaponTrail`). *Blows* in the settings.
+- **What stands in its way**: the air creeps on at the nearest Terrain Mist's **Creep**, and trees, rocks, logs, walls
+  and buildings in the square (colliders that don't move by themselves, plus the terrain's standing trees) are solid: the
+  creep parts round them and leaves a gap in their lee that fills in. Looked over every 0.4 s or 3 m moved.
+- The base fog is untouched: only Terrain Mist and Mist Volumes read the field.
+
+Cost, measured in the Haven on the RTX 4090 (2026-11-22): the fluid step is 0.23 ms of CPU a frame; GPU load did not move
+when it was switched on and off (192² texels, 26 small passes in one command buffer). The billows cost about 0.3 ms of
+GPU over the sheet. FrameTimingManager's GPU time grows by ~3.5 ms with the fluid on, but that is idle time between the
+step (in LateUpdate) and the frame's rendering, not work. Fewer **Pressure Steps** (20 by default) cost less still.
 
 #### Existing weather and day/night integration
 

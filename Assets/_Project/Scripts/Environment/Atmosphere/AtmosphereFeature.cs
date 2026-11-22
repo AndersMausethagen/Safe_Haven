@@ -165,6 +165,10 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
         private readonly Vector4[] mistTints = new Vector4[MaxMists];
         private readonly Vector4[] mistWaves = new Vector4[MaxMists];
         private readonly Vector4[] mistPooling = new Vector4[MaxMists];
+        private readonly Vector4[] mistClumps = new Vector4[MaxMists];
+        private readonly Vector4[] volumeClumps = new Vector4[MaxMistVolumes];
+        private readonly Vector4[] mistBillows = new Vector4[MaxMists];
+        private readonly Vector4[] volumeBillows = new Vector4[MaxMistVolumes];
         private readonly List<MistVolume> volumeOrder = new List<MistVolume>();
         private readonly ByDistance byDistance = new ByDistance();
         private readonly Matrix4x4[] volumeTransforms = new Matrix4x4[MaxMistVolumes];
@@ -498,6 +502,8 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
                     mistTints[i] = new Vector4(tint.r, tint.g, tint.b, mist.SkyLight);
                     mistWaves[i] = mist.Waves;
                     mistPooling[i] = mist.Pooling;
+                    mistClumps[i] = mist.Clumps;
+                    mistBillows[i] = mist.Billows;
                 }
 
                 material.SetInt(MistCount, mists);
@@ -509,6 +515,8 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
                 material.SetVectorArray(MistTints, mistTints);
                 material.SetVectorArray("_TerrainMistWaves", mistWaves);
                 material.SetVectorArray("_TerrainMistPooling", mistPooling);
+                material.SetVectorArray("_TerrainMistClumps", mistClumps);
+                material.SetVectorArray("_TerrainMistBillows", mistBillows);
 
                 volumeOrder.Clear();
                 foreach (MistVolume volume in MistVolume.Active)
@@ -536,6 +544,8 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
                     Color tint = volume.Tint;
                     volumeTints[i] = new Vector4(tint.r, tint.g, tint.b, volume.SkyLight);
                     volumeWaves[i] = volume.Waves;
+                    volumeClumps[i] = volume.Clumps;
+                    volumeBillows[i] = volume.Billows;
                 }
                 material.SetInt("_MistVolumeCount", volumes);
                 material.SetMatrixArray("_MistVolumeWorldToLocal", volumeTransforms);
@@ -545,6 +555,8 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
                 material.SetVectorArray("_MistVolumeWinds", volumeWinds);
                 material.SetVectorArray("_MistVolumeTints", volumeTints);
                 material.SetVectorArray("_MistVolumeWaves", volumeWaves);
+                material.SetVectorArray("_MistVolumeClumps", volumeClumps);
+                material.SetVectorArray("_MistVolumeBillows", volumeBillows);
 
                 int areaCount = Nearest(FogArea.Active, areaOrder, cameraPosition, MaxAreas);
                 for (int i = 0; i < areaCount; i++)
