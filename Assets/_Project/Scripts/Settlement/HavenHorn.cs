@@ -10,16 +10,23 @@ using UnityEngine;
 public static class HavenHorn
 {
     private static float until = -1f;
+    // The Haven scene it was sounded in: leaving it (a raid) ends the call, so coming home never finds everyone still at the portal.
+    private static UnityEngine.SceneManagement.Scene soundedIn;
 
     // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => ForgetGame();
 
     /// <summary>Another game loaded (GameSession.Reset): a horn in the last one sounds no more.</summary>
-    public static void ForgetGame() => until = -1f;
+    public static void ForgetGame()
+    {
+        until = -1f;
+        soundedIn = default;
+    }
 
     /// <summary>True while the horn's call holds: the guards out, everyone else in.</summary>
-    public static bool IsSounding => until >= 0f && Time.time < until && Place.AtHome;
+    public static bool IsSounding => until >= 0f && Time.time < until && Place.AtHome
+        && UnityEngine.SceneManagement.SceneManager.GetActiveScene() == soundedIn;
 
     /// <summary>Why the horn can't be sounded now, or null.</summary>
     public static string WhyNot()
@@ -63,6 +70,7 @@ public static class HavenHorn
 
         DefenceSettings settings = DefenceSettings.Current;
         until = Time.time + settings.HornSeconds;
+        soundedIn = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
         Vector3 at = HomePortal.Current != null ? HomePortal.Current.transform.position : Player.Current != null ? Player.Current.transform.position : Vector3.zero;
         if (settings.HornSound != null)
         {

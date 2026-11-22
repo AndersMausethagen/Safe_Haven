@@ -86,7 +86,14 @@ public sealed class FarmPlotLook : MonoBehaviour
             shownFor = null;
         }
 
-        ShowLook(FarmSettings.Current.LookFor(shownFor));
+        // A harvest that finished while the player was away waits with nothing under way: its crop by what it made.
+        FarmSettings.CropLook look = FarmSettings.Current.LookFor(shownFor);
+        if (look == null && queue != null && queue.Current == null && queue.OutputAmount > 0)
+        {
+            look = FarmSettings.Current.LookForHarvest(queue.Output);
+        }
+
+        ShowLook(look);
         ShowCrop(growth);
         ShowSoil(queue != null && queue.Water > 0f);
     }

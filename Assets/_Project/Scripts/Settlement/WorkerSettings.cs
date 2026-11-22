@@ -90,6 +90,8 @@ public sealed class WorkerSettings : GameSettings<WorkerSettings>
     [SerializeField, Min(1f)] private float quarrySeconds = 14f;
     [Tooltip("The pickaxe tier a quarrier breaks with: rocks needing more are left for the player.")]
     [SerializeField, Range(1, 5)] private int quarryPickTier = 1;
+    [Tooltip("What a quarrier breaks (stone, not ore): empty, any rock a pickaxe of their tier gathers.")]
+    [SerializeField] private System.Collections.Generic.List<GatheringNodeDefinition> quarried = new System.Collections.Generic.List<GatheringNodeDefinition>();
     [Tooltip("What a rock broken while the player is away gives (an average one), straight to the chests.")]
     [SerializeField] private System.Collections.Generic.List<ItemAmount> awayRockYield = new System.Collections.Generic.List<ItemAmount>();
     [Tooltip("The share of the time away a quarrier breaks stone (working hours only, and scaffolds and their bench first).")]
@@ -100,6 +102,10 @@ public sealed class WorkerSettings : GameSettings<WorkerSettings>
     public System.Collections.Generic.IReadOnlyList<JobDefinition> Quarriers => quarriers;
     public float QuarrySeconds => quarrySeconds;
     public int QuarryPickTier => quarryPickTier;
+    public System.Collections.Generic.IReadOnlyList<GatheringNodeDefinition> Quarried => quarried;
+
+    /// <summary>Whether a quarrier may break rocks of <paramref name="definition"/> (Quarried; empty allows any).</summary>
+    public bool MayQuarry(GatheringNodeDefinition definition) => quarried.Count == 0 || quarried.Contains(definition);
     public System.Collections.Generic.IReadOnlyList<ItemAmount> AwayRockYield => awayRockYield;
     public float AwayQuarryShare => awayQuarryShare;
     public ItemDefinition QuarryTool => quarryTool;

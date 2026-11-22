@@ -11,7 +11,12 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class SmallScenes : MonoBehaviour
 {
-    private const float LookSeconds = 5f;
+    private const float LookSeconds = 2f;
+    // Metres from their places within which the two count as there; seconds they have to get there before the scene is dropped.
+    private const float ThereWithin = 2.5f;
+    private const float ArriveSeconds = 60f;
+    // Metres from the first one a shore may be for a scene by the water.
+    private const float ShoreWithin = 60f;
 
     // Who is cheered, until when (Time.time).
     private static readonly Dictionary<ResidentDefinition, float> Cheered = new Dictionary<ResidentDefinition, float>();
@@ -23,9 +28,13 @@ public sealed class SmallScenes : MonoBehaviour
     private Vector3 spot;
     private Vector3 side;
     private float endsAt;
+    private float arriveBy;
+    private bool begun;
     private float nextAt;
     private float nextLook;
     private bool told;
+    private bool wantsTelling;
+    private bool telling;
     private int line;
 
     /// <summary>The scene under way at home now, if any.</summary>
@@ -91,7 +100,8 @@ public sealed class SmallScenes : MonoBehaviour
 
     private void OnDisable()
     {
-        End(false);
+        // The Haven closing (a raid setting out): nobody is sent anywhere while the scene unloads.
+        End(false, false);
         if (Current == this)
         {
             Current = null;
@@ -118,6 +128,23 @@ public sealed class SmallScenes : MonoBehaviour
             if (!Free(running.first) || !Free(running.second))
             {
                 End(false);
+            }
+            else if (!begun)
+            {
+                // Its clock starts once both are in their places; too long on the way, and it is let go.
+                if (There(running.first) && There(running.second))
+                {
+                    begun = true;
+                    endsAt = Time.time + running.lines.Length * settings.LineSeconds + settings.LingerSeconds;
+                    if (wantsTelling)
+                    {
+                        Tell();
+                    }
+                }
+                else if (Time.time >= arriveBy)
+                {
+                    End(false);
+                }
             }
             else if (Time.time >= endsAt)
             {
@@ -168,21 +195,40 @@ public sealed class SmallScenes : MonoBehaviour
         PlayedOn[chosen] = today;
         running = picked;
         told = false;
+        wantsTelling = false;
+        telling = false;
+        begun = false;
         line = 0;
-        endsAt = Time.time + picked.lines.Length * settings.LineSeconds + settings.LingerSeconds + 20f;
+        arriveBy = Time.time + ArriveSeconds;
+        endsAt = float.MaxValue;
         ResidentLife.Of(picked.first).Rethink();
         ResidentLife.Of(picked.second).Rethink();
     }
 
-    /// <summary>Says the scene's lines in turn, as words in passing (the mark clicked in the view, or the player walking near).</summary>
+    // In their place for the scene, near enough.
+    private static bool There(ResidentDefinition who)
+    {
+        ResidentLife life = ResidentLife.Of(who);
+        return life != null && life.IsInScene && SpotFor(who, out Vector3 at, out _) && Flat(life.transform.position - at) <= ThereWithin;
+    }
+
+    /// <summary>Says the scene's lines in turn, as words in passing (the mark clicked in the view, or the player walking near); from
+    /// the start again when asked after. Before the two are in their places it waits for them.</summary>
     public void Tell()
     {
-        if (running == null || told)
+        if (running == null || telling)
         {
             return;
         }
 
+        if (!begun)
+        {
+            wantsTelling = true;
+            return;
+        }
+
         told = true;
+        telling = true;
         line = 0;
         SayNext();
     }
@@ -192,6 +238,7 @@ public sealed class SmallScenes : MonoBehaviour
         SmallSceneSettings.Scene scene = running;
         if (scene == null || line >= scene.lines.Length || DialogueBox.Current == null)
         {
+            telling = false;
             return;
         }
 
@@ -205,18 +252,22 @@ public sealed class SmallScenes : MonoBehaviour
             return;
         }
 
-        // A bark that would interrupt something more important is dropped, and the rest with it.
-        DialogueBox.Current.Bark(new DialogueSpeaker(who.DisplayName, life.transform, null, 0f, null, life.transform), said, () =>
+        // A bark that would interrupt something more important is dropped, and the rest with it (the mark can tell it again).
+        bool spoken = DialogueBox.Current.Bark(new DialogueSpeaker(who.DisplayName, life.transform, null, 0f, null, life.transform), said, () =>
         {
             if (running == scene)
             {
                 SayNext();
             }
         });
+        if (!spoken)
+        {
+            telling = false;
+        }
     }
 
-    // The scene over: everyone near it cheered when it ran its course, and the two back to their day.
-    private void End(bool ranItsCourse)
+    // The scene over: everyone near it cheered when it ran its course, and the two back to their day (not while the scene unloads).
+    private void End(bool ranItsCourse, bool rethink = true)
     {
         if (running == null)
         {
@@ -225,6 +276,7 @@ public sealed class SmallScenes : MonoBehaviour
 
         SmallSceneSettings.Scene scene = running;
         running = null;
+        telling = false;
         SmallSceneSettings settings = SmallSceneSettings.Current;
         nextAt = Time.time + settings.RestSeconds;
         if (ranItsCourse)
@@ -247,6 +299,11 @@ public sealed class SmallScenes : MonoBehaviour
                 GameMessages.Post($"{scene.first.DisplayName} and {scene.second.DisplayName}, {doing}: {cheered} nearby {(cheered == 1 ? "is" : "are")} a little " +
                     "quicker at work for a while.", MessageKind.Gain);
             }
+        }
+
+        if (!rethink)
+        {
+            return;
         }
 
         foreach (ResidentDefinition who in new[] { scene.first, scene.second })
@@ -286,7 +343,7 @@ public sealed class SmallScenes : MonoBehaviour
 
         Vector3 portal = HomePortal.Current != null ? HomePortal.Current.transform.position : first.transform.position;
         Vector3 from = first.transform.position;
-        if (scene.at == SmallSceneSettings.Spot.Water && Shore(portal, out Vector3 shore))
+        if (scene.at == SmallSceneSettings.Spot.Water && Shore(from, out Vector3 shore))
         {
             at = shore;
         }
@@ -318,8 +375,8 @@ public sealed class SmallScenes : MonoBehaviour
         return true;
     }
 
-    // A step inland of the still water's shore nearest the portal.
-    private static bool Shore(Vector3 portal, out Vector3 at)
+    // A step inland of the still water's shore nearest the first one, if one is near (else the scene is by a fire).
+    private static bool Shore(Vector3 from, out Vector3 at)
     {
         at = default;
         float best = float.MaxValue;
@@ -330,12 +387,12 @@ public sealed class SmallScenes : MonoBehaviour
                 continue;
             }
 
-            Vector3 shore = water.NearestPoint(portal);
-            float distance = Flat(shore - portal);
-            if (distance < best && distance < 190f)
+            Vector3 shore = water.NearestPoint(from);
+            float distance = Flat(shore - from);
+            if (distance < best && distance < ShoreWithin)
             {
                 best = distance;
-                Vector3 inland = portal - shore;
+                Vector3 inland = from - shore;
                 inland.y = 0f;
                 at = shore + (inland.sqrMagnitude > 0.01f ? inland.normalized : Vector3.forward) * 2.5f;
             }

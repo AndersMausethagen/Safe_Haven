@@ -2,7 +2,8 @@
 /// An empty house for someone lost (GDD §15.6; Docs/ColonyModeResearch_2026-11-21.md §4.9): the house a raid companion lived in keeps
 /// their bed while the forest has them (FallenRecord.Home; HavenHomes gives it to nobody else), stands dark at night (NightFlame) and, in
 /// the Keeper's view, says whose it is and that a rumour on a raid may lead to them (RaidRumourDefinition › Seeks Lost). Found again,
-/// they come home to it. Plain reads of the settlement, cheap enough for every torch twice a second.
+/// they come home to it. Kept for SettlementSettings › Keep House Raids raids after the loss; then the bed goes to whoever needs one
+/// (found later, they are housed as anyone is). Plain reads of the settlement, cheap enough for every torch twice a second.
 /// </summary>
 public static class EmptyHouses
 {
@@ -16,7 +17,7 @@ public static class EmptyHouses
 
         foreach (FallenRecord lost in home.Fallen)
         {
-            if (lost.Resident != null && lost.Home == houseId)
+            if (Kept(home, lost) && lost.Home == houseId)
             {
                 return lost;
             }
@@ -24,6 +25,11 @@ public static class EmptyHouses
 
         return null;
     }
+
+    // Still kept: lost fewer than Keep House Raids raids ago.
+    private static bool Kept(IHavenView home, FallenRecord lost) =>
+        lost.Resident != null && !string.IsNullOrEmpty(lost.Home)
+        && home.SuccessfulExtractions - lost.AtExtraction < SettlementSettings.Current.KeepHouseRaids;
 
     /// <summary>Beds of <paramref name="houseId"/> kept for those lost.</summary>
     public static int BedsKept(IHavenView home, string houseId)
@@ -36,7 +42,7 @@ public static class EmptyHouses
 
         foreach (FallenRecord lost in home.Fallen)
         {
-            kept += lost.Resident != null && lost.Home == houseId ? 1 : 0;
+            kept += Kept(home, lost) && lost.Home == houseId ? 1 : 0;
         }
 
         return kept;

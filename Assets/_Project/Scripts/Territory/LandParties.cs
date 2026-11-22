@@ -54,6 +54,11 @@ public static class LandParties
         return null;
     }
 
+    /// <summary>True once the raid under way has run long enough for the parties to have set out (Party Min Seconds): before that, and
+    /// on a raid too short to bring anything, their stations are worked as ever.</summary>
+    public static bool SetOut(TerritorySettings settings) =>
+        RaidDirector.Current != null && RaidDirector.Current.Session != null && RaidDirector.Current.Session.Elapsed >= settings.PartyMinSeconds;
+
     /// <summary>Whether <paramref name="record"/> is out on a party while the player is away (their station unworked meanwhile).</summary>
     public static bool IsOut(SettlementState home, ResidentRecord record, ResidentDefinition along, TerritorySettings settings)
     {

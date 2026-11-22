@@ -106,6 +106,10 @@ public static class HavenLands
         return entry;
     }
 
+    // "Each raid of 3 minutes or more": shorter ones are no day's hunting.
+    private static string EachRaid(TerritorySettings settings) =>
+        $"Each raid of {Mathf.Max(1, Mathf.RoundToInt(settings.PartyMinSeconds / 60f))} minutes or more";
+
     // The parties (LandParties): who goes out to this land on raids, what they bring, and the orders to send or call them home. Only the
     // kinds someone here can lead are offered.
     private static void AddParties(HavenEntry entry, string region, TerritorySettings settings)
@@ -126,7 +130,7 @@ public static class HavenLands
             string there = home.PartyOn(kind);
             if (there == region)
             {
-                entry.Details.Add(new HavenDetail($"{name}, {doing} here", $"Each raid: {LandParties.Odds(kind, who, settings)}. {name}'s own work waits meanwhile."));
+                entry.Details.Add(new HavenDetail($"{name}, {doing} here", $"{EachRaid(settings)}: {LandParties.Odds(kind, who, settings)}. {name}'s own work waits meanwhile."));
                 entry.Actions.Add(new HavenAction($"Call the {doing} party home", () => GameSession.Home.SetParty(kind, null), !visiting,
                     closesWindow: false, primary: false));
                 continue;
@@ -137,7 +141,7 @@ public static class HavenLands
             entry.Actions.Add(new HavenAction(label, () => GameSession.Home.SetParty(kind, region), why == null, closesWindow: false, primary: false));
             if (why == null)
             {
-                entry.Details.Add(new HavenDetail($"If {name} went {doing}", $"Each raid: {LandParties.Odds(kind, who, settings)}" +
+                entry.Details.Add(new HavenDetail($"If {name} went {doing}", $"{EachRaid(settings)}: {LandParties.Odds(kind, who, settings)}" +
                     (there != null ? $" (now in {there})." : ".")));
             }
         }

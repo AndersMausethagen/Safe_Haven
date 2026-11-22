@@ -70,6 +70,12 @@ public sealed class CorruptionNights : MonoBehaviour
     /// <summary>True when it has gathered and comes at the next nightfall.</summary>
     public static bool IsForetold => foretold;
 
+    /// <summary>Degrees about up of the side a foretold night comes from (meaningful while <see cref="IsForetold"/>).</summary>
+    public static float ForetoldBearing => foretoldBearing;
+
+    /// <summary>The flat direction of <paramref name="degrees"/> about up (0 north, 90 east).</summary>
+    public static Vector3 DirectionOf(float degrees) => Direction(degrees);
+
     private void OnEnable() => Current = this;
 
     private void OnDisable()

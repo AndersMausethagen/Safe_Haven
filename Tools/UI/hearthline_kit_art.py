@@ -9,7 +9,8 @@ size and scaled down so every edge is smooth, white so UIStyle tints it.
 - Icons, one flat glyph each, for the stats, the sections and the buttons: Heart, Bolt, Weight, Horseshoe, Bond, Info,
   Stats, Star, Wheat, Brush, Gear, HorseHead, Lead, Stable, Saddle, Hourglass, Pencil, Barding, Bags, Wheel, Stay,
   Graze, Sword, Flame, Snowflake, Sun, Crit, Spark, Axe, Pickaxe, Sickle, Lock, Hammer, Book, Skull, Coin, Eye;
-  for the Haven town: House, Bed, Pot (kitchen), Drop (water), Bench, Lantern, Path, Fence.
+  for the Haven town: House, Bed, Pot (kitchen), Drop (water), Bench, Lantern, Path, Fence; for the Keeper's view: Horn, Flag
+  (a guard post), Return (back to one's feet), Cross (clear away).
 - Kit Icons.png and .json (next to the folder): the icons in one atlas, for TextMesh Pro's <sprite name=...>.
 
 Run from the project root: python Tools/UI/hearthline_kit_art.py
@@ -622,6 +623,62 @@ def fence():
     save(img, 'Fence', ICON)
 
 
+def horn():
+    img, d = canvas(ICON)
+    # A war horn lying like a new moon: the mouthpiece up on the left, curving down and up to the wide bell on the right.
+    pts = []
+    for i in range(49):
+        t = i / 48.0
+        a = math.radians(200 + 140 * t)
+        x = 50 + 40 * math.cos(a)
+        y = 34 - 40 * math.sin(a)
+        half = 2.5 + 15 * t ** 1.8
+        # The band's sides lie square to the curve.
+        nx, ny = math.cos(a), -math.sin(a)
+        pts.append((x, y, half, nx, ny))
+    outer = [(x + nx * h, y + ny * h) for x, y, h, nx, ny in pts]
+    inner = [(x - nx * h, y - ny * h) for x, y, h, nx, ny in reversed(pts)]
+    d.polygon(P(outer + inner), fill=W)
+    # The bell's mouth, and two bands of metal round the horn.
+    x, y, h, nx, ny = pts[-1]
+    d.ellipse([R(x - 7), R(y - h - 1), R(x + 5), R(y + h + 1)], fill=W)
+    for t in (0.4, 0.7):
+        x, y, h, nx, ny = pts[int(t * 48)]
+        d.line(P([(x + nx * (h + 2), y + ny * (h + 2)), (x - nx * (h + 2), y - ny * (h + 2))]), fill=CLEAR, width=int(R(2.6)))
+    save(img, 'Horn', ICON)
+
+
+def cross():
+    img, d = canvas(ICON)
+    # Clear away: a ring with a bar across it.
+    d.ellipse([R(12), R(12), R(88), R(88)], outline=W, width=int(R(9)))
+    bar = Image.new('RGBA', img.size, CLEAR)
+    b = ImageDraw.Draw(bar)
+    b.rounded_rectangle([R(46), R(14), R(54), R(86)], radius=R(3), fill=W)
+    bar = bar.rotate(45, center=(R(50), R(50)), resample=Image.BICUBIC)
+    img.alpha_composite(bar)
+    save(img, 'Cross', ICON)
+
+
+def flag():
+    img, d = canvas(ICON)
+    # A guard post: a pole driven into the ground, a pennant flying from it.
+    d.rounded_rectangle([R(24), R(6), R(32), R(94)], radius=R(3), fill=W)
+    d.polygon(P([(32, 10), (86, 22), (66, 34), (86, 48), (32, 50)]), fill=W)
+    d.ellipse([R(12), R(86), R(46), R(98)], fill=W)
+    save(img, 'Flag', ICON)
+
+
+def return_home():
+    img, d = canvas(ICON)
+    # Back to one's own feet: an arrow coming down onto a standing mark.
+    d.rounded_rectangle([R(44), R(6), R(56), R(48)], radius=R(4), fill=W)
+    d.polygon(P([(26, 42), (74, 42), (50, 68)]), fill=W)
+    d.ellipse([R(14), R(74), R(86), R(96)], outline=W, width=int(R(6)))
+    circle(d, 50, 85, 5)
+    save(img, 'Return', ICON)
+
+
 def _periodic_noise(size, cutoff, rng):
     """Smooth noise that tiles: white noise low-passed in the frequency domain (an FFT wraps), scaled to 0..1."""
     import numpy as np
@@ -749,6 +806,7 @@ if __name__ == '__main__':
     for make in (heart, bolt, weight, horseshoe, bond, info, stats, star, wheat, brush, gear, horse_head, lead, stable,
                  saddle, hourglass, pencil, barding, bags, wheel, stay, graze, sword, flame, snowflake, sun, crit, spark, axe,
                  pickaxe, sickle, lock, hammer, book, skull, coin, eye, house, bed, pot, drop, bench, lantern, path, fence,
+                 horn, flag, return_home, cross,
                  scroll_corner, card, leather, vignette, sheen):
         make()
     atlas()

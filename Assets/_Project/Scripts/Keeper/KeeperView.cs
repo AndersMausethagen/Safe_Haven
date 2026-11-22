@@ -460,6 +460,63 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
         }
     }
 
+    // ----- From the HUD: the people, the alerts and the command bar (KeeperHud) -----
+
+    /// <summary>Flies the view to <paramref name="at"/> (an alert); stops following anyone.</summary>
+    public void LookAt(Vector3 at)
+    {
+        if (!open || rig == null)
+        {
+            return;
+        }
+
+        following = null;
+        rig.Target = at;
+    }
+
+    /// <summary>Flies the view to <paramref name="who"/> and keeps them in the middle until the view is moved (a person's card).</summary>
+    public void FollowPerson(Transform who)
+    {
+        if (!open || rig == null || who == null)
+        {
+            return;
+        }
+
+        following = who;
+        rig.Target = who.position;
+    }
+
+    /// <summary>Who the view is following now, or null.</summary>
+    public Transform Following => following;
+
+    /// <summary>True while a ring of <paramref name="kind"/> is being drawn.</summary>
+    public bool IsDrawing(RingKind kind) => open && ringPlacing && ringKind == kind;
+
+    /// <summary>True while a guard post is being set.</summary>
+    public bool IsSettingPost => open && postPlacing;
+
+    /// <summary>Stops drawing a ring or setting a post (the command's button pressed again).</summary>
+    public void StopPlacing()
+    {
+        ringPlacing = false;
+        postPlacing = false;
+    }
+
+    /// <summary>The build menu, as at home on foot (placing works from the view).</summary>
+    public void OpenBuildMenu()
+    {
+        if (!open || player == null)
+        {
+            return;
+        }
+
+        StopPlacing();
+        if (player.TryGetComponent(out BuildPlacer placer))
+        {
+            placer.ToggleMenu();
+        }
+    }
+
     // The ground point under the pointer when the middle button went down stays under it as the mouse moves.
     private void Drag(bool blocked)
     {
@@ -602,7 +659,8 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
         }
 
         int found = RingWork.Standing(ring);
-        if (found == 0)
+        // An outcrop broken to the ground still makes a quarry: it grows back.
+        if (found == 0 && !(ring.Kind == RingKind.Quarry && RingWork.Regrows(ring)))
         {
             GameMessages.Post(ring.Kind == RingKind.Quarry
                 ? $"No rock a mason can break stands in that ring (boulders and stone, a Tier {Tiers.ToRoman(WorkerSettings.Current.QuarryPickTier)} pickaxe's)."

@@ -145,10 +145,10 @@ public static class RingWork
         }
     }
 
-    /// <summary>Lets go of what <see cref="Claim(RingTarget)"/> took.</summary>
+    /// <summary>Lets go of what <see cref="Claim(RingTarget)"/> took (a rock destroyed meanwhile too: by reference, not Unity's null).</summary>
     public static void Release(RingTarget target)
     {
-        if (target.Rock != null)
+        if ((object)target.Rock != null)
         {
             ClaimedRocks.Remove(target.Rock);
         }
@@ -226,7 +226,7 @@ public static class RingWork
     {
         GatheringNodeDefinition definition = rock != null ? rock.Definition : null;
         return definition != null && definition.GatherTool == ToolType.Pickaxe && definition.DepleteOnGather
-            && definition.RequiredToolTier <= settings.QuarryPickTier
+            && definition.RequiredToolTier <= settings.QuarryPickTier && settings.MayQuarry(definition)
             && (rock.transform.parent == null || !rock.transform.parent.TryGetComponent(out TerrainNodeHarvesting _));
     }
 
@@ -512,8 +512,8 @@ public static class RingWork
 
                 if (target.Rock != null)
                 {
-                    // Its stone went to the chests while away.
-                    target.Rock.BreakDown();
+                    // Its stone went to the chests while away; quietly, as it fell long ago.
+                    target.Rock.BreakDown(true);
                 }
                 else if (target.Felling.FellByHand(target.Index) && !Replant(target.Foot, settings))
                 {

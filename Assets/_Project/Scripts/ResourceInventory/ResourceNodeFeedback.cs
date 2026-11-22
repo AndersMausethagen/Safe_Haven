@@ -195,6 +195,12 @@ public sealed class ResourceNodeFeedback : MonoBehaviour
 
     private void OnHarvested()
     {
+        // Broken while the player was away, laid down on coming home: nothing to hear or see break.
+        if (node.BreaksQuietly)
+        {
+            return;
+        }
+
         Vector3 centre = Bounds(out Bounds bounds) ? bounds.center : transform.position + Vector3.up;
         if (body != null)
         {

@@ -75,7 +75,12 @@ public sealed class Overgrowth : MonoBehaviour
 
     private void OnHarvested()
     {
-        Bloom();
+        // Cleared while the player was away (a mason's quarry ring): it counts, without the bloom on arrival.
+        if (node == null || !node.BreaksQuietly)
+        {
+            Bloom();
+        }
+
         Cleared?.Invoke(this);
     }
 

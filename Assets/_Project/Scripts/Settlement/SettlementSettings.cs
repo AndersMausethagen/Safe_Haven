@@ -130,6 +130,7 @@ public sealed class SettlementSettings : GameSettings<SettlementSettings>
     public FallenCairn FallenCairn => fallenCairn;
     public string[] GriefLines => griefLines;
     public int GriefRaids => griefRaids;
+    public int KeepHouseRaids => keepHouseRaids;
     public IReadOnlyList<BossDefinition> Bosses => bosses;
     public IReadOnlyList<CompanionBondRank> BondRanks => bondRanks;
     public IReadOnlyList<CompanionMemoryLines> MemoryLines => memoryLines;
@@ -170,6 +171,8 @@ public sealed class SettlementSettings : GameSettings<SettlementSettings>
     [SerializeField, TextArea] private string[] griefLines = new string[0];
     [Tooltip("For how many raids after a loss they still speak of it.")]
     [SerializeField, Min(0)] private int griefRaids = 2;
+    [Tooltip("For how many raids after a loss their house is kept for them, dark and empty (EmptyHouses); then their bed goes to whoever needs one.")]
+    [SerializeField, Min(0)] private int keepHouseRaids = 10;
     [Tooltip("The bosses of the game, for what stands at home and what is said of them.")]
     [SerializeField] private List<BossDefinition> bosses = new List<BossDefinition>();
     [Tooltip("How a bond grows with raids together, lowest first.")]

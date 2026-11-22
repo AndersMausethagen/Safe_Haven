@@ -2294,6 +2294,25 @@ Palworld's plots (sow, water, grow, harvest, haul) on the Farm Plot's queue, so 
   Looked at in Play (barley 0.85, flax 0.8 read as full fields when grown).
 - **Breach lanes in the view**: while a ward breach is coming or under way its lanes' roads are drawn on the ground
   (`KeeperRings.ShowRoads`), so posts can be set on them.
+- **The HUD, reworked (2026-11-22, the user: "boring, big buttons on a screen ... look at how other games lay out their hud, like
+  gord")**, in the Hearthline kit: `KeeperStores` (top left: rank and renown, day and hour, the stores in KeeperViewSettings ›
+  Stores as pictures and counts), `KeeperAlerts` (under it: a breach or corruption night coming, the horn, dry fields, work ready, a
+  plan waiting, a scene, a wish; clicked, the view flies there: `KeeperView.LookAt`), `KeeperPeople` (down the right, Gord's column:
+  portrait, name, rank and work, an icon for what they are about, a heart for a wish; clicked, the view follows them:
+  `FollowPerson`), `KeeperCommandBar` (along the bottom: Work / Defence / Haven groups of icon buttons with a word under each, lit
+  while under way, grey with the reason on hover, counts in the corner; the build menu and the Haven window from here too),
+  `KeeperTip` (the sentences, on hover), chips over buildings and a scene's mark in a world layer under the panels, the view's name
+  carved in the display face for a moment as it opens. New kit icons: Horn, Flag, Return, Cross (Tools/UI/hearthline_kit_art.py; the
+  four PNGs added to UIStyle by hand, not by the retired installer: the inline atlas wasn't rebuilt). Tests: `KeeperHudTests`;
+  overlap audit clean.
+- **Phase 8's review fixes:** a small scene's clock starts once both are in their places (dropped after 60 s on the way; by the water
+  only within 60 m of the first one), its mark replays it, and its end doesn't send anyone walking while the Haven unloads; the horn
+  ends with the scene it was sounded in (a raid); a harvest that finished while away shows its crop (`FarmSettings.LookForHarvest`);
+  parties set out only once a raid has run Party Min Seconds (said in the Lands tab) and come home when their land is lost; a lost
+  one's house is kept for Keep House Raids raids (SettlementSettings, 10); rocks broken away fall quietly on coming home
+  (`ResourceNode.BreakDown(true)`: no sound, burst or bloom; still counted); a quarry can be drawn on an outcrop broken to the ground;
+  a destroyed rock's claim is let go; masons quarry only WorkerSettings › Quarried (Boulder, Grey Stone: no ore). Left as is: a
+  cheer active when a raid sets out lasts that raid (the stored station speed is refreshed at home).
 - Probed in Play (2026-11-22): Hild quarried a 5-rock ring 20 m out (a rock about every 22 s, 4 Grey Stone each, the ring kept for
   its outcrops); the horn called Gunnar to guard and Hild to the portal, and stood them down; Tor and Hild's scene placed, heard and
   cheered; a hunting party brought Boar Meat home; a Hut kept dark for Tor and Hild while lost and lit again once found. Tests:

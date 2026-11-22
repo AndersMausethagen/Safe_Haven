@@ -500,6 +500,16 @@ public static class Territory
 
         List<string> news = State.AdvanceTurn(Settings, settlement.Blight, () => UnityEngine.Random.value, out float spread, tended, scouted);
         news.AddRange(PartiesHome(parties));
+        // A party on a land the forest has taken back comes home for good.
+        foreach (LandPartyKind kind in LandParties.All)
+        {
+            string region = settlement.PartyOn(kind);
+            if (region != null && !State.IsClaimed(region))
+            {
+                settlement.SetParty(kind, null);
+                news.Add($"The {LandParties.Doing(kind)} party is home from {region}: the land is no longer the Haven's.");
+            }
+        }
         if (!pushComing && State.Incursion != null)
         {
             Tell(Settings.ForestGathers);
@@ -551,7 +561,7 @@ public static class Territory
                 }
             }
 
-            bool worn = Settings.ErosionAt(GameSession.Home.Blight) > 0f;
+            bool worn = Settings.ErosionAt(GameSession.Home.Blight) > 0f && State.IsClaimed(region);
             told.Add((sent.Count > 0
                 ? $"{name}'s {LandParties.Doing(kind)} party in {region} brought {string.Join(", ", sent)} to the chests"
                 : $"{name}'s {LandParties.Doing(kind)} party in {region} came back with nothing the chests had room for")

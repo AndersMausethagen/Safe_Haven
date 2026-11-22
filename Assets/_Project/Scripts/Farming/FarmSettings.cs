@@ -78,4 +78,23 @@ public sealed class FarmSettings : GameSettings<FarmSettings>
 
         return null;
     }
+
+    /// <summary>The look of the crop whose harvest is <paramref name="made"/> (one finished while the player was away), or null.</summary>
+    public CropLook LookForHarvest(Object made)
+    {
+        if (made == null)
+        {
+            return null;
+        }
+
+        foreach (CropLook look in cropLooks)
+        {
+            if (look != null && look.recipe != null && look.model != null && look.recipe.Output == made)
+            {
+                return look;
+            }
+        }
+
+        return null;
+    }
 }

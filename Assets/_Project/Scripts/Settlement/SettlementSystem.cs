@@ -127,7 +127,7 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
     private void NoteParties(SettlementState settlement, bool atHome, ResidentDefinition along)
     {
         HashSet<string> absent = settlement.Workshops.PartyAbsentAt;
-        if (atHome || settlement.Parties.Count == 0)
+        if (atHome || settlement.Parties.Count == 0 || !LandParties.SetOut(TerritorySettings.Current))
         {
             absent.Clear();
             return;

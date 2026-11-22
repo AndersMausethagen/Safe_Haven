@@ -1502,7 +1502,8 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
 
     private void ReleaseTree()
     {
-        if (ringAt.IsSet)
+        // By reference: a rock destroyed meanwhile still lets go of its claim.
+        if (ringAt.Felling != null || (object)ringAt.Rock != null)
         {
             RingWork.Release(ringAt);
         }

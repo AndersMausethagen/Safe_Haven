@@ -50,6 +50,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 59a0d6a12e809f84f92d2b2a418d1d26, type: 2}
   quarrySeconds: 14
   quarryPickTier: 1
+  quarried:
+  - {fileID: 11400000, guid: 4a19da33bca88784387905fc8d293401, type: 2}
+  - {fileID: 11400000, guid: e4e5ed837b9ba3d4b9191035a871dc6b, type: 2}
   awayRockYield:
   - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
     amount: 4

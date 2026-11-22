@@ -33,4 +33,22 @@ public sealed class EmptyHousesTests
         Assert.AreEqual("hut-7", back.Find(tor).Home, "found again, they come home to it");
         Assert.AreEqual(0, EmptyHouses.BedsKept(back, "hut-7"));
     }
+
+    [Test]
+    public void AHouse_IsKeptOnlyForSoManyRaids()
+    {
+        var tor = AssetDatabase.LoadAssetAtPath<ResidentDefinition>("Assets/_Project/Data/Prologue/Residents/Tor.asset");
+        var carpenter = AssetDatabase.LoadAssetAtPath<JobDefinition>("Assets/_Project/Data/Settlement/Carpenter.asset");
+        int keep = SettlementSettings.Current.KeepHouseRaids;
+        Assume.That(tor != null && carpenter != null && keep > 0);
+        var home = new SettlementState();
+        home.AddResident(tor, carpenter);
+        home.Find(tor).Home = "hut-7";
+        home.LoseResident(tor, "Misty Woods");
+        home.Restore(true, 0, keep - 1, BreachStatus.Dormant, 0, 0f);
+        Assert.AreEqual(1, EmptyHouses.BedsKept(home, "hut-7"), "still kept a raid before the end");
+        home.Restore(true, 0, keep, BreachStatus.Dormant, 0, 0f);
+        Assert.AreEqual(0, EmptyHouses.BedsKept(home, "hut-7"), "then the bed goes to whoever needs it");
+        Assert.IsNull(EmptyHouses.WaitingFor(home, "hut-7"));
+    }
 }

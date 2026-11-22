@@ -68,8 +68,8 @@ public static class ContentAudit
         "TradeSettings.sales", "RaidRumourDefinition.teaches",
         // Only shown in a resident's hand: the woodcutter's axe at a ring, the Farmer's water on the way back (nothing made or spent).
         "WorkerSettings.fellingTool", "FarmSettings.waterCarried",
-        // Only shown in a mason's hand at a quarry ring.
-        "WorkerSettings.quarryTool",
+        // Only shown in a mason's hand at a quarry ring; the stores counted along the top of the Keeper's view.
+        "WorkerSettings.quarryTool", "KeeperViewSettings.stores",
     };
 
     private static readonly string[] RecipeTeachers =

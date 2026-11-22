@@ -307,16 +307,29 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
         return true;
     }
 
+    /// <summary>True while broken down quietly (BreakDown): what listens to Harvested leaves out its sound and show.</summary>
+    public bool BreaksQuietly { get; private set; }
+
     /// <summary>Broken down by no one (a troll's charge snapping a sapling): as if gathered, with nothing given. False when
-    /// it is already down.</summary>
-    public bool BreakDown()
+    /// it is already down. <paramref name="quietly"/>: no sound or burst (a rock a mason broke while the player was away, laid down on
+    /// coming home: RingWork.SettleAtHome).</summary>
+    public bool BreakDown(bool quietly = false)
     {
         if (IsDepleted || node == null || !interactable.enabled)
         {
             return false;
         }
 
-        Harvested?.Invoke();
+        BreaksQuietly = quietly;
+        try
+        {
+            Harvested?.Invoke();
+        }
+        finally
+        {
+            BreaksQuietly = false;
+        }
+
         if (!node.DepleteOnGather)
         {
             return true;

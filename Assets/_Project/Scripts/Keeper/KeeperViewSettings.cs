@@ -54,6 +54,9 @@ public sealed class KeeperViewSettings : GameSettings<KeeperViewSettings>
     [Header("Hearing")]
     [Tooltip("Metres over the ground at the middle of the view that sounds are heard from while the view is open.")]
     [SerializeField, Min(0f)] private float earHeight = 7f;
+    [Header("The HUD")]
+    [Tooltip("The stores shown along the top of the view, each its picture and how many the chests hold: what building and work use.")]
+    [SerializeField] private System.Collections.Generic.List<ItemDefinition> stores = new System.Collections.Generic.List<ItemDefinition>();
 
     public QuestDefinition UnlockedBy => unlockedBy;
     public float GlideSeconds => glideSeconds;
@@ -74,4 +77,5 @@ public sealed class KeeperViewSettings : GameSettings<KeeperViewSettings>
     public float PickRange => pickRange;
     public float PadSnapRadius => padSnapRadius;
     public float EarHeight => earHeight;
+    public System.Collections.Generic.IReadOnlyList<ItemDefinition> Stores => stores;
 }
