@@ -314,6 +314,7 @@ public static class SaveMapper
         into.huldraRespect = settlement.HuldraRespect;
         into.huldraAwayUntil = settlement.HuldraAwayUntil;
         into.requests = new List<string>(settlement.Requests);
+        into.requestAskers = settlement.RequestAskerPairs();
         into.requestsAnswered = settlement.RequestsAnswered;
         into.requestsAskedAt = settlement.RequestsAskedAt;
         into.orderRenown = settlement.OrderRenown;
@@ -467,6 +468,7 @@ public static class SaveMapper
         ReadTerritory(saved.territory, settlement.Territory);
         settlement.RestoreSpirits(saved.spiritGifts, saved.huldraRespect, saved.huldraAwayUntil);
         settlement.RestoreRequests(saved.requests, saved.requestsAnswered, saved.orderRenown, saved.requestsAskedAt);
+        settlement.RestoreRequestAskers(saved.requestAskers);
         if (saved.tradeBought != null)
         {
             foreach (TradeSaveData bought in saved.tradeBought)

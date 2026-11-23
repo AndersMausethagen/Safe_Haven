@@ -68,6 +68,7 @@ public sealed class ResidentWindow : MonoBehaviour
     private KitSlotCard workCard;
     private TMP_Text workLine;
     private readonly KitFactRow[] orderRows = new KitFactRow[5];
+    private TMP_Text ordersTitle;
     private KitActionList workActions;
 
     private readonly KitFactRow[] storyRows = new KitFactRow[7];
@@ -182,7 +183,7 @@ public sealed class ResidentWindow : MonoBehaviour
         nameLabel = HearthKit.DisplayName(panel, x, Margin - 6f, 420f);
         subtitle = CodeUI.Label("Subtitle", panel, x, Margin + 82f, 400f, 30f, 21f, style.Accent);
         CodeUI.Hairline(panel, x, Margin + 120f, 380f, 1f, style);
-        summary = CodeUI.Paragraph("Summary", panel, x, Margin + 134f, 384f, 120f, 20f, style.Muted);
+        summary = CodeUI.Paragraph("Summary", panel, x, Margin + 134f, 364f, 120f, 20f, style.Muted);
         string[] names = { "Home", "Work", "Rank", "Raids" };
         string[] icons = { "House", "Hammer", "Star", "Sword" };
         for (int i = 0; i < names.Length; i++)
@@ -283,7 +284,7 @@ public sealed class ResidentWindow : MonoBehaviour
         spiritsMeans = CodeUI.Paragraph("Means", left, 24f, 94f, leftWidth - 48f, 44f, 15f, style.Muted);
         for (int i = 0; i < reasonRows.Length; i++)
         {
-            reasonRows[i] = new KitFactRow(left, 22f, 146f + i * 54f, leftWidth - 44f, 270f);
+            reasonRows[i] = new KitFactRow(left, 22f, 146f + i * 54f, leftWidth - 44f, 315f);
         }
 
         RectTransform middle = HearthKit.Card(page, "Standings Card", leftWidth + 16f, 0f, middleWidth, BodyHeight);
@@ -390,7 +391,14 @@ public sealed class ResidentWindow : MonoBehaviour
         // What makes it a home, one line each with its icon: lit when it has it, with what would give it when not.
         qualityLines = CodeUI.Paragraph("Quality", left, 24f, 254f, leftWidth - 48f, 196f, 16f, style.Text);
         qualityLines.richText = true;
-        bonusLine = CodeUI.Paragraph("Bonus", left, 24f, 446f, leftWidth - 48f, 32f, 15f, style.Accent);
+        // Every feature a home can have fits whole: smaller words rather than a list cut off at "…".
+        qualityLines.enableAutoSizing = true;
+        qualityLines.fontSizeMin = 11f;
+        qualityLines.fontSizeMax = 16f;
+        bonusLine = CodeUI.Paragraph("Bonus", left, 24f, 446f, leftWidth - 48f, 40f, 15f, style.Accent);
+        bonusLine.enableAutoSizing = true;
+        bonusLine.fontSizeMin = 11f;
+        bonusLine.fontSizeMax = 15f;
 
         float rx = leftWidth + 16f;
         float rightWidth = Width - Margin * 2f - rx;
@@ -403,7 +411,7 @@ public sealed class ResidentWindow : MonoBehaviour
         }
 
         HearthKit.Section(right, "Move them", "House", 22f, 136f);
-        houseList = new KitActionList(right, 22f, 176f, rightWidth - 44f, Choose, columns: 1, rowHeight: 54f,
+        houseList = new KitActionList(right, 22f, 176f, rightWidth - 44f, Choose, columns: 1, rowHeight: 62f,
             nothing: "No house stands yet. A Hut or a Cottage gives beds of their own.");
     }
 
@@ -416,10 +424,10 @@ public sealed class ResidentWindow : MonoBehaviour
         workCard = new KitSlotCard(card, 22f, 58f, 520f, "Works at", "Hammer");
         workLine = CodeUI.Paragraph("Line", card, 566f, 62f, width - 590f, 90f, 17f, style.Muted);
         CodeUI.Hairline(card, 22f, 166f, width - 44f, 1f, style);
-        HearthKit.Section(card, "What they keep making", "Gear", 22f, 178f);
+        ordersTitle = HearthKit.Section(card, "What they keep making", "Gear", 22f, 178f);
         for (int i = 0; i < orderRows.Length; i++)
         {
-            orderRows[i] = new KitFactRow(card, 22f, 218f + i * 40f, width - 44f, 300f);
+            orderRows[i] = new KitFactRow(card, 22f, 218f + i * 40f, width - 44f, 470f);
         }
 
         workActions = new KitActionList(card, 22f, BodyHeight - 84f, 520f, Choose, columns: 2, rowHeight: 62f, nothing: "");
@@ -639,6 +647,24 @@ public sealed class ResidentWindow : MonoBehaviour
             }
         }
 
+        // A job that makes nothing (the Stablehand, a Warden): what it does instead, from its own fields.
+        bool makes = job != null && job.WorkOrders.Count > 0;
+        if (ordersTitle != null)
+        {
+            ordersTitle.text = makes || job == null ? "What they keep making" : "What their work does";
+        }
+
+        if (!makes && job != null)
+        {
+            foreach ((string what, string worth) in WhatItDoes(job, record))
+            {
+                if (row < orderRows.Length)
+                {
+                    orderRows[row++].Set(what, worth);
+                }
+            }
+        }
+
         while (row < orderRows.Length)
         {
             orderRows[row++].Set("", "");
@@ -701,14 +727,61 @@ public sealed class ResidentWindow : MonoBehaviour
             JobDefinition offered = job;
             bool holds = record.Job == job;
             ProficiencyDefinition skill = job.Skill;
-            string where = job.Workplace != null ? $"At the {job.Workplace.DisplayName}" : "About the Haven";
-            string level = skill != null ? $"{skill.DisplayName} {ResidentTalents.LevelOf(record, skill)} {ResidentTalents.Flames(ResidentTalents.PassionOf(record, skill))} · " : "";
-            actions.Add(new MenuAction(holds ? $"Working as {job.DisplayName}" : $"Work as {job.DisplayName}", level + where, !holds,
+            string level = skill != null ? $"{skill.DisplayName} {ResidentTalents.LevelOf(record, skill)} {ResidentTalents.Flames(ResidentTalents.PassionOf(record, skill))}"
+                : job.Workplace != null ? $"At the {job.Workplace.DisplayName}" : "About the Haven";
+            actions.Add(new MenuAction(job.DisplayName, level, !holds,
                 () => ResidentNpc.GiveJob(who, offered, Player.Current != null ? Player.Current.gameObject : null)) { Icon = "Hammer", Status = holds ? "Now" : "" });
         }
 
-        actions.Add(new MenuAction("Who does what", "Everyone's level in every trade", true, WorkGridWindow.Show) { Icon = "Stats" });
+        actions.Add(new MenuAction("Who does what", "Everyone, every trade", true, WorkGridWindow.Show) { Icon = "Stats" });
         return actions;
+    }
+
+    // What a job that makes nothing does, as fact rows: read from the job's own fields (JobDefinition).
+    private static List<(string, string)> WhatItDoes(JobDefinition job, ResidentRecord record)
+    {
+        var rows = new List<(string, string)>();
+        if (job.TendsHorses > 0f)
+        {
+            rows.Add(("Tends the stabled horses", $"+{job.TendsHorses * ResidentTalents.StationSpeed(record):0.#} bond each, every morning"));
+        }
+
+        if (job.DefendsAs != null)
+        {
+            rows.Add(("In a ward breach", "Stands guard"));
+        }
+
+        if (job.WardHealth > 0f)
+        {
+            rows.Add(("The ward's health in a breach", $"+{job.WardHealth * 100f:0}%"));
+        }
+
+        if (job.RaidSeconds > 0f)
+        {
+            rows.Add(("Every raid's clock", $"+{job.RaidSeconds:0} s"));
+        }
+
+        if (job.ExtraRumours > 0)
+        {
+            rows.Add(("Rumours at the portal", $"+{job.ExtraRumours}"));
+        }
+
+        if (job.GearRepairDiscount > 0f)
+        {
+            rows.Add(("Mending gear", $"{job.GearRepairDiscount * 100f:0}% cheaper"));
+        }
+
+        if (job.BuildingRepairDiscount > 0f)
+        {
+            rows.Add(("Mending buildings after a breach", $"{job.BuildingRepairDiscount * 100f:0}% cheaper"));
+        }
+
+        if (rows.Count == 0)
+        {
+            rows.Add(("Their work", job.Workplace != null ? $"At the {job.Workplace.DisplayName}" : "About the Haven"));
+        }
+
+        return rows;
     }
 
     // Every house with beds: move in (the player's choice), and a row to let them choose again.
@@ -740,7 +813,8 @@ public sealed class ResidentWindow : MonoBehaviour
             string walk = work != null ? $" · {HavenHomes.Walk(house.Door(out _), work.transform.position):0} m to the {work.Definition.DisplayName}" : "";
             // A Rival living there or next door costs them spirits (PeopleStandings): said before they move, not after.
             ResidentRecord rival = lives ? null : PeopleStandings.RivalBy(GameSession.Here, record, house);
-            walk += rival != null ? $" · {rival.Resident.DisplayName}, a rival, next door" : "";
+            walk += rival != null ? $" · <color={UIStyle.Current.WarningHex}>{rival.Resident.DisplayName}, a rival, " +
+                                    $"{(HavenHomes.HomeOf(rival) == house ? "lives here" : "next door")}</color>" : "";
             actions.Add(new MenuAction(HavenHomes.Describe(house), $"{(lives ? "Lives here · " : "")}{HavenHomes.LivingIn(house).Count} of {house.Beds} beds{walk}", !lives && room,
                 () => HavenHomes.Choose(who, id)) { Icon = "House", Status = lives || room ? "" : "Promised" });
         }
@@ -807,6 +881,11 @@ public sealed class ResidentWindow : MonoBehaviour
         {
             shown.Add((HomeLife.IsContent(record) ? "Content at home" : $"Likes: {liking.likes.ToLowerInvariant()}", HomeLife.IsContent(record) ? style.Good : style.Muted));
         }
+        if (who.FavouriteDish != null)
+        {
+            shown.Add(($"Favourite: {who.FavouriteDish.DisplayName}", style.Muted));
+        }
+
         if (record.IsAway)
         {
             shown.Add(("Away on a foray", style.Info));

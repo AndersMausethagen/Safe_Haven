@@ -82,9 +82,20 @@ public sealed class Festivals : MonoBehaviour
         }
     }
 
+    /// <summary>The feeling a festival leaves on the people of one's own Haven, until the next day (ResidentSpirits).</summary>
+    public const string Feeling = "festival";
+
     private void Begin(FestivalDefinition festival)
     {
         Now = festival;
+        if (global::Place.InOwnHaven && GameSession.Home != null)
+        {
+            foreach (ResidentRecord record in GameSession.Home.Residents)
+            {
+                record.Feel(Feeling, GameSession.Home.DaysPassed + 1);
+            }
+        }
+
         Place = Where();
         if (bonfire != null)
         {

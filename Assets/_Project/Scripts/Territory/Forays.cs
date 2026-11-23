@@ -280,7 +280,7 @@ public static class Forays
             // What they did out there, they got better at (the land's work: ResidentTalents).
             ProficiencyDefinition skill = place != null && place.skill != null ? place.skill : ResidentTalents.JobSkill(record);
             int tier = place != null ? place.tier : 1;
-            ResidentTalents.Practise(record, skill, tier, LevelingSettings.Current.TierExperience(tier) * PeopleSettings.Current.ForayPractice);
+            ResidentTalents.Practise(record, skill, tier, LevelingSettings.Current.TierExperience(tier) * PeopleSettings.Current.ForayPractice, atHome: false);
         }
 
         // A road walked together (PeopleStandings).

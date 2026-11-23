@@ -125,6 +125,10 @@ public sealed class HomeLifeSettings : GameSettings<HomeLifeSettings>
     [SerializeField, Range(0, 5)] private int mostMealTier = 2;
     [Tooltip("Food they leave for the cook: raw meat and fish.")]
     [SerializeField] private List<ItemDefinition> uneaten = new List<ItemDefinition>();
+    [Tooltip("A resident's favourite dish (ResidentDefinition) is eaten first at most once in this many days: a treat, not their diet.")]
+    [SerializeField, Min(1)] private int favouriteEveryDays = 3;
+    [Tooltip("A favourite is taken first only while the chests hold more than this many of it: the rest is the player's (raid food).")]
+    [SerializeField, Min(0)] private int favouriteKeeps = 1;
     [Tooltip("How much faster a well-fed resident works that day (stations, building, rings).")]
     [SerializeField, Range(0f, 1f)] private float wellFedWork = 0.1f;
     [Tooltip("How much slower a hungry one works that day. Nobody starves or leaves.")]
@@ -185,6 +189,8 @@ public sealed class HomeLifeSettings : GameSettings<HomeLifeSettings>
     public float DailyHunger => dailyHunger;
     public int MostMealTier => mostMealTier;
     public IReadOnlyList<ItemDefinition> Uneaten => uneaten;
+    public int FavouriteEveryDays => Mathf.Max(1, favouriteEveryDays);
+    public int FavouriteKeeps => Mathf.Max(0, favouriteKeeps);
     public float WellFedWork => wellFedWork;
     public float HungryWork => hungryWork;
 

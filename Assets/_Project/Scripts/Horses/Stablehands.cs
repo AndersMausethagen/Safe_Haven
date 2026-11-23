@@ -35,6 +35,25 @@ public static class Stablehands
         return tended;
     }
 
+    /// <summary>True when a trade that tends horses is known in <paramref name="home"/> (someone could be given it).</summary>
+    public static bool Known(SettlementState home)
+    {
+        if (home == null)
+        {
+            return false;
+        }
+
+        foreach (JobDefinition job in home.KnownJobs())
+        {
+            if (job != null && job.TendsHorses > 0f)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /// <summary>The stablehand at work who tends best, and how much bond a horse gains from them a morning; null when nobody tends.</summary>
     public static ResidentRecord BestOf(SettlementState home, out float amount)
     {

@@ -34,6 +34,8 @@ public sealed class SaveCoverageTests
         ["Settlement.fallen[0].KitBody"] = "PeopleTests.WhoTheyAre_SurvivesASave_AndAnOldSaveKeepsItsRank",
         ["Settlement.fallen[0].Talents.passions"] = "PeopleTests.WhoTheyAre_SurvivesASave_AndAnOldSaveKeepsItsRank",
         ["Settlement.Standings.values"] = "PeopleTests.WhoTheyAre_SurvivesASave_AndAnOldSaveKeepsItsRank",
+        // Who an ask from a mark or trait was posted for: "id|resident" pairs of a standing ask, which the filler's strings aren't.
+        ["Settlement.requestAskers"] = "PeopleTests.AnAskFromWhoTheyAre_IsAskedOfWhoeverFits_AndOneAskEach",
         ["Settlement.Workshops.queues"] = "StationQueueTests.Workshops_RoundTripThroughSave",
         // Rings are only kept while they hold a radius the probe's filler doesn't give; the round trip is its own test.
         ["Settlement.rings"] = "RingWorkTests.Rings_AreSaved",

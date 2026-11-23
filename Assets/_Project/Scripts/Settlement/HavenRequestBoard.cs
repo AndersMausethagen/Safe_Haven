@@ -115,8 +115,9 @@ public sealed class HavenRequestBoard : MonoBehaviour
             {
                 GameSession.Home.RemoveRequest(request.Id);
                 told.Remove(request.Id);
-                GameMessages.Post(request.Asker != null ? $"{request.Asker.DisplayName}'s ask comes down from the board: they are not here to take it."
-                    : $"The ask for {request.WantedName} comes down from the board: nobody here needs it now.", MessageKind.Info);
+                GameMessages.Post(request.Asker != null && GameSession.Home.Find(request.Asker) == null
+                    ? $"{request.Asker.DisplayName}'s ask comes down from the board: they are not here to take it."
+                    : $"The ask for {request.WantedName} comes down from the board: it isn't needed now.", MessageKind.Info);
                 continue;
             }
 
@@ -341,7 +342,9 @@ public sealed class HavenRequestBoard : MonoBehaviour
         foreach (HavenRequestDefinition request in HavenRequestSettings.Choose(settings.Requests, standing, places, settlement,
                      Seasons.Today, settlement.DaysPassed + homecoming * 31))
         {
-            settlement.AddRequest(request.Id);
+            // An ask from who they are is fixed to who fits now: it stays theirs, and comes down if they stop fitting.
+            ResidentDefinition asker = request.IsPersonal ? request.AskerIn(settlement) : null;
+            settlement.AddRequest(request.Id, asker != null ? asker.Id : null);
         }
     }
 }

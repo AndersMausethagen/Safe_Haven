@@ -74,6 +74,9 @@ public interface IHavenView
     List<JobDefinition> KnownJobs();
     /// <summary>True when the job has room for one more who isn't its written holder (SettlementState.HasRoom).</summary>
     bool HasRoom(JobDefinition job, ResidentDefinition resident);
+    /// <summary>The resident id a standing ask from who they are was posted for (SettlementState.RequestAsker), or null.</summary>
+    string RequestAsker(string id);
+
     int BuiltCount(BuildingDefinition building);
     IReadOnlyList<JobDefinition> VacantJobs { get; }
     int JobBonus(Func<JobDefinition, int> bonus);

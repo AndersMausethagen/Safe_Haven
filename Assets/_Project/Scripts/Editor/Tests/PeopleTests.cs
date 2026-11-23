@@ -789,6 +789,29 @@ public sealed class PeopleTests
         home.SetStanding(tor.Resident.Id, bjarne.Resident.Id, 2f);
         Assert.AreEqual(1f + People.MentorShare, ResidentTalents.Mentored(tor, weapons, level, home), 0.0001f, "a Friend who knows far more teaches");
         Assert.AreEqual(1f, ResidentTalents.Mentored(bjarne, weapons, ResidentTalents.LevelOf(bjarne, weapons), home), 0.0001f, "not the other way");
+
+        // A mentor teaches at home: away (a raid, a foray) the same practice is unhelped.
+        GameSession.StartNewGame();
+        try
+        {
+            SettlementState own = GameSession.Home;
+            own.AddResident(Person("Tor"));
+            own.AddResident(Person("Bjarne"));
+            ResidentRecord learner = own.Find(Person("Tor")), master = own.Find(Person("Bjarne"));
+            own.SetStanding(learner.Resident.Id, master.Resident.Id, 2f);
+            float before = learner.Talents.ExperienceOf(weapons.Id);
+            ResidentTalents.Practise(learner, weapons, 1, 1f, atHome: false);
+            float away = learner.Talents.ExperienceOf(weapons.Id) - before;
+            before = learner.Talents.ExperienceOf(weapons.Id);
+            ResidentTalents.Practise(learner, weapons, 1, 1f);
+            float atHome = learner.Talents.ExperienceOf(weapons.Id) - before;
+            Assert.Greater(away, 0f);
+            Assert.AreEqual(away * (1f + People.MentorShare), atHome, away * 0.02f, "taught at home only");
+        }
+        finally
+        {
+            GameSession.StartNewGame();
+        }
     }
 
     [Test]
@@ -815,15 +838,34 @@ public sealed class PeopleTests
         Assert.Less(bread.Value, dish.Value, "the canary: the bread sorts first by the usual rule");
 
         var chests = new ItemContainer(10, 6);
-        chests.Add(bread, 3);
-        chests.Add(dish, 1);
+        chests.Add(bread, 9);
+        chests.Add(dish, settings.FavouriteKeeps);
         home.NoteBuilt(settings.MealsFrom, 1);
-        Assert.IsFalse(ResidentSpirits.ReasonsOf(tor, home).Any(reason => reason.Words.Contains("favourite")));
         ResidentMeals.Eat(home, chests, settings);
-        Assert.AreEqual(0, chests.Count(dish), "their favourite first");
+        Assert.AreEqual(settings.FavouriteKeeps, chests.Count(dish), "the last of it stays the player's (raid food)");
+        Assert.Less(tor.FeelingUntil(ResidentMeals.FavouriteFeeling), home.DaysPassed);
+
+        home.PassDay();
+        chests.Add(dish, 2);
+        Assert.IsFalse(ResidentSpirits.ReasonsOf(tor, home).Any(reason => reason.Words.Contains("favourite")));
+        string said = ResidentMeals.Eat(home, chests, settings);
+        Assert.AreEqual(settings.FavouriteKeeps + 1, chests.Count(dish), "their favourite first, one");
+        StringAssert.Contains("A favourite for Tor", said, "the breakfast says so");
         Assert.AreEqual(home.DaysPassed, tor.FeelingUntil(ResidentMeals.FavouriteFeeling), "and the day is better for it");
         Assert.IsTrue(ResidentSpirits.ReasonsOf(tor, home).Any(reason => reason.Words.Contains("favourite") && reason.Steps > 0));
         Assert.AreEqual(ResidentSpirits.ReasonsOf(tor, home).Sum(reason => reason.Steps), ResidentSpirits.StepsOf(tor, home), "the steps agree");
+
+        // A treat, not their diet: not again until Favourite Every Days have passed.
+        for (int day = 1; day < settings.FavouriteEveryDays; day++)
+        {
+            home.PassDay();
+            ResidentMeals.Eat(home, chests, settings);
+            Assert.AreEqual(settings.FavouriteKeeps + 1, chests.Count(dish), $"day {day} after: not yet");
+        }
+
+        home.PassDay();
+        ResidentMeals.Eat(home, chests, settings);
+        Assert.AreEqual(settings.FavouriteKeeps, chests.Count(dish), "and then again");
 
         // Without it in the chests, nothing is said of it.
         SettlementState other = Home("Tor");
@@ -868,6 +910,20 @@ public sealed class PeopleTests
         Assert.IsTrue(salve.CanAsk(home, "Summer"));
         Assert.AreEqual(asa.Resident, salve.AskerIn(home));
         Assert.AreEqual(asa.Resident.DisplayName, salve.NameIn(home));
+
+        // Posted for Asa, it stays hers: Tor carrying the wound too doesn't take it, and healed, it comes down rather than moving on.
+        ResidentRecord tor = home.Find(Person("Tor"));
+        ResidentMarks.Give(tor, salve.WhileMarked);
+        Assert.AreEqual(tor.Resident, salve.AskerIn(home), "the canary: unposted, the first who fits (Tor came home first)");
+        home.AddRequest(salve.Id, asa.Resident.Id);
+        Assert.AreEqual(asa.Resident, salve.AskerIn(home), "posted for Asa");
+        SettlementState back = SaveMapper.SettlementFrom(JsonUtility.FromJson<SettlementSaveData>(JsonUtility.ToJson(SaveMapper.ToData(home))),
+            Resources.Load<ContentDatabase>(ContentDatabase.ResourceName));
+        Assert.AreEqual(asa.Resident, salve.AskerIn(back), "and saved so");
+        Assert.IsTrue(ResidentMarks.Heal(asa, salve.WhileMarked));
+        Assert.IsNull(salve.AskerIn(home), "healed: nobody asks it, not Tor");
+        home.RemoveRequest(salve.Id);
+        Assert.IsNull(home.RequestAsker(salve.Id));
 
         HavenRequestDefinition parchment = requests.Find("bookish-parchment");
         Assert.IsFalse(parchment.CanAsk(Home("Tor"), "Summer"), "nobody Bookish");

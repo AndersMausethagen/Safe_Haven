@@ -33,8 +33,12 @@ public sealed class ResidentDefender
     /// <summary>The guard they have become, or null.</summary>
     public Companion Guard => guard;
 
-    public void Stand(ResidentDefinition who, CompanionDefinition how, Vector3 post)
+    // What called them out, kept from when they were posted: by the time they stand down the breach is already over (IsActive false).
+    private bool inBreach;
+
+    public void Stand(ResidentDefinition who, CompanionDefinition how, Vector3 post, bool breach)
     {
+        inBreach = breach;
         Companion prefab = SettlementSettings.Current.RaidCompanionPrefab;
         if (prefab == null || !NavMesh.SamplePosition(self.position, out NavMeshHit here, 6f, NavMesh.AllAreas))
         {
@@ -58,7 +62,7 @@ public sealed class ResidentDefender
             return;
         }
 
-        Remember(guard);
+        Remember(guard, inBreach);
 
         Vector3 there = guard.transform.position;
         Object.Destroy(guard.gameObject);
@@ -73,7 +77,7 @@ public sealed class ResidentDefender
     // What defending the Haven did to them (Docs/PeopleSystemReview_2026-11-23.md §2.7): helped up by the player grows their bond; downed in
     // a breach may leave a raid's marks (an old wound, a fear of what downed them), downed on a corruption night its own; foes felled count
     // toward marks as on raids. Only in the game that keeps the Haven.
-    private static void Remember(Companion fought)
+    private static void Remember(Companion fought, bool breach)
     {
         if (HavenVisit.IsVisiting || fought.Resident == null)
         {
@@ -91,10 +95,11 @@ public sealed class ResidentDefender
             PeopleBond.Grow(record, PeopleSettings.Current.BondHelpedUp, "helped up defending");
         }
 
-        bool breach = WardBreachDirector.Current != null && WardBreachDirector.Current.IsActive;
         var facts = new RaidFacts { Extracted = true, TimesDowned = Mathf.Max(fought.TimesHelpedUp, fought.DownedBy.Count), KillsBy = fought.KillsBy, DownedBy = fought.DownedBy };
+        // A night's terrors only on a corruption night (a horn call by day leaves none).
+        bool night = CorruptionNights.Current != null && CorruptionNights.Current.IsActive;
         List<MarkDefinition> came = breach ? ResidentMarks.AfterRaid(record, facts, () => Random.value)
-            : facts.TimesDowned > 0 ? ResidentMarks.AfterEvent(record, MarkCause.NightDowned, "", () => Random.value) : new List<MarkDefinition>();
+            : facts.TimesDowned > 0 && night ? ResidentMarks.AfterEvent(record, MarkCause.NightDowned, "", () => Random.value) : new List<MarkDefinition>();
         foreach (MarkDefinition mark in came)
         {
             PeopleNews.Tell($"{record.Resident.DisplayName} came out of the fight {(mark.Good ? "with" : "carrying")} {mark.DisplayName}.", mark.Good ? MessageKind.Gain : MessageKind.Info);

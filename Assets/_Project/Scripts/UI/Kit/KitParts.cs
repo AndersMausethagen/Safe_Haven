@@ -495,19 +495,22 @@ public sealed class KitFactRow
 {
     private readonly TMP_Text label;
     private readonly TMP_Text value;
+    private readonly GameObject rule;
 
     public KitFactRow(Transform parent, float x, float y, float width, float labelWidth = 300f)
     {
         UIStyle style = UIStyle.Current;
         label = CodeUI.Label("Label", parent, x + 4f, y, labelWidth, 30f, 19f, style.Accent);
         value = CodeUI.Label("Value", parent, x + labelWidth, y, width - labelWidth - 10f, 30f, 20f, style.Text);
-        CodeUI.Hairline(parent, x, y + 42f, width, 1f, style);
+        rule = CodeUI.Hairline(parent, x, y + 42f, width, 1f, style);
     }
 
+    /// <summary>Fills the row; an empty one (both blank) draws no rule, so a short list doesn't end in empty ruled lines.</summary>
     public void Set(string name, string shown)
     {
         label.text = name;
         value.text = HearthKit.ToneNumbers(shown);
+        rule.SetActive(!string.IsNullOrEmpty(name) || !string.IsNullOrEmpty(shown));
     }
 }
 

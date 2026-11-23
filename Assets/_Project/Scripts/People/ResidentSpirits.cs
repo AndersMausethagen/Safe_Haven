@@ -80,10 +80,11 @@ public static class ResidentSpirits
 
         if (record.FeelingUntil(ResidentMeals.FavouriteFeeling) >= today)
         {
-            reasons.Add(new SpiritReason("Had their favourite dish", "Pot", 1));
+            ItemDefinition dish = record.Resident.FavouriteDish;
+            reasons.Add(new SpiritReason(dish != null ? $"{dish.DisplayName}, a favourite" : "Had their favourite dish", "Pot", 1));
         }
 
-        if (Festivals.Now != null)
+        if (record.FeelingUntil(Festivals.Feeling) >= today)
         {
             reasons.Add(new SpiritReason("A festival", "Sun", 1));
         }
@@ -203,7 +204,7 @@ public static class ResidentSpirits
 
         steps += HomeLife.IsContent(record) ? 1 : 0;
         steps += record.FeelingUntil(ResidentMeals.FavouriteFeeling) >= (here != null ? here.DaysPassed : 0) ? 1 : 0;
-        steps += Festivals.Now != null ? 1 : 0;
+        steps += record.FeelingUntil(Festivals.Feeling) >= (here != null ? here.DaysPassed : 0) ? 1 : 0;
         steps += SmallScenes.CheerOf(record.Resident) > 0f ? 1 : 0;
         steps -= record.Bruised ? 1 : 0;
         steps += record.Job != null && !record.WorkPaused && ResidentTalents.PassionOf(record, ResidentTalents.JobSkill(record)) != Passion.None ? 1 : 0;

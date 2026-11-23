@@ -95,6 +95,7 @@ public static class ResidentMeals
         var eaten = new Dictionary<ItemDefinition, int>();
         var order = new List<ItemDefinition>();
         var hungry = new List<string>();
+        var treated = new List<string>();
         int wellFed = 0;
         foreach (ResidentRecord record in settlement.Residents)
         {
@@ -107,9 +108,15 @@ public static class ResidentMeals
             float had = 0f;
             bool raw = false;
             // Their favourite dish first, when the chests hold it and it is food they may eat (Docs/PeopleSystemReview_2026-11-23.md §2.6).
+            // A treat: once in Favourite Every Days, and never the last Favourite Keeps of it, which stay the player's.
             ItemDefinition favourite = record.Resident.FavouriteDish;
-            if (favourite != null && foods.Contains(favourite) && chests.Count(favourite) > 0 && chests.Remove(favourite, 1) > 0)
+            int lastHad = record.DeedOf(FavouriteDeed) - 1;
+            bool due = lastHad < 0 || settlement.DaysPassed - lastHad >= settings.FavouriteEveryDays;
+            if (favourite != null && due && foods.Contains(favourite) && chests.Count(favourite) > settings.FavouriteKeeps && chests.Remove(favourite, 1) > 0)
             {
+                record.ForgetDeed(FavouriteDeed);
+                record.AddDeed(FavouriteDeed, settlement.DaysPassed + 1);
+                treated.Add(record.Resident.DisplayName);
                 had += favourite.HungerRestore;
                 raw |= !IsPrepared(favourite);
                 if (!eaten.ContainsKey(favourite))
@@ -171,6 +178,11 @@ public static class ResidentMeals
             said.Append(wellFed > 0 ? $"; {wellFed} well fed on cooked food (+{settings.WellFedWork * 100f:0}% work)." : ".");
         }
 
+        if (treated.Count > 0)
+        {
+            said.Append(said.Length > 0 ? " " : "").Append($"A favourite for {Join(treated)}.");
+        }
+
         if (hungry.Count > 0)
         {
             said.Append(said.Length > 0 ? " " : "").Append($"Not enough to eat for {Join(hungry)}: hungry today ({-settings.HungryWork * 100f:0}% work). ")
@@ -182,6 +194,9 @@ public static class ResidentMeals
 
     /// <summary>The feeling their favourite dish at breakfast leaves, for the day (ResidentSpirits).</summary>
     public const string FavouriteFeeling = "dish";
+
+    // The day they last had their favourite, plus one (a deed, saved): favourites are a treat every few days.
+    private const string FavouriteDeed = "favourite-day";
 
     /// <summary>How much faster (or slower) this resident works for what they ate this morning; 0 before meals are expected.</summary>
     public static float WorkBonus(ResidentRecord record) => WorkBonus(record, GameSession.Here);

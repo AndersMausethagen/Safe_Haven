@@ -2084,17 +2084,24 @@ Tests: `PeopleTests`.
   level in every known trade.
 - **Raid planner and results**: the companion's skill, fighting traits and marks lit when they count, kit, spirits; the results' cards.
 - **Habits** (`TraitHabit` on traits; `PeopleHabits.Now`; spots in `ResidentLife.HabitSpot`): free time or a meal at the edge, the
-  stones, the water, the lanes or a watch post. Friends sit together at the fire, rivals across.
+  stones, the water, the lanes or a watch post. A spot is looked up once a day per place (the lanes each half hour, moving on to the next
+  door), a failed look-up too. Friends sit beside where a friend really sits (`seatAngle`, a free seat either side), rivals across.
 - **Rivals and mentors**: a rival working near −5% (`PeopleStandings.WorkShare`), rivals on a foray −10% a pair (`ForayBonus`); a Friend
-  Mentor Gap levels better teaches Mentor Share faster (`ResidentTalents.Mentored`).
-- **More marks**: Defended the Ward (`WardBreachDirector.Win`), Lost in the Mire (a marsh foray gone wrong), Night Terrors (downed on a
-  corruption night, `ResidentDefender.Remember`); the Haven window's lost show their marks, kit and who misses them.
-- **Tastes** (step 8): a favourite dish (`ResidentDefinition` › Favourite Dish) is eaten first at breakfast and lifts spirits that day
-  (feeling "dish"); a festival (`Festivals.Now`) lifts everyone's. Home likings live on the person (`ResidentDefinition` › Home Liking;
+  Mentor Gap levels better teaches Mentor Share faster (`ResidentTalents.Mentored`), at home only (`Practise(..., atHome: false)` for
+  raids, forays and land parties).
+- **More marks**: Defended the Ward (`WardBreachDirector.Win`, for those who stood at it: a post, or everyone with Everyone Fights), Lost in
+  the Mire (a marsh foray gone wrong), Night Terrors (downed on a corruption night, `ResidentDefender.Remember`; a guard keeps whether a
+  breach called them out from when they were posted, as the breach has ended by the time they stand down); the Haven window's lost show their marks, kit and who misses them.
+- **Tastes** (step 8): a favourite dish (`ResidentDefinition` › Favourite Dish) is a treat: eaten first at breakfast at most once in
+  Favourite Every Days (deed "favourite-day"), and only while the chests hold more than Favourite Keeps of it (the rest is the player's
+  raid food; `HomeLifeSettings`); it lifts spirits that day (feeling "dish") and the breakfast line names who had one. A festival leaves
+  the feeling "festival" on one's own people until the next day (`Festivals.Begin`), so the morning's spirits see it. Home likings live on the person (`ResidentDefinition` › Home Liking;
   `HomeLifeSettings.LikingOf` asks the person first, the old list is empty; `Likings` builds everyone's for tools). "Move them" says when
   a rival lives in or next to a house (`PeopleStandings.RivalBy`).
 - **Asks from who they are** (`HavenRequestDefinition` › Who they are): While Marked / While Trait, with no Asker asked of whoever here
   fits (`AskerIn`); Heals Mark heals it when brought. One ask per person counts by who would ask (`HavenRequestSettings.SameAsker`).
+  Posted, it is fixed to that person (`SettlementState.RequestAsker`, saved as "id|resident" pairs) and comes down when they stop
+  fitting, rather than moving to someone else who may hold an ask already.
   Content: old-wound-salve, cook-chanterelles (Proud Cook), bookish-parchment.
 - **Quest kinds** (`ObjectiveType` ResidentRank, BecomeFriends, HealMark, GiveKit; none count in a friend's Haven) and rewards
   (`QuestDefinition` › Reward Passion, Reward Mark for Reward Work For).

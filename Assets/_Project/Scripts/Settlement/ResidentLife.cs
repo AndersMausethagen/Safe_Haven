@@ -55,6 +55,9 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     private bool inHabit;
     private int habitKey = -1;
     private bool habitFound;
+    private bool habitMoved;
+    // The angle round the fire they last sat at (SeatAngle): where a friend sits beside them.
+    private float seatAngle = float.NaN;
     private HabitPlace habitPlace;
     private Vector3 habitAt;
     private Quaternion habitFacing;
@@ -339,7 +342,7 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
                 emotes.Stop();
             }
 
-            defender.Stand(npc.Resident, how, GuardPost(rank, night));
+            defender.Stand(npc.Resident, how, GuardPost(rank, night), breach);
             if (!defender.IsOnGuard)
             {
                 // Nowhere to stand (off the navmesh): not again every frame.
@@ -475,17 +478,23 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         if (habit)
         {
             // Found once for a habit (the lanes once a half hour), not every think: places are looked up in the scene.
-            int key = (int)doing.place * 100 + (doing.place == HabitPlace.Lanes ? Mathf.FloorToInt(hour * 2f) : 0);
-            if (key != habitKey || !inHabit)
+            int day = GameSession.Here != null ? GameSession.Here.DaysPassed : 0;
+            int key = ((day % 1000) * 8 + (int)doing.place) * 100 + (doing.place == HabitPlace.Lanes ? Mathf.FloorToInt(hour * 2f) : 0);
+            if (key != habitKey)
             {
                 habitKey = key;
                 habitFound = HabitSpot(doing.place, hour, out habitAt, out habitFacing);
+                // Already in the habit and the spot moved on (the lanes' next door): they go there.
+                habitMoved = inHabit && habitFound;
             }
 
             habit = habitFound;
         }
         HabitPlace place0 = habit ? doing.place : habitPlace;
-        if (next == activity && scaffold == building && ring == fellingRing && scene == inScene && habit == inHabit && place0 == habitPlace && started && !atOnce && !again)
+        bool moved = habitMoved;
+        habitMoved = false;
+        if (next == activity && scaffold == building && ring == fellingRing && scene == inScene && habit == inHabit && place0 == habitPlace && !moved
+            && started && !atOnce && !again)
         {
             return;
         }
@@ -561,7 +570,8 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
                 break;
             default:
                 Vector3 centre = Gathering(next, settings);
-                Vector3 round = Quaternion.Euler(0f, SeatAngle(), 0f) * Vector3.forward;
+                seatAngle = SeatAngle();
+                Vector3 round = Quaternion.Euler(0f, seatAngle, 0f) * Vector3.forward;
                 place = centre + round * RingRadius;
                 facing = Quaternion.LookRotation(-round);
                 break;
@@ -611,19 +621,44 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
                 continue;
             }
 
+            float theirs = float.IsNaN(other.seatAngle) ? other.ringAngle : other.seatAngle;
             int level = PeopleStandings.LevelOf(GameSession.Here, record, other.npc.Record);
             if (level >= 1)
             {
-                return other.ringAngle + 24f;
+                // Either side of them, then a seat further: the first nobody else sits at.
+                foreach (float step in SeatSteps)
+                {
+                    if (SeatFree(theirs + step))
+                    {
+                        return theirs + step;
+                    }
+                }
             }
 
             if (level <= -1 && float.IsNaN(rival))
             {
-                rival = other.ringAngle + 180f;
+                rival = theirs + 180f;
             }
         }
 
         return float.IsNaN(rival) ? ringAngle : rival;
+    }
+
+    private static readonly float[] SeatSteps = { 24f, -24f, 48f, -48f };
+
+    // Nobody else at the fire sits within half a seat of this angle.
+    private bool SeatFree(float angle)
+    {
+        foreach (ResidentLife other in Living)
+        {
+            if (other != this && !float.IsNaN(other.seatAngle) && (other.activity == ResidentActivity.Fire || other.activity == ResidentActivity.Meal)
+                && !other.inHabit && !other.inScene && Mathf.Abs(Mathf.DeltaAngle(other.seatAngle, angle)) < 12f)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     // Where a habit takes them now (PeopleHabits), from their home and the Haven's places. False where there is no such place.

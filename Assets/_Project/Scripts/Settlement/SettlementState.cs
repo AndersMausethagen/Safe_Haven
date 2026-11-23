@@ -352,16 +352,57 @@ public sealed class SettlementState : IHavenView
     /// <summary>What the Haven is asking to be brought home (HavenRequestDefinition ids), oldest first.</summary>
     public IReadOnlyList<string> Requests => requests;
 
-    public void AddRequest(string id)
+    public void AddRequest(string id, string askerId = null)
     {
         Borrowed();
         if (!string.IsNullOrEmpty(id) && !requests.Contains(id))
         {
             requests.Add(id);
         }
+
+        if (!string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(askerId))
+        {
+            requestAskers[id] = askerId;
+        }
     }
 
-    public bool RemoveRequest(string id) => requests.Remove(id);
+    public bool RemoveRequest(string id)
+    {
+        requestAskers.Remove(id ?? "");
+        return requests.Remove(id);
+    }
+
+    // Who was asked to ask each standing request from who they are (HavenRequestDefinition › Who they are): request id → resident id.
+    private readonly Dictionary<string, string> requestAskers = new Dictionary<string, string>();
+
+    /// <summary>The resident id a standing ask was posted for, or null (a written asker, or the Haven's own).</summary>
+    public string RequestAsker(string id) => id != null && requestAskers.TryGetValue(id, out string who) ? who : null;
+
+    /// <summary>"request id|resident id" pairs, for the save.</summary>
+    public List<string> RequestAskerPairs()
+    {
+        var pairs = new List<string>();
+        foreach (KeyValuePair<string, string> pair in requestAskers)
+        {
+            pairs.Add(pair.Key + "|" + pair.Value);
+        }
+
+        pairs.Sort(string.CompareOrdinal);
+        return pairs;
+    }
+
+    public void RestoreRequestAskers(IEnumerable<string> pairs)
+    {
+        requestAskers.Clear();
+        foreach (string pair in pairs ?? Array.Empty<string>())
+        {
+            int bar = pair != null ? pair.IndexOf('|') : -1;
+            if (bar > 0 && bar < pair.Length - 1 && requests.Contains(pair.Substring(0, bar)))
+            {
+                requestAskers[pair.Substring(0, bar)] = pair.Substring(bar + 1);
+            }
+        }
+    }
 
     /// <summary>Asks answered, all told.</summary>
     public int RequestsAnswered { get; private set; }
@@ -391,6 +432,7 @@ public sealed class SettlementState : IHavenView
         OrderRenown = Math.Max(0, orderRenown);
         RequestsAskedAt = askedAt;
         requests.Clear();
+        requestAskers.Clear();
         if (asked != null)
         {
             foreach (string id in asked)

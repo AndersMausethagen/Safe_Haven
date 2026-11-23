@@ -52,9 +52,11 @@ public static class CodeUI
         return text;
     }
 
-    public static void Hairline(Transform parent, float x, float y, float width, float height, UIStyle style)
+    public static GameObject Hairline(Transform parent, float x, float y, float width, float height, UIStyle style)
     {
-        At("Line", parent, x, y, width, height).gameObject.AddComponent<Image>().color = style.Hairline;
+        RectTransform line = At("Line", parent, x, y, width, height);
+        line.gameObject.AddComponent<Image>().color = style.Hairline;
+        return line.gameObject;
     }
 
     /// <summary>A heading in spaced capitals, the accent colour.</summary>

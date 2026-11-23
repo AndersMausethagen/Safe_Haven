@@ -93,6 +93,8 @@ public sealed class SettlementSaveData
     public int huldraAwayUntil;
     /// <summary>What the Haven is asking for (HavenRequestDefinition ids), and how many asks were answered. Empty in older saves.</summary>
     public List<string> requests = new List<string>();
+    // Who each standing ask from a mark or a trait was posted for: "request id|resident id" (HavenRequestDefinition › Who they are).
+    public List<string> requestAskers = new List<string>();
     public int requestsAnswered;
     /// <summary>The homecoming the asks were last posted at. Missing in older saves: -1, posted at the next look.</summary>
     public int requestsAskedAt = -1;

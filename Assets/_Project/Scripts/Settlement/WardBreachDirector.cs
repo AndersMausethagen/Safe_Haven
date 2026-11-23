@@ -504,10 +504,14 @@ public sealed class WardBreachDirector : MonoBehaviour
         }
 
         GameMessages.Post(breach.WonText + rewards, MessageKind.Gain);
-        // Everyone at home fought (DefenceSettings › Everyone Fights): a breach won may leave its mark (Defended the Ward).
+        // Those who stood at the ward (a post, or everyone when Everyone Fights): a breach won may leave its mark (Defended the Ward).
+        DefenceSettings defence = DefenceSettings.Current;
         foreach (ResidentRecord defender in GameSession.Home.Residents)
         {
-            if (!defender.IsAway)
+            int post = GuardPosts.Rank(GameSession.Home, defender);
+            bool stood = GuardPosts.FightsAs(defender, true, defence) != null
+                         && (defence.EveryoneFightsBreaches || (post >= 0 && post < GuardPosts.Cap(defence)));
+            if (!defender.IsAway && stood)
             {
                 foreach (MarkDefinition mark in ResidentMarks.AfterEvent(defender, MarkCause.BreachWon, breach.name, () => Random.value))
                 {

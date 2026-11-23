@@ -220,7 +220,7 @@ public static class ResidentTalents
     /// traits' and Work Share; beyond the day's practice in it, only a share. Raises their rank's message when their job's skill rises
     /// into a new one. Returns the levels gained.
     /// </summary>
-    public static int Practise(ResidentRecord record, ProficiencyDefinition skill, int tier, float baseAmount)
+    public static int Practise(ResidentRecord record, ProficiencyDefinition skill, int tier, float baseAmount, bool atHome = true)
     {
         if (record == null || skill == null || baseAmount <= 0f)
         {
@@ -232,7 +232,7 @@ public static class ResidentTalents
         int before = LevelOf(record, skill);
         int rankBefore = RankIndex(record);
         float amount = baseAmount * rules.Multiplier(Mathf.Max(1, tier), before, false) * settings.WorkShare
-                       * settings.LearningFor(PassionOf(record, skill)) * ResidentTraits.LearningOf(record, skill) * Mentored(record, skill, before)
+                       * settings.LearningFor(PassionOf(record, skill)) * ResidentTraits.LearningOf(record, skill) * (atHome ? Mentored(record, skill, before) : 1f)
                        / Mathf.Max(0.01f, rules.PracticeTimeScale);
         int day = GameSession.Home != null ? GameSession.Home.DaysPassed : 0;
         amount = Capped(record.Talents, skill.Id, day, amount, settings);
@@ -340,7 +340,7 @@ public static class ResidentTalents
         LevelingSettings rules = LevelingSettings.Current;
         PeopleSettings settings = PeopleSettings.Current;
         float each = rules.TierExperience(Mathf.Max(1, tier));
-        Practise(record, FightSkill(record), tier, each * (settings.RaidPractice + settings.KillPractice * Mathf.Max(0, kills)));
+        Practise(record, FightSkill(record), tier, each * (settings.RaidPractice + settings.KillPractice * Mathf.Max(0, kills)), atHome: false);
     }
 
     /// <summary>Extra damage beside the player for their fighting skill (a share: 0.15 is +15%).</summary>

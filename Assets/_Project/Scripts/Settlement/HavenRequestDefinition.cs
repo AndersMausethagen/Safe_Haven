@@ -103,8 +103,9 @@ public sealed class HavenRequestDefinition : ScriptableObject
         return true;
     }
 
-    /// <summary>Who asks it in <paramref name="here"/>: the written Asker while they fit, else the first living there who fits; null for
-    /// the Haven's own asks and when nobody fits.</summary>
+    /// <summary>Who asks it in <paramref name="here"/>: once posted, the one it was posted for while they still fit (never someone else:
+    /// SettlementState.RequestAsker); before, the written Asker while they fit, else the first living there who fits. Null for the
+    /// Haven's own asks and when nobody (or not the one it was posted for) fits.</summary>
     public ResidentDefinition AskerIn(IHavenView here)
     {
         if (!IsPersonal || here == null)
@@ -113,6 +114,20 @@ public sealed class HavenRequestDefinition : ScriptableObject
         }
 
         IReadOnlyList<ResidentRecord> people = here.Residents;
+        string pinned = here.RequestAsker(Id);
+        if (pinned != null)
+        {
+            for (int i = 0; i < people.Count; i++)
+            {
+                if (people[i]?.Resident != null && people[i].Resident.Id == pinned)
+                {
+                    return Fits(people[i]) ? people[i].Resident : null;
+                }
+            }
+
+            return null;
+        }
+
         for (int i = 0; i < people.Count; i++)
         {
             if (Fits(people[i]))
