@@ -110,7 +110,7 @@ public static class PeopleStandings
         }
 
         int before = LevelOf(home.Standings.ValueOf(a.Resident.Id, b.Resident.Id));
-        float now = home.Standings.ValueOf(a.Resident.Id, b.Resident.Id) + by;
+        float now = Banded(a, b, before, home.Standings.ValueOf(a.Resident.Id, b.Resident.Id) + by, scene: false);
         home.SetStanding(a.Resident.Id, b.Resident.Id, now);
         int after = LevelOf(home.Standings.ValueOf(a.Resident.Id, b.Resident.Id));
         Logged(a, b, before, after, by > 0f ? "closer" : "apart");
@@ -168,10 +168,37 @@ public static class PeopleStandings
         bool cleared = roll < settings.ClearedAirChance;
         float by = cleared ? settings.ClearedAir * bold : -settings.Hardened * bold;
         int before = LevelOf(home.Standings.ValueOf(a.Resident.Id, b.Resident.Id));
-        float now = home.Standings.ValueOf(a.Resident.Id, b.Resident.Id) + by;
+        float now = Banded(a, b, before, home.Standings.ValueOf(a.Resident.Id, b.Resident.Id) + by, scene: true);
         home.SetStanding(a.Resident.Id, b.Resident.Id, now);
         Logged(a, b, before, LevelOf(home.Standings.ValueOf(a.Resident.Id, b.Resident.Id)), cleared ? "cleared the air" : "hardened");
         return cleared;
+    }
+
+    // Lowest a written friendship goes (Friendly), and highest anything but a scene may leave two people (Cool): rounding (to even) puts
+    // 0.5 at Neutral and -1.5 at Rival, so the limits sit inside the levels.
+    private const float FriendlyFloor = 0.6f;
+    private const float CoolFloor = -1.4f;
+
+    /// <summary>The Campaign's band (PeopleSettings › Keep To The Writing): a written friendship never sinks below Friendly, and only a
+    /// rivals' <paramref name="scene"/> makes two people Rivals who weren't already.</summary>
+    private static float Banded(ResidentRecord a, ResidentRecord b, int before, float now, bool scene)
+    {
+        if (!PeopleSettings.Current.KeepToTheWriting)
+        {
+            return now;
+        }
+
+        if (a.Resident.Friend == b.Resident || b.Resident.Friend == a.Resident)
+        {
+            now = Mathf.Max(now, FriendlyFloor);
+        }
+
+        if (!scene && before > -2 && now < CoolFloor)
+        {
+            now = CoolFloor;
+        }
+
+        return now;
     }
 
     /// <summary>A dawn: everyone who worked near a friend-to-be grows a little closer to them.</summary>

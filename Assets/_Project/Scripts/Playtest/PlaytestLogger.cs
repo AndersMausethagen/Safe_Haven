@@ -210,7 +210,8 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
 
         PlaytestRun current = EnsureRun();
         FollowPlayer();
-        if (!GamePause.IsPaused)
+        // Played time: not paused, and the game in front (time in another window isn't play: Docs/CampaignAudit_2026-11-23.md §4.5).
+        if (!GamePause.IsPaused && Application.isFocused)
         {
             current.PlayedSeconds += Time.unscaledDeltaTime;
         }
@@ -239,7 +240,15 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
     private readonly System.Collections.Generic.Dictionary<string, float> homeSeconds = new System.Collections.Generic.Dictionary<string, float>();
     private bool wasRaid;
     private float countNodesAt = -1f;
-    private Vector3 lastAt;
+    // Walking is judged over a quarter of a second, not a frame: physics moves the player on some frames only, so a frame's step read
+    // most walking as standing still (1% walking in the 2026-11-21 run).
+    private Vector3 walkFrom;
+    private float walkSince = -1f;
+    private bool walking;
+    private const float WalkSample = 0.25f;
+    private const float WalkSpeed = 0.6f;
+    // "window:" + each window's id, made once (written every frame at home).
+    private readonly System.Collections.Generic.Dictionary<UIWindowId, string> windowKeys = new System.Collections.Generic.Dictionary<UIWindowId, string>();
     private PlayerInteractor interactor;
 
     private void TrackHome()
@@ -267,7 +276,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
 
         Player player = Player.Current;
         // One's own Haven: a portal stands here (not the prologue's camp), no raid, no visit.
-        if (GamePause.IsPaused || player == null || !Place.InAHaven || !Place.AtHome)
+        if (GamePause.IsPaused || !Application.isFocused || player == null || !Place.InAHaven || !Place.AtHome)
         {
             return;
         }
@@ -280,16 +289,35 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
     private string Doing(Player player)
     {
         Vector3 at = player.transform.position;
-        float moved = (at - lastAt).sqrMagnitude;
-        lastAt = at;
+        float now = Time.unscaledTime;
+        if (walkSince < 0f || now - walkSince >= WalkSample)
+        {
+            walking = walkSince >= 0f && (at - walkFrom).magnitude / Mathf.Max(0.01f, now - walkSince) > WalkSpeed;
+            walkFrom = at;
+            walkSince = now;
+        }
+
         if (KeeperView.IsOpen)
         {
             return "keeper";
         }
 
+        // Which window (a conversation is one too): what in the home's time is spent in menus.
         if (UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen)
         {
-            return "window";
+            UIWindow front = UIStateManager.Current.Front;
+            if (front == null)
+            {
+                return "window";
+            }
+
+            if (!windowKeys.TryGetValue(front.Id, out string key))
+            {
+                key = "window:" + front.Id;
+                windowKeys[front.Id] = key;
+            }
+
+            return key;
         }
 
         if (interactor == null || interactor.gameObject != player.gameObject)
@@ -303,8 +331,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
             return working.GetComponentInParent<Construction>() != null ? "build" : working.GetComponentInParent<CraftingStation>() != null ? "craft" : "gather";
         }
 
-        float speed = Time.unscaledDeltaTime > 0f ? Mathf.Sqrt(moved) / Time.unscaledDeltaTime : 0f;
-        return speed > 0.6f ? "walk" : "idle";
+        return walking ? "walk" : "idle";
     }
 
     // A stay at home is over (a raid began, or the session ends): the seconds at each thing. Written straight to the file of the

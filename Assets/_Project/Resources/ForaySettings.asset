@@ -175,6 +175,7 @@ MonoBehaviour:
       most: 1
       chance: 0.15
     skill: {fileID: 11400000, guid: e9528bdd6784e9d4eaa85d8753dfa51c, type: 2}
+  unlockedBy: {fileID: 11400000, guid: de7cec08a5c5edd48a00e1254ba218c9, type: 2}
   mostMembers: 4
   basePower: 10
   powerPerRank: 5

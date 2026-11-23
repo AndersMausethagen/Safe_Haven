@@ -80,7 +80,7 @@ public static class HavenPeople
             : "By the fire. They manage, but a Hut or Cottage would help."));
         // Their own page: the house they live in (and moving them), their work and their story.
         entry.Actions.Add(new HavenAction("Their page", () => ResidentWindow.Show(person, "Home"), primary: false));
-        if (!HavenVisit.InHostsHaven)
+        if (!HavenVisit.InHostsHaven && settlement.KnownJobs().Count >= 3)
         {
             entry.Actions.Add(new HavenAction("Who does what", WorkGridWindow.Show, closesWindow: false, primary: false));
         }

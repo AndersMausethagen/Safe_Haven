@@ -42,6 +42,9 @@ public sealed class ForaySettings : GameSettings<ForaySettings>
 
     [Header("Where")]
     [SerializeField] private List<Destination> destinations = new List<Destination>();
+    [Tooltip("The quest that brings forays (Tor's Past the Ridge): none can be sent before it starts, so a person brings them when the " +
+             "player has felt the need (Docs/CampaignAudit_2026-11-23.md). Empty: from the portal's first tier.")]
+    [SerializeField] private QuestDefinition unlockedBy;
 
     [Header("Who goes")]
     [Tooltip("At most this many go on one foray.")]
@@ -78,6 +81,7 @@ public sealed class ForaySettings : GameSettings<ForaySettings>
     [SerializeField, Range(0f, 1f)] private float bruisedWork = 0.3f;
 
     public IReadOnlyList<Destination> Destinations => destinations;
+    public QuestDefinition UnlockedBy => unlockedBy;
     public int MostMembers => mostMembers;
     public float BasePower => basePower;
     public float PowerPerRank => powerPerRank;

@@ -539,6 +539,7 @@ A changed co-op message fails `CoopWireTests` until `MultiplayerSettings.WireFor
 | BecameFriends | `PeopleStandings` when two of the player's own people become Friends (Subject: one; Detail: the other) |
 | MarkHealed | `ResidentMarks.Heal` (talk, an ask brought, a Friend's scene; Subject: the `MarkDefinition`; Detail: whose) |
 | KitGiven | `CompanionKit.Give` (Subject: the piece's `ItemDefinition`; Detail: who carries it) |
+| ForayReturned | `Forays.Tick` when a foray comes home, gone well or not (no subject); counted by `ObjectiveType.CompleteForay` (Tor's Past the Ridge) |
 | Custom (Story Events) | One-off moments only: `GameEventTrigger`'s Quest Event, `GameEventDefinition.Raise`, a quest's completion event and On Started/On Completed lists, story nodes, `RaidPortal` (repaired), the prologue's chapter events, and the optional Story Event fields on `Talkable`, `HomePortal`, `RescuableTraveler`, `JobDefinition` and `WardBreachDefinition`. Talking to someone, reaching a place, using a thing, rescuing someone, hiring, defending and Haven ranks are deeds above: a Quest Event made per person or place is not needed (and the shared traveller and companion prefabs used to raise one person's event for everyone). The Content Editor's "nothing raises this event" check finds raisers by `[RaisedByGame]` on the field; fields naming who or what an object is for quests carry `[QuestIdentity]` |
 
 ### Base building: clearing, construction, upgrades, renown
@@ -2069,6 +2070,24 @@ Tests: `PeopleTests`.
 - **Traps**: `SaveCoverageTests` can't invent kit stacks, passions or standings pairs: they are in its CheckedElsewhere (PeopleTests).
   The Content Audit wants `MarkDefinition.healedBy` sorted (done). An eval that sets a `GameSettings` asset needs `SetDirty` +
   `SaveAssetIfDirty` (one write was lost without it).
+
+### The Campaign's budget (Docs/CampaignAudit_2026-11-23.md, built 2026-11-23, unplayed)
+
+The rules every Haven system is held to (`Docs/CampaignAndSandboxResearch_2026-11-23.md`):
+- a system comes through a story beat or a person;
+- upkeep never blocks the story;
+- the writing wins;
+- the raid stays the centre.
+
+A Sandbox mode comes only after the Campaign is done (`Docs/TODO.md`). What the rules changed:
+- **The horse** comes after Heavy Loads (carts to pull).
+- **Forays** come with Tor's Past the Ridge (`ForaySettings.UnlockedBy`, `Forays.Unlocked`; the Lands tab hides the sending until then).
+- **The resident window shows itself as it fills:** `KitTabs.SetVisible` for Bonds (three people or a mark); kit after the first
+  raid along; Who does what at three known trades.
+- **`PeopleSettings.KeepToTheWriting`:** written friends stay at least Friendly, and only a rivals' scene makes Rivals
+  (`PeopleStandings.Banded`).
+- **The playtest logger** leaves out unfocused time, judges walking over 0.25 s, and names the window (`window:<UIWindowId>`, from
+  `UIStateManager.Front`).
 
 ### The review's steps 1-8 (Docs/PeopleSystemReview_2026-11-23.md, built 2026-11-23, unplayed)
 

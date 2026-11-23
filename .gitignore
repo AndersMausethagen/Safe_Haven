@@ -100,3 +100,6 @@ Tools/Playtest/.venv/
 Tools/Playtest/Inbox/
 Tools/Playtest/Work/
 Tools/Playtest/Results/
+
+# Discord webhooks for the playtest server (Docs/PlaytestDiscord.md): secrets, never committed.
+AgentScripts/discord.local.json

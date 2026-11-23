@@ -141,8 +141,10 @@ public sealed class HomeStoryTests
         QuestDefinition door = Quest("SteadyTheDoor");
         Assert.IsNotNull(door);
         CollectionAssert.AreEquivalent(new[] { Quest("CleansingTheCurse"), Quest("TheSmith") }, door.Prerequisites.ToArray());
-        QuestObjective raise = door.Objectives.Single();
-        Assert.AreEqual(ObjectiveType.RaisePortal, raise.Type);
+        // The portal's word first (a story event, the 2026-11-22 batch), then the raise.
+        Assert.AreEqual(2, door.Objectives.Count);
+        Assert.AreEqual(ObjectiveType.QuestEvent, door.Objectives[0].Type);
+        QuestObjective raise = door.Objectives.Single(objective => objective.Type == ObjectiveType.RaisePortal);
         Assert.AreEqual(0, raise.Progress(new GameEvent(GameEventKind.PortalRaised, null, 1)), "tier I is where it starts");
         Assert.AreEqual(1, raise.Progress(new GameEvent(GameEventKind.PortalRaised, null, 2)));
         Assert.AreEqual(0, raise.Progress(new GameEvent(GameEventKind.HavenRankReached, null, 2)), "another event of the same amount isn't a raise");

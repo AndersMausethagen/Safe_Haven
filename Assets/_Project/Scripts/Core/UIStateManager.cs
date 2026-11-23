@@ -20,6 +20,28 @@ public sealed class UIStateManager : MonoBehaviour
 
     public bool IsAnyWindowOpen => openWindows.Count > 0;
 
+    // The window opened last that is still open (the playtest log's HomeStay names it).
+    private UIWindow lastOpened;
+
+    /// <summary>The window in front: the one opened last that is still open, else any open one; null with none.</summary>
+    public UIWindow Front
+    {
+        get
+        {
+            if (lastOpened != null && openWindows.Contains(lastOpened))
+            {
+                return lastOpened;
+            }
+
+            foreach (UIWindow window in openWindows)
+            {
+                return window;
+            }
+
+            return null;
+        }
+    }
+
     /// <summary>Raised when the first window opens (true) and when the last one closes (false).</summary>
     public event Action<bool> AnyWindowOpenChanged;
 
@@ -135,6 +157,10 @@ public sealed class UIStateManager : MonoBehaviour
     {
         bool wasAnyOpen = IsAnyWindowOpen;
         bool changed = isOpen ? openWindows.Add(window) : openWindows.Remove(window);
+        if (isOpen && changed)
+        {
+            lastOpened = window;
+        }
 
         // The skill book occupies the same screen area as the other windows. Register the newly opened window first
         // so closing the old one never briefly unlocks the camera. Existing non-skill window combinations are unchanged.

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: ahorseofyourown
   displayName: A Horse of Your Own
-  description: A wild horse grazes near the Haven. Make a Lasso by hand (4 Nettle Cord, 1 Rough Hide) and bring 4 Barley (grown on a Farm Plot, or found in caches and barrels in the woods). Get close without it bolting, rope it, hold on through the struggle, ride it until it gives in, and feed it barley. Then give it a Stable to come home to.
+  description: A loaded cart drags at your arms, and the woods past the Haven are wide. A wild horse grazes near the Haven. Make a Lasso by hand (4 Nettle Cord, 1 Rough Hide) and bring 4 Barley (grown on a Farm Plot, or found in caches and barrels in the woods). Get close without it bolting, rope it, hold on through the struggle, ride it until it gives in, and feed it barley. Then give it a Stable to come home to.
   chain: 
   journalNotes: 'Wild horses are shy: come at them low and slow. A lasso holds one long enough to climb on; barley, fed a few times, makes it yours. A Stable keeps it, and two in one can foal.'
   rank: 1
@@ -23,7 +23,7 @@ MonoBehaviour:
   announceCompletion: 1
   showTimerInHud: 0
   prerequisites:
-  - {fileID: 11400000, guid: 3943d408532d51649b066fb789a31c5b, type: 2}
+  - {fileID: 11400000, guid: 8de8a5d687692334d85f5fe6c7d944c3, type: 2}
   startedFirst: []
   start: 1
   startEvent: {fileID: 11400000, guid: 84982ddea87b5c347a9942d18f748b2f, type: 2}
@@ -52,6 +52,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   closedBy: {fileID: 0}
   startDelay: 0
   startsInAFight: 0
@@ -83,6 +85,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   - type: 0
     description: Have 4 Barley (a Farm Plot grows it; caches and barrels hold some)
     amount: 4
@@ -107,6 +111,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   - type: 6
     description: 
     amount: 1
@@ -131,6 +137,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   - type: 7
     description: 
     amount: 1
@@ -155,6 +163,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   unlocksBuildings: []
   unlocksModules: []
   turnInToGiver: 0
@@ -167,6 +177,8 @@ MonoBehaviour:
   rewardEnchantments: []
   rewardWorkFor: {fileID: 0}
   rewardWork: 0
+  rewardPassion: 0
+  rewardMark: {fileID: 0}
   experience: 0
   completionEvent: {fileID: 0}
   onCompleted: []

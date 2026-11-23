@@ -53,7 +53,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 183fddc5567e8b8479fcb1618e73496c, type: 2}
   favouriteDish: {fileID: 11400000, guid: ab1d11a58572d62458740158da5361f4, type: 2}
   homeLiking:
-    resident: {fileID: 0}
+    resident: {fileID: 11400000}
     likes: A place to sit
     line: '"A bench by the door, for the evening and my leg."'
     thanks: '"A bench by the door. I''ll sit there tonight and admire your work. And mine."'
@@ -70,6 +70,12 @@ MonoBehaviour:
     text: The ward keeps out the worst. Not all of it. Four lengths of palisade between the fire and the trees, and we sleep better.
     acceptText: Four lengths.
     waitingText: Four palisade pieces. Drag them out in a line; they go up like anything else.
+    askText: 
+    thanksText: 
+  - quest: {fileID: 11400000, guid: de7cec08a5c5edd48a00e1254ba218c9, type: 2}
+    text: The trees round the fire won't grow back as fast as we cut them. There are old cuttings past where the portal takes you. Send two of us out with food for the road, and we'll bring back what we can carry.
+    acceptText: I'll choose who goes.
+    waitingText: The Haven's Lands. Pick who goes and where; they come home on their own.
     askText: 
     thanksText: 
   - quest: {fileID: 11400000, guid: b95103f99c217d3489eb46bd97d706d8, type: 2}

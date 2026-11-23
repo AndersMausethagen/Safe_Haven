@@ -161,10 +161,14 @@ public static class KitBar
 public sealed class KitTabs
 {
     private readonly List<(RectTransform rect, Image fill, Image rim, TMP_Text label)> tabs = new List<(RectTransform, Image, Image, TMP_Text)>();
+    private readonly float firstX;
+    private readonly float step;
 
     public KitTabs(Transform parent, float x, float y, float tabWidth, float height, IReadOnlyList<string> names, Action<int> chosen, float gap = 10f)
     {
         UIStyle style = UIStyle.Current;
+        firstX = x;
+        step = tabWidth + gap;
         for (int i = 0; i < names.Count; i++)
         {
             int index = i;
@@ -182,6 +186,27 @@ public sealed class KitTabs
             tabs.Add((rect, fill, rim, label));
         }
     }
+
+    /// <summary>Shows or hides a tab (a page with nothing in it yet); the shown ones close up from the left.</summary>
+    public void SetVisible(int index, bool visible)
+    {
+        if (index < 0 || index >= tabs.Count || tabs[index].rect.gameObject.activeSelf == visible)
+        {
+            return;
+        }
+
+        tabs[index].rect.gameObject.SetActive(visible);
+        int slot = 0;
+        foreach ((RectTransform rect, Image _, Image _, TMP_Text _) in tabs)
+        {
+            if (rect.gameObject.activeSelf)
+            {
+                rect.anchoredPosition = new Vector2(firstX + slot++ * step, rect.anchoredPosition.y);
+            }
+        }
+    }
+
+    public bool IsVisible(int index) => index >= 0 && index < tabs.Count && tabs[index].rect.gameObject.activeSelf;
 
     /// <summary>The tabs' rects, for PadTabs (where the bumpers' glyphs go).</summary>
     public List<RectTransform> Rects => tabs.ConvertAll(tab => tab.rect);

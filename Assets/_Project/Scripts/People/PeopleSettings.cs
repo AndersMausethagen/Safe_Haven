@@ -99,6 +99,9 @@ public sealed class PeopleSettings : GameSettings<PeopleSettings>
     [Tooltip("Metres between two workplaces that count as working near each other, and between two homes that are next door.")]
     [SerializeField, Min(1f)] private float nearReach = 25f;
     [SerializeField, Min(1f)] private float nextDoor = 15f;
+    [Tooltip("The Campaign's band: written friends never sink below Friendly, and only a rivals' scene makes two people Rivals " +
+             "(the writing wins). Off for a Sandbox, where standings drift freely.")]
+    [SerializeField] private bool keepToTheWriting = true;
     [Tooltip("A rivals' argument at the fire: the chance it clears the air, what that adds, and what it takes when it hardens instead.")]
     [SerializeField, Range(0f, 1f)] private float clearedAirChance = 0.5f;
     [SerializeField, Min(0f)] private float clearedAir = 2f;
@@ -171,6 +174,9 @@ public sealed class PeopleSettings : GameSettings<PeopleSettings>
     public float NearGain => nearGain;
     public float NearReach => nearReach;
     public float NextDoor => nextDoor;
+    /// <summary>The Campaign's band (Docs/CampaignAudit_2026-11-23.md §4.4): written friends never sink below Friendly, and only a rivals' scene
+    /// makes two people Rivals. Off in a Sandbox, where standings drift freely.</summary>
+    public bool KeepToTheWriting => keepToTheWriting;
     public float ClearedAirChance => clearedAirChance;
     public float ClearedAir => clearedAir;
     public float Hardened => hardened;

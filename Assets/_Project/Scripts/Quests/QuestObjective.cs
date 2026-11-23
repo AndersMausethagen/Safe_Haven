@@ -65,6 +65,8 @@ public enum ObjectiveType
     HealMark = 27,
     /// <summary>Give someone a piece of kit to carry on raids: the person named, or anyone; an item named, or any.</summary>
     GiveKit = 28,
+    /// <summary>Send people out on a foray and see them home (the Haven's Lands): X forays.</summary>
+    CompleteForay = 29,
 }
 
 /// <summary>
@@ -141,7 +143,8 @@ public sealed class QuestObjective
         && type != ObjectiveType.AssignJob && type != ObjectiveType.ReachHavenRank && type != ObjectiveType.StoreItem
         && type != ObjectiveType.RepairItem && type != ObjectiveType.UpgradeBuilding && type != ObjectiveType.EnchantItem
         && type != ObjectiveType.LearnEnchantment && type != ObjectiveType.GiveInscription && type != ObjectiveType.EmpowerItem
-        && type != ObjectiveType.ResidentRank && type != ObjectiveType.BecomeFriends && type != ObjectiveType.HealMark && type != ObjectiveType.GiveKit;
+        && type != ObjectiveType.ResidentRank && type != ObjectiveType.BecomeFriends && type != ObjectiveType.HealMark && type != ObjectiveType.GiveKit
+        && type != ObjectiveType.CompleteForay;
     public int Amount => Mathf.Max(1, amount);
     public bool CountAlreadyOwned => countAlreadyOwned && Array.IndexOf(FieldsOf(type), nameof(countAlreadyOwned)) >= 0;
     public ItemDefinition Item => item;
@@ -359,6 +362,8 @@ public sealed class QuestObjective
         [ObjectiveType.BecomeFriends] = false,
         [ObjectiveType.HealMark] = false,
         [ObjectiveType.GiveKit] = false,
+        // A foray is the Haven's people going out.
+        [ObjectiveType.CompleteForay] = false,
     };
 
     /// <summary>The types the co-op rule covers (for the check that none is missing).</summary>
@@ -454,6 +459,8 @@ public sealed class QuestObjective
                 return gameEvent.Kind == GameEventKind.MarkHealed && Is(mark, gameEvent.Subject, false) && Is(person, gameEvent.Detail, false) ? 1 : 0;
             case ObjectiveType.GiveKit:
                 return gameEvent.Kind == GameEventKind.KitGiven && Is(item, gameEvent.Subject, false) && Is(person, gameEvent.Detail, false) ? 1 : 0;
+            case ObjectiveType.CompleteForay:
+                return gameEvent.Kind == GameEventKind.ForayReturned ? 1 : 0;
             default:
                 return 0;
         }
@@ -717,6 +724,8 @@ public sealed class QuestObjective
             case ObjectiveType.HealMark:
                 string healed = mark != null ? mark.DisplayName : "a hard mark";
                 return person != null ? $"Heal {person.DisplayName}'s {healed}" : $"Heal someone's {healed}";
+            case ObjectiveType.CompleteForay:
+                return Amount == 1 ? "Send people out on a foray and see them home ({key:Haven}, Lands)" : $"See {count} forays home ({{key:Haven}}, Lands)";
             case ObjectiveType.GiveKit:
                 string piece = item != null ? item.DisplayName : "a piece of kit";
                 return $"Give {(person != null ? person.DisplayName : "someone")} {piece} to carry (talk to them)";

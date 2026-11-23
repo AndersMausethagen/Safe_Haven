@@ -82,6 +82,8 @@ public enum GameEventKind
     MarkHealed = 36,
     /// <summary>The player gave someone a piece of kit (CompanionKit.Give). Subject: the ItemDefinition; Detail: their ResidentDefinition.</summary>
     KitGiven = 37,
+    /// <summary>A foray came home (Forays.Tick), gone well or not. No subject.</summary>
+    ForayReturned = 38,
 }
 
 /// <summary>

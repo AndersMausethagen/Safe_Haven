@@ -118,3 +118,44 @@ Introduction points come from the quest assets (`Unlocks Buildings`), the settin
 Nothing built needs taking out. The spine (rescue order, one building per quest, the Keeper's view after the Heartroot, territory
 in Act II, meals with the Kitchen, fields with Asa) already follows the budget. Most of the sandbox depth sits behind people and
 quests, as Dragon Quest Builders 2 and Enshrouded do it.
+
+---
+
+## 6. As built (2026-11-23)
+
+The user's answers:
+1. The horse later, once it solves a problem ("no carts to drag yet").
+2. Forays as suggested.
+3. The people layer as it fills.
+4. The band in the Campaign.
+5. The logger: playtime that isn't play shouldn't count.
+6. The Haven after the story, later.
+
+Unplayed by hand. Tests: `CampaignBudgetTests`.
+
+1. **A Horse of Your Own** now follows Tor's **Heavy Loads**, which brings the Wainwright's Yard and its carts; horses pull carts
+   (`HorseHitch`). Its text opens with why: a loaded cart drags at your arms, and the woods past the Haven are wide.
+2. **Past the Ridge** (`Data/Quests/PastTheRidge.asset`, Tor's line after Raise the Walls): speak to Tor, then send a foray and see
+   it home.
+   - `ForaySettings › Unlocked By` names it, and the Lands tab shows no forays to send before it starts (`Forays.Unlocked`).
+   - A foray already out, from an older save, still shows and comes home.
+   - Its return raises **ForayReturned**, which the new objective **CompleteForay** counts.
+3. **The resident window shows itself as it fills.**
+   - Bonds once three people are home or they carry a mark (`KitTabs.SetVisible`; the pad's bumpers skip hidden tabs).
+   - Their kit after their first raid along. Before that, a word on how it comes.
+   - "Who does what" once three trades are known (the window and the Haven's People).
+4. **The writing band** (`PeopleSettings › Keep To The Writing`, on): a written friendship never sinks below Friendly, and nothing
+   but a rivals' scene (`PeopleStandings.Argue`) makes two people Rivals (`PeopleStandings.Banded`). A Sandbox turns it off.
+5. **The logger** (`PlaytestLogger`):
+   - Play time and home time leave out time with another window in front (`Application.isFocused`). The pause menu was already
+     left out: it holds `GamePause`.
+   - Walking is judged over a quarter of a second, not a frame.
+   - Home time in a window is written as `window:<id>`, the window in front (`UIStateManager.Front`), so the 48% can be broken down.
+6. **The Haven after the story and the Sandbox** are in `Docs/TODO.md`.
+
+Found while building: the full suite before the build had two failures from the 11-22 batch.
+- Steady the Door's test still expected one objective.
+- The tier I wolf pack weighed 14 after the widow moved, so wolves were 51% of tier I. It is 8 now: wolves 38%, small trolls 24%,
+  black widows 20%, wisps 18%.
+
+The Stablehand job (step 8 of the people review) had not been added to the content database; it is now.

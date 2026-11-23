@@ -234,6 +234,14 @@ public static class Forays
     }
 
     /// <summary>Played time passes (SettlementSystem, at home and raiding): the foray comes home once its time is up.</summary>
+    /// <summary>Whether forays can be sent: their quest has started (ForaySettings › Unlocked By), or none is set. A foray already out
+    /// (an older save) still comes home either way.</summary>
+    public static bool Unlocked(ForaySettings settings)
+    {
+        QuestDefinition quest = settings != null ? settings.UnlockedBy : null;
+        return quest == null || Cheats.NoRequirements || (GameSession.Quests != null && GameSession.Quests.StatusOf(quest) != QuestStatus.NotStarted);
+    }
+
     public static void Tick(SettlementState home, float seconds, ItemContainer chests, ForaySettings settings, System.Func<float> roll,
         System.Func<int, int, int> amount)
     {
@@ -252,6 +260,12 @@ public static class Forays
         ForaySettings.Destination place = settings.Find(foray.Destination);
         List<ResidentRecord> party = MembersOf(home, foray);
         bool won = roll() < foray.Chance;
+        // For quests (QuestObjective › Complete Foray): one's own people home from one, gone well or not.
+        if (!HavenVisit.IsVisiting)
+        {
+            GameEvents.Raise(new GameEvent(GameEventKind.ForayReturned, null, 1));
+        }
+
         List<ItemAmount> haul = place != null ? Haul(place, foray.HaulScale * (won ? 1f : settings.FailedHaul), roll, amount) : new List<ItemAmount>();
         var brought = new List<string>();
         foreach (ItemAmount found in haul)

@@ -166,7 +166,7 @@ public sealed class ResidentWindow : MonoBehaviour
                 portrait.Hide();
             }
         };
-        PadTabs.Register(this, () => window != null && window.IsOpen, step => ShowTab((Tab)PadTabs.Next((int)tab, TabNames.Length, step)),
+        PadTabs.Register(this, () => window != null && window.IsOpen, step => ShowTab(NextShown(step)),
             () => tabs.Rects);
     }
 
@@ -446,8 +446,40 @@ public sealed class ResidentWindow : MonoBehaviour
 
     // ----- Showing it -----
 
+    // The next tab shown from here, by the bumpers (a hidden one skipped).
+    private Tab NextShown(int step)
+    {
+        int at = (int)tab;
+        for (int i = 0; i < TabNames.Length; i++)
+        {
+            at = PadTabs.Next(at, TabNames.Length, step);
+            if (tabs.IsVisible(at))
+            {
+                return (Tab)at;
+            }
+        }
+
+        return tab;
+    }
+
+    // The people layer shows itself as it fills (Docs/CampaignAudit_2026-11-23.md §4.3): Bonds once three are home or they carry a mark.
+    private void ShowTabsFor(ResidentRecord record)
+    {
+        bool bonds = GameSession.Here.Residents.Count >= 3 || (record != null && record.Marks.Count > 0);
+        tabs.SetVisible((int)Tab.Bonds, bonds);
+        if (!bonds && tab == Tab.Bonds)
+        {
+            ShowTab(Tab.Overview);
+        }
+    }
+
     private void ShowTab(Tab shown)
     {
+        if (!tabs.IsVisible((int)shown))
+        {
+            shown = Tab.Overview;
+        }
+
         tab = shown;
         for (int i = 0; i < pages.Length; i++)
         {
@@ -486,6 +518,7 @@ public sealed class ResidentWindow : MonoBehaviour
         }
 
         nextRefresh = Time.unscaledTime + RefreshSeconds;
+        ShowTabsFor(record);
         UIStyle style = UIStyle.Current;
         ResidentNpc npc = ResidentNpc.Of(who);
         BuildingObject house = HavenHomes.HomeOf(record);
@@ -733,7 +766,10 @@ public sealed class ResidentWindow : MonoBehaviour
                 () => ResidentNpc.GiveJob(who, offered, Player.Current != null ? Player.Current.gameObject : null)) { Icon = "Hammer", Status = holds ? "Now" : "" });
         }
 
-        actions.Add(new MenuAction("Who does what", "Everyone, every trade", true, WorkGridWindow.Show) { Icon = "Stats" });
+        if (GameSession.Here.KnownJobs().Count >= 3)
+        {
+            actions.Add(new MenuAction("Who does what", "Everyone, every trade", true, WorkGridWindow.Show) { Icon = "Stats" });
+        }
         return actions;
     }
 
@@ -1104,7 +1140,9 @@ public sealed class ResidentWindow : MonoBehaviour
     // Their kit: the two pieces as pictures (or empty hands), and giving or taking back here (as in talk; one's own Haven only).
     private void RefreshKit(ResidentRecord record, UIStyle style)
     {
-        bool fights = record.Resident.RaidCompanion != null;
+        // Their own kit once they have raided beside the player (or already carry some): before, a word on how it comes.
+        bool raided = record.RaidsAlong > 0 || !record.KitWeapon.IsEmpty || !record.KitBody.IsEmpty;
+        bool fights = record.Resident.RaidCompanion != null && raided;
         for (int i = 0; i < kitCards.Length; i++)
         {
             bool weapon = i == 0;
@@ -1121,7 +1159,9 @@ public sealed class ResidentWindow : MonoBehaviour
             kitCards[i].SetLook(piece.IsEmpty, piece.IsBroken ? style.Warning : (Color?)null);
         }
 
-        kitNote.text = !fights ? "They stay home when you raid." : record.KitWeapon.IsEmpty && record.KitBody.IsEmpty
+        kitNote.text = record.Resident.RaidCompanion == null ? "They stay home when you raid."
+            : !raided ? "Take them on a raid: after that, you can give them a weapon and clothes of their own."
+            : record.KitWeapon.IsEmpty && record.KitBody.IsEmpty
             ? "Give them a weapon that suits how they fight, and a body piece: theirs by name after enough raids."
             : $"Wears with every raid along. Mend it by taking it back. Theirs by name after {PeopleSettings.Current.KitNamedAfter} raids.";
         kitActions.Show(fights && !HavenVisit.InHostsHaven ? KitActions(record) : new List<MenuAction>());

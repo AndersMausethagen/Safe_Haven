@@ -68,6 +68,12 @@ public static class HavenLands
             return shelf;
         }
 
+        // Before their quest (Tor's Past the Ridge), there are none to send: a person brings them (Docs/CampaignAudit_2026-11-23.md).
+        if (!Forays.Unlocked(settings))
+        {
+            return shelf;
+        }
+
         TerritorySettings lands = TerritorySettings.Current;
         List<ResidentRecord> free = Forays.Strongest(home, int.MaxValue, settings, lands);
         int count = Mathf.Clamp(forayCount, 1, Mathf.Max(1, Mathf.Min(settings.MostMembers, free.Count)));

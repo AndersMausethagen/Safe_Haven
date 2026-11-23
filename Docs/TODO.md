@@ -3,6 +3,16 @@
 Open work and ideas. Tick items off (`[x]`) or delete them when done. Architecture notes for each system live in
 [ARCHITECTURE.md](../Assets/_Project/Scripts/ARCHITECTURE.md).
 
+## Campaign and Sandbox (2026-11-23, the user's answers to Docs/CampaignAndSandboxResearch_2026-11-23.md)
+
+- [ ] **The Haven after the story** (answer 2: yes, later): when the Campaign's ending exists, the Haven carries on as an open game with a
+      director for nights, wanderers (the eleven as rare visitors fit here too) and wishes. Build it once the story's end is written.
+- [ ] **Sandbox mode** (answer 3): only after the Campaign is done and refined. Needs its own unlock spine (renown or research, not
+      quests and rescues), rolled strangers (the people review's step 9), an event director, scenario settings, a mode flag on the save;
+      the eleven written people appear as rare wanderers (answer 4).
+- [ ] **Measure the first two hours** with the newest systems in: ask the friends for their 11-22 CSVs, then the next build's (the
+      logger now leaves out time away from the game, measures walking properly and names the window open).
+
 ## Queued by the user (2026-11-11), in this order
 
 1. ~~**Horse improvements**~~ (done 2026-11-12 but co-op, which is 4; GDD §10.9). Not yet seen in Play: a horse at work

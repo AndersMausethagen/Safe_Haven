@@ -202,7 +202,7 @@ MonoBehaviour:
     huntPlayer: 0
     entries:
     - prefab: {fileID: 4584692032328657812, guid: 64cf9de042e1bc142907212054f70f50, type: 3}
-      weight: 14
+      weight: 8
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 1
