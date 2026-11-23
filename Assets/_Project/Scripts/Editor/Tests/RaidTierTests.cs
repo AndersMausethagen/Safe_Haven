@@ -136,7 +136,7 @@ public sealed class RaidTierTests
     public void AtTheRecommendedKit_FightsStayAlike_AndSkippingATierHurts()
     {
         List<ItemDefinition> gear = GearBalance.AllGear();
-        GearBalance.Kit first = GearBalance.KitOf(1, gear);
+        GearBalance.Kit first = GearBalance.EntryKitOf(1, gear); // fed, as every tier is tuned to (2026-11-23)
         float kill = GearBalance.HitsToKill(first, 100f, 10f, Raid.Difficulties[0].enemyHealth);
         float die = GearBalance.HitsToDie(first, 15f, Raid.Difficulties[0].enemyPower);
         foreach (RaidDifficulty tier in Raid.Difficulties)

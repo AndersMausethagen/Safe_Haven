@@ -37,6 +37,8 @@ public sealed class CoatedFireTests
         Assert.IsTrue(CoatedFire.Ignites(0.05f, 0.01f));
         Assert.IsFalse(CoatedFire.Ignites(0.05f, 0.2f));
         Assert.IsFalse(CoatedFire.Ignites(0f, 0f), "no chance never ignites, even on a roll of 0");
+        Assert.IsTrue(CoatedFire.Ignites(0.05f, 0.99f, true), "a heavy or charged blow, coated, always sets it alight");
+        Assert.IsFalse(CoatedFire.Ignites(0f, 0f, true), "uncoated, not even a heavy one");
     }
 
     [Test]

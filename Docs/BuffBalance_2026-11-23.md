@@ -5,8 +5,31 @@ that new effects or buffs get too weak so using them does almost nothing. If nec
 each tier scale higher. [...] Do we have underwhelming effects from pots, foods, buffs etc? Should we instead of nerfing effects,
 increase the power level of the different tiers?"
 
-**What is built today:** Ember Pitch has a damage budget of its own, ×1.35 over the stacked kit (`PowerCurveSettings` › Coating
-Damage), as enchantments have theirs. Nothing else here is built; the rest needs the user's answers (§5).
+## Status: built 2026-11-23 (the user: "do all you recommended", and heavy charges 10% faster)
+
+- **B1, flat armour becomes percent:** Honey Cake +15% armour, Barkskin +20%, Ironbark +30% (and its 5% resistance), Haven Feast
+  +18%.
+- **B2, felt sizes:**
+  - Fierce: Roast Boar Strength 6, Smoked Boar Strength 7, Trout in Cream +25%, Honey Mead +18% (−5 armour), Cursed Draught +25%
+    (−8 armour).
+  - Hearty: Hunter's Stew and Purified Draught +15% health, Boar Pie +20% health and +10% armour, Haven Feast +22% health and +18%
+    armour.
+  - Each tier's own food is a step past the last tier's, so mastering a tier includes its kitchen.
+- **B3, the reach:** damage ×1.5 (tier V ×1.65), toughness ×1.7; the coating's ×1.35 stays on top.
+- **B4, tuned to a fed kit.** The entry kit eats **one** meal, its best (`GearBalance.EntryKitOf`, `FoodSlots.MealsOnly`).
+  - Two meals left no room for the user's rule that mastering a tier makes it a fifth easier: the tier's food, the second plate and the
+    tonic are now part of mastering.
+  - Every raid's tier multipliers were raised by the fed kit's gain over the hungry one: health ×1.0–1.17, power ×1.0–1.36 (tier V's
+    power most, as Haven Feast is its meal).
+  - Coming in hungry is harder by that much, and coming in fed is as before.
+  - The two boss encounters are scaled too.
+- **Ember Pitch:** coated heavy and charged blows always set the struck alight; lights keep 5%.
+- **RaidTierTests and PowerCurveTests pass on the new numbers.** Not played by hand.
+
+---
+
+**Before this:** Ember Pitch had a damage budget of its own, ×1.35 over the stacked kit (`PowerCurveSettings` › Coating Damage), as
+enchantments have theirs.
 
 ## The short answer
 

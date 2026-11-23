@@ -37,6 +37,7 @@ MonoBehaviour:
   healAmount: 0
   healAtOnce: 0
   healSeconds: 0
+  healAsShare: 0
   hungerRestore: 0
   thirstRestore: 0
   waterCapacity: 0
@@ -44,12 +45,13 @@ MonoBehaviour:
   boonBonuses:
   - stat: 14
     op: 0
-    value: 0.15
+    value: 0.25
   - stat: 7
     op: 0
     value: -8
   boonSeconds: 180
   tonic: 1
+  coating: 0
   cures: []
   gearRepair: 0
   placesInRaid: {fileID: 0}

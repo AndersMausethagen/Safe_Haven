@@ -45,9 +45,10 @@ MonoBehaviour:
   boonBonuses:
   - stat: 13
     op: 0
-    value: 4
+    value: 7
   boonSeconds: 600
   tonic: 0
+  coating: 0
   cures: []
   gearRepair: 0
   placesInRaid: {fileID: 0}

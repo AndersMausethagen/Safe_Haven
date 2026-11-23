@@ -20,6 +20,7 @@ MonoBehaviour:
   rarity: 1
   value: 80
   gearScoreOverride: 0
+  raidOnly: 0
   icon: {fileID: 21300000, guid: d7d76dbc7b32d5d4daa12dc924885e1d, type: 3}
   prefab: {fileID: 0}
   heldModel: {fileID: 0}
@@ -34,6 +35,9 @@ MonoBehaviour:
   weapon: {fileID: 0}
   arrow: {fileID: 0}
   healAmount: 25
+  healAtOnce: 0
+  healSeconds: 0
+  healAsShare: 0
   hungerRestore: 90
   thirstRestore: 40
   waterCapacity: 0
@@ -41,12 +45,13 @@ MonoBehaviour:
   boonBonuses:
   - stat: 0
     op: 1
-    value: 0.1
+    value: 0.22
   - stat: 7
-    op: 0
-    value: 12
+    op: 1
+    value: 0.18
   boonSeconds: 720
   tonic: 0
+  coating: 0
   cures: []
   gearRepair: 0
   placesInRaid: {fileID: 0}
@@ -58,10 +63,12 @@ MonoBehaviour:
   armorSlot: 0
   wornLook: {fileID: 0}
   statBonuses: []
+  breaksInto: []
   teachesBuildings: []
   teachesRecipes: []
   experience: 0
   learnedAtHome: 0
+  inscription: 0
   transport: {fileID: 0}
   sapling: {fileID: 0}
   lantern: {fileID: 0}
@@ -74,3 +81,6 @@ MonoBehaviour:
   runeFocus: 30
   runeFor: 0
   raidModifier: {fileID: 0}
+  workerCarryWeight: 0
+  workerCarrySlots: 0
+  workerSpeed: 0

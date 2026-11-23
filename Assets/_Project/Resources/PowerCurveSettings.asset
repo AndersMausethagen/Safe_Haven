@@ -12,8 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec03c631a98814141961d63d69a0958b, type: 3}
   m_Name: PowerCurveSettings
   m_EditorClassIdentifier: SafeHaven::PowerCurveSettings
-  stackedToughness: 1.5
-  stackedDamage: 1.35
+  stackedToughness: 1.7
+  stackedDamageByTier:
+  - 1.5
+  - 1.5
+  - 1.5
+  - 1.5
+  - 1.65
+  coatingDamage: 1.35
   mounted: 1.35
   charge: 1.7
   partyShareTolerance: 0.02

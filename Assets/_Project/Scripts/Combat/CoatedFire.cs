@@ -12,11 +12,13 @@ public static class CoatedFire
     /// <summary>The fire a swing that brought <paramref name="incoming"/> damage (before defences) carries at this share.</summary>
     public static float Amount(float incoming, float share) => share > 0f && incoming > 0f ? incoming * share : 0f;
 
-    /// <summary>True when a roll (0 to 1) under the chance sets the creature alight.</summary>
-    public static bool Ignites(float chance, float roll) => chance > 0f && roll < chance;
+    /// <summary>True when a roll (0 to 1) under the chance sets the creature alight; a heavy or charged blow always does, coated (the
+    /// user, 2026-11-23: a light blow's 5% was easy to miss, and it gives the big blows a reason).</summary>
+    public static bool Ignites(float chance, float roll, bool weighty = false) => chance > 0f && (weighty || roll < chance);
 
     /// <summary>A coated swing has landed on <paramref name="target"/> with <paramref name="result"/>: its fire, and maybe a burn.</summary>
-    public static void AfterSwing(Combatant by, IDamageable target, in DamageResult result, float weaponDamage, Vector3 point, Vector3 direction)
+    public static void AfterSwing(Combatant by, IDamageable target, in DamageResult result, float weaponDamage, Vector3 point, Vector3 direction,
+        HitTechnique technique = HitTechnique.None)
     {
         if (by == null || target == null || !result.Landed || result.Blocked || result.Parried || target.Category != TargetCategory.Creature)
         {
@@ -31,7 +33,8 @@ public static class CoatedFire
             target.ApplyDamage(new DamageInfo(by, null, fire, DamageType.Fire, false, point, direction, 0f, HitTechnique.OverTime));
         }
 
-        if (target.IsAlive && target is Damageable body && Ignites(stats.Get(StatType.MeleeIgniteChance), Random.value))
+        if (target.IsAlive && target is Damageable body && Ignites(stats.Get(StatType.MeleeIgniteChance), Random.value,
+                (technique & (HitTechnique.Heavy | HitTechnique.Charged)) != 0))
         {
             CombatTechniqueSettings rules = CombatTechniqueSettings.Current;
             Burning.Apply(body, by, rules.MeleeBurnShare * weaponDamage, rules.MeleeBurnSeconds);

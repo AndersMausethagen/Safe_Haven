@@ -170,15 +170,16 @@ public static class GearBalance
         StackedKitOf(tier, gear, enchanted, reached, true);
 
     /// <summary>
-    /// The kit a player enters a tier with (the user, 2026-11-15: hard at entry, mastered just before the next): the tier's gear and what
-    /// they keep from the tier before (perks, enchantments known), without what is eaten or slept for each raid. The tier's multipliers
-    /// are tuned to this one (RaidTierTests); a player who eats and rests well finds it easier, and a mastered one is ready for the next.
-    /// At tier I it is the plain kit: a new player has nothing yet.
+    /// The kit a tier is tuned to (the user, 2026-11-15: hard at entry, mastered just before the next): the tier's gear, the perks and
+    /// enchantments kept from the tier before, and one meal, the best of the food then within reach. Fed, since
+    /// 2026-11-23 (Docs/BuffBalance_2026-11-23.md B4): food is the everyday baseline, as in Valheim and Monster Hunter, so a meal is felt
+    /// and coming in hungry is harder. No tonic, coating or rest: those are the edge for a hard fight, and part of mastering a tier.
     /// </summary>
-    /// <summary>The kit a tier is tuned to: its gear, and the perks and enchantments kept from the tier before; no food, no rest.
-    /// (Docs/PowerCurveResearch_2026-11-22.md #11 counted Well Rested here, since every raid sets out rested; that moved its 10% out of
-    /// mastering at every tier, against the user's rule that mastering a tier makes it a fifth easier: RaidTierTests. Kept out.)</summary>
     public static Kit EntryKitOf(int tier, IReadOnlyList<ItemDefinition> gear) =>
+        StackedKitOf(tier, gear, tier > 1, Mathf.Max(0, tier - 1), true, FoodSlots.MealsOnly);
+
+    /// <summary>The same kit unfed (no meals): what the tiers were tuned to before 2026-11-23, and what coming in hungry meets.</summary>
+    public static Kit HungryEntryKitOf(int tier, IReadOnlyList<ItemDefinition> gear) =>
         tier <= 1 ? KitOf(tier, gear) : StackedKitOf(tier, gear, true, tier - 1, false);
 
     /// <summary>Everything within reach by the end of the tier, food and rest included: the tier mastered.</summary>
@@ -199,6 +200,9 @@ public static class GearBalance
         Every,
         /// <summary>The base and one more of each, as the GDD words the tonic's ("from the Master's Shelf or the Second Vial").</summary>
         OneMoreOfEach,
+        /// <summary>One meal, the best within reach: no second plate, no tonic, no rest. A fed player, as every tier is now tuned to
+        /// (Docs/BuffBalance_2026-11-23.md B4, the user: "do all you recommended").</summary>
+        MealsOnly,
     }
 
     /// <summary>A stacked kit with or without its coating (Ember Pitch): a coating has a budget of its own, as enchantments do
@@ -314,7 +318,7 @@ public static class GearBalance
         {
             int extraMeals = MostFromBuildings(upgrade => upgrade.extraMealSlots, reached) + (TechniqueWithin(PerkTechnique.ThirdPlate, skills, level) ? 1 : 0);
             int extraTonics = MostFromBuildings(upgrade => upgrade.extraTonicSlots, reached) + (TechniqueWithin(PerkTechnique.SecondVial, skills, level) ? 1 : 0);
-            if (slots == FoodSlots.Base)
+            if (slots == FoodSlots.Base || slots == FoodSlots.MealsOnly)
             {
                 extraMeals = extraTonics = 0;
             }
@@ -324,8 +328,12 @@ public static class GearBalance
                 extraTonics = Mathf.Min(1, extraTonics);
             }
 
-            Eat(false, (survival != null ? survival.MealSlots : 2) + extraMeals);
-            Eat(true, (survival != null ? survival.TonicSlots : 1) + extraTonics);
+            // A fed kit eats one meal, its best: the second plate, the tier's own kitchen and a tonic are part of mastering it.
+            Eat(false, slots == FoodSlots.MealsOnly ? 1 : (survival != null ? survival.MealSlots : 2) + extraMeals);
+            if (slots != FoodSlots.MealsOnly)
+            {
+                Eat(true, (survival != null ? survival.TonicSlots : 1) + extraTonics);
+            }
             // A weapon coating (Ember Pitch): a slot of its own, one at a time, sharing no family (PlayerBoons).
             ItemDefinition coating = food.Where(item => item.IsCoating)
                 .OrderByDescending(item => { FightMath.Totals t = totals.Copy(); Take(item.BoonBonuses, t); return Worth(t); })
@@ -336,8 +344,11 @@ public static class GearBalance
                 kit.Food.Add(coating);
             }
 
-            // Well Rested (Docs/BaseProgression.md › Endurance): +10% health.
-            totals.HealthShare += WellRestedHealth;
+            // Well Rested (Docs/BaseProgression.md › Endurance): +10% health. Not in a fed kit (meals only).
+            if (slots != FoodSlots.MealsOnly)
+            {
+                totals.HealthShare += WellRestedHealth;
+            }
         }
 
         // Enchantments (Docs/EnchantingResearch.md #1): on each piece the one that fits and adds most, from those the tier's raids hand out
