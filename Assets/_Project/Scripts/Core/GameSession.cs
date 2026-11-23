@@ -266,6 +266,7 @@ public static class GameSession
         SmallScenes.ForgetGame();
         ResidentSpirits.ForgetGame();
         PeopleStandings.ForgetGame();
+        PeopleDay.ForgetGame();
         Forays.ForgetGame();
     }
 }

@@ -260,7 +260,8 @@ public static class PeopleStandings
     // ----- Near at work, next door: worked out from the buildings every Recheck Seconds -----
 
     private const float RecheckSeconds = 10f;
-    private static readonly Dictionary<ResidentRecord, (float until, int friends, bool rival)> near = new Dictionary<ResidentRecord, (float, int, bool)>();
+    // By who, not by record: a guest's copy of a friend's Haven is rebuilt with new records many times a visit.
+    private static readonly Dictionary<ResidentDefinition, (float until, int friends, bool rival)> near = new Dictionary<ResidentDefinition, (float, int, bool)>();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => near.Clear();
@@ -281,13 +282,13 @@ public static class PeopleStandings
 
     private static (float until, int friends, bool rival) Near(ResidentRecord record)
     {
-        if (record == null)
+        if (record?.Resident == null)
         {
             return default;
         }
 
         float now = Time.unscaledTime;
-        if (near.TryGetValue(record, out (float until, int friends, bool rival) known) && now < known.until)
+        if (near.TryGetValue(record.Resident, out (float until, int friends, bool rival) known) && now < known.until)
         {
             return known;
         }
@@ -320,7 +321,7 @@ public static class PeopleStandings
         }
 
         var found = (now + RecheckSeconds, Mathf.Min(friends, settings.MostNearFriends), rival);
-        near[record] = found;
+        near[record.Resident] = found;
         return found;
     }
 

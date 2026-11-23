@@ -59,7 +59,14 @@ public static class ResidentTalents
             }
         }
 
+        // At least the rank's level, and enough for the speed the rank gave before talents (never slower than before).
         int level = ranks.WorkerRanks.Count > 0 ? ranks.WorkerRanks[index].level : 1;
+        float perLevel = PeopleSettings.Current.SpeedPerLevel;
+        if (ranks.WorkerRanks.Count > 0 && perLevel > 0f)
+        {
+            level = Mathf.Max(level, 10 + Mathf.CeilToInt((ranks.WorkerRanks[index].speed - 1f) / perLevel - 0.0001f));
+        }
+
         LevelingSettings rules = LevelingSettings.Current;
         float needed = rules.TotalExperienceFor(Mathf.Clamp(level, 1, rules.MaxLevel));
         if (record.Talents.ExperienceOf(skill.Id) < needed)
@@ -389,11 +396,14 @@ public static class ResidentTalents
 
     // ----- Passions the player helps grow (§3.2: at bond ranks Trusted and Sworn) -----
 
-    /// <summary>A bond rank reached: one more passion pick is owed them.</summary>
-    public static void OwePick(ResidentRecord record)
+    /// <summary>A bond rank (<paramref name="rank"/>) reached: one more passion pick is owed them, once a rank (found again and
+    /// rising through it a second time pays nothing more).</summary>
+    public static void OwePick(ResidentRecord record, string rank)
     {
-        if (record != null && PeopleSettings.Current.PicksAtBondRanks)
+        string key = "pick:" + rank;
+        if (record != null && PeopleSettings.Current.PicksAtBondRanks && record.DeedOf(key) == 0)
         {
+            record.AddDeed(key, 1);
             record.Talents.SetPicksOwed(record.Talents.PicksOwed + 1);
         }
     }

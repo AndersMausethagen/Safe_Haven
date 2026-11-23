@@ -279,3 +279,34 @@ Six parts. Each stands on its own, and they are listed in build order. Everythin
 4. **Fixed or rolled.** The 11 keep written talents and traits, with player choices at bond ranks (recommended). Should later strangers and wanderers be rolled RimWorld-style, which would bring more recruits than the 11?
 5. **Companion gear.** Should you equip companions from your stash, with the items named after long use (recommended)?
 6. **Romance.** Friendships and rivalries only (recommended for now), or relationships and families as RimWorld has?
+
+---
+
+## 7. As built (2026-11-23)
+
+The user said "implement as recommended": every §6 answer is the recommended one. Built in commits 9b728b96, 1a6e241c (first review),
+c830c242 (window UX pass) and the second review's fixes; design and file map in ARCHITECTURE.md "People". Unplayed by hand. Where the
+build differs from §3:
+
+- **Talents.** As written. Talents never make work slower than before talents (Least Speed 1), so helpers and ring workers at an
+  unlisted level work as they did. An old save's rank converts to at least the level that gave its old speed.
+- **Worker gear quality.** Built, but no job's work orders make gear yet, so for now an inspired Craft gives two more of the next craft
+  at the bench instead of a finer piece.
+- **Traits.** All 11 written ones plus 7 general ones (Tireless, Early Riser, Brave, Wary, Kind, Sharp-Tongued, Light Sleeper) are
+  built. Simplified from the table:
+  - Opinionated: +15% at scaffolds, not +10% building health.
+  - Night Eyes: works late and starts late, sees further at night; the night-only rumour isn't built.
+  - Proud Cook: everyone she feeds well gets half as much again of Well Fed, and she cooks 10% slower.
+  - Secretive: finer draughts and slower friendships; bond-gated topics aren't built.
+  - Steadfast: +20% health defending and less dodge; it doesn't refuse the Retreat order.
+  - Born Leader: +10% to everyone else on a foray; others aren't cheered when she returns.
+  - Hammer-Gruff: his asks pay double, and friendships come at half pace (there are no gifts to double).
+  - Seed-Keeper: half her harvests give one more; the anniversary day off isn't built.
+- **Spirits, inspired days, friends and rivals, marks, kit.** As written. Not built:
+  - helping a friend up in a breach raising the standing (residents don't help each other up yet);
+  - friends being sad at someone wearing a lost friend's gear;
+  - the Haven chronicle on the Journal page;
+  - showing skills in the raid companion picker. Forays already choose the best for a land's skill.
+- **Kit.** It is given and taken back in talk or from the window's Overview. A piece is named after 8 raids, counted by item, so
+  mending doesn't reset it.
+- **Lines.** The trait lines and the 13 new scenes (6 friends', 7 rivals') are written but not yet voiced.

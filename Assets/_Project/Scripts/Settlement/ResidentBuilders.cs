@@ -20,11 +20,19 @@ public sealed class ResidentBuilders : MonoBehaviour
     private static readonly List<ResidentDefinition> worked = new List<ResidentDefinition>();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForNewPlaySession() => worked.Clear();
+    private static void ResetForNewPlaySession() => ForgetGame();
 
     /// <summary>Forgets who built while the player was away in the game being played (a new game, or a load: GameSession): a raid
     /// left by the menu named the old game's builders in the next game's message home.</summary>
-    public static void ForgetGame() => worked.Clear();
+    public static void ForgetGame()
+    {
+        worked.Clear();
+        hammered.Clear();
+    }
+
+    // Seconds of building work while the player is away not yet counted toward each one's Construction (counted a second's worth at a
+    // time: a frame's sliver was lost to a float holding thousands of experience).
+    private static readonly Dictionary<ResidentDefinition, float> hammered = new Dictionary<ResidentDefinition, float>();
 
     /// <summary>
     /// How many who live here build (their job is one of HomeLifeSettings › Builders) and are at home to do it: not
@@ -118,9 +126,16 @@ public sealed class ResidentBuilders : MonoBehaviour
                 // A practised builder's hands count for more (their Construction: ResidentTalents), and practise as they work.
                 PeopleSettings people = PeopleSettings.Current;
                 hands += share * ResidentTalents.SpeedAt(record, people.BuildingSkill);
-                if (settlement.ScaffoldsWaiting && seconds > 0f)
+                if (settlement.ScaffoldsWaiting && seconds > 0f && record.Resident != null)
                 {
-                    ResidentTalents.Practise(record, people.BuildingSkill, 1, seconds * share * people.BuildPracticePerSecond);
+                    float since = (hammered.TryGetValue(record.Resident, out float had) ? had : 0f) + seconds * share;
+                    if (since >= 1f)
+                    {
+                        ResidentTalents.Practise(record, people.BuildingSkill, 1, since * people.BuildPracticePerSecond);
+                        since = 0f;
+                    }
+
+                    hammered[record.Resident] = since;
                 }
 
                 if (!worked.Contains(record.Resident))

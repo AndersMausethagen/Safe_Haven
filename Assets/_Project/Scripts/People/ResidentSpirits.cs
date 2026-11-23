@@ -141,7 +141,8 @@ public static class ResidentSpirits
         record != null && Cached(record) == Spirits.Low ? -PeopleSettings.Current.LowWork : 0f;
 
     private const float RecheckSeconds = 2f;
-    private static readonly Dictionary<ResidentRecord, (float until, Spirits spirits)> cache = new Dictionary<ResidentRecord, (float, Spirits)>();
+    // By who, not by record: a guest's copy of a friend's Haven is rebuilt with new records many times a visit.
+    private static readonly Dictionary<ResidentDefinition, (float until, Spirits spirits)> cache = new Dictionary<ResidentDefinition, (float, Spirits)>();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => cache.Clear();
@@ -154,7 +155,8 @@ public static class ResidentSpirits
     public static Spirits Cached(ResidentRecord record)
     {
         float now = Time.unscaledTime;
-        if (cache.TryGetValue(record, out (float until, Spirits spirits) known) && now < known.until)
+        ResidentDefinition who = record?.Resident;
+        if (who != null && cache.TryGetValue(who, out (float until, Spirits spirits) known) && now < known.until)
         {
             return known.spirits;
         }
@@ -162,7 +164,11 @@ public static class ResidentSpirits
         PeopleSettings settings = PeopleSettings.Current;
         int steps = StepsOf(record, GameSession.Here);
         Spirits spirits = steps >= settings.BrightAt ? Spirits.Bright : steps <= settings.LowAt ? Spirits.Low : Spirits.Steady;
-        cache[record] = (now + RecheckSeconds, spirits);
+        if (who != null)
+        {
+            cache[who] = (now + RecheckSeconds, spirits);
+        }
+
         return spirits;
     }
 

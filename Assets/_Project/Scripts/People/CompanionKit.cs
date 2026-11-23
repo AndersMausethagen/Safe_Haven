@@ -40,7 +40,7 @@ public static class CompanionKit
 
     /// <summary>
     /// Gives them the piece in <paramref name="from"/>'s <paramref name="slot"/>: what they had of that kind comes back to the bag (or the
-    /// stash, or the feet). Their raids with it start again. False when it doesn't suit them.
+    /// stash, or the feet). Raids with a piece are counted by its item (RaidsWith). False when it doesn't suit them.
     /// </summary>
     public static bool Give(ResidentRecord record, ItemContainer from, int slot, ItemContainer stash, Transform dropAt)
     {
@@ -109,7 +109,7 @@ public static class CompanionKit
                 continue;
             }
 
-            foreach (StatBonus bonus in GearPower.BonusesOf(piece, EssenceSettings.Current, false))
+            foreach (StatBonus bonus in GearPower.BonusesOf(piece, EssenceSettings.Current, true))
             {
                 if (bonus.value != 0f)
                 {

@@ -31,6 +31,9 @@ public static class Place
     /// <summary>In a Haven, one's own or a friend's: no raid, and a portal stands here.</summary>
     public static bool InAHaven => !OnRaid && HomePortal.Current != null;
 
+    /// <summary>In one's own Haven with its scene up: its buildings and people are here to read (PeopleDay's mornings).</summary>
+    public static bool InOwnHaven => AtHome && HomePortal.Current != null;
+
     /// <summary>Where the stash may be used: one's own Haven, or a friend's with their leave.</summary>
     public static bool StashUsable => !OnRaid && (!HavenVisit.IsVisiting || HavenVisit.MayUseStash);
 }

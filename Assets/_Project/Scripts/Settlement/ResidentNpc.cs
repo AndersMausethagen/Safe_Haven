@@ -394,8 +394,9 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
             page.Add(new MenuAction($"Take back the {name}", had.IsBroken ? "It's broken: mend it and give it back" : $"{Mathf.RoundToInt(had.Durability * 100f)}% sound",
                 true, () =>
                 {
+                    bool theirs = CompanionKit.IsTheirs(record, weapon);
                     CompanionKit.TakeBack(record, weapon, bag, GameSession.Stash != null ? GameSession.Stash.Items : null, player.transform);
-                    DialogueBox.Current.Say(speaker, CompanionKit.IsTheirs(record, weapon) ? "Mend it well. It knows my hand." : "Here.", afterAnswer);
+                    DialogueBox.Current.Say(speaker, theirs ? "Mend it well. It knows my hand." : "Here.", afterAnswer);
                 }));
         }
     }

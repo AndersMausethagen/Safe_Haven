@@ -65,6 +65,8 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
         // Only off a visit (above), where one's own Haven is the one here.
         SettlementState settlement = GameSession.Home;
         bool atHome = HomePortal.Current != null;
+        // A morning for the people that waited for home (dawns passed on a raid: PeopleDay).
+        PeopleDay.Tick(settlement, Time.timeSinceLevelLoad);
         // Away, no workplace is loaded: each worker is taken to be at their station (StationQueue.WorkerHere).
         settlement.Workshops.AwayFromHome = !atHome;
         ResidentDefinition along = GameSession.ActiveRaid != null ? GameSession.ActiveRaid.Companion : null;
@@ -202,7 +204,7 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
         // Gear: their own hand's quality, and an inspired morning's finer piece, wait for whoever collects it (ResidentTalents).
         string finer = ResidentTalents.WorkerPiece(worker, recipe, UnityEngine.Random.value);
         // An inspired morning at a bench that doesn't make gear: their best work is more of it (Inspirations › Craft).
-        if (recipe.Output != null && !recipe.Output.HasDurability && Inspirations.Use(worker, Inspiration.Craft))
+        if (recipe.Output != null && !recipe.Output.HasDurability && worker.Inspiration == Inspiration.Craft)
         {
             int added = 0;
             for (int i = 0; i < PeopleSettings.Current.InspiredExtra && station.AddExtra(recipe.Output, 1); i++)
@@ -210,7 +212,8 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
                 added++;
             }
 
-            if (added > 0)
+            // Spent only when it gave something: a full output slot keeps it for the next craft.
+            if (added > 0 && Inspirations.Use(worker, Inspiration.Craft))
             {
                 GameMessages.Post($"{worker.Resident.DisplayName}'s inspired morning at the bench: +{added} {recipe.Output.DisplayName}.", MessageKind.Gain);
             }

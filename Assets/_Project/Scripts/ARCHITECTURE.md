@@ -2015,7 +2015,8 @@ Tests: `PeopleTests`.
   only ever help, so helpers and ring workers at an unlisted 5 work as before), the extra-piece chance, the rank
   name (`SettlementSettings.WorkerRank.level`; `RankName`, `RankIndex`) read by lessons (`ExperienceTracker.LessonTier` = the level's
   tier band), Liv's carving reach, land parties and the Keeper's tags. `WorkDone` still counts crafts (shown, and an old save's rank
-  becomes its level once: `ResidentTalents.FromOldRank`). The old ranks' speed/extra are kept, unused.
+  becomes its level once: `ResidentTalents.FromOldRank`, at least the level that gives the old rank's speed, so nobody converts slower).
+  The old ranks' speed is read only by that conversion.
 - **Worker gear quality**: a worker's finished gear rolls their own quality (`ResidentTalents.QualityChance`: the skill's Quality bonus
   at their level + traits) and an inspired morning lifts it a step (`WorkerPiece`); a finer one waits in `StationQueue.Lifts`
   ("quality|maker|item id", saved, at most 8) and lifts and signs the next piece of that same item collected there (`StationCrafting` →
@@ -2023,7 +2024,8 @@ Tests: `PeopleTests`.
   goods gives Inspired Extra more of the next craft instead (`SettlementSystem.WorkerLearned`). Craft is only chosen for someone whose
   job has work orders.
 - **Passions**: Keen/Burning per skill; a share quicker at the work (`Joy`); a pick owed at each bond rank (`RaidCompanions.SettlePerson`
-  → `OwePick`), chosen in talk from two offers (`ResidentNpc.AddPeopleTopics`).
+  → `OwePick`, once a rank: deed "pick:<rank>", so being found again pays nothing more), chosen in talk from two offers
+  (`ResidentNpc.AddPeopleTopics`) or on the window's Talents tab.
 - **Traits and marks** are data: `ResidentTraitDefinition` (Data/People/Traits) and `MarkDefinition` (Data/People/Marks) hold
   `TraitEffect`s; each system asks `ResidentTraits.Sum(record, kind, skill)` for the kinds it concerns (no garbage: indexed loops).
   Readers: WorkSpeed `PeopleWork`; Learning `Practise`; QualityChance `QualityChance`; WorkLater/StartEarlier `ResidentRoutine.HoursOf`;
@@ -2040,8 +2042,9 @@ Tests: `PeopleTests`.
   The cap: Most Dodge 0.8 sits above every kind's Reads Attacks (0.6), so dodge bonuses count (PeopleTests guards it).
 - **Spirits** (`ResidentSpirits`): worked out from what is (meal, content home, scene cheer, bruised, passion work, inspired, kind words,
   a friend near work, a rival next door, a friend missed, a hard mark, traits' Spirits): Bright at Bright At steps, Low at Low Steps
-  down. Low: −Low Work at work (`PeopleWork`, cached 2 s). Bright: `Inspirations.Dawn` may give an inspired day (`PeopleDay.Dawn`, from
-  `HavenDawn.Pass`), its kind weighted by passion: Craft (gear skills), WorkFever, GoodFind (`Forays.Send`), FightingHeart
+  down. Low: −Low Work at work (`PeopleWork`, cached 2 s by `ResidentDefinition`). Bright: `Inspirations.Dawn` may give an inspired day
+  (`PeopleDay.Dawn`, from `HavenDawn.Pass`; a dawn passed away from one's own Haven, `Place.InOwnHaven`, waits and its morning comes once
+  home has settled: `PeopleDay.Tick` from `SettlementSystem.Update`), its kind weighted by passion: Craft (gear skills), WorkFever, GoodFind (`Forays.Send`), FightingHeart
   (`CompanionPeople`), Lesson (`ExperienceTracker.TakeLesson`), Story (`SmallScenes.CheerAll`).
 - **Friends and rivals** (`SettlementState.Standings`, `StandingsState`: "idA|idB" → −2.5..2.5, saved): written Friend/Friction on
   arrival (`PeopleStandings.Welcome` from `AddResident`); scenes (`SmallScenes.Shared`), forays together, a dawn's work near each other;

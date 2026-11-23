@@ -156,7 +156,7 @@ public sealed class RaidCompanions
         }
         if (rose)
         {
-            ResidentTalents.OwePick(record);
+            ResidentTalents.OwePick(record, CompanionBond.RankFor(record.RaidsAlong, SettlementSettings.Current.BondRanks)?.name);
         }
     }
 

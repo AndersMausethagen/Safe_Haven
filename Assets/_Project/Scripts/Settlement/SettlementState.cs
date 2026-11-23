@@ -1149,7 +1149,21 @@ public sealed class SettlementState : IHavenView
 
     public ResidentRecord Find(ResidentDefinition resident)
     {
-        return resident == null ? null : residents.Find(record => record.Resident == resident);
+        // Indexed: asked every frame (station speeds, a scene's cheer), where a lambda allocated each time.
+        if (resident == null)
+        {
+            return null;
+        }
+
+        for (int i = 0; i < residents.Count; i++)
+        {
+            if (residents[i].Resident == resident)
+            {
+                return residents[i];
+            }
+        }
+
+        return null;
     }
 
     /// <summary>True for anyone who lives here, or did and was lost: neither is sought as a new face (the lost have a way back: FindAgain).</summary>
@@ -1391,6 +1405,8 @@ public sealed class SettlementState : IHavenView
         residents.Add(found);
         ResidentMarks.FoundAgain(found);
         PeopleStandings.Found(this, resident);
+        // A written friend or friction who came home while they were lost: set now (pairs already standing are kept).
+        PeopleStandings.Welcome(this, found);
         Changed?.Invoke();
         return true;
     }

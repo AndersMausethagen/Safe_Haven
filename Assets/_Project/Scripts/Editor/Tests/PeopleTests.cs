@@ -148,7 +148,7 @@ public sealed class PeopleTests
         SettlementState home = Home("Tor");
         ResidentRecord tor = home.Find(Person("Tor"));
         Assert.IsFalse(ResidentTalents.Pick(tor, Skill("Melee"), Passion.Keen), "nothing owed yet");
-        ResidentTalents.OwePick(tor);
+        ResidentTalents.OwePick(tor, "Trusted");
         List<(ProficiencyDefinition skill, Passion to)> offers = ResidentTalents.PickOffers(tor);
         Assert.AreEqual(2, offers.Count);
         Assert.AreNotEqual(offers[0].skill, offers[1].skill);
@@ -489,5 +489,88 @@ public sealed class PeopleTests
         data.settlement.residents[0].talents = new TalentSaveData();
         ResidentRecord bjarne = SaveMapper.FromSaveData(JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(data)), content).Settlement.Find(bjarneDef);
         Assert.AreEqual(ranks[ranks.Count - 1].name, ResidentTalents.RankName(bjarne));
+    }
+
+    // ----- The second review's fixes -----
+
+    [Test]
+    public void SpiritsCountedForWork_MatchTheReasonsShown()
+    {
+        SettlementState home = Home("Tor", "Ingrid", "Gunnar");
+        ResidentRecord tor = home.Find(Person("Tor"));
+        ResidentRecord gunnar = home.Find(Person("Gunnar"));
+        var states = new List<Action>
+        {
+            () => { },
+            () => tor.Bruised = true,
+            () => tor.Inspiration = Inspiration.Story,
+            () => tor.Feel(ResidentSpirits.LostFeeling + "someone", home.DaysPassed + 1),
+            () => tor.AddMark("old_wound"),
+            () => home.AssignJob(tor.Resident, tor.Resident.Jobs[0]),
+        };
+        int checkedStates = 0;
+        foreach (Action change in states)
+        {
+            change();
+            foreach (ResidentRecord record in new[] { tor, gunnar })
+            {
+                int shown = ResidentSpirits.ReasonsOf(record, home).Sum(reason => reason.Steps);
+                Assert.AreEqual(shown, ResidentSpirits.StepsOf(record, home), $"{record.Resident.name}, state {checkedStates}");
+            }
+
+            checkedStates++;
+        }
+
+        Assert.AreEqual(states.Count, checkedStates);
+    }
+
+    [Test]
+    public void AFriendWhoCameWhileTheyWereLost_IsAFriendOnceTheyAreFound()
+    {
+        SettlementState home = Home("Eirik");
+        ResidentDefinition eirik = Person("Eirik");
+        home.LoseResident(eirik, "probe");
+        home.AddResident(Person("Sigrid"));
+        Assert.IsTrue(home.FindAgain(eirik));
+        Assert.AreEqual(1, PeopleStandings.LevelOf(home, home.Find(eirik), home.Find(Person("Sigrid"))), "written friends, though one was lost");
+    }
+
+    [Test]
+    public void EarningAFearsOpposite_PutsTheFearAway()
+    {
+        ResidentRecord eirik = Home("Eirik").Find(Person("Eirik"));
+        MarkDefinition afraid = Mark("afraid_of_widows");
+        Assert.IsTrue(ResidentMarks.Give(eirik, afraid));
+        Assert.IsTrue(ResidentMarks.Give(eirik, afraid.TurnsInto));
+        Assert.IsFalse(eirik.HasMark(afraid.Id), "not afraid of what they have learned to fell");
+    }
+
+    [Test]
+    public void ABondRanksPick_IsPaidOnce_EvenFoundAgain()
+    {
+        ResidentRecord tor = Home("Tor").Find(Person("Tor"));
+        ResidentTalents.OwePick(tor, "Trusted");
+        ResidentTalents.OwePick(tor, "Trusted");
+        Assert.AreEqual(1, tor.Talents.PicksOwed);
+        ResidentTalents.OwePick(tor, "Sworn");
+        Assert.AreEqual(2, tor.Talents.PicksOwed);
+    }
+
+    [Test]
+    public void AnOldSavesRank_IsNeverSlowerThanItWas()
+    {
+        IReadOnlyList<SettlementSettings.WorkerRank> ranks = SettlementSettings.Current.WorkerRanks;
+        ResidentDefinition who = All<ResidentDefinition>().First(one => one.Jobs.Length > 0 && one.Jobs[0].Skill != null);
+        int checkedRanks = 0;
+        foreach (SettlementSettings.WorkerRank rank in ranks)
+        {
+            var old = new ResidentRecord(who, who.Jobs[0]);
+            ResidentTalents.FromOldRank(old, rank.crafts);
+            Assert.GreaterOrEqual(ResidentTalents.StationSpeed(old), rank.speed - 0.0001f, rank.name);
+            Assert.AreEqual(rank.name, ResidentTalents.RankName(old), "and keeps its name");
+            checkedRanks++;
+        }
+
+        Assert.Greater(checkedRanks, 1);
     }
 }

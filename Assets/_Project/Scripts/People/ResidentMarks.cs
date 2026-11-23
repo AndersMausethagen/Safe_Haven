@@ -110,6 +110,16 @@ public static class ResidentMarks
         }
 
         record.AddMark(mark.Id);
+        // A fear this mark is the opposite of goes with it (Spider-bane earned by kills while Afraid of Widows was still on them).
+        foreach (MarkDefinition had in Of(record))
+        {
+            if (had.TurnsInto == mark)
+            {
+                record.RemoveMark(had.Id);
+                record.ForgetDeed(SinceKey(had));
+            }
+        }
+
         // Earned by deeds, once: pushed out later by others, it doesn't come back every raid after.
         record.AddDeed(EarnedKey(mark), 1);
         if (mark.TurnsInto != null && !string.IsNullOrEmpty(mark.Creature))
