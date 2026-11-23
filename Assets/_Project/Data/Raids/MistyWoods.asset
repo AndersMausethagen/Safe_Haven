@@ -298,7 +298,7 @@ MonoBehaviour:
     - Timber
     - Herbs and Fibres
     - Life Wells
-    count: {x: 161, y: 182}
+    count: {x: 175, y: 198}
     entryBand: 0
     separation: 0
     trigger: 0
@@ -366,13 +366,13 @@ MonoBehaviour:
       fromTier: 2
       toTier: 0
     - prefab: {fileID: 7857519288705744795, guid: e8f5ac7427646e942aaf261bf18f6768, type: 3}
-      weight: 6
+      weight: 12
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
     - prefab: {fileID: 9111748613750876259, guid: 4cff8733c679b964f97f5aa116eda933, type: 3}
-      weight: 6
+      weight: 12
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0

@@ -22,6 +22,8 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
         // When it was saved, in this run of the game (DayNightCycle.Run), so the time away on a raid counts.
         public string run;
         public double savedAt;
+        // The home day it grows back on (Gathering Node › Regrows At Home After Days), 0 when it doesn't count days.
+        public int regrowOnDay;
     }
 
     [SerializeField] private GatheringNodeDefinition node;
@@ -36,6 +38,8 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
     private Renderer[] renderers;
     private Collider[] colliders;
     private float respawnAt;
+    // The home day (SettlementState.DaysPassed) it grows back on, 0 when it doesn't count days.
+    private int regrowOnDay;
     private float hideAt = -1f;
     private Coroutine countdown;
 
@@ -68,6 +72,7 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
         return JsonUtility.ToJson(new SavedNode
         {
             depleted = IsDepleted, respawnRemaining = RespawnRemaining, run = DayNightCycle.Run, savedAt = DayNightCycle.AwayStamp,
+            regrowOnDay = IsDepleted ? regrowOnDay : 0,
         });
     }
 
@@ -81,6 +86,7 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
             // On the day's own clock (game time): in real time, an hour in the pause menu on a raid grew every node back.
             float away = DayNightCycle.SecondsAwaySince(saved.run, saved.savedAt);
             respawnAt = Time.time + Mathf.Max(0f, saved.respawnRemaining - away);
+            regrowOnDay = saved.regrowOnDay;
             SetPresent(false);
         }
         else if (IsDepleted)
@@ -167,7 +173,18 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
         }
     }
 
-    private bool HasTimer => hideAt >= 0f || (IsDepleted && node != null && node.RegrowsAfter > 0f);
+    private bool HasTimer => hideAt >= 0f || (IsDepleted && node != null && (node.RegrowsAfter > 0f || regrowOnDay > 0));
+
+    /// <summary>
+    /// The home day a node gathered now grows back on: today plus its Regrows At Home After Days, at home only (not in a raid, the
+    /// prologue or a friend's Haven, whose host keeps its own), else 0. Pure, for tests.
+    /// </summary>
+    public static int RegrowDay(int afterDays, int today, bool atHome) => afterDays > 0 && atHome ? today + afterDays : 0;
+
+    private static bool AtOwnHome => RaidDirector.Current == null && PrologueDirector.Current == null && !HavenVisit.IsVisiting;
+
+    // True once the home day it waits for has come.
+    private bool DayHasCome => regrowOnDay > 0 && GameSession.Home.DaysPassed >= regrowOnDay;
 
     private void WatchTimers()
     {
@@ -189,8 +206,9 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
                 SetRenderers(false);
             }
 
-            if (IsDepleted && node != null && node.RegrowsAfter > 0f && Time.time >= respawnAt)
+            if (IsDepleted && node != null && ((node.RegrowsAfter > 0f && Time.time >= respawnAt) || DayHasCome))
             {
+                regrowOnDay = 0;
                 SetPresent(true);
                 Regrown?.Invoke();
             }
@@ -336,6 +354,7 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
         }
 
         respawnAt = Time.time + node.RegrowsAfter;
+        regrowOnDay = RegrowDay(node.RegrowsAtHomeAfterDays, GameSession.Home.DaysPassed, AtOwnHome);
         SetPresent(false, 0f);
         return true;
     }
@@ -354,6 +373,7 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
         }
 
         respawnAt = Time.time + node.RegrowsAfter;
+        regrowOnDay = RegrowDay(node.RegrowsAtHomeAfterDays, GameSession.Home.DaysPassed, AtOwnHome);
         SetPresent(false, feedback != null ? feedback.BreakSeconds : 0f);
     }
 

@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEditor;
@@ -35,12 +36,15 @@ public sealed class GatheringMinigameTests
         {
             var node = AssetDatabase.LoadAssetAtPath<GatheringNodeDefinition>(AssetDatabase.GUIDToAssetPath(guid));
             if (node.WorldPrefab == null || !node.WorldPrefab.TryGetComponent(out ResourceSource source)) continue;
-            Assert.AreEqual(node.Yields.Entries.Count, source.Drops.Entries.Count, node.name);
-            for (int i = 0; i < node.Yields.Entries.Count; i++)
+            // A row bound to one raid (Only In Raid: the Misty Woods' Cursed Sap) stays on the definition, rolled as the node is felled
+            // (ChoppableTree): on the prefab it would drop everywhere.
+            var rows = node.Yields.Entries.Where(entry => entry == null || entry.OnlyInRaid == null).ToList();
+            Assert.AreEqual(rows.Count, source.Drops.Entries.Count, node.name);
+            for (int i = 0; i < rows.Count; i++)
             {
-                Assert.AreSame(node.Yields.Entries[i].Drop, source.Drops.Entries[i].Drop, node.name);
-                Assert.AreEqual(node.Yields.Entries[i].MinQuantity, source.Drops.Entries[i].MinQuantity, node.name);
-                Assert.AreEqual(node.Yields.Entries[i].MaxQuantity, source.Drops.Entries[i].MaxQuantity, node.name);
+                Assert.AreSame(rows[i].Drop, source.Drops.Entries[i].Drop, node.name);
+                Assert.AreEqual(rows[i].MinQuantity, source.Drops.Entries[i].MinQuantity, node.name);
+                Assert.AreEqual(rows[i].MaxQuantity, source.Drops.Entries[i].MaxQuantity, node.name);
             }
         }
     }

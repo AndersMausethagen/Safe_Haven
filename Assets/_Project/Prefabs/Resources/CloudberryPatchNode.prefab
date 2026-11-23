@@ -118,9 +118,13 @@ MonoBehaviour:
     entries:
     - item: {fileID: 11400000, guid: bb670a5310dbb494296de3c93180cebd, type: 2}
       resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 3
+      minQuantity: 2
+      maxQuantity: 4
       probability: 1
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+      onlyInRaid: {fileID: 0}
   grantOnInteractionComplete: 1
 --- !u!114 &336845262206995111
 MonoBehaviour:

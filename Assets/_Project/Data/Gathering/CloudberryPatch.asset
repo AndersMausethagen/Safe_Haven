@@ -15,13 +15,18 @@ MonoBehaviour:
   id: cloudberrypatch
   displayName: Cloudberry Patch
   tier: 1
+  spawnWeight: 1
   yields:
     entries:
     - item: {fileID: 11400000, guid: bb670a5310dbb494296de3c93180cebd, type: 2}
       resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 3
+      minQuantity: 2
+      maxQuantity: 4
       probability: 1
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+      onlyInRaid: {fileID: 0}
   gatherTool: 0
   requiredToolTier: 1
   gatherAnimation: 1
@@ -31,6 +36,7 @@ MonoBehaviour:
   gatherRange: 1.5
   depleteOnGather: 1
   respawnSeconds: 240
+  regrowsAtHomeAfterDays: 3
   inSeasons:
   - Summer
   burstPieces: 0

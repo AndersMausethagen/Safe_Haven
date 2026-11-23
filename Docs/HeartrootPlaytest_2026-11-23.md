@@ -13,9 +13,11 @@ changes C1 to C10 are all in the game now. The numbers come from the user's run 
 - **P0, boss rows:** `BossTryLog` and `BossTryTally`. A `Boss` row at its waking, each stage and each topple (with its cause), and
   one `BossTry` row as a try ends (won, died, left). The row has the health left, the seconds, the stage, topples by cause, heart
   strikes, interrupts, calls, summons killed, the player's damage by kind of blow, draughts drunk and the last blow on the player.
-- **P5, no root lock:** Status Effect › Refreshes, Ends On Dodge, Rest Seconds and Takes Hold Line (`StatusTiming`). Roots no longer
-  restart on a volley's later rings, a roll tears free, it rests 1.5 s after it ends, and the player is told "Rooted! Roll to tear
-  free."
+- **P5, no root lock:** Status Effect › Refreshes, Ends On Dodge, Rest Seconds and Takes Hold Line (`StatusTiming`), on a status of
+  their own (EruptionRoots) for the Heartroot's and Root Guardian's eruptions and grasps.
+  - These roots no longer restart on a volley's later rings, a roll tears free, they rest 1.5 s after they end, and the player is told
+    "Rooted! Roll to tear free."
+  - The shared Roots (the widow's web, the bog troll's drag, the root enchantments) still hold through a roll.
 - **P1, Rootlings as the key:** Monster Attack › Bond Poise Share 0.3, Bond Topple Seconds 4, Bond Within 12 on the Heartroot's
   Call Roots (`BoundSummons`, `SummonBondLedger`).
   - Sap lines tie each Rootling to its chest.

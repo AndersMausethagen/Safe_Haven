@@ -47,6 +47,9 @@ public sealed class GatheringNodeDefinition : ScriptableObject
     [SerializeField] private bool depleteOnGather = true;
     [Tooltip("Seconds until a gathered node grows back. 0 means it never comes back.")]
     [SerializeField, Min(0f)] private float respawnSeconds = 180f;
+    [Tooltip("At home, it grows back this many in-game days after it was gathered (counted at dawn, as the seasons are), even though " +
+             "gathered things don't grow back in the Haven (Regrowth). Berry bushes: 3 (the user, 2026-11-23). 0: as every other node.")]
+    [SerializeField, Min(0)] private int regrowsAtHomeAfterDays;
     [Tooltip("The seasons it grows in, by the Season Cycle's names (Summer, Autumn...). Empty: all year. Random " +
              "resource spots at home only become it in its seasons (berries in summer, mushrooms in autumn).")]
     [SerializeField] private List<string> inSeasons = new List<string>();
@@ -115,6 +118,9 @@ public sealed class GatheringNodeDefinition : ScriptableObject
 
     /// <summary>Seconds before a gathered node grows back here, 0 when it doesn't (Regrowth: never in a raid's scene).</summary>
     public float RegrowsAfter => Regrowth.After(respawnSeconds);
+
+    /// <summary>In-game days after which it grows back at home (Regrows At Home After Days), 0 when it follows the usual rule.</summary>
+    public int RegrowsAtHomeAfterDays => regrowsAtHomeAfterDays;
     public int BurstPieces => burstPieces;
     public NodeFracture Fracture => fracture;
     public ItemDropTable BurstYields => burstYields;
