@@ -13,7 +13,7 @@ public sealed class BossTryTally
     public static readonly string[] Kinds = { "light", "heavy", "charged", "counter", "art", "backstab", "heart", "fire", "arrow", "spell", "other" };
 
     private readonly Dictionary<string, float> damage = new Dictionary<string, float>();
-    private readonly int[] topples = new int[5];
+    private readonly int[] topples = new int[System.Enum.GetValues(typeof(ToppleCause)).Length];
 
     public float WokeAt = -1f;
     public int Stage;
@@ -26,7 +26,7 @@ public sealed class BossTryTally
 
     public bool Woke => WokeAt >= 0f;
 
-    public int ToppledBy(ToppleCause cause) => topples[(int)cause];
+    public int ToppledBy(ToppleCause cause) => (int)cause >= 0 && (int)cause < topples.Length ? topples[(int)cause] : 0;
 
     public void Toppled(ToppleCause cause) => topples[Mathf.Clamp((int)cause, 0, topples.Length - 1)]++;
 

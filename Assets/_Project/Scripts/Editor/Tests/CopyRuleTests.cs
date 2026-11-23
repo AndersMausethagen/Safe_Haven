@@ -15,7 +15,10 @@ using Object = UnityEngine.Object;
 public sealed class CopyRuleTests
 {
     // Added to creatures while the game runs, so not on their prefabs: list one here when it is new.
-    private static readonly Type[] AddedAtRuntime = { typeof(StatusEffects), typeof(Burning), typeof(ForcedMove), typeof(EliteCreature), typeof(LostOne) };
+    private static readonly Type[] AddedAtRuntime =
+    {
+        typeof(StatusEffects), typeof(Burning), typeof(ForcedMove), typeof(EliteCreature), typeof(LostOne), typeof(BoundSummons), typeof(BossTryLog),
+    };
 
     private readonly List<GameObject> made = new List<GameObject>();
 

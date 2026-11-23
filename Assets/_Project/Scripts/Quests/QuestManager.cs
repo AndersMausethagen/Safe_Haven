@@ -427,11 +427,31 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
 
             StartAvailableQuests();
             StartQuestsWhoseEventHappened();
+            TeachStartRecipes();
             // A frame on: this runs before the scene's Start, where saved objects get their state back (a building its tier).
             StartCoroutine(RecountOwnedNextFrame());
         }
 
         RaiseChanged();
+    }
+
+    // The recipes quests under way teach as they start (Quest › Teaches At Start), taught again on arriving anywhere: a quest that began
+    // while there was no player (a scene change) would have left its craft step out of reach. Unlock is quiet for what is known.
+    private void TeachStartRecipes()
+    {
+        PlayerCrafting crafting = Player.Current != null ? Player.Current.Crafting : null;
+        if (crafting == null)
+        {
+            return;
+        }
+
+        foreach (QuestDefinition quest in Quests)
+        {
+            if (quest != null && quest.TeachesAtStart.Count > 0 && Log.StatusOf(quest) == QuestStatus.Active)
+            {
+                crafting.Unlock(quest.TeachesAtStart, false);
+            }
+        }
     }
 
     private System.Collections.IEnumerator RecountOwnedNextFrame()

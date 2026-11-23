@@ -6,6 +6,8 @@ using UnityEngine;
 /// it appears, while runs are logged (PlaytestLogger).
 /// </summary>
 [DisallowMultipleComponent]
+[OnAFriendsCopy(CopyRule.Same, "logs the try as this game sees it; on a friend's copy the health is the host's, and topple causes, calls and " +
+                               "summons killed are the host's to know, so the row says it is a copy")]
 public sealed class BossTryLog : MonoBehaviour
 {
     private readonly BossTryTally tally = new BossTryTally();
@@ -200,6 +202,13 @@ public sealed class BossTryLog : MonoBehaviour
     private void Write(string outcome)
     {
         written = true;
-        PlaytestLogger.Note(PlaytestLog.BossTry, BossId, outcome == "won" ? 0 : HealthPercent, tally.Detail(outcome, Time.time));
+        string detail = tally.Detail(outcome, Time.time);
+        // On a friend's game the creature is a copy: its topples' causes and its calls happened in the host's game.
+        if (ai != null && ai.IsRemote)
+        {
+            detail += "; a friend's copy (causes, calls and summons are the host's)";
+        }
+
+        PlaytestLogger.Note(PlaytestLog.BossTry, BossId, outcome == "won" ? 0 : HealthPercent, detail);
     }
 }

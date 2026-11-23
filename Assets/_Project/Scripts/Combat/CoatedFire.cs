@@ -27,9 +27,8 @@ public static class CoatedFire
         float fire = Amount(result.Incoming, stats.Get(StatType.MeleeFireDamage));
         if (fire > 0f && target.IsAlive)
         {
-            var info = new DamageInfo(by, null, fire, DamageType.Fire, false, point, direction, 0f, HitTechnique.OverTime);
-            DamageResult burned = target.ApplyDamage(info);
-            by.ReportDamageDealt(target, info, burned);
+            // Not reported as a blow of the player's (as Burning's ticks aren't): no training or Insight for it, no second lifesteal.
+            target.ApplyDamage(new DamageInfo(by, null, fire, DamageType.Fire, false, point, direction, 0f, HitTechnique.OverTime));
         }
 
         if (target.IsAlive && target is Damageable body && Ignites(stats.Get(StatType.MeleeIgniteChance), Random.value))

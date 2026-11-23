@@ -93,29 +93,52 @@ public sealed class CoatedFireTests
     [Test]
     public void AStackedKit_CarriesTheBestCoating()
     {
-        GearBalance.Kit stacked = GearBalance.StackedKitOf(1, GearBalance.AllGear(), false);
+        GearBalance.Kit stacked = GearBalance.StackedKitOf(1, GearBalance.AllGear(), false, true);
         Assert.IsTrue(stacked.Food.Any(item => item.IsCoating), "the reach counts what a prepared player carries, coating included");
         Assert.AreEqual(1, stacked.Food.Count(item => item.IsCoating), "one coating at a time");
     }
 
     [Test]
-    public void CursedSap_WeepsFromTheMistyWoodsFelledTrees_AndNowhereElse()
+    public void ARaidOnlyRow_RollsInItsRaid_AndNowhereElse()
     {
         ItemDefinition sap = Sap;
         var misty = AssetDatabase.LoadAssetAtPath<RaidDefinition>("Assets/_Project/Data/Raids/MistyWoods.asset");
+        var valley = AssetDatabase.LoadAssetAtPath<RaidDefinition>("Assets/_Project/Data/Raids/TrollValley.asset");
         Assert.IsNotNull(sap);
-        var rows = AssetDatabase.FindAssets("t:GatheringNodeDefinition")
-            .Select(id => AssetDatabase.LoadAssetAtPath<GatheringNodeDefinition>(AssetDatabase.GUIDToAssetPath(id)))
-            .Where(node => node != null)
-            .SelectMany(node => node.Yields.Entries.Where(entry => entry != null && entry.Item == sap).Select(entry => (node, entry)))
-            .ToList();
-        Assert.Greater(rows.Count, 0, "some tree gives it");
-        foreach ((GatheringNodeDefinition node, ItemDropEntry entry) in rows)
+        Assert.IsNotNull(misty);
+        var node = AssetDatabase.LoadAssetAtPath<GatheringNodeDefinition>("Assets/_Project/Data/Gathering/Tree.asset");
+        // Rolled many times, a half chance shows up; never outside its raid.
+        int inMisty = 0, elsewhere = 0;
+        for (int i = 0; i < 200; i++)
         {
-            Assert.AreEqual(misty, entry.OnlyInRaid, $"{node.name}: only in the Misty Woods");
-            Assert.AreEqual(ToolType.Axe, node.GatherTool, $"{node.name}: from felling");
-            Assert.IsFalse(entry.DropsHere, "at home (no raid) it doesn't drop");
+            inMisty += node.Yields.RollOnlyIn(misty).Count(drop => drop.Item == sap);
+            elsewhere += node.Yields.RollOnlyIn(null).Count(drop => drop.Item == sap) + node.Yields.RollOnlyIn(valley).Count(drop => drop.Item == sap);
+            elsewhere += node.Yields.Roll(0, 1f).Count(drop => drop.Item == sap) + node.Yields.Roll(1, 1f).Count(drop => drop.Item == sap);
         }
+
+        Assert.Greater(inMisty, 50, "a felled Misty Woods tree often weeps sap");
+        Assert.AreEqual(0, elsewhere, "never at home, in another raid, or through the ordinary roll");
+    }
+
+    [Test]
+    public void TheTreePrefabs_DontCarryTheRaidOnlyRow()
+    {
+        // The prefabs' own drops have no raid to check: carried there, the sap would drop at home too (the review, 2026-11-23).
+        ItemDefinition sap = Sap;
+        int trees = 0;
+        foreach (string id in AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/_Project" }))
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(id));
+            if (prefab == null || !prefab.TryGetComponent(out ChoppableTree _) || !prefab.TryGetComponent(out ResourceSource source))
+            {
+                continue;
+            }
+
+            trees++;
+            Assert.IsFalse(source.Drops.Entries.Any(entry => entry != null && entry.Item == sap), prefab.name);
+        }
+
+        Assert.Greater(trees, 0, "the canary: tree prefabs were found");
     }
 
     [Test]

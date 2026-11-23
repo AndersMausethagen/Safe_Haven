@@ -10,7 +10,8 @@ using UnityEngine;
 /// A Rootling crushed by its own slam counts too. Only in the game that runs the summoner: summons are made there.
 /// </summary>
 [DisallowMultipleComponent]
-public sealed class BoundSummons : MonoBehaviour
+[OnAFriendsCopy(CopyRule.HostOnly, "summons are made in the host's game, which ties them and topples its creature; the topple comes back from there")]
+public sealed class BoundSummons : MonoBehaviour, ICopyAware
 {
     private static readonly Color SapColour = new Color(1f, 0.68f, 0.22f, 0.85f);
     private const float LineWidth = 0.09f;
@@ -26,6 +27,9 @@ public sealed class BoundSummons : MonoBehaviour
     private readonly SummonBondLedger ledger = new SummonBondLedger();
     private readonly List<Bond> bonds = new List<Bond>();
     private MonsterAI ai;
+    private bool isCopy;
+
+    public void OnCopyChanged(bool copy) => isCopy = copy;
 
     /// <summary>A bound summon died: who it was tied to, and whether its death toppled the summoner (the boss's try row counts them).</summary>
     public static event Action<BoundSummons, bool> AnySevered;
@@ -90,7 +94,7 @@ public sealed class BoundSummons : MonoBehaviour
 
     private void OnSummoned(MonsterAttack action, List<GameObject> roots)
     {
-        if (action == null || roots == null || (action.bondPoiseShare <= 0f && action.bondToppleSeconds <= 0f))
+        if (isCopy || action == null || roots == null || (action.bondPoiseShare <= 0f && action.bondToppleSeconds <= 0f))
         {
             return;
         }

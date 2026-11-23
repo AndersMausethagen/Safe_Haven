@@ -301,11 +301,19 @@ public sealed partial class MonsterAI
     /// </summary>
     public void ToppleFromBond(float seconds)
     {
-        if (IsRemote || !Topples || CurrentState == State.Staggered)
+        if (IsRemote || !Topples || CurrentState == State.Dead)
         {
             return;
         }
 
+        // Already down (the first Rootling's shock often floors it): it lies on for at least the call's topple, its heart open as it is.
+        if (IsToppled)
+        {
+            StaggerAtLeast(seconds);
+            return;
+        }
+
+        // Reeling (a stage's reel, a broken call): the roots tear out of it all the same, and it goes down from the reel.
         Topple(-transform.forward, seconds, false, false, ToppleCause.Bond);
     }
 

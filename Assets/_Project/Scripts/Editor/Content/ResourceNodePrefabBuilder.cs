@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -87,9 +88,15 @@ public static class ResourceNodePrefabBuilder
         return problems;
     }
 
+    // The rows a node's prefab carries: all but those bound to one raid (Only In Raid), which the definition gives as the node is felled
+    // (ChoppableTree) and which, copied, would drop everywhere (the copy has no raid).
+    private static List<ItemDropEntry> PrefabRows(ItemDropTable table) =>
+        table.Entries.Where(entry => entry == null || entry.OnlyInRaid == null).ToList();
+
     private static bool SameYields(ItemDropTable actual, ItemDropTable expected)
     {
-        if (actual.Entries.Count != expected.Entries.Count)
+        List<ItemDropEntry> wanted = PrefabRows(expected);
+        if (actual.Entries.Count != wanted.Count)
         {
             return false;
         }
@@ -97,7 +104,7 @@ public static class ResourceNodePrefabBuilder
         for (int i = 0; i < actual.Entries.Count; i++)
         {
             ItemDropEntry a = actual.Entries[i];
-            ItemDropEntry b = expected.Entries[i];
+            ItemDropEntry b = wanted[i];
             if (a == null || b == null || a.Drop != b.Drop || a.MinQuantity != b.MinQuantity || a.MaxQuantity != b.MaxQuantity
                 || !Mathf.Approximately(a.Probability, b.Probability))
             {
@@ -136,7 +143,7 @@ public static class ResourceNodePrefabBuilder
     /// <summary>Copies the definition's yield table into a ResourceSource's drop entries.</summary>
     public static void CopyYields(GatheringNodeDefinition definition, SerializedProperty entries)
     {
-        IReadOnlyList<ItemDropEntry> yields = definition.Yields.Entries;
+        IReadOnlyList<ItemDropEntry> yields = PrefabRows(definition.Yields);
         entries.arraySize = yields.Count;
         for (int i = 0; i < yields.Count; i++)
         {

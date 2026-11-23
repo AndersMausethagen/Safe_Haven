@@ -143,6 +143,29 @@ public sealed class ItemDropTable
         return results;
     }
 
+    /// <summary>
+    /// Rolls only the item lines bound to <paramref name="raid"/> (Only In Raid): what that raid's nodes give on top (the Misty Woods'
+    /// Cursed Sap when a tree there is felled: ChoppableTree). Nothing outside a raid (null) or in another one.
+    /// </summary>
+    public List<ItemAmount> RollOnlyIn(RaidDefinition raid, List<ItemAmount> results = null)
+    {
+        results ??= new List<ItemAmount>();
+        if (raid == null)
+        {
+            return results;
+        }
+
+        foreach (ItemDropEntry entry in entries)
+        {
+            if (entry != null && entry.OnlyInRaid == raid && entry.TryRoll(out ItemAmount drop) && drop.Amount > 0)
+            {
+                results.Add(drop);
+            }
+        }
+
+        return results;
+    }
+
     /// <summary>The resource lines that drop at a raid tier, as <see cref="Roll(int, float, List{ItemAmount})"/>.</summary>
     public List<ResourceAmount> RollResources(int tier, float multiplier, List<ResourceAmount> results = null)
     {

@@ -28,17 +28,22 @@ MonoBehaviour:
   poiseDamage: 10
   impact: 1
   lunge: 0
+  hop: 0
   staminaCost: -1
-  appliesStatus: {fileID: 11400000, guid: 89bc0b3576e7cde40a48a2c27f924015, type: 2}
+  appliesStatus: {fileID: 11400000, guid: b00f0b86456ad3642a05f58ad2c8e5d5, type: 2}
   statusChance: 1
   groundImpact: {fileID: 0}
   unblockable: 0
   pull: 0
+  lassoSeconds: 0
   windupMove: -1
   afterContactMove: -1
   windupTurnRate: -1
   moveAt: -1
   lungeShare: -1
+  ownCancels: 0
+  windupCancels: 1
+  recoveryCancels: 3
   motion: 0
   motionDistance: 3.5
   alwaysCritical: 0
@@ -55,6 +60,11 @@ MonoBehaviour:
   strikeLead: 0.08
   followThroughSpeed: 0.7
   growsFromLight: 1
+  blendIn: 0
+  blendInFromReady: 0
+  fromGuardStart: 0
+  blendInFromGuard: 0
+  fromHeavyStart: 0
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.95, b: 0.85, a: 0.8}

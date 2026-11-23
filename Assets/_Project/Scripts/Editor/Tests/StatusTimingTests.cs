@@ -57,14 +57,26 @@ public sealed class StatusTimingTests
     }
 
     [Test]
-    public void Roots_DontRefresh_RestAfter_AndARollTearsFree()
+    public void TheRootCreaturesVolleys_RootOnce_AndARollTearsFree_WhileHoldsStayHolds()
     {
-        var roots = AssetDatabase.LoadAssetAtPath<StatusEffectDefinition>("Assets/_Project/Data/Combat/Status/Roots.asset");
-        Assert.IsNotNull(roots);
+        var eruption = AssetDatabase.LoadAssetAtPath<AttackDefinition>("Assets/_Project/Data/Combat/Attacks/Heartroot/HeartrootEruption.asset");
+        Assert.IsNotNull(eruption);
+        StatusEffectDefinition roots = eruption.AppliesStatus;
+        Assert.IsNotNull(roots, "the Heartroot's eruption roots");
         Assert.IsFalse(roots.Refreshes, "a volley's later rings mustn't hold the player longer than the first");
         Assert.IsTrue(roots.EndsOnDodge, "a roll is the way out");
         Assert.Greater(roots.RestSeconds, 0f, "it can't take hold again the moment the player rolls clear");
         StringAssert.Contains("Roll", roots.TakesHoldLine, "the player is told the way out");
+
+        // The widow's web and the bog troll's drag are holds on purpose (the review, 2026-11-23): a roll mustn't undo them.
+        foreach (string hold in new[] { "WidowWeb", "BogTrollDrag" })
+        {
+            var attack = AssetDatabase.LoadAssetAtPath<AttackDefinition>($"Assets/_Project/Data/Combat/Attacks/{hold}.asset");
+            Assert.IsNotNull(attack, hold);
+            Assert.IsNotNull(attack.AppliesStatus, hold);
+            Assert.IsFalse(attack.AppliesStatus.EndsOnDodge, $"{hold} still holds through a roll");
+            Assert.AreNotSame(roots, attack.AppliesStatus, $"{hold} doesn't share the eruption's roots");
+        }
     }
 
     [Test]

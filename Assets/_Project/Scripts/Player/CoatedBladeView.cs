@@ -70,7 +70,16 @@ public sealed class CoatedBladeView : MonoBehaviour
         }
     }
 
-    private void OnDisable() => Attach(null);
+    // Only hidden here: reparenting while the player is being destroyed or deactivated (a scene change) is refused by Unity.
+    private void OnDisable()
+    {
+        if (flames != null)
+        {
+            flames.SetActive(false);
+        }
+
+        on = null;
+    }
 
     private void OnDestroy()
     {

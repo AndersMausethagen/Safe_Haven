@@ -166,6 +166,16 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
         {
             source.GrantItems(user, logs);
         }
+
+        // What only this raid's trees give as they fall (a node row with Only In Raid: the Misty Woods' Cursed Sap), to the feller.
+        if (node != null && node.Definition != null && GameSession.ActiveRaid != null)
+        {
+            List<ItemAmount> wept = node.Definition.Yields.RollOnlyIn(GameSession.ActiveRaid.Definition);
+            if (wept.Count > 0)
+            {
+                source.GrantItems(user, wept);
+            }
+        }
     }
 
     /// <summary>Saplings (in the raids, 4-7 m) at most this tall can be snapped by a heavy blow or a charge (Snap).</summary>

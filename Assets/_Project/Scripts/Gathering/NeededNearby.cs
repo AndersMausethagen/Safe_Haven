@@ -204,7 +204,8 @@ public sealed class NeededNearby : MonoBehaviour
     {
         foreach (ItemDropEntry entry in node.Definition.Yields.Entries)
         {
-            if (entry != null && entry.Drop != null && needed.ContainsKey(entry.Drop))
+            // A row this map doesn't give (Only In Raid elsewhere: the Misty Woods' sap on a Haven tree) is no source here.
+            if (entry != null && entry.Drop != null && entry.DropsHere && needed.ContainsKey(entry.Drop))
             {
                 return entry.Drop;
             }

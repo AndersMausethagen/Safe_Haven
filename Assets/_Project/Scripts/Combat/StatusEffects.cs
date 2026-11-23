@@ -58,7 +58,11 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
             effects = target.gameObject.AddComponent<StatusEffects>();
         }
 
-        effects.Add(effect, source);
+        if (!effects.Add(effect, source))
+        {
+            return null; // resting after it ended (Rest Seconds): it doesn't take hold, and nothing is sent on
+        }
+
         Applied?.Invoke(target, effect, source);
         return effects;
     }
@@ -135,12 +139,13 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
         return null;
     }
 
-    private void Add(StatusEffectDefinition effect, Combatant source)
+    // False when it can't take hold now (resting after it ended).
+    private bool Add(StatusEffectDefinition effect, Combatant source)
     {
         // Resting after it ended (Rest Seconds): the next ring of a volley can't take hold of a player who has just torn free.
         if (restUntil.TryGetValue(effect, out float resting) && !StatusTiming.MayTakeHold(Time.time, resting))
         {
-            return;
+            return false;
         }
 
         Active entry = Find(effect);
@@ -149,7 +154,7 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
             entry.EndsAt = StatusTiming.EndsAt(effect, true, entry.EndsAt, Time.time);
             entry.Source = source;
             entry.Scale = DamageCalculator.BonusScale(source);
-            return;
+            return true;
         }
 
         active.Add(new Active
@@ -164,6 +169,7 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
         }
 
         Changed?.Invoke(effect, true);
+        return true;
     }
 
     // When each effect that ended may take hold again (Status Effect › Rest Seconds).

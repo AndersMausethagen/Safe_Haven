@@ -207,7 +207,7 @@ public static class GearBalance
         StackedKitOf(tier, gear, enchanted, tier, true, FoodSlots.Base, coated);
 
     public static Kit StackedKitOf(int tier, IReadOnlyList<ItemDefinition> gear, bool enchanted, int reached, bool consumables, FoodSlots slots,
-        bool coated = true)
+        bool coated = false)
     {
         Kit plain = KitOf(tier, gear);
         var kit = new Kit { Tier = tier, Score = plain.Score, SkillDamage = plain.SkillDamage };
