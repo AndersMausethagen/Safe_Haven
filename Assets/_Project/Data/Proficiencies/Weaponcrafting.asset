@@ -24,9 +24,6 @@ MonoBehaviour:
   gathersByHand: 0
   mentor: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
   levelBonuses:
-  - stat: 36
-    atFirstLevel: -0.25
-    atLastLevel: 0
   - stat: 35
     atFirstLevel: 0
     atLastLevel: 0.59999996
