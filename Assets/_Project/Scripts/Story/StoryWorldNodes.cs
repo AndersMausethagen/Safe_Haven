@@ -189,8 +189,11 @@ public sealed class MoveObjectNode : StoryNode
     public bool waitUntilArrived;
     [Tooltip("Keeps it on the ground over hills and hollows (a creature walking). Off: a straight line between the two points (something flying).")]
     public bool followGround;
+    [Tooltip("A horse (its Animator's Gait, 0 to 1: 0.53 canters, 0.71 gallops) while it moves. Below 0: not a horse; Speed is set.")]
+    public float gait = -1f;
 
     private static readonly int Speed = Animator.StringToHash("Speed");
+    private static readonly int Gait = Animator.StringToHash("Gait");
 
     public override string Title => "Move Object";
     public override string Category => "World";
@@ -202,7 +205,7 @@ public sealed class MoveObjectNode : StoryNode
             yield break;
         }
 
-        IEnumerator moving = Move(target, destination.position, seconds, animationSpeed, followGround);
+        IEnumerator moving = Move(target, destination.position, seconds, animationSpeed, followGround, gait);
         if (waitUntilArrived)
         {
             yield return moving;
@@ -213,7 +216,7 @@ public sealed class MoveObjectNode : StoryNode
         }
     }
 
-    private static IEnumerator Move(Transform mover, Vector3 to, float seconds, float animationSpeed, bool followGround)
+    private static IEnumerator Move(Transform mover, Vector3 to, float seconds, float animationSpeed, bool followGround, float gait = -1f)
     {
         Vector3 from = mover.position;
         Vector3 flat = new Vector3(to.x - from.x, 0f, to.z - from.z);
@@ -223,7 +226,8 @@ public sealed class MoveObjectNode : StoryNode
         }
 
         Animator animator = mover.GetComponentInChildren<Animator>();
-        bool walks = animator != null && HasSpeed(animator);
+        bool gaits = gait >= 0f && animator != null && HasParameter(animator, Gait);
+        bool walks = !gaits && animator != null && HasSpeed(animator);
         float previousSpeed = animator != null ? animator.speed : 1f;
         float speed = seconds > 0f ? Vector3.Distance(from, to) / seconds : 0f;
         try
@@ -233,6 +237,7 @@ public sealed class MoveObjectNode : StoryNode
             {
                 mover.position = OnGround(Vector3.Lerp(from, to, t / seconds), followGround);
                 if (walks) animator.SetFloat(Speed, speed);
+                if (gaits) animator.SetFloat(Gait, gait);
 
                 yield return null;
             }
@@ -244,6 +249,11 @@ public sealed class MoveObjectNode : StoryNode
             {
                 animator.SetFloat(Speed, 0f);
                 animator.speed = previousSpeed;
+            }
+
+            if (gaits && animator != null)
+            {
+                animator.SetFloat(Gait, 0f);
             }
         }
     }
@@ -268,6 +278,19 @@ public sealed class MoveObjectNode : StoryNode
         }
 
         return point;
+    }
+
+    private static bool HasParameter(Animator animator, int hash)
+    {
+        foreach (AnimatorControllerParameter parameter in animator.parameters)
+        {
+            if (parameter.nameHash == hash && parameter.type == AnimatorControllerParameterType.Float)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static bool HasSpeed(Animator animator)
