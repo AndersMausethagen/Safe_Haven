@@ -120,8 +120,6 @@ public sealed class ResidentRecord
     private int inspiredOn = -1;
     private ItemStack kitWeapon;
     private ItemStack kitBody;
-    private int kitWeaponRaids;
-    private int kitBodyRaids;
 
     /// <summary>The marks raids have left on them, by id, oldest first (ResidentMarks; PeopleSettings › Marks).</summary>
     public IReadOnlyList<string> Marks => marks;
@@ -187,6 +185,20 @@ public sealed class ResidentRecord
         feelings.Remove(id);
     }
 
+    /// <summary>True while they miss someone the forest took (a "lost:" feeling lasting to <paramref name="today"/>). No garbage.</summary>
+    public bool MissesSomeone(int today)
+    {
+        foreach (KeyValuePair<string, int> feeling in feelings)
+        {
+            if (feeling.Value >= today && feeling.Key.StartsWith("lost:", StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /// <summary>Forgets every feeling that ended before <paramref name="day"/>.</summary>
     public void ForgetFeelingsBefore(int day)
     {
@@ -218,9 +230,6 @@ public sealed class ResidentRecord
     public ItemStack KitWeapon { get => kitWeapon; set => Change(ref kitWeapon, value); }
     /// <summary>The body piece the player gave them, or empty.</summary>
     public ItemStack KitBody { get => kitBody; set => Change(ref kitBody, value); }
-    /// <summary>Raids gone along on with that weapon and that body piece: after enough, they are theirs, by name (CompanionKit).</summary>
-    public int KitWeaponRaids { get => kitWeaponRaids; set => Change(ref kitWeaponRaids, value); }
-    public int KitBodyRaids { get => kitBodyRaids; set => Change(ref kitBodyRaids, value); }
 }
 
 /// <summary>Someone who went along on a raid and didn't come home. The forest has them: they can be found again, and won't know the player.</summary>
@@ -246,10 +255,12 @@ public sealed class FallenRecord
 
     /// <summary>Who they are, kept while the forest has them: their talents come home with them (only the player is forgotten).</summary>
     public TalentSheet Talents { get; } = new TalentSheet();
-    /// <summary>The kit they carried, waiting in their empty house (CompanionKit), and the marks the raids had left on them.</summary>
+    /// <summary>The kit they carried, waiting in their empty house (CompanionKit), the marks the raids had left on them, and their deeds
+    /// (kills toward marks, raids with each piece of kit, scenes had).</summary>
     public ItemStack KitWeapon { get; set; }
     public ItemStack KitBody { get; set; }
     public List<string> Marks { get; set; } = new List<string>();
+    public Dictionary<string, int> Deeds { get; set; } = new Dictionary<string, int>();
 
     public ResidentDefinition Resident { get; }
     public string Where { get; }
@@ -1232,6 +1243,13 @@ public sealed class SettlementState : IHavenView
 
     public float StandingOf(string a, string b) => Standings.ValueOf(a, b);
 
+    /// <summary>Sets how two residents stand (PeopleStandings), guarded as every change of the Haven is (co-op: never the host's copy).</summary>
+    public void SetStanding(string a, string b, float value)
+    {
+        Borrowed();
+        Standings.Set(a, b, value);
+    }
+
     /// <summary>Who a raid's rumour can lead to next: the one lost longest ago who can walk a raid at all. Null with nobody to find.</summary>
     public FallenRecord LostToFind => fallen.Find(record => record.Resident != null && record.Resident.RaidCompanion != null);
 
@@ -1325,7 +1343,7 @@ public sealed class SettlementState : IHavenView
 
         residents.Remove(record);
         fallen.Add(new FallenRecord(resident, where, SuccessfulExtractions, record.RaidsAlong, CompanionBond.WhatIsForgotten(record.Remembers, record.Forgotten),
-            record.Home, record.Talents) { KitWeapon = record.KitWeapon, KitBody = record.KitBody, Marks = new List<string>(record.Marks) });
+            record.Home, record.Talents) { KitWeapon = record.KitWeapon, KitBody = record.KitBody, Marks = new List<string>(record.Marks), Deeds = new Dictionary<string, int>(record.Deeds) });
         if (record.Job != null && !vacantJobs.Contains(record.Job) && !IsHeld(record.Job))
         {
             vacantJobs.Add(record.Job);
@@ -1363,6 +1381,11 @@ public sealed class SettlementState : IHavenView
         foreach (string mark in lost.Marks)
         {
             found.AddMark(mark);
+        }
+
+        foreach (KeyValuePair<string, int> deed in lost.Deeds)
+        {
+            found.AddDeed(deed.Key, deed.Value);
         }
 
         residents.Add(found);

@@ -20,6 +20,13 @@ public static class PeopleDay
             record.ForgetFeelingsBefore(today);
         }
 
+        // Visiting a friend, the buildings and people about are theirs: one's own people's day waits for home (near-work friendships,
+        // inspirations read the Haven in the scene).
+        if (HavenVisit.IsVisiting)
+        {
+            return;
+        }
+
         PeopleStandings.Dawn(home);
         foreach (ResidentRecord inspired in Inspirations.Dawn(home, () => Random.value))
         {

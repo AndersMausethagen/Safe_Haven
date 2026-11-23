@@ -207,9 +207,11 @@ public static class Forays
         float find = 1f;
         foreach (ResidentRecord record in party)
         {
+            // One feeling is enough: the others keep theirs for another foray.
             if (Inspirations.Use(record, Inspiration.GoodFind))
             {
                 find = 1f + PeopleSettings.Current.GoodFind;
+                break;
             }
         }
 

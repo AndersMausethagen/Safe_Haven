@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::PeopleSettings
   unlistedLevel: 5
   speedPerLevel: 0.015
-  leastSpeed: 0.7
+  leastSpeed: 1
   extraPerLevel: 0.004
   mostExtra: 0.2
   workShare: 1
@@ -40,7 +40,7 @@ MonoBehaviour:
   picksAtBondRanks: 1
   damagePerLevel: 0.015
   dodgePerLevel: 0.005
-  mostDodge: 0.6
+  mostDodge: 0.8
   brightAt: 2
   lowSteps: 1
   lowWork: 0.1
@@ -49,6 +49,7 @@ MonoBehaviour:
   feverWork: 0.5
   fightingHeart: 0.2
   goodFind: 0.5
+  inspiredExtra: 2
   storyCheerSeconds: 600
   writtenFriend: 1
   frictionCool: 1

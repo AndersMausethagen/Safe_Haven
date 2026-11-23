@@ -201,6 +201,21 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
         ResidentTalents.PractiseCraft(worker, recipe);
         // Gear: their own hand's quality, and an inspired morning's finer piece, wait for whoever collects it (ResidentTalents).
         string finer = ResidentTalents.WorkerPiece(worker, recipe, UnityEngine.Random.value);
+        // An inspired morning at a bench that doesn't make gear: their best work is more of it (Inspirations › Craft).
+        if (recipe.Output != null && !recipe.Output.HasDurability && Inspirations.Use(worker, Inspiration.Craft))
+        {
+            int added = 0;
+            for (int i = 0; i < PeopleSettings.Current.InspiredExtra && station.AddExtra(recipe.Output, 1); i++)
+            {
+                added++;
+            }
+
+            if (added > 0)
+            {
+                GameMessages.Post($"{worker.Resident.DisplayName}'s inspired morning at the bench: +{added} {recipe.Output.DisplayName}.", MessageKind.Gain);
+            }
+        }
+
         if (finer != null)
         {
             station.Lifts.Add(finer);

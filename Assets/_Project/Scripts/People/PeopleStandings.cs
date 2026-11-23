@@ -83,11 +83,11 @@ public static class PeopleStandings
             ResidentDefinition a = record.Resident, b = other.Resident;
             if (a.Friend == b || b.Friend == a)
             {
-                home.Standings.Set(a.Id, b.Id, settings.WrittenFriend);
+                home.SetStanding(a.Id, b.Id, settings.WrittenFriend);
             }
             else if (a.Friction == b || b.Friction == a)
             {
-                home.Standings.Set(a.Id, b.Id, settings.WrittenFriction);
+                home.SetStanding(a.Id, b.Id, settings.WrittenFriction);
             }
         }
     }
@@ -110,7 +110,7 @@ public static class PeopleStandings
         }
 
         float now = home.Standings.ValueOf(a.Resident.Id, b.Resident.Id) + by;
-        home.Standings.Set(a.Resident.Id, b.Resident.Id, now);
+        home.SetStanding(a.Resident.Id, b.Resident.Id, now);
         return LevelOf(home.Standings.ValueOf(a.Resident.Id, b.Resident.Id));
     }
 
@@ -142,7 +142,7 @@ public static class PeopleStandings
         bool cleared = roll < settings.ClearedAirChance;
         float by = cleared ? settings.ClearedAir * bold : -settings.Hardened * bold;
         float now = home.Standings.ValueOf(a.Resident.Id, b.Resident.Id) + by;
-        home.Standings.Set(a.Resident.Id, b.Resident.Id, now);
+        home.SetStanding(a.Resident.Id, b.Resident.Id, now);
         return cleared;
     }
 
@@ -244,8 +244,10 @@ public static class PeopleStandings
         }
 
         int kind = 0;
-        foreach (ResidentRecord other in here.Residents)
+        IReadOnlyList<ResidentRecord> people = here.Residents;
+        for (int i = 0; i < people.Count; i++)
         {
+            ResidentRecord other = people[i];
             if (other != record && !other.IsAway && LevelOf(here, record, other) >= 0)
             {
                 kind += Mathf.RoundToInt(ResidentTraits.Sum(other, TraitEffectKind.KindWords));
@@ -296,8 +298,10 @@ public static class PeopleStandings
         bool rival = false;
         if (here != null && !record.IsAway)
         {
-            foreach (ResidentRecord other in here.Residents)
+            IReadOnlyList<ResidentRecord> people = here.Residents;
+            for (int i = 0; i < people.Count; i++)
             {
+                ResidentRecord other = people[i];
                 if (other == record || other.IsAway)
                 {
                     continue;

@@ -894,6 +894,8 @@ person's rumour waits until the person before has finished their core quest; a n
 
 Start with lightweight differentiation: name, portrait, profession, preferred home, one or two personality traits, basic needs, and dialogue tied to recent events. Well-being can influence work productivity or available side stories, but avoid turning residents into a constant micromanagement chore.
 
+**As built (November 23, 2026).** Residents have talents in the player's own skills with passions (Keen, Burning), two or three traits each with a tell and an upside for every flaw, spirits (Low, Steady, Bright; Low costs a little work and nothing more) that bring inspired days, friends and rivals who share scenes or argue at the fire, marks that raids leave (each hard one with a way back) and their own kit for fighting beside the player. See [People worth caring about](PeopleResearch_2026-11-23.md) and ARCHITECTURE.md "People".
+
 ### 15.5 Companions
 
 Suggested launch prototype: **one active companion** per raid. Command options can begin with follow, hold, and context-sensitive interact/revive. A companion's utility must justify the genuine risk of losing them to the forest, and what it costs to get them back. Build readable pathfinding and safe-zone behavior before implementing complex companion combat tactics.

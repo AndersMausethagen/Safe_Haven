@@ -107,8 +107,10 @@ public static class ResidentTalents
     {
         ProficiencyDefinition best = null;
         int bestLevel = 0;
-        foreach (ProficiencyDefinition skill in LevelingSettings.Current.Skills)
+        IReadOnlyList<ProficiencyDefinition> skills = LevelingSettings.Current.Skills;
+        for (int i = 0; i < skills.Count; i++)
         {
+            ProficiencyDefinition skill = skills[i];
             int level = skill != null ? LevelOf(record, skill) : 0;
             if (level > bestLevel)
             {
@@ -247,8 +249,8 @@ public static class ResidentTalents
         return counted;
     }
 
-    /// <summary>A craft made at their station: practice in the skill it trains (the player's, LevelingSettings.SkillCrafting), or their
-    /// job's skill when it trains none.</summary>
+    /// <summary>A craft made at their station: practice in their job's skill (the smith's ingots train Weaponcrafting, the carpenter's
+    /// planks Woodcutting: the station's own work, as the old ranks rose with it), at the craft's tier and kind of work.</summary>
     public static void PractiseCraft(ResidentRecord record, RecipeDefinition recipe)
     {
         if (record == null || recipe == null || recipe.Output == null)
@@ -258,7 +260,7 @@ public static class ResidentTalents
 
         LevelingSettings rules = LevelingSettings.Current;
         CraftedGoods goods = CraftedWork.Of(recipe);
-        ProficiencyDefinition skill = rules.SkillCrafting(goods) ?? JobSkill(record);
+        ProficiencyDefinition skill = JobSkill(record) ?? rules.SkillCrafting(goods);
         int tier = Mathf.Max(1, recipe.Output.Tier);
         Practise(record, skill, tier, rules.TierExperience(tier) * Mathf.Max(0.5f, rules.CraftWork(goods)));
     }
@@ -275,11 +277,12 @@ public static class ResidentTalents
         Practise(record, JobSkill(record), tier, rules.TierExperience(Mathf.Max(1, tier)) * PeopleSettings.Current.WorkUnitPractice * units);
     }
 
-    /// <summary>The skill they fight with beside the player: Archery for an archer, Melee for the rest.</summary>
-    public static ProficiencyDefinition FightSkill(ResidentRecord record)
+    /// <summary>The skill they fight with: Archery as an archer, Melee otherwise; <paramref name="how"/> is the kind they fight as now
+    /// (a guard at the ward may defend as their job's kind), their raid kind when not given.</summary>
+    public static ProficiencyDefinition FightSkill(ResidentRecord record, CompanionDefinition how = null)
     {
         PeopleSettings settings = PeopleSettings.Current;
-        CompanionDefinition how = record?.Resident != null ? record.Resident.RaidCompanion : null;
+        how ??= record?.Resident != null ? record.Resident.RaidCompanion : null;
         return how != null && how.IsRanged ? settings.ArcherySkill : settings.MeleeSkill;
     }
 
@@ -298,8 +301,8 @@ public static class ResidentTalents
     }
 
     /// <summary>Extra damage beside the player for their fighting skill (a share: 0.15 is +15%).</summary>
-    public static float CompanionDamage(ResidentRecord record) =>
-        Mathf.Max(0f, PeopleSettings.Current.DamagePerLevel * (LevelOf(record, FightSkill(record)) - 10));
+    public static float CompanionDamage(ResidentRecord record, CompanionDefinition how = null) =>
+        Mathf.Max(0f, PeopleSettings.Current.DamagePerLevel * (LevelOf(record, FightSkill(record, how)) - 10));
 
     /// <summary>More chance of reading a blow and stepping aside, for their Melee (an archer's too: footwork).</summary>
     public static float CompanionDodge(ResidentRecord record) =>
@@ -328,7 +331,7 @@ public static class ResidentTalents
             }
         }
 
-        return Mathf.Max(0f, chance + ResidentTraits.Sum(record, TraitEffectKind.QualityChance, skill) + ResidentTraits.Sum(record, TraitEffectKind.QualityChance));
+        return Mathf.Max(0f, chance + ResidentTraits.Sum(record, TraitEffectKind.QualityChance, skill));
     }
 
     /// <summary>
@@ -351,11 +354,11 @@ public static class ResidentTalents
             GameMessages.Post($"{record.Resident.DisplayName}'s inspired morning at the bench: a {quality} {recipe.Output.DisplayName} waits to be collected.", MessageKind.Gain);
         }
 
-        return quality == ItemQuality.Plain ? null : (int)quality + "|" + record.Resident.DisplayName;
+        return quality == ItemQuality.Plain ? null : (int)quality + "|" + record.Resident.DisplayName + "|" + recipe.Output.Id;
     }
 
-    /// <summary>A collected piece of gear from <paramref name="queue"/>: the oldest finer piece its worker made lifts it (never lower) and
-    /// signs it with their name.</summary>
+    /// <summary>A collected piece of gear from <paramref name="queue"/>: the oldest finer piece its worker made of that same item
+    /// ("quality|maker|item id") lifts it (never lower) and signs it with their name; another item is left as it is.</summary>
     public static ItemStack Lift(StationQueue queue, ItemStack piece)
     {
         if (queue == null || queue.Lifts.Count == 0 || piece.IsEmpty)
@@ -363,16 +366,25 @@ public static class ResidentTalents
             return piece;
         }
 
-        string lift = queue.Lifts[0];
-        queue.Lifts.RemoveAt(0);
-        int bar = lift.IndexOf('|');
-        if (bar <= 0 || !int.TryParse(lift.Substring(0, bar), out int made) || !System.Enum.IsDefined(typeof(ItemQuality), made))
+        for (int i = 0; i < queue.Lifts.Count; i++)
         {
-            return piece;
+            string[] parts = queue.Lifts[i].Split('|');
+            if (parts.Length < 3 || parts[2] != piece.Item.Id)
+            {
+                continue;
+            }
+
+            queue.Lifts.RemoveAt(i);
+            if (!int.TryParse(parts[0], out int made) || !System.Enum.IsDefined(typeof(ItemQuality), made))
+            {
+                return piece;
+            }
+
+            ItemQuality quality = (ItemQuality)made;
+            return quality > piece.Quality ? piece.WithQuality(quality).WithMaker(parts[1]) : piece;
         }
 
-        ItemQuality quality = (ItemQuality)made;
-        return quality > piece.Quality ? piece.WithQuality(quality).WithMaker(lift.Substring(bar + 1)) : piece;
+        return piece;
     }
 
     // ----- Passions the player helps grow (§3.2: at bond ranks Trusted and Sworn) -----

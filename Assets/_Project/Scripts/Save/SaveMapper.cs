@@ -344,7 +344,7 @@ public static class SaveMapper
 
         foreach (ResidentRecord record in settlement.Residents)
         {
-            into.residents.Add(new ResidentSaveData { id = record.Resident.Id, workPaused = record.PausedByPlayer, job = record.Job != null ? record.Job.Id : "", raidsAlong = record.RaidsAlong, killsAlong = record.KillsAlong, timesHelpedUp = record.TimesHelpedUp, memory = (int)record.Memory, remembers = ToSaved(record.Remembers), forgotten = ToSaved(record.Forgotten), stranger = record.IsStranger, comingBack = (int)record.ComingBack, allCameBack = record.AllCameBack, workDone = record.WorkDone, taughtSinceRaid = record.TaughtSinceRaid, home = record.Home ?? "", homeChosen = record.HomeChosen ?? "", workplace = record.Workplace ?? "", workQueue = record.WorkQueue ?? "", haulDone = record.HaulDone, workGear = record.WorkGear != null ? record.WorkGear.Id : "", wishMet = record.WishMet, meal = (int)record.Meal, bruised = record.Bruised , talents = TalentsOf(record.Talents), marks = new List<string>(record.Marks), deeds = Pairs(record.Deeds), feelings = Pairs(record.Feelings), inspiration = (int)record.Inspiration, inspiredOn = record.InspiredOn, kitWeapon = KitSlot(record.KitWeapon), kitBody = KitSlot(record.KitBody), kitWeaponRaids = record.KitWeaponRaids, kitBodyRaids = record.KitBodyRaids });
+            into.residents.Add(new ResidentSaveData { id = record.Resident.Id, workPaused = record.PausedByPlayer, job = record.Job != null ? record.Job.Id : "", raidsAlong = record.RaidsAlong, killsAlong = record.KillsAlong, timesHelpedUp = record.TimesHelpedUp, memory = (int)record.Memory, remembers = ToSaved(record.Remembers), forgotten = ToSaved(record.Forgotten), stranger = record.IsStranger, comingBack = (int)record.ComingBack, allCameBack = record.AllCameBack, workDone = record.WorkDone, taughtSinceRaid = record.TaughtSinceRaid, home = record.Home ?? "", homeChosen = record.HomeChosen ?? "", workplace = record.Workplace ?? "", workQueue = record.WorkQueue ?? "", haulDone = record.HaulDone, workGear = record.WorkGear != null ? record.WorkGear.Id : "", wishMet = record.WishMet, meal = (int)record.Meal, bruised = record.Bruised , talents = TalentsOf(record.Talents), marks = new List<string>(record.Marks), deeds = Pairs(record.Deeds), feelings = Pairs(record.Feelings), inspiration = (int)record.Inspiration, inspiredOn = record.InspiredOn, kitWeapon = KitSlot(record.KitWeapon), kitBody = KitSlot(record.KitBody) });
         }
 
         foreach (KeyValuePair<string, List<string>> house in settlement.HouseComforts)
@@ -365,7 +365,7 @@ public static class SaveMapper
         into.heldQuestsStarted = settlement.HeldQuestsStarted;
         foreach (FallenRecord record in settlement.Fallen)
         {
-            into.fallen.Add(new FallenSaveData { id = record.Resident.Id, where = record.Where, atExtraction = record.AtExtraction, raidsAlong = record.RaidsAlong, forgotten = ToSaved(record.Forgotten), home = record.Home, talents = TalentsOf(record.Talents), kitWeapon = KitSlot(record.KitWeapon), kitBody = KitSlot(record.KitBody), marks = new List<string>(record.Marks) });
+            into.fallen.Add(new FallenSaveData { id = record.Resident.Id, where = record.Where, atExtraction = record.AtExtraction, raidsAlong = record.RaidsAlong, forgotten = ToSaved(record.Forgotten), home = record.Home, talents = TalentsOf(record.Talents), kitWeapon = KitSlot(record.KitWeapon), kitBody = KitSlot(record.KitBody), marks = new List<string>(record.Marks), deeds = Pairs(record.Deeds) });
         }
 
         foreach (KeyValuePair<string, float> pair in settlement.Standings.Values)
@@ -554,8 +554,6 @@ public static class SaveMapper
                 restored.InspiredOn = entry.inspiredOn;
                 restored.KitWeapon = KitFrom(entry.kitWeapon, content, missing);
                 restored.KitBody = KitFrom(entry.kitBody, content, missing);
-                restored.KitWeaponRaids = Math.Max(0, entry.kitWeaponRaids);
-                restored.KitBodyRaids = Math.Max(0, entry.kitBodyRaids);
             }
         }
 
@@ -590,6 +588,10 @@ public static class SaveMapper
                 lost.KitWeapon = KitFrom(entry.kitWeapon, content, missing);
                 lost.KitBody = KitFrom(entry.kitBody, content, missing);
                 lost.Marks = new List<string>(entry.marks ?? new List<string>());
+                foreach ((string key, int value) in FromPairs(entry.deeds))
+                {
+                    lost.Deeds[key] = value;
+                }
             }
         }
 

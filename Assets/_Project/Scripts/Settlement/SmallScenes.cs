@@ -357,7 +357,7 @@ public sealed class SmallScenes : MonoBehaviour
         switch (scene.kind)
         {
             case SmallSceneSettings.Kind.Friends:
-                return level >= 2 && first.DeedOf(SeenKey(index)) == 0;
+                return level >= 2 && first.DeedOf(SeenKey(scene)) == 0;
             case SmallSceneSettings.Kind.Rivals:
                 return level <= -1;
             default:
@@ -365,7 +365,8 @@ public sealed class SmallScenes : MonoBehaviour
         }
     }
 
-    private static string SeenKey(int index) => "scene:" + index;
+    // By who and what, not by place in the list, so reordering the scenes neither replays nor blocks one.
+    private static string SeenKey(SmallSceneSettings.Scene scene) => "scene:" + scene.first.Id + "|" + scene.second.Id + "|" + scene.kind;
 
     // A good scene shared: the two grow closer, a friends' scene is theirs once, and a Friend may ease a hard mark.
     private static void Shared(SmallSceneSettings.Scene scene)
@@ -381,9 +382,8 @@ public sealed class SmallScenes : MonoBehaviour
         PeopleStandings.SharedAScene(home, first, second);
         if (scene.kind == SmallSceneSettings.Kind.Friends)
         {
-            int index = IndexOf(scene);
-            first.AddDeed(SeenKey(index), 1);
-            second.AddDeed(SeenKey(index), 1);
+            first.AddDeed(SeenKey(scene), 1);
+            second.AddDeed(SeenKey(scene), 1);
         }
 
         if (PeopleStandings.LevelOf(home, first, second) >= 2)
@@ -420,20 +420,6 @@ public sealed class SmallScenes : MonoBehaviour
 
         GameMessages.Post(cleared ? $"{scene.first.DisplayName} and {scene.second.DisplayName} had it out at the fire, and laughed after: the air is cleared."
             : $"{scene.first.DisplayName} and {scene.second.DisplayName} had it out at the fire. It went badly.", cleared ? MessageKind.Gain : MessageKind.Info);
-    }
-
-    private static int IndexOf(SmallSceneSettings.Scene scene)
-    {
-        IReadOnlyList<SmallSceneSettings.Scene> scenes = SmallSceneSettings.Current.Scenes;
-        for (int i = 0; i < scenes.Count; i++)
-        {
-            if (scenes[i] == scene)
-            {
-                return i;
-            }
-        }
-
-        return -1;
     }
 
     private static bool Content(ResidentDefinition who)

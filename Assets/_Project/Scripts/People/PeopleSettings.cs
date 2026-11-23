@@ -14,8 +14,8 @@ public sealed class PeopleSettings : GameSettings<PeopleSettings>
     [SerializeField, Range(1, 50)] private int unlistedLevel = 5;
     [Tooltip("How much faster their station works for each level of their job's skill above 10 (level 30: x1.3, 40: x1.45).")]
     [SerializeField, Range(0f, 0.05f)] private float speedPerLevel = 0.015f;
-    [Tooltip("Their station's speed never falls below this for a low skill.")]
-    [SerializeField, Range(0.3f, 1f)] private float leastSpeed = 0.7f;
+    [Tooltip("Work never falls below this speed for a low skill (1: talents only ever help, so nobody works slower than before talents).")]
+    [SerializeField, Range(0.3f, 1f)] private float leastSpeed = 1f;
     [Tooltip("Chance of one more of what they make, for each level of their job's skill above 10 (level 40: 12%).")]
     [SerializeField, Range(0f, 0.02f)] private float extraPerLevel = 0.004f;
     [SerializeField, Range(0f, 0.5f)] private float mostExtra = 0.2f;
@@ -63,7 +63,7 @@ public sealed class PeopleSettings : GameSettings<PeopleSettings>
     [SerializeField, Range(0f, 0.05f)] private float damagePerLevel = 0.015f;
     [Tooltip("More chance of reading a blow and stepping aside, for each level of Melee above 10 (kept under Most Dodge).")]
     [SerializeField, Range(0f, 0.02f)] private float dodgePerLevel = 0.005f;
-    [SerializeField, Range(0f, 0.95f)] private float mostDodge = 0.6f;
+    [SerializeField, Range(0f, 0.95f)] private float mostDodge = 0.8f;
 
     [Header("Spirits")]
     [Tooltip("Steps (lifts less lowers: ResidentSpirits) at which they are Bright; and how many more lowers than lifts make them Low.")]
@@ -83,6 +83,8 @@ public sealed class PeopleSettings : GameSettings<PeopleSettings>
     [SerializeField, Range(0f, 1f)] private float fightingHeart = 0.2f;
     [Tooltip("A feeling about the woods: the share more their next foray brings home.")]
     [SerializeField, Range(0f, 2f)] private float goodFind = 0.5f;
+    [Tooltip("An idea at the bench that doesn't make gear: how many more of their next craft come out (gear comes out a step finer).")]
+    [SerializeField, Min(0)] private int inspiredExtra = 2;
     [Tooltip("A story told: how long everyone at home is cheered, in seconds of play (SmallScenes' cheer).")]
     [SerializeField, Min(0f)] private float storyCheerSeconds = 600f;
 
@@ -135,6 +137,7 @@ public sealed class PeopleSettings : GameSettings<PeopleSettings>
     public float FightingHeart => fightingHeart;
     public float GoodFind => goodFind;
     public float StoryCheerSeconds => storyCheerSeconds;
+    public int InspiredExtra => inspiredExtra;
     public float WrittenFriend => writtenFriend;
     /// <summary>Where a written friction starts (a negative standing).</summary>
     public float WrittenFriction => -frictionCool;

@@ -9,6 +9,8 @@ public struct RaidFacts
     public int BossesBeaten;
     /// <summary>Foes they felled, by the creature's id.</summary>
     public IReadOnlyDictionary<string, int> KillsBy;
+    /// <summary>What knocked them down, by the creature's id (a fear of it: Afraid of Widows).</summary>
+    public IReadOnlyList<string> DownedBy;
 }
 
 /// <summary>
@@ -79,22 +81,37 @@ public static class ResidentMarks
             return false;
         }
 
+        // Beyond Most Marks of its kind the oldest goes, but never one the forest still holds (Forest-touched while memories are lost);
+        // with nothing that may go, the new one doesn't come (the forest's own always does).
         int most = PeopleSettings.Current.MostMarks;
-        var sameKind = new List<MarkDefinition>();
+        var mayGo = new List<MarkDefinition>();
+        int sameKind = 0;
         foreach (MarkDefinition had in Of(record))
         {
             if (had.Good == mark.Good)
             {
-                sameKind.Add(had);
+                sameKind++;
+                if (!Held(record, had))
+                {
+                    mayGo.Add(had);
+                }
             }
         }
 
-        for (int i = 0; i <= sameKind.Count - most && i < sameKind.Count; i++)
+        int over = sameKind - most + 1;
+        if (over > mayGo.Count && !Held(record, mark))
         {
-            record.RemoveMark(sameKind[i].Id);
+            return false;
+        }
+
+        for (int i = 0; i < over && i < mayGo.Count; i++)
+        {
+            record.RemoveMark(mayGo[i].Id);
         }
 
         record.AddMark(mark.Id);
+        // Earned by deeds, once: pushed out later by others, it doesn't come back every raid after.
+        record.AddDeed(EarnedKey(mark), 1);
         if (mark.TurnsInto != null && !string.IsNullOrEmpty(mark.Creature))
         {
             record.ForgetDeed(SinceKey(mark));
@@ -147,7 +164,8 @@ public static class ResidentMarks
 
         foreach (MarkDefinition mark in PeopleSettings.Current.Marks)
         {
-            if (mark == null || record.HasMark(mark.Id) || !CauseHappened(record, mark, facts))
+            // Not a fear they have already faced down (Afraid of Widows beside Spider-bane).
+            if (mark == null || record.HasMark(mark.Id) || (mark.TurnsInto != null && record.HasMark(mark.TurnsInto.Id)) || !CauseHappened(record, mark, facts))
             {
                 continue;
             }
@@ -168,13 +186,14 @@ public static class ResidentMarks
             case MarkCause.GoodRaid:
                 return facts.Extracted && facts.TimesDowned == 0;
             case MarkCause.Downed:
-                return facts.TimesDowned > 0;
+                // A fear of one kind of creature comes only from being downed by it.
+                return facts.TimesDowned > 0 && (string.IsNullOrEmpty(mark.Creature) || DownedByKind(facts.DownedBy, mark.Creature));
             case MarkCause.Failed:
                 return !facts.Extracted;
             case MarkCause.Boss:
                 return facts.BossesBeaten > 0;
             case MarkCause.Kills:
-                return mark.Count > 0 && KillsOf(record, mark.Creature) >= mark.Count;
+                return mark.Count > 0 && record.DeedOf(EarnedKey(mark)) == 0 && KillsOf(record, mark.Creature) >= mark.Count;
             default:
                 return false;
         }
@@ -251,15 +270,40 @@ public static class ResidentMarks
     public static int HardCount(ResidentRecord record)
     {
         int count = 0;
-        foreach (MarkDefinition mark in Of(record))
+        IReadOnlyList<string> marks = record != null ? record.Marks : null;
+        for (int i = 0; marks != null && i < marks.Count; i++)
         {
-            count += mark.Good ? 0 : 1;
+            MarkDefinition mark = Find(marks[i]);
+            count += mark != null && !mark.Good ? 1 : 0;
         }
 
         return count;
     }
 
     private static string KillKey(string creatureId) => "kills:" + creatureId;
+
+    private static string EarnedKey(MarkDefinition mark) => "earned:" + mark.Id;
+
+    // A mark that can't go now: the forest's, while memories are still lost.
+    private static bool Held(ResidentRecord record, MarkDefinition mark) => mark.HeldByTheForest && record.Forgotten.Count > 0;
+
+    private static bool DownedByKind(IReadOnlyList<string> downedBy, string word)
+    {
+        if (downedBy == null)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < downedBy.Count; i++)
+        {
+            if (Matches(word, downedBy[i]))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     private static string SinceKey(MarkDefinition mark) => "since:" + mark.Id;
 

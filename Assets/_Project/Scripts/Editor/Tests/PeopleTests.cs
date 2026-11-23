@@ -118,6 +118,31 @@ public sealed class PeopleTests
     }
 
     [Test]
+    public void AWorkersCraft_TrainsTheirJobsSkill()
+    {
+        int jobs = 0;
+        foreach (ResidentDefinition who in All<ResidentDefinition>().Where(one => one.Jobs.Length > 0 && one.Jobs[0].WorkOrders.Count > 0))
+        {
+            JobDefinition job = who.Jobs[0];
+            RecipeDefinition order = job.WorkOrders.Select(o => o.recipe).FirstOrDefault(r => r != null && r.Output != null);
+            if (order == null || job.Skill == null)
+            {
+                continue;
+            }
+
+            jobs++;
+            SettlementState home = Home(who.name);
+            home.AssignJob(who, job);
+            ResidentRecord record = home.Find(who);
+            float before = record.Talents.ExperienceOf(job.Skill.Id);
+            ResidentTalents.PractiseCraft(record, order);
+            Assert.Greater(record.Talents.ExperienceOf(job.Skill.Id), before, $"{who.name}'s {order.name} trains {job.Skill.name}");
+        }
+
+        Assert.Greater(jobs, 3, "the trades with work orders");
+    }
+
+    [Test]
     public void ABondRank_OwesAPassionPick_FromTwoOffers()
     {
         SettlementState home = Home("Tor");
@@ -169,6 +194,8 @@ public sealed class PeopleTests
         Assert.Less(ResidentTraits.ForayShare(gunnar, 4), 0f, "a loner in a crowd");
         ResidentRecord tor = home.Find(Person("Tor"));
         Assert.Less(ResidentTraits.Sum(tor, TraitEffectKind.WorkSpeed), 0f, "Patient Hands is slower");
+        Assert.AreEqual(ResidentTraits.Sum(tor, TraitEffectKind.WorkSpeed), ResidentTraits.WorkShare(tor, Skill("Woodcutting")), 0.0001f,
+            "an effect for any work counts once at work with a skill");
         Assert.Greater(ResidentTraits.Sum(tor, TraitEffectKind.QualityChance), 0f, "and finer");
         Assert.Greater(ResidentRoutine.HoursOf(tor, SettlementSettings.Current.ResidentHours).WorkFrom, -1f);
         Assert.Less(ResidentRoutine.HoursOf(tor, SettlementSettings.Current.ResidentHours).WorkFrom, SettlementSettings.Current.ResidentHours.WorkFrom, "an early riser");
@@ -234,7 +261,10 @@ public sealed class PeopleTests
             Assert.AreNotEqual(Inspiration.Craft, Inspirations.Choose(yrsa, pick), $"at {pick}");
         }
 
-        ResidentRecord bjarne = Home("Bjarne").Find(Person("Bjarne"));
+        SettlementState smithy = Home("Bjarne");
+        ResidentRecord bjarne = smithy.Find(Person("Bjarne"));
+        Assert.AreNotEqual(Inspiration.Craft, Inspirations.Choose(bjarne, 0f), "no bench of his own yet: no idea for it");
+        smithy.AssignJob(bjarne.Resident, bjarne.Resident.Jobs[0]);
         Assert.AreEqual(Inspiration.Craft, Inspirations.Choose(bjarne, 0f), "the smith burns for Weaponcrafting");
     }
 
@@ -246,11 +276,14 @@ public sealed class PeopleTests
         Assert.IsNull(ResidentTalents.WorkerPiece(bjarne, recipe, 0.9999f), "a plain piece leaves nothing waiting");
         bjarne.Inspiration = Inspiration.Craft;
         string piece = ResidentTalents.WorkerPiece(bjarne, recipe, 0.9999f);
-        Assert.AreEqual((int)ItemQuality.Fine + "|" + bjarne.Resident.DisplayName, piece);
+        Assert.AreEqual((int)ItemQuality.Fine + "|" + bjarne.Resident.DisplayName + "|" + recipe.Output.Id, piece);
         Assert.AreEqual(Inspiration.None, bjarne.Inspiration, "used");
 
         var queue = new StationQueue("probe", CraftingStationType.Anvil, 1, 1);
         queue.Lifts.Add(piece);
+        ItemDefinition other = All<ItemDefinition>().First(item => item.HasDurability && item != recipe.Output);
+        Assert.AreEqual(ItemQuality.Plain, ResidentTalents.Lift(queue, new ItemStack(other, 1)).Quality, "another item is left as it is");
+        Assert.AreEqual(1, queue.Lifts.Count);
         ItemStack lifted = ResidentTalents.Lift(queue, new ItemStack(recipe.Output, 1));
         Assert.AreEqual(ItemQuality.Fine, lifted.Quality);
         Assert.AreEqual(bjarne.Resident.DisplayName, lifted.Maker);
@@ -296,8 +329,12 @@ public sealed class PeopleTests
         Assert.IsTrue(came.Any(mark => mark.Id == "troll_wary"), "three trolls along");
         Assert.IsFalse(came.Any(mark => !mark.Good), "a clean raid leaves nothing hard");
 
-        came = ResidentMarks.AfterRaid(eirik, new RaidFacts { Extracted = true, TimesDowned = 1 }, () => 0f);
-        Assert.IsTrue(eirik.HasMark("afraid_of_widows") && eirik.HasMark("old_wound"), "downed");
+        ResidentMarks.AfterRaid(eirik, new RaidFacts { Extracted = true, TimesDowned = 1, DownedBy = new List<string> { "bog_troll" } }, () => 0f);
+        Assert.IsTrue(eirik.HasMark("old_wound"), "downed");
+        Assert.IsFalse(eirik.HasMark("afraid_of_widows"), "a troll downed him: no fear of spiders");
+        eirik.RemoveMark("old_wound");
+        ResidentMarks.AfterRaid(eirik, new RaidFacts { Extracted = true, TimesDowned = 1, DownedBy = new List<string> { "black_widow" } }, () => 0f);
+        Assert.IsTrue(eirik.HasMark("afraid_of_widows") && eirik.HasMark("old_wound"), "downed by a widow");
         MarkDefinition afraid = Mark("afraid_of_widows");
         ResidentMarks.AfterRaid(eirik, new RaidFacts { Extracted = true, KillsBy = new Dictionary<string, int> { ["black_widow_small"] = afraid.Count } }, () => 0.9999f);
         Assert.IsFalse(eirik.HasMark(afraid.Id));
@@ -315,6 +352,39 @@ public sealed class PeopleTests
         }
 
         Assert.AreEqual(Mathf.Min(People.MostMarks, People.Marks.Count(mark => mark.Good)), ResidentMarks.Of(crowded).Count, "at most Most Marks good");
+
+        // Earned by deeds once: pushed out by others, Troll-wary doesn't come back every raid after.
+        var veteran = new ResidentRecord(Person("Eirik"));
+        ResidentMarks.AfterRaid(veteran, new RaidFacts { Extracted = true, KillsBy = trolls }, () => 0.9999f);
+        Assert.IsTrue(veteran.HasMark("troll_wary"));
+        veteran.RemoveMark("troll_wary");
+        ResidentMarks.AfterRaid(veteran, new RaidFacts { Extracted = true }, () => 0.9999f);
+        Assert.IsFalse(veteran.HasMark("troll_wary"), "once");
+
+        // The forest's mark holds while memories are lost: three more hard marks don't push it out.
+        var found = new ResidentRecord(Person("Eirik"));
+        found.Forgotten.Add(CompanionMemory.HardFight);
+        ResidentMarks.FoundAgain(found);
+        foreach (MarkDefinition mark in People.Marks.Where(mark => !mark.Good && mark != People.ForestMark))
+        {
+            ResidentMarks.Give(found, mark);
+        }
+
+        Assert.IsTrue(found.HasMark(People.ForestMark.Id), "held by the forest");
+        Assert.LessOrEqual(ResidentMarks.Of(found).Count(mark => !mark.Good), People.MostMarks);
+    }
+
+    [Test]
+    public void ACompanionsDodge_CanStillGrow_PastTheirKindsOwn()
+    {
+        int kinds = 0;
+        foreach (CompanionDefinition kind in All<CompanionDefinition>())
+        {
+            kinds++;
+            Assert.Greater(People.MostDodge, kind.ReadsAttacks, kind.name + ": a Wary trait or Melee footwork must still count");
+        }
+
+        Assert.Greater(kinds, 0);
     }
 
     // ----- Kit -----
@@ -356,6 +426,8 @@ public sealed class PeopleTests
         Assert.IsTrue(CompanionKit.TakeBack(gunnar, true, bag, null, null));
         Assert.IsTrue(gunnar.KitWeapon.IsEmpty);
         Assert.AreEqual(blade, bag.GetSlot(0).Item);
+        Assert.IsTrue(CompanionKit.Give(gunnar, bag, 0, null, null), "mended and given back");
+        Assert.IsTrue(CompanionKit.IsTheirs(gunnar, true), "taking it back to mend cost nothing of its raids");
     }
 
     // ----- A save -----
@@ -376,7 +448,7 @@ public sealed class PeopleTests
         gunnar.InspiredOn = 3;
         ItemDefinition blade = All<ItemDefinition>().First(item => item.IsWeapon && item.Weapon.Kind == WeaponKind.Melee && item.HasDurability);
         gunnar.KitWeapon = new ItemStack(blade, 1).WithDurability(0.5f);
-        gunnar.KitWeaponRaids = 4;
+        gunnar.AddDeed("kit:" + blade.Id, 4);
         PeopleStandings.Change(home, gunnar, home.Find(Person("Sigrid")), 0.7f);
         float standing = home.Standings.ValueOf(gunnarDef.Id, Person("Sigrid").Id);
 
@@ -394,7 +466,7 @@ public sealed class PeopleTests
         Assert.AreEqual(3, back.InspiredOn);
         Assert.AreEqual(blade, back.KitWeapon.Item);
         Assert.AreEqual(0.5f, back.KitWeapon.Durability, 0.001f);
-        Assert.AreEqual(4, back.KitWeaponRaids);
+        Assert.AreEqual(4, CompanionKit.RaidsWith(back, true));
         Assert.AreEqual(standing, read.Standings.ValueOf(gunnarDef.Id, Person("Sigrid").Id), 0.0001f);
 
         // Lost with all of it, and saved while lost: it waits with them.
@@ -405,6 +477,7 @@ public sealed class PeopleTests
         Assert.AreEqual(4321f, lost.Talents.ExperienceOf(Skill("Archery").Id), 0.01f);
         Assert.AreEqual(blade, lost.KitWeapon.Item);
         Assert.Contains("old_wound", lost.Marks);
+        Assert.AreEqual(4, lost.Deeds["kit:" + blade.Id], "the kit's raids wait with them");
 
         // A save from before talents: the old rank, by crafts, becomes the job skill's level.
         var smithy = new SettlementState();

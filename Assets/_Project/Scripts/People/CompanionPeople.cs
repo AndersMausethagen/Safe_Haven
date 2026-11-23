@@ -23,7 +23,9 @@ public static class CompanionPeople
         StatSheet stats = combatant.Stats;
         stats.RemoveModifiersFrom(Source);
         float health = ResidentTraits.Sum(record, TraitEffectKind.FightHealth) + (defending ? ResidentTraits.Sum(record, TraitEffectKind.DefendHealth) : 0f);
-        float damage = ResidentTalents.CompanionDamage(record) + ResidentTraits.Sum(record, TraitEffectKind.FightDamage)
+        // Their own kit's weapon only where they fight as their own kind (a guard defending as their job's kind holds its weapon).
+        bool ownKind = who.Definition != null && who.Definition == record.Resident.RaidCompanion;
+        float damage = ResidentTalents.CompanionDamage(record, who.Definition) + ResidentTraits.Sum(record, TraitEffectKind.FightDamage)
                        + (onRaid && record.Inspiration == Inspiration.FightingHeart ? PeopleSettings.Current.FightingHeart : 0f);
         if (health != 0f)
         {
@@ -35,12 +37,12 @@ public static class CompanionPeople
             stats.AddModifier(new StatModifier(StatType.DamageBonus, StatModifierOp.Flat, damage, Source));
         }
 
-        CompanionKit.Apply(stats, record, Source);
+        CompanionKit.Apply(stats, record, Source, ownKind);
         who.DodgeBonus = ResidentTalents.CompanionDodge(record) + ResidentTraits.Sum(record, TraitEffectKind.FightDodge);
         who.NightSight = Mathf.Max(0f, ResidentTraits.Sum(record, TraitEffectKind.NightSight));
         if (who.Weapon != null)
         {
-            who.Weapon.DamageScale = CompanionKit.DamageScale(record, who.Definition);
+            who.Weapon.DamageScale = ownKind ? CompanionKit.DamageScale(record, who.Definition) : 1f;
             who.Weapon.Against = target => ResidentTraits.DamageAgainst(record, target.Definition != null ? target.Definition.Id : target.name);
         }
 

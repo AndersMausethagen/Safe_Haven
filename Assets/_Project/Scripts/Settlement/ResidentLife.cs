@@ -98,6 +98,8 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     private Vector3 sceneAt;
     private Vector3 sceneLook;
     private float chopLeft;
+    // Seconds of building work not yet counted toward their Construction (counted a second's worth at a time).
+    private float hammeredSince;
     private bool logsToChest;
     private float carriedWeight;
     // When a guard with no post free may look again (KeepsGuard).
@@ -1654,9 +1656,14 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         {
             float hammered = Time.deltaTime * BuildRate(npc.Record) * ResidentBuilders.ShareOf(npc.Record);
             building.AddWork(hammered);
-            // Their Construction grows with every blow (ResidentTalents), counted as the work is.
-            ResidentTalents.Practise(npc.Record, PeopleSettings.Current.BuildingSkill, 1,
-                hammered / Mathf.Max(0.01f, HomeLifeSettings.Current.BuilderWorkPerSecond) * PeopleSettings.Current.BuildPracticePerSecond);
+            // Their Construction grows with the work (ResidentTalents), counted a second's worth at a time: tiny sums each frame were lost
+            // to a float holding thousands of experience.
+            hammeredSince += hammered / Mathf.Max(0.01f, HomeLifeSettings.Current.BuilderWorkPerSecond);
+            if (hammeredSince >= 1f)
+            {
+                ResidentTalents.Practise(npc.Record, PeopleSettings.Current.BuildingSkill, 1, hammeredSince * PeopleSettings.Current.BuildPracticePerSecond);
+                hammeredSince = 0f;
+            }
         }
 
         return true;

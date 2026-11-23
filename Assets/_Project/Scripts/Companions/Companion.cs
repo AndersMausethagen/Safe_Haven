@@ -121,6 +121,9 @@ public sealed class Companion : MonoBehaviour, IConversationTopics, IQuestPerson
     public int TimesHelpedUp { get; private set; }
     public int Kills { get; private set; }
 
+    /// <summary>The creatures that knocked them down, by id (a mark of what downed them: ResidentMarks).</summary>
+    public System.Collections.Generic.List<string> DownedBy { get; } = new System.Collections.Generic.List<string>();
+
     /// <summary>Foes felled, by the creature's id (marks earned by deeds: ResidentMarks).</summary>
     public System.Collections.Generic.Dictionary<string, int> KillsBy { get; } = new System.Collections.Generic.Dictionary<string, int>();
 
@@ -637,6 +640,12 @@ public sealed class Companion : MonoBehaviour, IConversationTopics, IQuestPerson
 
     private void OnKnockedDown(Damageable victim, DamageInfo hit)
     {
+        string by = hit.Source != null && hit.Source.TryGetComponent(out MonsterAI foe) && foe.Definition != null ? foe.Definition.Id : null;
+        if (by != null)
+        {
+            DownedBy.Add(by);
+        }
+
         getUpAt = bleedsOut ? float.PositiveInfinity : Time.time + definition.DownedSeconds;
         bleedOutAt = Time.time + definition.BleedOutSeconds;
         weapon.Cancel();

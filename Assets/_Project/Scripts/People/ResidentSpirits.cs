@@ -115,13 +115,9 @@ public static class ResidentSpirits
             reasons.Add(new SpiritReason("A rival next door", "House", -1));
         }
 
-        foreach (KeyValuePair<string, int> feeling in record.Feelings)
+        if (record.MissesSomeone(today))
         {
-            if (feeling.Value >= today && feeling.Key.StartsWith(LostFeeling))
-            {
-                reasons.Add(new SpiritReason("Misses a friend the forest took", "Skull", -1));
-                break;
-            }
+            reasons.Add(new SpiritReason("Misses a friend the forest took", "Skull", -1));
         }
 
         if (ResidentMarks.HardCount(record) > 0)
@@ -153,7 +149,8 @@ public static class ResidentSpirits
     /// <summary>Forgets what was worked out (a new game or a load: GameSession.Reset).</summary>
     public static void ForgetGame() => cache.Clear();
 
-    // Their spirits, worked out again once Recheck Seconds have passed since the last time.
+    // Their spirits, worked out again once Recheck Seconds have passed since the last time, by counting the steps (StepsOf) without
+    // building the reasons' list and words (asked every frame by station speeds).
     public static Spirits Cached(ResidentRecord record)
     {
         float now = Time.unscaledTime;
@@ -162,9 +159,39 @@ public static class ResidentSpirits
             return known.spirits;
         }
 
-        Spirits spirits = Of(record);
+        PeopleSettings settings = PeopleSettings.Current;
+        int steps = StepsOf(record, GameSession.Here);
+        Spirits spirits = steps >= settings.BrightAt ? Spirits.Bright : steps <= settings.LowAt ? Spirits.Low : Spirits.Steady;
         cache[record] = (now + RecheckSeconds, spirits);
         return spirits;
+    }
+
+    /// <summary>The sum of their reasons' steps, as <see cref="ReasonsOf(ResidentRecord, IHavenView)"/> gives them, without allocating.</summary>
+    public static int StepsOf(ResidentRecord record, IHavenView here)
+    {
+        if (record == null || record.Resident == null)
+        {
+            return 0;
+        }
+
+        int steps = 0;
+        if (ResidentMeals.Expected(here, HomeLifeSettings.Current))
+        {
+            steps += record.Meal == ResidentMeal.WellFed ? 1 : record.Meal == ResidentMeal.Hungry ? -1 : 0;
+        }
+
+        steps += HomeLife.IsContent(record) ? 1 : 0;
+        steps += SmallScenes.CheerOf(record.Resident) > 0f ? 1 : 0;
+        steps -= record.Bruised ? 1 : 0;
+        steps += record.Job != null && !record.WorkPaused && ResidentTalents.PassionOf(record, ResidentTalents.JobSkill(record)) != Passion.None ? 1 : 0;
+        steps += record.Inspiration != Inspiration.None ? 1 : 0;
+        steps += PeopleStandings.KindWordsFor(here, record) > 0 ? 1 : 0;
+        steps += PeopleStandings.FriendNearWork(record) ? 1 : 0;
+        steps -= PeopleStandings.RivalNextDoor(record) && !ResidentTraits.Has(record, TraitEffectKind.RivalsDontBother) ? 1 : 0;
+        steps -= record.MissesSomeone(here != null ? here.DaysPassed : 0) ? 1 : 0;
+        steps -= ResidentMarks.HardCount(record) > 0 ? 1 : 0;
+        steps += Mathf.RoundToInt(ResidentTraits.Sum(record, TraitEffectKind.Spirits));
+        return steps;
     }
 
     /// <summary>A feeling's id for missing a friend the forest took ("lost:" + their id).</summary>

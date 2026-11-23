@@ -75,7 +75,7 @@ public static class Inspirations
             float weight = passion == Passion.Burning ? 5f : passion == Passion.Keen ? 2.5f : 0f;
             if (weight > 0f)
             {
-                kinds.Add((KindFor(skill), weight));
+                kinds.Add((KindFor(record, skill), weight));
             }
         }
 
@@ -106,15 +106,16 @@ public static class Inspirations
         return Inspiration.WorkFever;
     }
 
-    private static Inspiration KindFor(ProficiencyDefinition skill)
+    private static Inspiration KindFor(ResidentRecord record, ProficiencyDefinition skill)
     {
         if (skill.Training == ProficiencyTraining.Melee || skill.Training == ProficiencyTraining.Archery || skill.Training == ProficiencyTraining.Sneaking)
         {
             return Inspiration.FightingHeart;
         }
 
-        // A finer piece is gear's (CraftedWork: weapons, tools, armour); a cook's or brewer's inspired day is a working fever.
-        if ((skill.Crafts & (CraftedGoods.Weapons | CraftedGoods.Tools | CraftedGoods.Armor)) != 0)
+        // Their best work at the bench: only for one whose work is making things at their station (the job's orders); a gear piece
+        // comes out a step finer, anything else with more of it (ResidentTalents.WorkerPiece, SettlementSystem).
+        if (skill.Crafts != CraftedGoods.None && record?.Job != null && record.Job.WorkOrders.Count > 0)
         {
             return Inspiration.Craft;
         }
@@ -148,7 +149,7 @@ public static class Inspirations
         switch (record.Inspiration)
         {
             case Inspiration.Craft:
-                return $"{who} woke with an idea at the bench: the next piece of gear made there will be a step finer.";
+                return $"{who} woke with an idea at the bench: the next thing made there will be their best work.";
             case Inspiration.WorkFever:
                 return $"{who} is in a working fever today: half as fast again.";
             case Inspiration.GoodFind:

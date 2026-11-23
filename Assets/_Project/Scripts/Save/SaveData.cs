@@ -229,10 +229,11 @@ public sealed class FallenSaveData
     public string home;
     /// <summary>Their talents, kept while lost. Missing in older saves: their written start.</summary>
     public TalentSaveData talents = new TalentSaveData();
-    /// <summary>The kit and marks waiting with them. Missing in older saves: none.</summary>
+    /// <summary>The kit, marks and deeds waiting with them. Missing in older saves: none.</summary>
     public SlotSaveData kitWeapon;
     public SlotSaveData kitBody;
     public List<string> marks = new List<string>();
+    public List<string> deeds = new List<string>();
 }
 
 [Serializable]
@@ -284,11 +285,9 @@ public sealed class ResidentSaveData
     /// <summary>Inspiration (0 none) and the day it came.</summary>
     public int inspiration;
     public int inspiredOn = -1;
-    /// <summary>The kit the player gave them (CompanionKit) and the raids along with each piece. Missing in older saves: none.</summary>
+    /// <summary>The kit the player gave them (CompanionKit). Missing in older saves: none.</summary>
     public SlotSaveData kitWeapon;
     public SlotSaveData kitBody;
-    public int kitWeaponRaids;
-    public int kitBodyRaids;
 }
 
 [Serializable]

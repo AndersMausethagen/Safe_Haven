@@ -18,13 +18,18 @@ public static class CompanionKit
             return false;
         }
 
+        CompanionDefinition how = record.Resident.RaidCompanion;
+        if (how == null)
+        {
+            return false;
+        }
+
         if (!weapon)
         {
             return item.IsArmor && item.ArmorSlot == ArmorSlot.Chest;
         }
 
-        CompanionDefinition how = record.Resident.RaidCompanion;
-        if (how == null || !item.IsWeapon)
+        if (!item.IsWeapon)
         {
             return false;
         }
@@ -57,12 +62,10 @@ public static class CompanionKit
         if (weapon)
         {
             record.KitWeapon = given;
-            record.KitWeaponRaids = 0;
         }
         else
         {
             record.KitBody = given;
-            record.KitBodyRaids = 0;
         }
 
         if (!before.IsEmpty)
@@ -82,15 +85,14 @@ public static class CompanionKit
             return false;
         }
 
+        // The raids it went with them stay counted (by the item: RaidsWith), so taking it back to mend it costs nothing of that.
         if (weapon)
         {
             record.KitWeapon = ItemStack.Empty;
-            record.KitWeaponRaids = 0;
         }
         else
         {
             record.KitBody = ItemStack.Empty;
-            record.KitBodyRaids = 0;
         }
 
         ItemDelivery.Give(to, had, stash, dropAt);
@@ -98,9 +100,9 @@ public static class CompanionKit
     }
 
     /// <summary>Their kit's stats on <paramref name="stats"/> under <paramref name="source"/>, as the player's gear gives them (a broken piece gives nothing).</summary>
-    public static void Apply(StatSheet stats, ResidentRecord record, object source)
+    public static void Apply(StatSheet stats, ResidentRecord record, object source, bool withWeapon = true)
     {
-        foreach (ItemStack piece in new[] { record.KitWeapon, record.KitBody })
+        foreach (ItemStack piece in new[] { withWeapon ? record.KitWeapon : ItemStack.Empty, record.KitBody })
         {
             if (piece.IsEmpty || piece.IsBroken)
             {
@@ -152,22 +154,33 @@ public static class CompanionKit
         if (!record.KitWeapon.IsEmpty)
         {
             record.KitWeapon = Worn(record.KitWeapon, wear);
-            record.KitWeaponRaids++;
+            record.AddDeed(RaidsKey(record.KitWeapon.Item), 1);
         }
 
         if (!record.KitBody.IsEmpty)
         {
             record.KitBody = Worn(record.KitBody, wear);
-            record.KitBodyRaids++;
+            record.AddDeed(RaidsKey(record.KitBody.Item), 1);
         }
     }
+
+    /// <summary>Raids gone along on with a piece of this item (kept through mending, and while the forest has them).</summary>
+    public static int RaidsWith(ResidentRecord record, ItemDefinition item) => record != null && item != null ? record.DeedOf(RaidsKey(item)) : 0;
+
+    /// <summary>Raids with what they carry now in that hand (0 with nothing).</summary>
+    public static int RaidsWith(ResidentRecord record, bool weapon)
+    {
+        ItemStack piece = record == null ? ItemStack.Empty : weapon ? record.KitWeapon : record.KitBody;
+        return piece.IsEmpty ? 0 : RaidsWith(record, piece.Item);
+    }
+
+    private static string RaidsKey(ItemDefinition item) => "kit:" + item.Id;
 
     private static ItemStack Worn(ItemStack piece, float wear) =>
         piece.Item.HasDurability ? piece.WithDurability(Mathf.Max(0f, piece.Durability - wear)) : piece;
 
     /// <summary>True when the piece is theirs by now (enough raids along with it).</summary>
-    public static bool IsTheirs(ResidentRecord record, bool weapon) =>
-        record != null && (weapon ? record.KitWeaponRaids : record.KitBodyRaids) >= PeopleSettings.Current.KitNamedAfter;
+    public static bool IsTheirs(ResidentRecord record, bool weapon) => RaidsWith(record, weapon) >= PeopleSettings.Current.KitNamedAfter;
 
     /// <summary>"Gunnar's Yew Bow" once it is theirs; the piece's own name before.</summary>
     public static string NameOf(ResidentRecord record, bool weapon)

@@ -12,13 +12,8 @@ public static class ResidentTraits
     public static IReadOnlyList<ResidentTraitDefinition> Of(ResidentRecord record) =>
         record?.Resident != null ? record.Resident.Traits : System.Array.Empty<ResidentTraitDefinition>();
 
-    /// <summary>True when one of their traits or marks has an effect of <paramref name="kind"/>.</summary>
-    public static bool Has(ResidentRecord record, TraitEffectKind kind)
-    {
-        bool found = false;
-        Visit(record, (in TraitEffect effect) => found |= effect.kind == kind);
-        return found;
-    }
+    /// <summary>True when one of their traits or marks has an effect of <paramref name="kind"/> (a flag kind: any amount but 0).</summary>
+    public static bool Has(ResidentRecord record, TraitEffectKind kind) => Sum(record, kind) != 0f;
 
     /// <summary>
     /// The sum of their traits' and marks' effects of <paramref name="kind"/>: those for <paramref name="skill"/> and those for any skill
@@ -112,21 +107,48 @@ public static class ResidentTraits
             return 0f;
         }
 
+        // Asked on every blow: indexed, no closure.
         float total = 0f;
-        Visit(record, (in TraitEffect effect) =>
+        if (record?.Resident == null)
         {
+            return 0f;
+        }
+
+        IReadOnlyList<ResidentTraitDefinition> traits = record.Resident.Traits;
+        for (int i = 0; i < traits.Count; i++)
+        {
+            total += traits[i] != null ? AgainstOf(traits[i].Effects, creatureId) : 0f;
+        }
+
+        IReadOnlyList<string> marks = record.Marks;
+        for (int i = 0; i < marks.Count; i++)
+        {
+            MarkDefinition mark = ResidentMarks.Find(marks[i]);
+            total += mark != null ? AgainstOf(mark.Effects, creatureId) : 0f;
+        }
+
+        return total;
+    }
+
+    private static float AgainstOf(IReadOnlyList<TraitEffect> effects, string creatureId)
+    {
+        float total = 0f;
+        for (int i = 0; i < effects.Count; i++)
+        {
+            TraitEffect effect = effects[i];
             if (effect.kind == TraitEffectKind.DamageAgainst && !string.IsNullOrEmpty(effect.creature)
                 && creatureId.IndexOf(effect.creature, System.StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 total += effect.amount;
             }
-        });
+        }
+
         return total;
     }
 
     /// <summary>Their learning multiplier in <paramref name="skill"/> from traits (1 with none): Bookish's x1.5 in Runecraft and Alchemy.</summary>
     public static float LearningOf(ResidentRecord record, ProficiencyDefinition skill) =>
-        Mathf.Max(0.1f, 1f + Sum(record, TraitEffectKind.Learning, skill) + (skill != null ? Sum(record, TraitEffectKind.Learning) : 0f));
+        Mathf.Max(0.1f, 1f + Sum(record, TraitEffectKind.Learning, skill));
 
     /// <summary>What their traits make of their own foray power in a party of <paramref name="partyCount"/>: a share (-0.1, +0.25).</summary>
     public static float ForayShare(ResidentRecord record, int partyCount)
@@ -147,8 +169,7 @@ public static class ResidentTraits
     }
 
     /// <summary>Their work speed share from traits and marks, at work with <paramref name="skill"/> (any work, and that skill's).</summary>
-    public static float WorkShare(ResidentRecord record, ProficiencyDefinition skill) =>
-        Sum(record, TraitEffectKind.WorkSpeed) + (skill != null ? Sum(record, TraitEffectKind.WorkSpeed, skill) : 0f);
+    public static float WorkShare(ResidentRecord record, ProficiencyDefinition skill) => Sum(record, TraitEffectKind.WorkSpeed, skill);
 
     /// <summary>A line one of their traits gives them to say in passing, or null (their tell; ResidentAsides).</summary>
     public static string LineOf(ResidentRecord record, int pick)

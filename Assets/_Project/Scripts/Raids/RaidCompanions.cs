@@ -10,6 +10,7 @@ using UnityEngine.AI;
 public sealed class RaidCompanions
 {
     private readonly RaidDirector raid;
+    private bool heartAlong;
     private CompanionBondRank companionRank;
 
     public RaidCompanions(RaidDirector raid)
@@ -56,6 +57,8 @@ public sealed class RaidCompanions
         // Who they are: their talents, traits, marks, an inspired fighting heart and the kit given them (CompanionPeople).
         Companion.KitWeapon = CompanionKit.ShownWeapon(record);
         CompanionPeople.Apply(Companion, record, false, true);
+        // A fighting heart they set out with is spent by this raid; one that comes at a dawn while out waits for the next.
+        heartAlong = record != null && record.Inspiration == Inspiration.FightingHeart;
         Toughen(Companion, companionRank);
     }
 
@@ -135,7 +138,11 @@ public sealed class RaidCompanions
         }
 
         ResidentTalents.PractiseRaid(record, session.Tier, Companion.Kills);
-        var facts = new RaidFacts { Extracted = extracted, TimesDowned = Companion.TimesHelpedUp, BossesBeaten = session.BossesBeaten, KillsBy = Companion.KillsBy };
+        var facts = new RaidFacts
+        {
+            Extracted = extracted, TimesDowned = Mathf.Max(Companion.TimesHelpedUp, Companion.DownedBy.Count), BossesBeaten = session.BossesBeaten,
+            KillsBy = Companion.KillsBy, DownedBy = Companion.DownedBy,
+        };
         foreach (MarkDefinition mark in ResidentMarks.AfterRaid(record, facts, () => UnityEngine.Random.value))
         {
             GameMessages.Post($"{record.Resident.DisplayName} came home {(mark.Good ? "with" : "carrying")} something new: {mark.DisplayName}.",
@@ -143,7 +150,10 @@ public sealed class RaidCompanions
         }
 
         CompanionKit.AfterRaid(record, extracted);
-        Inspirations.Use(record, Inspiration.FightingHeart);
+        if (heartAlong)
+        {
+            Inspirations.Use(record, Inspiration.FightingHeart);
+        }
         if (rose)
         {
             ResidentTalents.OwePick(record);

@@ -261,11 +261,12 @@ public sealed class ResidentWindow : MonoBehaviour
         float rightWidth = Width - Margin * 2f - rx;
         RectTransform right = HearthKit.Card(page, "Marks Card", rx, 0f, rightWidth, BodyHeight);
         HearthKit.Section(right, "Marks of the raids", "Cross", 22f, 18f);
+        float markWidth = (rightWidth - 44f - 16f) / 3f;
         for (int i = 0; i < 6; i++)
         {
             int index = i;
-            var card = new KitPictureCard(right, "Mark " + i, 104f, 52f, 2, 14f, () => ShowTip(markTips, index), HideTip);
-            card.Place(22f + (i % 3) * 112f, 58f + (i / 3) * 118f);
+            var card = new KitPictureCard(right, "Mark " + i, markWidth, 52f, 2, 14f, () => ShowTip(markTips, index), HideTip);
+            card.Place(22f + (i % 3) * (markWidth + 8f), 58f + (i / 3) * 118f);
             markCards.Add(card);
         }
 
@@ -869,7 +870,7 @@ public sealed class ResidentWindow : MonoBehaviour
         kitRows[0].Set("Weapon", record.KitWeapon.IsEmpty ? "Their own" : $"{CompanionKit.NameOf(record, true)} ({Mathf.RoundToInt(record.KitWeapon.Durability * 100f)}%)");
         kitRows[1].Set("Body", record.KitBody.IsEmpty ? "Their own" : $"{CompanionKit.NameOf(record, false)} ({Mathf.RoundToInt(record.KitBody.Durability * 100f)}%)");
         kitRows[2].Set("Theirs after", record.KitWeapon.IsEmpty && record.KitBody.IsEmpty ? "Give them kit in talk"
-            : $"{Mathf.Max(record.KitWeaponRaids, record.KitBodyRaids)} of {PeopleSettings.Current.KitNamedAfter} raids");
+            : $"{Mathf.Max(CompanionKit.RaidsWith(record, true), CompanionKit.RaidsWith(record, false))} of {PeopleSettings.Current.KitNamedAfter} raids");
     }
 
     // A kit icon for a skill, by what it trains.
