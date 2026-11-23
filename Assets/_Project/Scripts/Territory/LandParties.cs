@@ -149,9 +149,9 @@ public static class LandParties
         return string.Join(", ", parts) + $", and the hold wears {Mathf.RoundToInt((1f - settings.PartyWearShare) * 100f)}% less";
     }
 
-    // More of each yield for each worker rank above the first (SettlementSettings › Worker Ranks).
+    // More of each yield for each rank of the leader's job skill above the first (ResidentTalents, SettlementSettings › Worker Ranks).
     private static int Bonus(ResidentRecord who, TerritorySettings settings) =>
-        who != null ? Mathf.Max(0, SettlementSettings.Current.RankIndex(who.WorkDone)) * settings.PartyRankBonus : 0;
+        who != null ? Mathf.Max(0, ResidentTalents.RankIndex(who)) * settings.PartyRankBonus : 0;
 
     /// <summary>What one party of <paramref name="kind"/> led by <paramref name="who"/> brings home, rolled with <paramref name="roll"/>
     /// (least and most, inclusive, to a number).</summary>

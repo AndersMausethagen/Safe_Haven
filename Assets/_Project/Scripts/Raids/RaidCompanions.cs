@@ -53,6 +53,9 @@ public sealed class RaidCompanions
         // One's own companion, from one's own Haven: on a raid followed with a host, the Haven here is still the host's.
         ResidentRecord record = GameSession.Home.Find(session.Companion);
         companionRank = record != null ? CompanionBond.RankFor(record.RaidsAlong, SettlementSettings.Current.BondRanks) : null;
+        // Who they are: their talents, traits, marks, an inspired fighting heart and the kit given them (CompanionPeople).
+        Companion.KitWeapon = CompanionKit.ShownWeapon(record);
+        CompanionPeople.Apply(Companion, record, false, true);
         Toughen(Companion, companionRank);
     }
 
@@ -115,10 +118,36 @@ public sealed class RaidCompanions
                 // Read back from where it was written (Home): from the Haven here, a guest's would be the host's record, or none.
                 ResidentRecord record = GameSession.Home.Find(session.Companion);
                 report.CompanionNewRank = rose && record != null ? CompanionBond.RankFor(record.RaidsAlong, SettlementSettings.Current.BondRanks)?.name : null;
+                SettlePerson(record, session, extracted, rose);
             }
         }
 
         SettleTheLost(report, extracted);
+    }
+
+    // What the raid made of the person (Docs/PeopleResearch_2026-11-23.md): their fighting skill grew, it may have left a mark (said in
+    // the homecoming's words), their kit wore, a fighting heart was spent, and a new bond rank lets the player grow a passion.
+    private void SettlePerson(ResidentRecord record, RaidSession session, bool extracted, bool rose)
+    {
+        if (record == null || Companion == null)
+        {
+            return;
+        }
+
+        ResidentTalents.PractiseRaid(record, session.Tier, Companion.Kills);
+        var facts = new RaidFacts { Extracted = extracted, TimesDowned = Companion.TimesHelpedUp, BossesBeaten = session.BossesBeaten, KillsBy = Companion.KillsBy };
+        foreach (MarkDefinition mark in ResidentMarks.AfterRaid(record, facts, () => UnityEngine.Random.value))
+        {
+            GameMessages.Post($"{record.Resident.DisplayName} came home {(mark.Good ? "with" : "carrying")} something new: {mark.DisplayName}.",
+                mark.Good ? MessageKind.Gain : MessageKind.Info);
+        }
+
+        CompanionKit.AfterRaid(record, extracted);
+        Inspirations.Use(record, Inspiration.FightingHeart);
+        if (rose)
+        {
+            ResidentTalents.OwePick(record);
+        }
     }
 
     // Home with the player when they get out, alive and still following, however far behind: as a rescued traveller is

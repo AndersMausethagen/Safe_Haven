@@ -182,7 +182,8 @@ public static class StationCrafting
                 if (item.HasDurability)
                 {
                     StatSheet maker = user.TryGetComponent(out Combatant combatant) ? combatant.Stats : null;
-                    taken = CraftedWork.GiveTo(bag, item, taken, maker, queue.FineChance, () => ModuleCues.Fire(queue, "Fine work: the building's skill"));
+                    taken = CraftedWork.GiveTo(bag, item, taken, maker, queue.FineChance, () => ModuleCues.Fire(queue, "Fine work: the building's skill"),
+                        piece => ResidentTalents.Lift(queue, piece));
                     queue.TakeOutput(taken);
                 }
                 else

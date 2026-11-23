@@ -5,9 +5,10 @@ using UnityEngine.UI;
 
 /// <summary>
 /// A resident's page (the user's playtest list, 2026-11-15: "an NPC window like the horse window"): their live picture,
-/// name, job and rank, and tabs: Overview (who they are, their jobs), Home (the house they sleep in, what it is like, and
-/// every house they could move into: the player's choice wins, "Let them choose" gives it back), Work (where they work, how
-/// far from home, what they keep making) and Story (raids along, lessons). Opened from the Haven window's People tab and
+/// name, job and rank, and tabs: Overview (who they are, their traits, their jobs), Talents (their level and passion in every skill:
+/// Docs/PeopleResearch_2026-11-23.md), Bonds (their spirits and why, friends and rivals, the marks raids left, the kit they fight with),
+/// Home (the house they sleep in, what it is like, and every house they could move into: the player's choice wins, "Let them choose"
+/// gives it back), Work (where they work, how far from home, what they keep making) and Story (raids along, lessons). Opened from the Haven window's People tab and
 /// from talking to them. While it is open the player stands still (PlayerHold).
 /// <para>Made of the UI kit (HearthKit, KitParts) like HorsePanelWindow. Built in code the first time it is opened.</para>
 /// </summary>
@@ -19,15 +20,21 @@ public sealed class ResidentWindow : MonoBehaviour
     private const float BodyTop = 384f;
     private const float BodyHeight = Height - BodyTop - Margin;
     private const float RefreshSeconds = 0.5f;
-    private static readonly string[] TabNames = { "Overview", "Home", "Work", "Story" };
+    private static readonly string[] TabNames = { "Overview", "Talents", "Bonds", "Home", "Work", "Story" };
 
     private enum Tab
     {
         Overview = 0,
-        Home = 1,
-        Work = 2,
-        Story = 3,
+        Talents = 1,
+        Bonds = 2,
+        Home = 3,
+        Work = 4,
+        Story = 5,
     }
+
+    private const int MostTraits = 4;
+    private const int MostStandings = 7;
+    private const int MostReasons = 6;
 
     private static ResidentWindow current;
 
@@ -64,6 +71,19 @@ public sealed class ResidentWindow : MonoBehaviour
     private KitActionList workActions;
 
     private readonly KitFactRow[] storyRows = new KitFactRow[7];
+
+    private readonly List<KitPictureCard> traitCards = new List<KitPictureCard>();
+    private readonly List<(string title, string body, Color colour)> traitTips = new List<(string, string, Color)>();
+    private readonly List<KitStatRow> skillRows = new List<KitStatRow>();
+    private readonly List<ProficiencyDefinition> skillOrder = new List<ProficiencyDefinition>();
+    private TMP_Text talentNote;
+    private KitStatRow spiritsRow;
+    private readonly KitFactRow[] reasonRows = new KitFactRow[MostReasons];
+    private readonly KitFactRow[] standingRows = new KitFactRow[MostStandings];
+    private readonly List<KitPictureCard> markCards = new List<KitPictureCard>();
+    private readonly List<(string title, string body, Color colour)> markTips = new List<(string, string, Color)>();
+    private readonly KitFactRow[] kitRows = new KitFactRow[3];
+    private ItemTooltipView tooltip;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => current = null;
@@ -107,7 +127,7 @@ public sealed class ResidentWindow : MonoBehaviour
     {
         panel = HearthKit.Window(root, Width, Height, () => window.Close(), out RectTransform content);
         BuildHeader();
-        tabs = new KitTabs(panel, Margin + 8f, 312f, 178f, 54f, TabNames, i => ShowTab((Tab)i));
+        tabs = new KitTabs(panel, Margin + 8f, 312f, 168f, 54f, TabNames, i => ShowTab((Tab)i));
         HearthKit.Rule(panel, Margin, 370f, Width - Margin * 2f);
         for (int i = 0; i < pages.Length; i++)
         {
@@ -115,15 +135,23 @@ public sealed class ResidentWindow : MonoBehaviour
         }
 
         BuildOverview(pages[(int)Tab.Overview]);
+        BuildTalents(pages[(int)Tab.Talents]);
+        BuildBonds(pages[(int)Tab.Bonds]);
         BuildHome(pages[(int)Tab.Home]);
         BuildWork(pages[(int)Tab.Work]);
         BuildStory(pages[(int)Tab.Story]);
 
+        BuildTooltip(content);
         window = root.gameObject.AddComponent<UIWindow>();
         window.Configure(UIWindowId.ResidentPanel, content.gameObject);
         window.OpenChanged += open =>
         {
             PlayerHold.Set(this, open);
+            if (!open && tooltip != null)
+            {
+                tooltip.Hide();
+            }
+
             if (!open && portrait != null)
             {
                 portrait.Hide();
@@ -161,16 +189,135 @@ public sealed class ResidentWindow : MonoBehaviour
         const float leftWidth = 548f;
         RectTransform left = HearthKit.Card(page, "About Card", 0f, 0f, leftWidth, BodyHeight);
         HearthKit.Section(left, "About", "Info", 22f, 18f);
-        about = CodeUI.Paragraph("About", left, 24f, 58f, leftWidth - 48f, 250f, 19f, style.Text);
-        CodeUI.Hairline(left, 22f, 322f, leftWidth - 44f, 1f, style);
-        HearthKit.Section(left, "Traits", "Star", 22f, 336f);
-        chips = new KitChips(left, 24f, 376f, leftWidth - 48f);
+        about = CodeUI.Paragraph("About", left, 24f, 58f, leftWidth - 48f, 120f, 19f, style.Text);
+        CodeUI.Hairline(left, 22f, 186f, leftWidth - 44f, 1f, style);
+        // Their traits as pictures with names, what each means on hover (no walls of text: the user, 2026-11-21).
+        HearthKit.Section(left, "Who they are", "Star", 22f, 198f);
+        for (int i = 0; i < MostTraits; i++)
+        {
+            int index = i;
+            var card = new KitPictureCard(left, "Trait " + i, 118f, 62f, 2, 15f, () => ShowTip(traitTips, index), HideTip);
+            card.Place(24f + i * 128f, 238f);
+            traitCards.Add(card);
+        }
+
+        chips = new KitChips(left, 24f, 420f, leftWidth - 48f);
 
         float rx = leftWidth + 16f;
         float rightWidth = Width - Margin * 2f - rx;
         RectTransform right = HearthKit.Card(page, "Work Card", rx, 0f, rightWidth, BodyHeight);
         HearthKit.Section(right, "Their work", "Hammer", 22f, 18f);
         jobList = new KitActionList(right, 22f, 58f, rightWidth - 44f, Choose, columns: 1, rowHeight: 62f, nothing: "There is no work here they can do.");
+    }
+
+    // Their level in every skill, best first, with its band's name and their passion's flames; a passion to choose, said at the top.
+    private void BuildTalents(RectTransform page)
+    {
+        UIStyle style = UIStyle.Current;
+        float width = Width - Margin * 2f;
+        RectTransform card = HearthKit.Card(page, "Talents Card", 0f, 0f, width, BodyHeight);
+        HearthKit.Section(card, "Their talents", "Star", 22f, 18f);
+        talentNote = CodeUI.Label("Note", card, width - 560f, 20f, 536f, 30f, 17f, style.Accent, TextAlignmentOptions.Right);
+        talentNote.richText = true;
+        int count = 0;
+        foreach (ProficiencyDefinition skill in LevelingSettings.Current.Skills)
+        {
+            count += skill != null ? 1 : 0;
+        }
+
+        int perColumn = Mathf.Max(1, Mathf.CeilToInt(count / 2f));
+        float column = (width - 44f - 30f) / 2f;
+        float step = Mathf.Min(58f, (BodyHeight - 70f) / perColumn);
+        for (int i = 0; i < count; i++)
+        {
+            float x = 22f + (i / perColumn) * (column + 30f);
+            float y = 62f + (i % perColumn) * step;
+            skillRows.Add(new KitStatRow(card, x, y, column, "Skill", "Star", true, 18f, labelWidth: 180f));
+        }
+    }
+
+    // Their spirits and why, how they stand with the others, the marks raids left and the kit they fight with.
+    private void BuildBonds(RectTransform page)
+    {
+        UIStyle style = UIStyle.Current;
+        const float leftWidth = 372f;
+        const float middleWidth = 372f;
+        RectTransform left = HearthKit.Card(page, "Spirits Card", 0f, 0f, leftWidth, BodyHeight);
+        HearthKit.Section(left, "Spirits", "Sun", 22f, 18f);
+        spiritsRow = new KitStatRow(left, 22f, 60f, leftWidth - 44f, "Now", "Heart", false, 20f);
+        for (int i = 0; i < reasonRows.Length; i++)
+        {
+            reasonRows[i] = new KitFactRow(left, 22f, 116f + i * 54f, leftWidth - 44f, 250f);
+        }
+
+        RectTransform middle = HearthKit.Card(page, "Standings Card", leftWidth + 16f, 0f, middleWidth, BodyHeight);
+        HearthKit.Section(middle, "Friends and rivals", "Bond", 22f, 18f);
+        for (int i = 0; i < standingRows.Length; i++)
+        {
+            standingRows[i] = new KitFactRow(middle, 22f, 60f + i * 56f, middleWidth - 44f, 180f);
+        }
+
+        float rx = leftWidth + middleWidth + 32f;
+        float rightWidth = Width - Margin * 2f - rx;
+        RectTransform right = HearthKit.Card(page, "Marks Card", rx, 0f, rightWidth, BodyHeight);
+        HearthKit.Section(right, "Marks of the raids", "Cross", 22f, 18f);
+        for (int i = 0; i < 6; i++)
+        {
+            int index = i;
+            var card = new KitPictureCard(right, "Mark " + i, 104f, 52f, 2, 14f, () => ShowTip(markTips, index), HideTip);
+            card.Place(22f + (i % 3) * 112f, 58f + (i / 3) * 118f);
+            markCards.Add(card);
+        }
+
+        HearthKit.Section(right, "Their kit", "Sword", 22f, 302f);
+        for (int i = 0; i < kitRows.Length; i++)
+        {
+            kitRows[i] = new KitFactRow(right, 22f, 342f + i * 44f, rightWidth - 44f, 120f);
+        }
+    }
+
+    // Laid over the content, as the raid planner's: the words of a trait or mark on hover.
+    private void BuildTooltip(RectTransform content)
+    {
+        UIStyle style = UIStyle.Current;
+        var holder = new GameObject("Tooltip Holder", typeof(RectTransform));
+        holder.SetActive(false);
+        holder.transform.SetParent(content, false);
+        RectTransform tip = CodeUI.At("Tooltip", content, 0f, 0f, 380f, 100f);
+        tip.pivot = new Vector2(0f, 1f);
+        tip.gameObject.AddComponent<Image>().raycastTarget = false;
+        tip.gameObject.AddComponent<Outline>().effectDistance = new Vector2(1f, -1f);
+        tip.gameObject.AddComponent<UIRole>().Set(UIRole.Kind.Window);
+        var layout = tip.gameObject.AddComponent<VerticalLayoutGroup>();
+        layout.padding = new RectOffset(14, 14, 10, 12);
+        layout.spacing = 4f;
+        layout.childControlWidth = true;
+        layout.childControlHeight = true;
+        layout.childForceExpandWidth = true;
+        layout.childForceExpandHeight = false;
+        tip.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        TMP_Text title = CodeUI.Paragraph("Title", tip, 0f, 0f, 352f, 28f, 19f, style.Text);
+        style.Title(title);
+        TMP_Text body = CodeUI.Paragraph("Body", tip, 0f, 0f, 352f, 28f, 16f, style.Text);
+        tooltip = holder.AddComponent<ItemTooltipView>();
+        tooltip.Configure(tip, title, body);
+        holder.SetActive(true);
+    }
+
+    private void ShowTip(List<(string title, string body, Color colour)> tips, int index)
+    {
+        if (tooltip != null && index < tips.Count && !string.IsNullOrEmpty(tips[index].title))
+        {
+            tooltip.Show(tips[index].title, tips[index].colour, tips[index].body);
+        }
+    }
+
+    private void HideTip()
+    {
+        if (tooltip != null)
+        {
+            tooltip.Hide();
+        }
     }
 
     private void BuildHome(RectTransform page)
@@ -282,7 +429,7 @@ public sealed class ResidentWindow : MonoBehaviour
 
         nameLabel.text = who.DisplayName;
         JobDefinition job = record.Job;
-        subtitle.text = job != null ? $"{settings.RankFor(record.WorkDone).name} {job.DisplayName}" : "No work yet";
+        subtitle.text = job != null ? $"{ResidentTalents.RankName(record)} {job.DisplayName}" : "No work yet";
         summary.text = Summary(record, npc, house, work);
         SetHeader(record, house, work, style);
 
@@ -290,8 +437,15 @@ public sealed class ResidentWindow : MonoBehaviour
         {
             case Tab.Overview:
                 about.text = string.IsNullOrWhiteSpace(who.Description) ? who.DisplayName : who.Description;
+                ShowTraits(record, style);
                 chips.Show(Traits(record, style));
                 jobList.Show(JobActions(record));
+                break;
+            case Tab.Talents:
+                RefreshTalents(record, style);
+                break;
+            case Tab.Bonds:
+                RefreshBonds(record, style);
                 break;
             case Tab.Home:
                 RefreshHome(record, npc, house, work);
@@ -312,7 +466,7 @@ public sealed class ResidentWindow : MonoBehaviour
             house != null ? 1f : 0f, style.Accent, style.Warning);
         CraftingStation station = work != null ? work.GetComponent<CraftingStation>() : null;
         headerRows[1].Set(station != null ? $"{station.Speed * 100f:0}% speed" : work != null ? work.Definition.DisplayName : "None", 0f, style.Text, style.Accent);
-        headerRows[2].Set(settings.RankFor(record.WorkDone).name, RankShare(record.WorkDone), style.Accent, style.Info);
+        headerRows[2].Set(ResidentTalents.RankName(record), ResidentTalents.LevelShare(record, ResidentTalents.JobSkill(record)), style.Accent, style.Info);
         headerRows[3].Set($"{record.RaidsAlong} along", 0f, style.Text, style.Accent);
     }
 
@@ -452,7 +606,9 @@ public sealed class ResidentWindow : MonoBehaviour
     private void RefreshStory(ResidentRecord record)
     {
         SettlementSettings settings = SettlementSettings.Current;
-        storyRows[0].Set("Rank", record.Job != null ? $"{settings.RankFor(record.WorkDone).name}, {record.WorkDone} made" : "No work yet");
+        ProficiencyDefinition jobSkill = ResidentTalents.JobSkill(record);
+        storyRows[0].Set("Rank", record.Job != null && jobSkill != null
+            ? $"{ResidentTalents.RankName(record)}, {jobSkill.DisplayName} {ResidentTalents.LevelOf(record, jobSkill)}, {record.WorkDone} made" : "No work yet");
         storyRows[1].Set("Raids along", $"{record.RaidsAlong}");
         storyRows[2].Set("Foes felled along", $"{record.KillsAlong}");
         storyRows[3].Set("Helped you up", $"{record.TimesHelpedUp} times");
@@ -610,13 +766,127 @@ public sealed class ResidentWindow : MonoBehaviour
         return $"\nCarries {hand.Weight:0} a trip, {hand.Slots} kind{(hand.Slots == 1 ? "" : "s")} at once (Strength {strength}{gear}). A cart or a working horse carries more.";
     }
 
-    private static float RankShare(int workDone)
+    // Their traits as picture cards (a double-edged one in the warm colour), each one's words for its hover.
+    private void ShowTraits(ResidentRecord record, UIStyle style)
     {
-        SettlementSettings settings = SettlementSettings.Current;
-        int index = settings.RankIndex(workDone);
-        int from = settings.RankFor(workDone).crafts;
-        int to = index + 1 < settings.WorkerRanks.Count ? settings.WorkerRanks[index + 1].crafts : from;
-        return to > from ? Mathf.Clamp01((workDone - from) / (float)(to - from)) : 1f;
+        IReadOnlyList<ResidentTraitDefinition> traits = ResidentTraits.Of(record);
+        traitTips.Clear();
+        for (int i = 0; i < traitCards.Count; i++)
+        {
+            ResidentTraitDefinition trait = i < traits.Count ? traits[i] : null;
+            traitCards[i].SetActive(trait != null);
+            if (trait == null)
+            {
+                traitTips.Add((null, null, style.Text));
+                continue;
+            }
+
+            Color colour = trait.DoubleEdged ? style.Warning : style.Good;
+            traitCards[i].ShowPicture(null, trait.Icon, colour);
+            traitCards[i].SetName(trait.DisplayName);
+            traitTips.Add((trait.DisplayName, trait.Description, colour));
+        }
+    }
+
+    private void RefreshTalents(ResidentRecord record, UIStyle style)
+    {
+        skillOrder.Clear();
+        skillOrder.AddRange(ResidentTalents.BestFirst(record));
+        for (int i = 0; i < skillRows.Count; i++)
+        {
+            ProficiencyDefinition skill = i < skillOrder.Count ? skillOrder[i] : null;
+            if (skill == null)
+            {
+                continue;
+            }
+
+            int level = ResidentTalents.LevelOf(record, skill);
+            string flames = ResidentTalents.Flames(ResidentTalents.PassionOf(record, skill));
+            skillRows[i].SetName(skill.DisplayName, IconOf(skill));
+            skillRows[i].Set($"{flames} {level} {ResidentTalents.RankNameAt(level)}", ResidentTalents.LevelShare(record, skill),
+                skill == ResidentTalents.JobSkill(record) ? style.Accent : style.Info, style.Info);
+        }
+
+        string note = record.Talents.PicksOwed > 0 ? $"{HearthKit.InlineIcon(ResidentTalents.PassionIcon)} A passion to grow: talk to them" : "";
+        if (record.Inspiration != Inspiration.None)
+        {
+            note = $"{HearthKit.InlineIcon("Spark")} {Inspirations.NameOf(record.Inspiration)}" + (note.Length > 0 ? "   " + note : "");
+        }
+
+        talentNote.text = note;
+    }
+
+    private void RefreshBonds(ResidentRecord record, UIStyle style)
+    {
+        Spirits spirits = ResidentSpirits.Of(record);
+        spiritsRow.Set($"{HearthKit.InlineIcon(ResidentSpirits.IconOf(spirits))} {ResidentSpirits.NameOf(spirits)}", 0f,
+            spirits == Spirits.Bright ? style.Good : spirits == Spirits.Low ? style.Warning : style.Text, style.Warning);
+        List<SpiritReason> reasons = ResidentSpirits.ReasonsOf(record);
+        for (int i = 0; i < reasonRows.Length; i++)
+        {
+            bool shown = i < reasons.Count;
+            reasonRows[i].Set(shown ? $"{HearthKit.InlineIcon(reasons[i].Icon)} {reasons[i].Words}" : "", shown ? (reasons[i].Steps > 0 ? "+" : "-") : "");
+        }
+
+        var standings = new List<(string name, int level)>();
+        foreach (ResidentRecord other in GameSession.Here.Residents)
+        {
+            int level = PeopleStandings.LevelOf(GameSession.Here, record, other);
+            if (other != record && level != 0)
+            {
+                standings.Add((other.Resident.DisplayName, level));
+            }
+        }
+
+        standings.Sort((a, b) => b.level.CompareTo(a.level));
+        for (int i = 0; i < standingRows.Length; i++)
+        {
+            bool shown = i < standings.Count;
+            standingRows[i].Set(shown ? standings[i].name : i == 0 ? "Nobody close yet" : "", shown ? PeopleStandings.NameOf(standings[i].level) : "");
+        }
+
+        List<MarkDefinition> marks = ResidentMarks.Of(record);
+        markTips.Clear();
+        for (int i = 0; i < markCards.Count; i++)
+        {
+            MarkDefinition mark = i < marks.Count ? marks[i] : null;
+            markCards[i].SetActive(mark != null);
+            if (mark == null)
+            {
+                markTips.Add((null, null, style.Text));
+                continue;
+            }
+
+            Color colour = mark.Good ? style.Good : style.Warning;
+            markCards[i].ShowPicture(null, mark.Icon, colour);
+            markCards[i].SetName(mark.DisplayName);
+            string way = mark.Good ? "" : mark.HeldByTheForest && record.Forgotten.Count > 0 ? "\nIt stays until every memory is back."
+                : mark.HealedBy != null ? $"\nA {mark.HealedBy.DisplayName} would ease it." : mark.FriendsHeal ? "\nAn evening with a friend would ease it."
+                : mark.TurnsInto != null ? $"\nFaced down, it becomes {mark.TurnsInto.DisplayName}." : "";
+            markTips.Add((mark.DisplayName, mark.Description + way, colour));
+        }
+
+        kitRows[0].Set("Weapon", record.KitWeapon.IsEmpty ? "Their own" : $"{CompanionKit.NameOf(record, true)} ({Mathf.RoundToInt(record.KitWeapon.Durability * 100f)}%)");
+        kitRows[1].Set("Body", record.KitBody.IsEmpty ? "Their own" : $"{CompanionKit.NameOf(record, false)} ({Mathf.RoundToInt(record.KitBody.Durability * 100f)}%)");
+        kitRows[2].Set("Theirs after", record.KitWeapon.IsEmpty && record.KitBody.IsEmpty ? "Give them kit in talk"
+            : $"{Mathf.Max(record.KitWeaponRaids, record.KitBodyRaids)} of {PeopleSettings.Current.KitNamedAfter} raids");
+    }
+
+    // A kit icon for a skill, by what it trains.
+    private static string IconOf(ProficiencyDefinition skill)
+    {
+        switch (skill.Training)
+        {
+            case ProficiencyTraining.Melee: return "Sword";
+            case ProficiencyTraining.Archery: return "Crit";
+            case ProficiencyTraining.Sneaking: return "Eye";
+            case ProficiencyTraining.Spells: return "Book";
+            case ProficiencyTraining.Fishing: return "Drop";
+            case ProficiencyTraining.Construction: return "House";
+            case ProficiencyTraining.Horsemanship: return "HorseHead";
+            case ProficiencyTraining.Crafting: return skill.Crafts == CraftedGoods.Meals ? "Pot" : "Hammer";
+            default: return skill.GatherTool == ToolType.Pickaxe ? "Pickaxe" : skill.GatherTool == ToolType.Axe ? "Axe" : "Sickle";
+        }
     }
 
     // ----- The picture: a camera before them at face height; their painted portrait while they sleep indoors -----

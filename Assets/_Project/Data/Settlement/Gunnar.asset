@@ -30,6 +30,30 @@ MonoBehaviour:
   raidCompanion: {fileID: 11400000, guid: 60d284aaf3c06f24fba9e928940c43c5, type: 2}
   memoryLines: []
   returningLines: []
+  talents:
+  - skill: {fileID: 11400000, guid: c02bc5ecd6589b94daa2ae6d5320cfb6, type: 2}
+    level: 22
+    passion: 2
+  - skill: {fileID: 11400000, guid: cada299a42945b04b8c891d31b0c5351, type: 2}
+    level: 16
+    passion: 1
+  - skill: {fileID: 11400000, guid: b7b0a5e2ce2709341b1d81708498a315, type: 2}
+    level: 14
+    passion: 0
+  - skill: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
+    level: 14
+    passion: 0
+  - skill: {fileID: 11400000, guid: a277ba53f2eae0648aa06826e44cbfd8, type: 2}
+    level: 12
+    passion: 0
+  - skill: {fileID: 11400000, guid: d50f36a74b08c1b4a81b1f363a882045, type: 2}
+    level: 4
+    passion: 0
+  traits:
+  - {fileID: 11400000, guid: 77f8652e1d6877c48bece2e2df3b58e5, type: 2}
+  - {fileID: 11400000, guid: e3b3804e66822fa42a16d0507f192e1a, type: 2}
+  friend: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
+  friction: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
   jobs:
   - {fileID: 11400000, guid: 9d8e9d72cc07d544c975b891d5c740e6, type: 2}
   - {fileID: 11400000, guid: e9647a52d2bdeec478f332bf63b64731, type: 2}

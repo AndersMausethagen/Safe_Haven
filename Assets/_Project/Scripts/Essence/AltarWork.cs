@@ -292,6 +292,7 @@ public static class AltarWork
             if (carver != null)
             {
                 carver.WorkDone += EssenceSettings.Current.WorkPerEnchanting;
+                ResidentTalents.PractiseWork(carver, EssenceSettings.Current.WorkPerEnchanting, stack.Item.Tier);
             }
         }
 

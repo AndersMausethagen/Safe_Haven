@@ -56,6 +56,8 @@ public static class ContentAudit
         "HorseDefinition.lasso", "HorseDefinition.barley",
         // A carved stone's rubbing uses one up (CarvedStone).
         "EssenceSettings.blankParchment",
+        // A hard mark healed by an item given in talk, used up (ResidentMarks: Old Wound and a Mending Draught).
+        "MarkDefinition.healedBy",
         // A comfort bought for a house from a resident's window (HomeLife.Furnish).
         "HomeLifeSettings.comforts[].cost[].item",
         // A boss encounter's gate takes its price (the Hearth Ember into Guardian's Hollow).

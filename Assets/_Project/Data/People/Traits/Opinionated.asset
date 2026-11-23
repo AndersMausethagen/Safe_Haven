@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01398805f2cfdcc408fe54d76824fc8e, type: 3}
+  m_Name: Opinionated
+  m_EditorClassIdentifier: SafeHaven::ResidentTraitDefinition
+  id: opinionated
+  displayName: Opinionated
+  icon: Hammer
+  description: 'Builds quickly and right, and tells you so: a sixth faster at a scaffold, but friendships come slower.'
+  doubleEdged: 1
+  effects:
+  - kind: 0
+    amount: 0.15
+    skill: {fileID: 11400000, guid: 71d286514cbbbe149ba663b354b4f1ae, type: 2}
+    partySize: 0
+    creature: 
+  - kind: 15
+    amount: -0.25
+    skill: {fileID: 0}
+    partySize: 0
+    creature: 
+  lines:
+  - Your footings again. I'll say nothing. I'll think it loudly.
+  - Stone forgives nothing. Neither do I.
+  excludes: []

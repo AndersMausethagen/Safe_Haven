@@ -207,7 +207,13 @@ public static class CraftedWork
         GiveTo(bag, item, amount, maker, stationChance, null);
 
     /// <summary>The same; <paramref name="stationHelped"/> as <see cref="Make(ItemDefinition, StatSheet, float, System.Action)"/> says.</summary>
-    public static int GiveTo(ItemInventory bag, ItemDefinition item, int amount, StatSheet maker, float stationChance, System.Action stationHelped)
+    public static int GiveTo(ItemInventory bag, ItemDefinition item, int amount, StatSheet maker, float stationChance, System.Action stationHelped) =>
+        GiveTo(bag, item, amount, maker, stationChance, stationHelped, null);
+
+    /// <summary>The same; each piece of gear passes through <paramref name="finish"/> before it is given (a worker's finer piece:
+    /// StationQueue.Lifts).</summary>
+    public static int GiveTo(ItemInventory bag, ItemDefinition item, int amount, StatSheet maker, float stationChance, System.Action stationHelped,
+        System.Func<ItemStack, ItemStack> finish)
     {
         if (bag == null || item == null || amount <= 0)
         {
@@ -235,6 +241,7 @@ public static class CraftedWork
         for (int i = 0; i < amount; i++)
         {
             ItemStack piece = Make(item, maker, stationChance, stationHelped);
+            piece = finish != null ? finish(piece) : piece;
             if (bag.GiveMade(piece, ArrivalCause.Crafted) <= 0)
             {
                 break;

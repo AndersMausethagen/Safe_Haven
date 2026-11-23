@@ -55,9 +55,30 @@ public sealed class SmallScenes : MonoBehaviour
         PlayedOn.Clear();
     }
 
-    /// <summary>The work speed <paramref name="who"/> adds for being cheered by a scene nearby (0 when not).</summary>
-    public static float CheerOf(ResidentDefinition who) =>
-        who != null && Cheered.TryGetValue(who, out float until) && Time.time < until ? SmallSceneSettings.Current.CheerSpeed : 0f;
+    /// <summary>The work speed <paramref name="who"/> adds for being cheered by a scene nearby (0 when not), as much as their traits take
+    /// from a gathering (a Loner none: ResidentTraits, SceneCheer).</summary>
+    public static float CheerOf(ResidentDefinition who)
+    {
+        if (who == null || !Cheered.TryGetValue(who, out float until) || Time.time >= until)
+        {
+            return 0f;
+        }
+
+        ResidentRecord record = GameSession.Here != null ? GameSession.Here.Find(who) : null;
+        return SmallSceneSettings.Current.CheerSpeed * Mathf.Max(0f, 1f + ResidentTraits.Sum(record, TraitEffectKind.SceneCheer));
+    }
+
+    /// <summary>Cheers everyone at home for <paramref name="seconds"/> (a story told at the fire: Inspirations).</summary>
+    public static void CheerAll(IEnumerable<ResidentRecord> residents, float seconds)
+    {
+        foreach (ResidentRecord record in residents)
+        {
+            if (record.Resident != null && !record.IsAway)
+            {
+                Cheered[record.Resident] = Mathf.Max(Cheered.TryGetValue(record.Resident, out float until) ? until : 0f, Time.time + seconds);
+            }
+        }
+    }
 
     /// <summary>Where <paramref name="who"/> stands for the scene under way and what they face, if they are in it.</summary>
     public static bool SpotFor(ResidentDefinition who, out Vector3 at, out Vector3 lookAt)
@@ -173,7 +194,7 @@ public sealed class SmallScenes : MonoBehaviour
         {
             SmallSceneSettings.Scene scene = settings.Scenes[i];
             if (scene != null && scene.first != null && scene.second != null && scene.lines.Length > 0
-                && !(PlayedOn.TryGetValue(i, out int day) && day == today) && Content(scene.first) && Content(scene.second)
+                && !(PlayedOn.TryGetValue(i, out int day) && day == today) && Ready(scene, i)
                 && Free(scene.first) && Free(scene.second))
             {
                 ready.Add(i);
@@ -279,8 +300,13 @@ public sealed class SmallScenes : MonoBehaviour
         telling = false;
         SmallSceneSettings settings = SmallSceneSettings.Current;
         nextAt = Time.time + settings.RestSeconds;
-        if (ranItsCourse)
+        if (ranItsCourse && scene.kind == SmallSceneSettings.Kind.Rivals)
         {
+            Argued(scene);
+        }
+        else if (ranItsCourse)
+        {
+            Shared(scene);
             int cheered = 0;
             float reach = settings.CheerReach;
             foreach (ResidentRecord record in GameSession.Home.Residents)
@@ -314,6 +340,100 @@ public sealed class SmallScenes : MonoBehaviour
                 life.Rethink();
             }
         }
+    }
+
+    // Whether a scene may play now (Docs/PeopleResearch_2026-11-23.md §3.5): a gathering between two content at home who aren't at odds;
+    // a friends' scene once, when they have become Friends; a rivals' argument while they are Cool or worse.
+    private static bool Ready(SmallSceneSettings.Scene scene, int index)
+    {
+        ResidentRecord first = GameSession.Home.Find(scene.first);
+        ResidentRecord second = GameSession.Home.Find(scene.second);
+        if (first == null || second == null)
+        {
+            return false;
+        }
+
+        int level = PeopleStandings.LevelOf(GameSession.Home, first, second);
+        switch (scene.kind)
+        {
+            case SmallSceneSettings.Kind.Friends:
+                return level >= 2 && first.DeedOf(SeenKey(index)) == 0;
+            case SmallSceneSettings.Kind.Rivals:
+                return level <= -1;
+            default:
+                return level >= 0 && Content(scene.first) && Content(scene.second);
+        }
+    }
+
+    private static string SeenKey(int index) => "scene:" + index;
+
+    // A good scene shared: the two grow closer, a friends' scene is theirs once, and a Friend may ease a hard mark.
+    private static void Shared(SmallSceneSettings.Scene scene)
+    {
+        SettlementState home = GameSession.Home;
+        ResidentRecord first = home.Find(scene.first);
+        ResidentRecord second = home.Find(scene.second);
+        if (first == null || second == null)
+        {
+            return;
+        }
+
+        PeopleStandings.SharedAScene(home, first, second);
+        if (scene.kind == SmallSceneSettings.Kind.Friends)
+        {
+            int index = IndexOf(scene);
+            first.AddDeed(SeenKey(index), 1);
+            second.AddDeed(SeenKey(index), 1);
+        }
+
+        if (PeopleStandings.LevelOf(home, first, second) >= 2)
+        {
+            foreach (ResidentRecord eased in new[] { first, second })
+            {
+                MarkDefinition mark = ResidentMarks.EasedByFriends(eased);
+                if (mark != null)
+                {
+                    GameMessages.Post($"An evening with a friend eased {eased.Resident.DisplayName}'s {mark.DisplayName.ToLowerInvariant()}.", MessageKind.Gain);
+                }
+            }
+        }
+    }
+
+    // Rivals had it out: it cleared the air or hardened (PeopleStandings.Argue), said in the first one's last line if heard.
+    private void Argued(SmallSceneSettings.Scene scene)
+    {
+        SettlementState home = GameSession.Home;
+        ResidentRecord first = home.Find(scene.first);
+        ResidentRecord second = home.Find(scene.second);
+        if (first == null || second == null)
+        {
+            return;
+        }
+
+        bool cleared = PeopleStandings.Argue(home, first, second, Random.value);
+        string last = cleared ? scene.cleared : scene.hardened;
+        ResidentLife life = ResidentLife.Of(scene.first);
+        if (told && !string.IsNullOrWhiteSpace(last) && life != null && DialogueBox.Current != null)
+        {
+            DialogueBox.Current.Bark(new DialogueSpeaker(scene.first.DisplayName, life.transform, null, 0f, null, life.transform), last, null);
+        }
+
+        GameMessages.Post(cleared ? $"{scene.first.DisplayName} and {scene.second.DisplayName} had it out at the fire, and laughed after: the air is cleared."
+            : $"{scene.first.DisplayName} and {scene.second.DisplayName} had it out at the fire. It went badly.", cleared ? MessageKind.Gain : MessageKind.Info);
+    }
+
+    private static int IndexOf(SmallSceneSettings.Scene scene)
+    {
+        IReadOnlyList<SmallSceneSettings.Scene> scenes = SmallSceneSettings.Current.Scenes;
+        for (int i = 0; i < scenes.Count; i++)
+        {
+            if (scenes[i] == scene)
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     private static bool Content(ResidentDefinition who)

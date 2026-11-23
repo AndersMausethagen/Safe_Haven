@@ -405,15 +405,20 @@ public sealed class HavenTownTests
         Assert.IsFalse(ResidentBuilders.WorkAway(settlement, 10f, people[0]), "no work done");
         Assert.AreEqual(0f, settlement.BuilderSeconds);
 
+        // Each pair of hands counts for its Construction (ResidentTalents.SpeedAt, Docs/PeopleResearch_2026-11-23.md §3.1).
+        ProficiencyDefinition building = PeopleSettings.Current.BuildingSkill;
+        float[] skill = people.Select(one => ResidentTalents.SpeedAt(settlement.Find(one), building)).ToArray();
         settlement.Find(people[2]).WorkPaused = false;
         Assert.IsTrue(ResidentBuilders.WorkAway(settlement, 10f, people[0]), "the helper alone");
-        Assert.AreEqual(10f * hand, settlement.TakeBuilderSeconds(), 0.01f, "at their share");
+        Assert.AreEqual(10f * hand * skill[2], settlement.TakeBuilderSeconds(), 0.01f, "at their share");
 
         settlement.Find(people[1]).WorkPaused = false;
         Assert.IsTrue(ResidentBuilders.WorkAway(settlement, 10f, null));
-        Assert.AreEqual(20f + 10f * hand, settlement.BuilderSeconds, 0.01f, "builder-seconds: ten seconds, two builders and a helper at home");
+        Assert.AreEqual(10f * skill[0] + 10f * skill[1] + 10f * hand * skill[2], settlement.BuilderSeconds, 0.01f,
+            "builder-seconds: ten seconds, two builders and a helper at home");
         Assert.IsTrue(ResidentBuilders.WorkAway(settlement, 10f, people[0]));
-        Assert.AreEqual(30f + 20f * hand, settlement.TakeBuilderSeconds(), 0.01f, "the next ten seconds with the carpenter away");
+        Assert.AreEqual(10f * skill[0] + 20f * skill[1] + 20f * hand * skill[2], settlement.TakeBuilderSeconds(), 0.01f,
+            "the next ten seconds with the carpenter away");
     }
 
     [Test]

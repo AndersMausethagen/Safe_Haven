@@ -193,7 +193,7 @@ public sealed class EnchantingTests
         Assert.IsTrue(job.Carves);
         GameSession.Home.AddResident(liv, job);
         ResidentRecord record = GameSession.Here.Find(liv);
-        record.WorkDone = 1000;
+        record.Talents.SetExperience(job.Skill.Id, LevelingSettings.Current.TotalExperienceFor(LevelingSettings.Current.MaxLevel));
         Assert.AreEqual(job.CarvesPastAt(4), Inscriptions.CarverReach(record), "a master carves furthest");
         EnchantmentDefinition frenzied = E("Frenzied");
         Assert.IsTrue(Inscriptions.CanCarve(frenzied, out bool byCarver, out _));

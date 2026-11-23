@@ -176,7 +176,30 @@ public static class ResidentMeals
             return 0f;
         }
 
-        return record.Meal == ResidentMeal.WellFed ? settings.WellFedWork : record.Meal == ResidentMeal.Hungry ? -settings.HungryWork : 0f;
+        return record.Meal == ResidentMeal.WellFed ? settings.WellFedWork * (1f + FedWell(here, settings)) : record.Meal == ResidentMeal.Hungry ? -settings.HungryWork : 0f;
+    }
+
+    /// <summary>What a cook who feeds people well adds to everyone's Well Fed (a Proud Cook at the Kitchen: ResidentTraits, FeedsWell), as a
+    /// share. Asked every frame by station speeds: indexed, no garbage.</summary>
+    public static float FedWell(IHavenView here, HomeLifeSettings settings)
+    {
+        if (here == null || settings.MealsFrom == null)
+        {
+            return 0f;
+        }
+
+        float more = 0f;
+        IReadOnlyList<ResidentRecord> people = here.Residents;
+        for (int i = 0; i < people.Count; i++)
+        {
+            ResidentRecord cook = people[i];
+            if (!cook.IsAway && cook.Job != null && cook.Job.Workplace == settings.MealsFrom)
+            {
+                more += ResidentTraits.Sum(cook, TraitEffectKind.FeedsWell);
+            }
+        }
+
+        return UnityEngine.Mathf.Max(0f, more);
     }
 
     /// <summary>Their meal in words, for their window and their card: empty before meals are expected.</summary>
@@ -265,5 +288,7 @@ public static class HavenDawn
         }
 
         global::Territory.Turn(true);
+        // The people's own day: feelings, friendships, inspired mornings (PeopleDay).
+        PeopleDay.Dawn(home);
     }
 }

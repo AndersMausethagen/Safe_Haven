@@ -1,0 +1,82 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e0792ce20bf4c74da376b7172e33278, type: 3}
+  m_Name: PeopleSettings
+  m_EditorClassIdentifier: SafeHaven::PeopleSettings
+  unlistedLevel: 5
+  speedPerLevel: 0.015
+  leastSpeed: 0.7
+  extraPerLevel: 0.004
+  mostExtra: 0.2
+  workShare: 1
+  dailyPractice: 400
+  beyondTheDay: 0.2
+  noPassionLearning: 0.5
+  keenLearning: 1
+  burningLearning: 1.5
+  workUnitPractice: 2
+  raidPractice: 4
+  killPractice: 0.5
+  forayPractice: 6
+  partyPractice: 4
+  ringPractice: 1
+  buildPracticePerSecond: 0.4
+  fellingSkill: {fileID: 11400000, guid: a277ba53f2eae0648aa06826e44cbfd8, type: 2}
+  quarrySkill: {fileID: 11400000, guid: e9528bdd6784e9d4eaa85d8753dfa51c, type: 2}
+  buildingSkill: {fileID: 11400000, guid: 71d286514cbbbe149ba663b354b4f1ae, type: 2}
+  meleeSkill: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
+  archerySkill: {fileID: 11400000, guid: c02bc5ecd6589b94daa2ae6d5320cfb6, type: 2}
+  keenJoy: 0.05
+  burningJoy: 0.1
+  picksAtBondRanks: 1
+  damagePerLevel: 0.015
+  dodgePerLevel: 0.005
+  mostDodge: 0.6
+  brightAt: 2
+  lowSteps: 1
+  lowWork: 0.1
+  inspirationChance: 0.08
+  inspirationWaits: 3
+  feverWork: 0.5
+  fightingHeart: 0.2
+  goodFind: 0.5
+  storyCheerSeconds: 600
+  writtenFriend: 1
+  frictionCool: 1
+  sceneGain: 0.35
+  forayGain: 0.25
+  nearGain: 0.1
+  nearReach: 25
+  nextDoor: 15
+  clearedAirChance: 0.5
+  clearedAir: 2
+  hardened: 1
+  missedDays: 5
+  friendNearWork: 0.05
+  mostNearFriends: 2
+  forayFriends: 0.1
+  mostForayFriends: 3
+  marks:
+  - {fileID: 11400000, guid: 831483a537fe21f468aa30a138a64d51, type: 2}
+  - {fileID: 11400000, guid: cd620f6a33617384c84258813818383f, type: 2}
+  - {fileID: 11400000, guid: 06600b4c15f0a8b4a846f763d4f77eef, type: 2}
+  - {fileID: 11400000, guid: 49b803a38d42fb14589252df0cad9b66, type: 2}
+  - {fileID: 11400000, guid: 09415a58a07d6494c9689d3940ab4f90, type: 2}
+  - {fileID: 11400000, guid: 8b72b361fbedd9641a9d3df328d82fc0, type: 2}
+  - {fileID: 11400000, guid: a6331526b041ef44884333df9107e047, type: 2}
+  - {fileID: 11400000, guid: 425f2558e10d85e46a3cfc157717682f, type: 2}
+  - {fileID: 11400000, guid: fb7f4ab98695d434b89bdcc5d497e191, type: 2}
+  mostMarks: 3
+  forestMark: {fileID: 11400000, guid: fb7f4ab98695d434b89bdcc5d497e191, type: 2}
+  kitNamedAfter: 8
+  kitWearPerRaid: 0.06
+  kitWearFailed: 0.2

@@ -19,12 +19,28 @@ public sealed class SmallSceneSettings : GameSettings<SmallSceneSettings>
         Water = 1,
     }
 
+    /// <summary>What a scene is between the two (Docs/PeopleResearch_2026-11-23.md §3.5). Saved as numbers in the asset: add at the end.</summary>
+    public enum Kind
+    {
+        /// <summary>Two who get on, both content at home: everyone near is cheered, and the two grow closer.</summary>
+        Gathering = 0,
+        /// <summary>Once, when the two have become Friends (PeopleStandings +2): their own scene, easing a hard mark a friend can ease.</summary>
+        Friends = 1,
+        /// <summary>Two who rub each other up the wrong way (Cool or worse) have it out at the fire: it clears the air or hardens.</summary>
+        Rivals = 2,
+    }
+
     /// <summary>Two friends, what they do (shown over them in the Keeper's view), where, and their exchange, the first speaking first.</summary>
     [Serializable]
     public sealed class Scene
     {
         public ResidentDefinition first;
         public ResidentDefinition second;
+        [Tooltip("Gathering (two who get on), Friends (once, when they have become Friends), Rivals (an argument that clears the air or hardens).")]
+        public Kind kind = Kind.Gathering;
+        [Tooltip("Rivals: the first one's last line when it cleared the air, and when it hardened.")]
+        [TextArea(1, 3)] public string cleared;
+        [TextArea(1, 3)] public string hardened;
         [Tooltip("What it looks like from above, a word or two: \"Laughing\", \"Singing\", \"Telling a story\".")]
         public string doing = "Talking";
         public Spot at = Spot.Fire;

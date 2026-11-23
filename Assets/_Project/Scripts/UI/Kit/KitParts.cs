@@ -17,6 +17,7 @@ public sealed class KitStatRow
     private readonly Image fillImage;
     private readonly bool hasBar;
     private readonly bool inline;
+    private readonly Image iconImage;
     private readonly float labelX;
     private readonly float rowEnd;
     private bool fitted;
@@ -27,7 +28,7 @@ public sealed class KitStatRow
         UIStyle style = UIStyle.Current;
         hasBar = bar;
         this.inline = inline;
-        HearthKit.Icon(parent, icon, x, y + 2f, size + 6f);
+        iconImage = HearthKit.Icon(parent, icon, x, y + 2f, size + 6f);
         labelX = x + size + 18f;
         rowEnd = x + width;
         label = CodeUI.Label(name, parent, labelX, y, labelWidth, size + 10f, size, style.Text);
@@ -44,6 +45,23 @@ public sealed class KitStatRow
         float barY = inline ? y + size * 0.5f + 1f : y + size + 12f;
         float barWidth = inline ? x + width - barX : x + width - labelX;
         fill = KitBar.Make(parent, barX, barY, barWidth, 9f, out fillImage);
+    }
+
+    /// <summary>Names the row anew and gives it another kit icon (a list whose rows change what they show: a resident's skills, best first).</summary>
+    public void SetName(string name, string icon)
+    {
+        if (label.text != name)
+        {
+            label.text = name;
+            fitted = false;
+        }
+
+        if (iconImage != null)
+        {
+            iconImage.sprite = UIStyle.Current.Icon(icon);
+            iconImage.color = HearthKit.IconColour(icon);
+            iconImage.enabled = iconImage.sprite != null;
+        }
     }
 
     /// <summary>Shows <paramref name="shown"/>; the bar at <paramref name="fraction"/>, in <paramref name="low"/> under a quarter.</summary>

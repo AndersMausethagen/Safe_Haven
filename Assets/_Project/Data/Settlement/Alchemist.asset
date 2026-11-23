@@ -29,6 +29,7 @@ MonoBehaviour:
   workSoundEvery: {x: 3, y: 8}
   workOrders: []
   teaches: {fileID: 0}
+  skill: {fileID: 11400000, guid: fc9f5ddf81e83b64d9706fd80ce6aade, type: 2}
   assignedEvent: {fileID: 0}
   extraRumours: 0
   gearRepairDiscount: 0
@@ -36,3 +37,4 @@ MonoBehaviour:
   defendsAs: {fileID: 0}
   wardHealth: 0
   raidSeconds: 0
+  carvesPast: 

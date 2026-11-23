@@ -25,6 +25,15 @@ public sealed class SaveCoverageTests
         ["Quests.entries"] = "QuestTests, QuestPacingTests (status, counts, rewards waiting)",
         ["Settlement.Territory.holds"] = "TerritoryTests.TheLands_SurviveASave",
         ["Settlement.Plunder"] = "DeathRulesTests.TheRulesAndThePlunder_AreSaved_AndOldSavesAreNormal (its leader and items)",
+        // People (Docs/PeopleResearch_2026-11-23.md): kit is a real item's stack, passions only Passion's values and standings only
+        // pairs of ids, none of which the probe's filler gives; each is round-tripped in its own test.
+        ["Settlement.residents[0].kitWeapon"] = "PeopleTests.WhoTheyAre_SurvivesASave_AndAnOldSaveKeepsItsRank",
+        ["Settlement.residents[0].kitBody"] = "PeopleTests.WhoTheyAre_SurvivesASave_AndAnOldSaveKeepsItsRank",
+        ["Settlement.residents[0].talents.passions"] = "PeopleTests.WhoTheyAre_SurvivesASave_AndAnOldSaveKeepsItsRank",
+        ["Settlement.fallen[0].KitWeapon"] = "PeopleTests.WhoTheyAre_SurvivesASave_AndAnOldSaveKeepsItsRank",
+        ["Settlement.fallen[0].KitBody"] = "PeopleTests.WhoTheyAre_SurvivesASave_AndAnOldSaveKeepsItsRank",
+        ["Settlement.fallen[0].Talents.passions"] = "PeopleTests.WhoTheyAre_SurvivesASave_AndAnOldSaveKeepsItsRank",
+        ["Settlement.Standings.values"] = "PeopleTests.WhoTheyAre_SurvivesASave_AndAnOldSaveKeepsItsRank",
         ["Settlement.Workshops.queues"] = "StationQueueTests.Workshops_RoundTripThroughSave",
         // Rings are only kept while they hold a radius the probe's filler doesn't give; the round trip is its own test.
         ["Settlement.rings"] = "RingWorkTests.Rings_AreSaved",

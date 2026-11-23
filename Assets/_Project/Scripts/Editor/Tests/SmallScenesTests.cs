@@ -14,7 +14,7 @@ public sealed class SmallScenesTests
     {
         SmallSceneSettings settings = SmallSceneSettings.Current;
         Assert.Greater(settings.Scenes.Count, 5, "enough scenes that a week doesn't repeat them");
-        var pairs = new HashSet<(ResidentDefinition, ResidentDefinition)>();
+        var pairs = new HashSet<(ResidentDefinition, ResidentDefinition, SmallSceneSettings.Kind)>();
         foreach (SmallSceneSettings.Scene scene in settings.Scenes)
         {
             Assert.IsNotNull(scene.first);
@@ -30,7 +30,8 @@ public sealed class SmallScenesTests
                 StringAssert.DoesNotContain("...", line);
             }
 
-            Assert.IsTrue(pairs.Add((scene.first, scene.second)), $"{scene.first.name} and {scene.second.name} twice");
+            // One scene of each kind a pair (a gathering, their friends' scene, their argument: SmallSceneSettings.Kind).
+            Assert.IsTrue(pairs.Add((scene.first, scene.second, scene.kind)), $"{scene.first.name} and {scene.second.name} twice as {scene.kind}");
         }
     }
 

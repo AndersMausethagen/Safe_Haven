@@ -27,15 +27,17 @@ public static class Forays
 
     // ----- Who, and how strong -----
 
-    /// <summary>The power one resident brings: their rank, their raids along, their gear and their breakfast.</summary>
-    public static float PowerOf(ResidentRecord record, ForaySettings settings)
+    /// <summary>The power one resident brings: the rank of their level in the land's work (its Skill; their job's, with none: ResidentTalents),
+    /// their raids along, their gear and their breakfast.</summary>
+    public static float PowerOf(ResidentRecord record, ForaySettings settings, ForaySettings.Destination place = null)
     {
         if (record == null)
         {
             return 0f;
         }
 
-        int rank = Mathf.Max(0, SettlementSettings.Current.RankIndex(record.WorkDone));
+        ProficiencyDefinition skill = place != null && place.skill != null ? place.skill : ResidentTalents.JobSkill(record);
+        int rank = Mathf.Max(0, ResidentTalents.RankIndexAt(ResidentTalents.LevelOf(record, skill)));
         int raids = Mathf.Min(record.RaidsAlong, settings.MostRaidsCounted);
         int gear = record.WorkGear != null ? Mathf.Max(1, record.WorkGear.Tier) : 0;
         return settings.BasePower + rank * settings.PowerPerRank + raids * settings.PowerPerRaid + gear * settings.PowerPerGearTier
@@ -50,7 +52,8 @@ public static class Forays
     }
 
     /// <summary>The <paramref name="count"/> strongest who could go, strongest first.</summary>
-    public static List<ResidentRecord> Strongest(SettlementState home, int count, ForaySettings settings, TerritorySettings lands)
+    public static List<ResidentRecord> Strongest(SettlementState home, int count, ForaySettings settings, TerritorySettings lands,
+        ForaySettings.Destination place = null)
     {
         var free = new List<ResidentRecord>();
         foreach (ResidentRecord record in home.Residents)
@@ -61,19 +64,31 @@ public static class Forays
             }
         }
 
-        free.Sort((a, b) => PowerOf(b, settings).CompareTo(PowerOf(a, settings)));
+        free.Sort((a, b) => PowerOf(b, settings, place).CompareTo(PowerOf(a, settings, place)));
         return free.GetRange(0, Mathf.Min(count, free.Count));
     }
 
-    public static float PowerOf(IEnumerable<ResidentRecord> party, ForaySettings settings)
+    /// <summary>
+    /// A party's power: each one's own (PowerOf), times what their traits make of a party this size (a Loner alone or in a pair, less in
+    /// a crowd), plus what a born leader among them adds to everyone else's, times what friends going together add (PeopleStandings).
+    /// </summary>
+    public static float PowerOf(IEnumerable<ResidentRecord> party, ForaySettings settings, ForaySettings.Destination place = null, IHavenView here = null)
     {
-        float power = 0f;
-        foreach (ResidentRecord record in party)
+        var members = new List<ResidentRecord>(party);
+        float led = 0f;
+        foreach (ResidentRecord record in members)
         {
-            power += PowerOf(record, settings);
+            led += ResidentTraits.Sum(record, TraitEffectKind.LeadsParty);
         }
 
-        return power;
+        float power = 0f;
+        foreach (ResidentRecord record in members)
+        {
+            float own = ResidentTraits.Sum(record, TraitEffectKind.LeadsParty);
+            power += PowerOf(record, settings, place) * Mathf.Max(0f, 1f + ResidentTraits.ForayShare(record, members.Count) + (led - own));
+        }
+
+        return power * (1f + PeopleStandings.ForayBonus(members, here));
     }
 
     // ----- The odds, the time, the haul -----
@@ -180,7 +195,7 @@ public static class Forays
         }
 
         ResidentMeals.TakeFood(chests, party.Count * settings.RoadHunger, HomeLifeSettings.Current);
-        float power = PowerOf(party, settings);
+        float power = PowerOf(party, settings, place, home);
         var ids = new List<string>();
         foreach (ResidentRecord record in party)
         {
@@ -188,7 +203,17 @@ public static class Forays
         }
 
         float seconds = Seconds(power, place, settings);
-        home.SetForay(new ForayRecord(place.id, ids, seconds, seconds, Chance(power, place.power, settings), HaulScale(power, place.power, settings)));
+        // A feeling about the woods (an inspired morning: Inspirations) brings more home.
+        float find = 1f;
+        foreach (ResidentRecord record in party)
+        {
+            if (Inspirations.Use(record, Inspiration.GoodFind))
+            {
+                find = 1f + PeopleSettings.Current.GoodFind;
+            }
+        }
+
+        home.SetForay(new ForayRecord(place.id, ids, seconds, seconds, Chance(power, place.power, settings), HaulScale(power, place.power, settings) * find));
         GameMessages.Post($"{Names(party)} set out through the portal for {Where(place)}: back in about {Mathf.CeilToInt(seconds / 60f)} minutes.", MessageKind.Info);
         return true;
     }
@@ -241,7 +266,14 @@ public static class Forays
         foreach (ResidentRecord record in party)
         {
             record.Bruised = !won;
+            // What they did out there, they got better at (the land's work: ResidentTalents).
+            ProficiencyDefinition skill = place != null && place.skill != null ? place.skill : ResidentTalents.JobSkill(record);
+            int tier = place != null ? place.tier : 1;
+            ResidentTalents.Practise(record, skill, tier, LevelingSettings.Current.TierExperience(tier) * PeopleSettings.Current.ForayPractice);
         }
+
+        // A road walked together (PeopleStandings).
+        PeopleStandings.WentTogether(home, party);
 
         string what = brought.Count > 0 ? string.Join(", ", brought) : "nothing";
         string where = place != null ? Where(place) : "the woods";

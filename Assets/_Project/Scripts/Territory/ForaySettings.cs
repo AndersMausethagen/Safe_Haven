@@ -35,6 +35,9 @@ public sealed class ForaySettings : GameSettings<ForaySettings>
         [Min(1f)] public float power = 30f;
         [Tooltip("What they may bring home, each its own chance.")]
         public List<Loot> loot = new List<Loot>();
+        [Tooltip("The skill the work there is done with (Woodcutting for timber, Mining for ore): who is best at it goes, and it is what " +
+                 "they practise (ResidentTalents). Empty: each one's job skill.")]
+        public ProficiencyDefinition skill;
     }
 
     [Header("Where")]

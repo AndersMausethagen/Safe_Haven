@@ -71,14 +71,16 @@ public static class HavenLands
         TerritorySettings lands = TerritorySettings.Current;
         List<ResidentRecord> free = Forays.Strongest(home, int.MaxValue, settings, lands);
         int count = Mathf.Clamp(forayCount, 1, Mathf.Max(1, Mathf.Min(settings.MostMembers, free.Count)));
-        List<ResidentRecord> chosen = free.GetRange(0, Mathf.Min(count, free.Count));
-        float power = Forays.PowerOf(chosen, settings);
         foreach (ForaySettings.Destination place in settings.Destinations)
         {
             if (place == null)
             {
                 continue;
             }
+
+            // The strongest for this land's work (its skill: ResidentTalents), as Send will choose them.
+            List<ResidentRecord> chosen = Forays.Strongest(home, count, settings, lands, place);
+            float power = Forays.PowerOf(chosen, settings, place, home);
 
             bool open = PortalTiers.Of(home) >= place.tier;
             string why = Forays.WhyNot(home, place, chosen, GameSession.Stash != null ? GameSession.Stash.Items : null, false, settings);
@@ -122,7 +124,7 @@ public static class HavenLands
     private static void Send(ForaySettings.Destination place, int count)
     {
         SettlementState home = GameSession.Home;
-        List<ResidentRecord> party = Forays.Strongest(home, count, ForaySettings.Current, TerritorySettings.Current);
+        List<ResidentRecord> party = Forays.Strongest(home, count, ForaySettings.Current, TerritorySettings.Current, place);
         Forays.Send(home, place, party, GameSession.Stash != null ? GameSession.Stash.Items : null, ForaySettings.Current);
     }
 

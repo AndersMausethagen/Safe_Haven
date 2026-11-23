@@ -26,6 +26,8 @@ public sealed class JobDefinition : ScriptableObject
 {
     public EmoteDefinition WorkGesture => workGesture;
     public ProficiencyDefinition Teaches => teaches;
+    /// <summary>The skill the work is done with and trains: Skill, else what it teaches; null for neither.</summary>
+    public ProficiencyDefinition Skill => skill != null ? skill : teaches;
     public ItemDefinition WorkTool => workTool;
     public float WorkToolScale => workToolScale;
     public SoundDefinition WorkSound => workSound;
@@ -61,6 +63,9 @@ public sealed class JobDefinition : ScriptableObject
     [SerializeField] private List<WorkOrder> workOrders = new List<WorkOrder>();
     [Tooltip("The skill they can give the player a lesson in, once between raids. Empty for none.")]
     [SerializeField] private ProficiencyDefinition teaches;
+    [Tooltip("The skill the work is done with and trains (ResidentTalents): its level sets their station's speed and their rank. Empty: " +
+             "what it teaches; with neither (the Leader), their best skill.")]
+    [SerializeField] private ProficiencyDefinition skill;
     [Tooltip("Raised when someone takes the job, for quests such as \"Find work for the traveler\".")]
     [SerializeField, RaisedByGame] private GameEventDefinition assignedEvent;
 

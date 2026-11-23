@@ -36,6 +36,8 @@ public static class WorkerCarry
         int strength = Strength(record, settings);
         ItemDefinition gear = record != null ? record.WorkGear : null;
         float weight = settings.CarryWeight + strength * settings.WeightPerStrength + (gear != null ? gear.WorkerCarryWeight : 0f);
+        // Their traits (Bookish carries less: ResidentTraits, CarryWeight).
+        weight *= Mathf.Max(0.2f, 1f + ResidentTraits.Sum(record, TraitEffectKind.CarryWeight));
         int slots = settings.SlotsAt(strength) + (gear != null ? gear.WorkerCarrySlots : 0);
         return new CarryLimits(weight, slots);
     }

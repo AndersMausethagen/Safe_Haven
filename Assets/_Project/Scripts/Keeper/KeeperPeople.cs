@@ -161,7 +161,9 @@ public sealed class KeeperPeople
         bool wish = HomeWishes.WishOf(record) != null;
         bool followed = KeeperView.Current != null && life != null && KeeperView.Current.Following == life.transform;
         bool hungry = record.Meal == ResidentMeal.Hungry && ResidentMeals.Expected(GameSession.Here, HomeLifeSettings.Current);
-        string state = $"{who.name}|{(record.Job != null ? record.Job.name : "")}|{record.WorkDone}|{doing}|{wish}|{followed}|{hungry}";
+        Spirits spirits = ResidentSpirits.Cached(record);
+        bool loves = record.Job != null && ResidentTalents.PassionOf(record, ResidentTalents.JobSkill(record)) != Passion.None;
+        string state = $"{who.name}|{(record.Job != null ? record.Job.name : "")}|{ResidentTalents.JobLevel(record)}|{doing}|{wish}|{followed}|{hungry}|{spirits}|{loves}";
         if (state == card.Shown)
         {
             return;
@@ -172,8 +174,13 @@ public sealed class KeeperPeople
         card.Portrait.enabled = who.Portrait != null;
         card.Initial.text = who.Portrait != null ? "" : who.DisplayName.Substring(0, 1);
         card.Name.text = who.DisplayName;
-        string rank = record.Job != null ? SettlementSettings.Current.RankFor(record.WorkDone).name : "";
+        string rank = record.Job != null ? ResidentTalents.RankName(record) : "";
         card.Work.text = record.Job != null ? (string.IsNullOrEmpty(rank) ? record.Job.DisplayName : $"{rank} {record.Job.DisplayName}") : "No work yet";
+        // Who they are at a glance (Docs/PeopleResearch_2026-11-23.md §4): a heart when the work is what they love, a sun or a drop
+        // when their spirits are Bright or Low; nothing for Steady, so the column stays quiet.
+        card.Work.text = (spirits != Spirits.Steady ? HearthKit.InlineIcon(ResidentSpirits.IconOf(spirits)) + " " : "") + card.Work.text
+                         + (loves ? " " + HearthKit.InlineIcon(ResidentTalents.PassionIcon) : "");
+        card.Work.richText = true;
         // Hungry this morning: their work line goes the warning colour (the tip says why).
         card.Work.color = hungry ? style.Warning : style.Muted;
         card.Doing.sprite = style.Icon(doing);

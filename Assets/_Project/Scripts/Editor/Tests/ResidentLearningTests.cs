@@ -14,25 +14,26 @@ public sealed class ResidentLearningTests
         .First(job => job != null && job.name == name);
 
     [Test]
-    public void Workers_RiseInRank_ByTheCraftsTheyMake()
+    public void Workers_RiseInRank_ByTheirJobsSkill()
     {
         SettlementSettings settings = SettlementSettings.Current;
-        // The ranks' names and thresholds are the settings' own; the rule is that a beginner works at the station's own pace and
-        // more work done never makes anyone slower, up to a master who is faster.
-        Assert.AreEqual(1f, settings.RankFor(0).speed);
-        for (int work = 10; work <= 1000; work += 10)
+        // The ranks' names and levels are the settings' own; the rule is that each rank needs more of the job's skill than the one
+        // before, and more skill never makes anyone slower (ResidentTalents, Docs/PeopleResearch_2026-11-23.md §3.1).
+        for (int i = 1; i < settings.WorkerRanks.Count; i++)
         {
-            Assert.GreaterOrEqual(settings.RankFor(work).speed, settings.RankFor(work - 10).speed, $"slower at {work} work done");
+            Assert.Greater(settings.WorkerRanks[i].level, settings.WorkerRanks[i - 1].level, settings.WorkerRanks[i].name);
         }
-
-        Assert.Greater(settings.RankFor(1000).speed, settings.RankFor(0).speed);
 
         var settlement = new SettlementState();
         JobDefinition smith = Job("Smith");
         settlement.AddResident(Bjarne, smith);
-        Assert.AreEqual(1f, settlement.WorkerSpeed(smith.Workplace.Station), "a novice smith");
-        settlement.Find(Bjarne).WorkDone = 70;
-        Assert.AreEqual(settings.RankFor(70).speed, settlement.WorkerSpeed(smith.Workplace.Station), 0.0001f, "an expert speeds the smithy");
+        ResidentRecord bjarne = settlement.Find(Bjarne);
+        float before = settlement.WorkerSpeed(smith.Workplace.Station);
+        Assert.AreEqual(ResidentTalents.StationSpeed(bjarne), before, 0.0001f, "the smithy works at his skill's speed");
+        LevelingSettings leveling = LevelingSettings.Current;
+        bjarne.Talents.SetExperience(smith.Skill.Id, leveling.TotalExperienceFor(settings.WorkerRanks[settings.WorkerRanks.Count - 1].level));
+        Assert.AreEqual(settings.WorkerRanks[settings.WorkerRanks.Count - 1].name, ResidentTalents.RankName(bjarne), "a master");
+        Assert.Greater(settlement.WorkerSpeed(smith.Workplace.Station), before, "a master speeds the smithy");
         Assert.AreEqual(1f, settlement.WorkerSpeed(CraftingStationType.Kitchen), "nobody works the kitchen");
     }
 
@@ -49,14 +50,15 @@ public sealed class ResidentLearningTests
             int learned = ExperienceTracker.TakeLesson(bjarne);
             // A lesson is practice, so the Practice Time Scale slows it like any other (as the crafting test counts it).
             LevelingSettings leveling = LevelingSettings.Current;
-            Assert.AreEqual(Mathf.FloorToInt(leveling.TierExperience(1) * SettlementSettings.Current.LessonWork / leveling.PracticeTimeScale), learned);
+            int tier = ExperienceTracker.LessonTier(bjarne);
+            Assert.AreEqual(Mathf.FloorToInt(leveling.TierExperience(tier) * SettlementSettings.Current.LessonWork / leveling.PracticeTimeScale), learned);
             Assert.AreEqual(learned, GameSession.Progress.ExperienceOf(smith.Teaches));
             Assert.AreEqual(0, ExperienceTracker.TakeLesson(bjarne), "one between raids");
 
             GameSession.Home.RecordExtraction();
             Assert.Greater(ExperienceTracker.TakeLesson(bjarne), 0, "again after a raid survived");
 
-            bjarne.WorkDone = 150;
+            bjarne.Talents.SetExperience(smith.Teaches.Id, leveling.TotalExperienceFor(leveling.MaxLevel));
             Assert.AreEqual(5, ExperienceTracker.LessonTier(bjarne), "a master teaches at the top tier");
         }
         finally

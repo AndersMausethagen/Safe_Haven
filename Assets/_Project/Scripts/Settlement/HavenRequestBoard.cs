@@ -240,8 +240,10 @@ public sealed class HavenRequestBoard : MonoBehaviour
         settlement.RemoveRequest(request.Id);
         settlement.RecordRequestAnswered(request.Renown);
         var given = new List<string>();
-        Give(request.Reward, request.RewardCount, bag, given);
-        Give(TradeSettings.Current.Coin, request.Coins, bag, given);
+        // An asker whose traits make much of a kept word pays more (Hammer-Gruff: ResidentTraits, AskReward).
+        float more = 1f + Mathf.Max(0f, ResidentTraits.Sum(request.Asker != null ? settlement.Find(request.Asker) : null, TraitEffectKind.AskReward));
+        Give(request.Reward, Mathf.RoundToInt(request.RewardCount * more), bag, given);
+        Give(TradeSettings.Current.Coin, Mathf.RoundToInt(request.Coins * more), bag, given);
         if (request.Experience > 0)
         {
             ExperienceTracker.GrantInsight(request.Experience);

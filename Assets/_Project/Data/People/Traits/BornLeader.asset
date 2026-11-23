@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01398805f2cfdcc408fe54d76824fc8e, type: 3}
+  m_Name: BornLeader
+  m_EditorClassIdentifier: SafeHaven::ResidentTraitDefinition
+  id: born_leader
+  displayName: Born Leader
+  icon: Flag
+  description: 'Everyone she goes with is stronger: each other one on a foray with her brings a tenth more.'
+  doubleEdged: 0
+  effects:
+  - kind: 8
+    amount: 0.1
+    skill: {fileID: 0}
+    partySize: 0
+    creature: 
+  lines:
+  - Count heads. Then count them again.
+  - We go out together and we come back together. That's the whole of it.
+  excludes: []

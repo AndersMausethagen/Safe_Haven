@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76e0c92852a3914498e494feab24c1f5, type: 3}
+  m_Name: SpiderBane
+  m_EditorClassIdentifier: SafeHaven::MarkDefinition
+  id: spider_bane
+  displayName: Spider-bane
+  icon: Skull
+  description: 'Has seen enough widows fall to know where their legs join: a fifth more against spiders.'
+  good: 1
+  effects:
+  - kind: 24
+    amount: 0.2
+    skill: {fileID: 0}
+    partySize: 0
+    creature: widow
+  cause: 5
+  chance: 1
+  creature: widow
+  count: 6
+  healedBy: {fileID: 0}
+  friendsHeal: 0
+  turnsInto: {fileID: 0}
+  heldByTheForest: 0
+  line: 

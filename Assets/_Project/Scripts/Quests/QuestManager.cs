@@ -670,6 +670,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
                 if (worker != null)
                 {
                     worker.WorkDone += quest.RewardWork;
+                    ResidentTalents.PractiseWork(worker, quest.RewardWork);
                 }
             }
 

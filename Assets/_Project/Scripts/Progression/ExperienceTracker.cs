@@ -205,7 +205,8 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         return Mathf.Max(0f, 1f + mentor + gain);
     }
 
-    /// <summary>The tier a resident teaches at: their rank in the job, or their workplace's tier if that is higher.</summary>
+    /// <summary>The tier a resident teaches at: the band of their level in what they teach (ResidentTalents), or their workplace's tier
+    /// if that is higher.</summary>
     public static int LessonTier(ResidentRecord teacher)
     {
         if (teacher == null || teacher.Job == null)
@@ -213,7 +214,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
             return 1;
         }
 
-        int rank = 1 + SettlementSettings.Current.RankIndex(teacher.WorkDone);
+        int rank = Rules.TierBand(ResidentTalents.LevelOf(teacher, teacher.Job.Teaches ?? teacher.Job.Skill));
         int workplace = teacher.Job.Workplace != null ? GameSession.Here.BuiltTier(teacher.Job.Workplace) : 0;
         return Mathf.Clamp(Mathf.Max(rank, workplace), 1, Tiers.Max);
     }
@@ -225,7 +226,8 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
     public static int TakeLesson(ResidentRecord teacher)
     {
         ProficiencyDefinition skill = teacher?.Job?.Teaches;
-        if (skill == null || teacher.TaughtSinceRaid)
+        // One between raids; an inspired morning ("more to teach": Inspirations) gives a second.
+        if (skill == null || (teacher.TaughtSinceRaid && !Inspirations.Use(teacher, Inspiration.Lesson)))
         {
             return 0;
         }

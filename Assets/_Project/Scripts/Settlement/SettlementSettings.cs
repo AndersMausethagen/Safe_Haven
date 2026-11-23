@@ -51,16 +51,19 @@ public sealed class SettlementSettings : GameSettings<SettlementSettings>
     public struct WorkerRank
     {
         public string name;
-        [Tooltip("Crafts made at their workplace to reach it.")]
+        [Tooltip("The level of their job's skill that reaches it (ResidentTalents).")]
+        [Min(1)] public int level;
+        [Tooltip("Crafts that reached it before talents: an old save's rank becomes its level once, as it loads.")]
         [Min(0)] public int crafts;
-        [Tooltip("How much faster their station works.")]
+        [Tooltip("Before talents: how much faster their station worked (kept for reference; the speed is now their job skill's, People Settings).")]
         [Min(0.1f)] public float speed;
-        [Tooltip("Chance of one more of what they make.")]
+        [Tooltip("Before talents: the chance of one more (now their job skill's, People Settings).")]
         [Range(0f, 1f)] public float extraChance;
 
-        public WorkerRank(string name, int crafts, float speed, float extraChance)
+        public WorkerRank(string name, int crafts, float speed, float extraChance, int level = 1)
         {
             this.name = name;
+            this.level = level;
             this.crafts = crafts;
             this.speed = speed;
             this.extraChance = extraChance;
@@ -71,8 +74,8 @@ public sealed class SettlementSettings : GameSettings<SettlementSettings>
     [Tooltip("Lowest first. A worker reaches each by the crafts they make at their workplace.")]
     [SerializeField] private List<WorkerRank> workerRanks = new List<WorkerRank>
     {
-        new WorkerRank("Novice", 0, 1f, 0f), new WorkerRank("Apprentice", 10, 1.1f, 0.03f), new WorkerRank("Journeyman", 30, 1.2f, 0.06f),
-        new WorkerRank("Expert", 70, 1.3f, 0.09f), new WorkerRank("Master", 150, 1.4f, 0.12f),
+        new WorkerRank("Novice", 0, 1f, 0f, 1), new WorkerRank("Apprentice", 10, 1.1f, 0.03f, 15), new WorkerRank("Journeyman", 30, 1.2f, 0.06f, 20),
+        new WorkerRank("Expert", 70, 1.3f, 0.09f, 28), new WorkerRank("Master", 150, 1.4f, 0.12f, 36),
     };
     [Tooltip("A lesson from a resident, in the tier experience of their rank (or their workplace's tier, if higher).")]
     [SerializeField, Min(0f)] private float lessonWork = 6f;

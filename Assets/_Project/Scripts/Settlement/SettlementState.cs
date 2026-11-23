@@ -20,7 +20,14 @@ public sealed class ResidentRecord
     {
         Resident = resident;
         this.job = job;
+        talents = new TalentSheet(change => SettlementState.RecordChanging(this, change));
     }
+
+    // Their talents in every skill and their passions (ResidentTalents; Docs/PeopleResearch_2026-11-23.md §3.1).
+    private readonly TalentSheet talents;
+
+    /// <summary>Their level in each of the player's skills and what they love (ResidentTalents).</summary>
+    public TalentSheet Talents => talents;
 
     // What the setters below keep. Each change goes through Change, which cries out (as SettlementState's changers do) when the record
     // is one of a guest's copy of the host's settlement (co-op): a guest used up the host's residents' raid memories and wrote the host's
@@ -103,14 +110,126 @@ public sealed class ResidentRecord
     public bool WishMet { get => wishMet; set => Change(ref wishMet, value); }
     /// <summary>What they ate this morning (ResidentMeals): fed, well fed or hungry, for their work speed that day.</summary>
     public ResidentMeal Meal { get => meal; set => Change(ref meal, value); }
+
+    // ----- Who they are beyond their work (Docs/PeopleResearch_2026-11-23.md §3.4-3.6) -----
+
+    private readonly List<string> marks = new List<string>();
+    private readonly Dictionary<string, int> deeds = new Dictionary<string, int>();
+    private readonly Dictionary<string, int> feelings = new Dictionary<string, int>();
+    private Inspiration inspiration;
+    private int inspiredOn = -1;
+    private ItemStack kitWeapon;
+    private ItemStack kitBody;
+    private int kitWeaponRaids;
+    private int kitBodyRaids;
+
+    /// <summary>The marks raids have left on them, by id, oldest first (ResidentMarks; PeopleSettings › Marks).</summary>
+    public IReadOnlyList<string> Marks => marks;
+
+    public bool HasMark(string id) => id != null && marks.Contains(id);
+
+    public void AddMark(string id)
+    {
+        if (!string.IsNullOrEmpty(id) && !marks.Contains(id))
+        {
+            SettlementState.RecordChanging(this, "Marks");
+            marks.Add(id);
+        }
+    }
+
+    public bool RemoveMark(string id)
+    {
+        SettlementState.RecordChanging(this, "Marks");
+        return marks.Remove(id);
+    }
+
+    /// <summary>Deeds counted toward marks ("kills:troll" along, "since:&lt;mark&gt;:troll" since a mark came).</summary>
+    public IReadOnlyDictionary<string, int> Deeds => deeds;
+
+    public int DeedOf(string key) => key != null && deeds.TryGetValue(key, out int had) ? had : 0;
+
+    public void AddDeed(string key, int amount)
+    {
+        if (string.IsNullOrEmpty(key) || amount == 0)
+        {
+            return;
+        }
+
+        SettlementState.RecordChanging(this, "Deeds");
+        deeds[key] = DeedOf(key) + amount;
+    }
+
+    public void ForgetDeed(string key)
+    {
+        SettlementState.RecordChanging(this, "Deeds");
+        deeds.Remove(key);
+    }
+
+    /// <summary>What they feel for a while, by id ("lost:tor", "inspired"), and the last Haven day each lasts (ResidentSpirits).</summary>
+    public IReadOnlyDictionary<string, int> Feelings => feelings;
+
+    public int FeelingUntil(string id) => id != null && feelings.TryGetValue(id, out int day) ? day : -1;
+
+    public void Feel(string id, int untilDay)
+    {
+        if (string.IsNullOrEmpty(id))
+        {
+            return;
+        }
+
+        SettlementState.RecordChanging(this, "Feelings");
+        feelings[id] = untilDay;
+    }
+
+    public void ForgetFeeling(string id)
+    {
+        SettlementState.RecordChanging(this, "Feelings");
+        feelings.Remove(id);
+    }
+
+    /// <summary>Forgets every feeling that ended before <paramref name="day"/>.</summary>
+    public void ForgetFeelingsBefore(int day)
+    {
+        List<string> ended = null;
+        foreach (KeyValuePair<string, int> pair in feelings)
+        {
+            if (pair.Value < day)
+            {
+                (ended ??= new List<string>()).Add(pair.Key);
+            }
+        }
+
+        if (ended != null)
+        {
+            SettlementState.RecordChanging(this, "Feelings");
+            foreach (string id in ended)
+            {
+                feelings.Remove(id);
+            }
+        }
+    }
+
+    /// <summary>The inspired day they are having, or None (Inspirations).</summary>
+    public Inspiration Inspiration { get => inspiration; set => Change(ref inspiration, value); }
+    /// <summary>The Haven day it came (-1: none yet).</summary>
+    public int InspiredOn { get => inspiredOn; set => Change(ref inspiredOn, value); }
+
+    /// <summary>The weapon the player gave them to fight with beside them (CompanionKit), or empty.</summary>
+    public ItemStack KitWeapon { get => kitWeapon; set => Change(ref kitWeapon, value); }
+    /// <summary>The body piece the player gave them, or empty.</summary>
+    public ItemStack KitBody { get => kitBody; set => Change(ref kitBody, value); }
+    /// <summary>Raids gone along on with that weapon and that body piece: after enough, they are theirs, by name (CompanionKit).</summary>
+    public int KitWeaponRaids { get => kitWeaponRaids; set => Change(ref kitWeaponRaids, value); }
+    public int KitBodyRaids { get => kitBodyRaids; set => Change(ref kitBodyRaids, value); }
 }
 
 /// <summary>Someone who went along on a raid and didn't come home. The forest has them: they can be found again, and won't know the player.</summary>
 public sealed class FallenRecord
 {
     public FallenRecord(ResidentDefinition resident, string where, int atExtraction, int raidsAlong = 0, IEnumerable<CompanionMemory> forgotten = null,
-        string home = null)
+        string home = null, TalentSheet talents = null)
     {
+        Talents.CopyFrom(talents);
         Resident = resident;
         Where = where;
         AtExtraction = atExtraction;
@@ -124,6 +243,13 @@ public sealed class FallenRecord
 
     /// <summary>What they will have to get back.</summary>
     public List<CompanionMemory> Forgotten { get; } = new List<CompanionMemory>();
+
+    /// <summary>Who they are, kept while the forest has them: their talents come home with them (only the player is forgotten).</summary>
+    public TalentSheet Talents { get; } = new TalentSheet();
+    /// <summary>The kit they carried, waiting in their empty house (CompanionKit), and the marks the raids had left on them.</summary>
+    public ItemStack KitWeapon { get; set; }
+    public ItemStack KitBody { get; set; }
+    public List<string> Marks { get; set; } = new List<string>();
 
     public ResidentDefinition Resident { get; }
     public string Where { get; }
@@ -1007,7 +1133,7 @@ public sealed class SettlementState : IHavenView
     public float WorkerSpeed(string stationId, CraftingStationType station)
     {
         ResidentRecord worker = WorkerAt(stationId, station);
-        return worker != null ? SettlementSettings.Current.RankFor(worker.WorkDone).speed : 1f;
+        return worker != null ? ResidentTalents.StationSpeed(worker) : 1f;
     }
 
     public ResidentRecord Find(ResidentDefinition resident)
@@ -1100,6 +1226,11 @@ public sealed class SettlementState : IHavenView
 
     /// <summary>Those who went along on a raid and haven't come home.</summary>
     public IReadOnlyList<FallenRecord> Fallen => fallen;
+
+    /// <summary>How residents stand with each other, pair by pair (PeopleStandings). Saved.</summary>
+    public StandingsState Standings { get; } = new StandingsState();
+
+    public float StandingOf(string a, string b) => Standings.ValueOf(a, b);
 
     /// <summary>Who a raid's rumour can lead to next: the one lost longest ago who can walk a raid at all. Null with nobody to find.</summary>
     public FallenRecord LostToFind => fallen.Find(record => record.Resident != null && record.Resident.RaidCompanion != null);
@@ -1194,12 +1325,14 @@ public sealed class SettlementState : IHavenView
 
         residents.Remove(record);
         fallen.Add(new FallenRecord(resident, where, SuccessfulExtractions, record.RaidsAlong, CompanionBond.WhatIsForgotten(record.Remembers, record.Forgotten),
-            record.Home));
+            record.Home, record.Talents) { KitWeapon = record.KitWeapon, KitBody = record.KitBody, Marks = new List<string>(record.Marks) });
         if (record.Job != null && !vacantJobs.Contains(record.Job) && !IsHeld(record.Job))
         {
             vacantJobs.Add(record.Job);
         }
 
+        // Their friends miss them (PeopleStandings).
+        PeopleStandings.Lost(this, resident);
         Changed?.Invoke();
     }
 
@@ -1219,21 +1352,39 @@ public sealed class SettlementState : IHavenView
         fallen.Remove(lost);
         var found = new ResidentRecord(resident) { IsStranger = true };
         found.Forgotten.AddRange(lost.Forgotten);
-        // Their house waited for them (HavenHomes kept their bed): it is theirs again.
+        // Who they are came back with them; only the player is forgotten.
+        found.Talents.CopyFrom(lost.Talents);
+        ResidentTalents.Seed(found.Talents, resident);
+        // Their house waited for them (HavenHomes kept their bed): it is theirs again; so did the kit they carried, and the marks the
+        // raids had left; the forest leaves its own (ResidentMarks).
         found.Home = lost.Home;
+        found.KitWeapon = lost.KitWeapon;
+        found.KitBody = lost.KitBody;
+        foreach (string mark in lost.Marks)
+        {
+            found.AddMark(mark);
+        }
+
         residents.Add(found);
+        ResidentMarks.FoundAgain(found);
+        PeopleStandings.Found(this, resident);
         Changed?.Invoke();
         return true;
     }
 
     /// <summary>Puts someone lost back on the list when loading a save.</summary>
-    public void RestoreFallen(ResidentDefinition resident, string where, int atExtraction, int raidsAlong = 0, IEnumerable<CompanionMemory> forgotten = null,
-        string home = null)
+    public FallenRecord RestoreFallen(ResidentDefinition resident, string where, int atExtraction, int raidsAlong = 0, IEnumerable<CompanionMemory> forgotten = null,
+        string home = null, TalentSheet talents = null)
     {
-        if (resident != null && !IsFallen(resident))
+        if (resident == null || IsFallen(resident))
         {
-            fallen.Add(new FallenRecord(resident, where, atExtraction, raidsAlong, forgotten, home));
+            return null;
         }
+
+        var lost = new FallenRecord(resident, where, atExtraction, raidsAlong, forgotten, home, talents);
+        ResidentTalents.Seed(lost.Talents, resident);
+        fallen.Add(lost);
+        return lost;
     }
 
     public void RestoreVacantJob(JobDefinition job)
@@ -1267,7 +1418,11 @@ public sealed class SettlementState : IHavenView
             return false;
         }
 
-        residents.Add(new ResidentRecord(resident, job));
+        var record = new ResidentRecord(resident, job);
+        ResidentTalents.Seed(record.Talents, resident);
+        residents.Add(record);
+        // Their written friend and friction, once both live here (PeopleStandings).
+        PeopleStandings.Welcome(this, record);
         Changed?.Invoke();
         return true;
     }

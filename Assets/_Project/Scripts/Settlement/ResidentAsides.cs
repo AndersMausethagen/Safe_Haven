@@ -65,6 +65,10 @@ public sealed class ResidentAsides : MonoBehaviour
             {
                 line = festival.Lines[Random.Range(0, festival.Lines.Count)];
             }
+            else if (PersonalLine() is string own)
+            {
+                line = own;
+            }
             else
             {
                 string[] lines = settings.AsidesAt(AtmosphereConditions.Hour);
@@ -81,6 +85,25 @@ public sealed class ResidentAsides : MonoBehaviour
         lastSpokenAt = Time.time;
         string who = npc.Resident != null ? npc.Resident.DisplayName : name;
         box.Bark(new DialogueSpeaker(who, transform, null, 0f, null, transform), line);
+    }
+
+    // Who they are, now and then (Docs/PeopleResearch_2026-11-23.md): a friend the forest has, asked after; else, a third of the time, a
+    // line of one of their traits (their tell). Null for the hour's line instead. In one's own Haven: a friend's people say the hour's.
+    private string PersonalLine()
+    {
+        ResidentRecord record = npc.Resident != null && !HavenVisit.InHostsHaven ? GameSession.Here.Find(npc.Resident) : null;
+        if (record == null)
+        {
+            return null;
+        }
+
+        ResidentDefinition missed = PeopleStandings.Misses(GameSession.Here, record);
+        if (missed != null && Random.value < 0.6f)
+        {
+            return $"Bring {missed.DisplayName} home. The forest has no right to them.";
+        }
+
+        return Random.value < 0.35f ? ResidentTraits.LineOf(record, Random.Range(0, 1000)) : null;
     }
 
     // Entering Play doesn't reload scripts in this project, and Time.time starts again at 0: an old moment would silence residents.

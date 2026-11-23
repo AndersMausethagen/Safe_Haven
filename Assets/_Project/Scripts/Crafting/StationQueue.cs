@@ -319,6 +319,10 @@ public sealed class StationQueue
     /// player's practice (SettlementSystem). Saved with the station.</summary>
     public int WorkerCrafts { get; set; }
 
+    /// <summary>Finer pieces its worker made, waiting for whoever collects the gear ("quality|maker": ResidentTalents.WorkerPiece):
+    /// each lifts one piece collected to that quality and signs it with their name. Saved with the station.</summary>
+    public List<string> Lifts { get; } = new List<string>();
+
     /// <summary>
     /// Works for the given seconds, delivering every craft that finishes. Resources go to storage first (may be null).
     /// Calls finished once per delivered craft. Returns how many crafts were delivered.

@@ -38,6 +38,24 @@ public readonly struct ResidentHours
 public static class ResidentRoutine
 {
     /// <summary>
+    /// <paramref name="record"/>'s own hours (Docs/PeopleResearch_2026-11-23.md §3.3): an early riser wakes and starts work earlier
+    /// (StartEarlier; a late starter, negative, later), one who works late ends work and goes to bed later (WorkLater); meals stay
+    /// when everyone eats.
+    /// </summary>
+    public static ResidentHours HoursOf(ResidentRecord record, in ResidentHours hours)
+    {
+        float earlier = UnityEngine.Mathf.Clamp(ResidentTraits.Sum(record, TraitEffectKind.StartEarlier), -4f, 4f);
+        float later = UnityEngine.Mathf.Clamp(ResidentTraits.Sum(record, TraitEffectKind.WorkLater), -4f, 4f);
+        if (earlier == 0f && later == 0f)
+        {
+            return hours;
+        }
+
+        return new ResidentHours(hours.Wake - earlier, hours.WorkFrom - earlier, hours.MealFrom, hours.MealUntil, hours.WorkUntil + later,
+            UnityEngine.Mathf.Max(hours.WorkUntil + later + 1f, hours.SleepFrom + UnityEngine.Mathf.Max(0f, later)));
+    }
+
+    /// <summary>
     /// Whether someone goes out on a day (about one day in three each), and when: a start
     /// between ten and two, for an hour or so. Fixed by who they are and the day, so it holds however often it is asked.
     /// </summary>

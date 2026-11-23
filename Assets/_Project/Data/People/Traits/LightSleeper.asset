@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01398805f2cfdcc408fe54d76824fc8e, type: 3}
+  m_Name: LightSleeper
+  m_EditorClassIdentifier: SafeHaven::ResidentTraitDefinition
+  id: light_sleeper
+  displayName: Light Sleeper
+  icon: Lantern
+  description: 'Wakes at the first sound: a sixth more health defending the Haven.'
+  doubleEdged: 0
+  effects:
+  - kind: 12
+    amount: 0.15
+    skill: {fileID: 0}
+    partySize: 0
+    creature: 
+  lines:
+  - Something moved by the fence last night. I heard it.
+  excludes: []

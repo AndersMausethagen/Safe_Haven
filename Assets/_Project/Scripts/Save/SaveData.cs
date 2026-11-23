@@ -130,6 +130,8 @@ public sealed class SettlementSaveData
     public int heldQuestsStarted;
     /// <summary>Those lost on raids. Missing in older saves.</summary>
     public List<FallenSaveData> fallen = new List<FallenSaveData>();
+    /// <summary>How residents stand with each other ("idA|idB|value", PeopleStandings). Missing in older saves: the written friends and frictions.</summary>
+    public List<string> standings = new List<string>();
     /// <summary>Ids of the jobs they left. Missing in older saves.</summary>
     public List<string> vacantJobs = new List<string>();
     /// <summary>Rings drawn for the woodcutters to clear (RingOrder). Missing in older saves: none.</summary>
@@ -179,6 +181,8 @@ public sealed class StationSaveData
     public int outputAmount;
     /// <summary>How many of the queued crafts a worker started (StationQueue.WorkerCrafts).</summary>
     public int workerCrafts;
+    /// <summary>Finer pieces the worker made, waiting to be collected ("quality|maker"). Missing in older saves: none.</summary>
+    public List<string> lifts = new List<string>();
     /// <summary>What waits in the output slots after the first (a Storage Loft's). Missing in older saves: none.</summary>
     public List<StationOutputSaveData> moreOutput = new List<StationOutputSaveData>();
     /// <summary>What its worker has fetched from the chests for their orders (StationQueue.Supplies). Missing in older saves: none.</summary>
@@ -203,6 +207,15 @@ public sealed class StationJobSaveData
     public int count;
 }
 
+/// <summary>A person's talents (TalentSheet): experience and passions by skill id ("id|amount"), and passion picks owed.</summary>
+[Serializable]
+public sealed class TalentSaveData
+{
+    public List<string> experience = new List<string>();
+    public List<string> passions = new List<string>();
+    public int picksOwed;
+}
+
 [Serializable]
 public sealed class FallenSaveData
 {
@@ -214,6 +227,12 @@ public sealed class FallenSaveData
     public List<int> forgotten = new List<int>();
     /// <summary>The house kept for them (a building id). Missing in older saves: none, so their bed went to whoever needed it.</summary>
     public string home;
+    /// <summary>Their talents, kept while lost. Missing in older saves: their written start.</summary>
+    public TalentSaveData talents = new TalentSaveData();
+    /// <summary>The kit and marks waiting with them. Missing in older saves: none.</summary>
+    public SlotSaveData kitWeapon;
+    public SlotSaveData kitBody;
+    public List<string> marks = new List<string>();
 }
 
 [Serializable]
@@ -256,6 +275,20 @@ public sealed class ResidentSaveData
     public int meal;
     /// <summary>Home bruised from a foray gone wrong, until the next dawn.</summary>
     public bool bruised;
+    /// <summary>Their talents (ResidentTalents). Missing in older saves: their written start, with their old rank's level in their job.</summary>
+    public TalentSaveData talents = new TalentSaveData();
+    /// <summary>Marks raids left (ids), deeds toward them ("key|count") and what they feel for a while ("id|last day"). Missing in older saves: none.</summary>
+    public List<string> marks = new List<string>();
+    public List<string> deeds = new List<string>();
+    public List<string> feelings = new List<string>();
+    /// <summary>Inspiration (0 none) and the day it came.</summary>
+    public int inspiration;
+    public int inspiredOn = -1;
+    /// <summary>The kit the player gave them (CompanionKit) and the raids along with each piece. Missing in older saves: none.</summary>
+    public SlotSaveData kitWeapon;
+    public SlotSaveData kitBody;
+    public int kitWeaponRaids;
+    public int kitBodyRaids;
 }
 
 [Serializable]

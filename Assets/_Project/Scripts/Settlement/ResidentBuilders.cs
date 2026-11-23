@@ -115,7 +115,14 @@ public sealed class ResidentBuilders : MonoBehaviour
                 : Builds(record, away) ? 1f : Helps(record, away) && FreeToHelp(settlement, record) ? HomeLifeSettings.Current.HelperShare : 0f;
             if (share > 0f)
             {
-                hands += share;
+                // A practised builder's hands count for more (their Construction: ResidentTalents), and practise as they work.
+                PeopleSettings people = PeopleSettings.Current;
+                hands += share * ResidentTalents.SpeedAt(record, people.BuildingSkill);
+                if (settlement.ScaffoldsWaiting && seconds > 0f)
+                {
+                    ResidentTalents.Practise(record, people.BuildingSkill, 1, seconds * share * people.BuildPracticePerSecond);
+                }
+
                 if (!worked.Contains(record.Resident))
                 {
                     worked.Add(record.Resident);

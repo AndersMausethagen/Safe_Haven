@@ -63,8 +63,9 @@ public sealed class LandPartiesTests
     {
         TerritorySettings.PartyInfo hunt = Settings.PartyOf(LandPartyKind.Hunt);
         var novice = new ResidentRecord(null, hunt.job);
-        var practised = new ResidentRecord(null, hunt.job) { WorkDone = 100000 };
-        Assume.That(SettlementSettings.Current.RankIndex(practised.WorkDone) > 0);
+        var practised = new ResidentRecord(null, hunt.job);
+        practised.Talents.SetExperience(hunt.job.Skill.Id, LevelingSettings.Current.TotalExperienceFor(LevelingSettings.Current.MaxLevel));
+        Assert.Greater(ResidentTalents.RankIndex(practised), 0, "a master of the job's skill");
 
         List<ItemAmount> least = LandParties.Roll(LandPartyKind.Hunt, novice, Settings, (low, high) => low);
         List<ItemAmount> most = LandParties.Roll(LandPartyKind.Hunt, practised, Settings, (low, high) => high);

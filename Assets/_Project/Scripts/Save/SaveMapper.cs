@@ -191,6 +191,84 @@ public static class SaveMapper
     /// <summary>A stack as save data, in no slot (-1): everything about the piece, as a save keeps it.</summary>
     public static SlotSaveData SlotOf(ItemStack stack) => ToSlot(-1, stack);
 
+    private static List<string> Pairs(IReadOnlyDictionary<string, int> values)
+    {
+        var saved = new List<string>();
+        foreach (KeyValuePair<string, int> pair in values)
+        {
+            saved.Add(pair.Key + "|" + pair.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        }
+
+        return saved;
+    }
+
+    private static IEnumerable<(string, int)> FromPairs(List<string> saved)
+    {
+        foreach (string entry in saved ?? new List<string>())
+        {
+            int bar = entry != null ? entry.LastIndexOf('|') : -1;
+            if (bar > 0 && int.TryParse(entry.Substring(bar + 1), System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out int value))
+            {
+                yield return (entry.Substring(0, bar), value);
+            }
+        }
+    }
+
+    // A piece of kit to save, or none for an empty hand (an empty stack has no item to write).
+    private static SlotSaveData KitSlot(ItemStack stack) => stack.IsEmpty ? null : SlotOf(stack);
+
+    // A piece of kit as saved, or empty (none given, an older save, or content gone).
+    private static ItemStack KitFrom(SlotSaveData slot, IContentLookup content, List<string> missing) =>
+        slot != null && !string.IsNullOrEmpty(slot.item) && TryReadStack(slot, content, missing, out ItemStack stack) ? stack : ItemStack.Empty;
+
+    private static TalentSaveData TalentsOf(TalentSheet sheet)
+    {
+        var saved = new TalentSaveData { picksOwed = sheet.PicksOwed };
+        foreach (KeyValuePair<string, float> pair in sheet.Experience)
+        {
+            saved.experience.Add(pair.Key + "|" + pair.Value.ToString("R", System.Globalization.CultureInfo.InvariantCulture));
+        }
+
+        foreach (KeyValuePair<string, int> pair in sheet.Passions)
+        {
+            saved.passions.Add(pair.Key + "|" + pair.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        }
+
+        return saved;
+    }
+
+    // Null for a save from before talents (none saved), so the written start stands.
+    private static TalentSheet TalentsFrom(TalentSaveData saved)
+    {
+        if (saved == null || saved.experience == null || saved.experience.Count == 0)
+        {
+            return null;
+        }
+
+        var sheet = new TalentSheet();
+        foreach (string entry in saved.experience)
+        {
+            int bar = entry != null ? entry.LastIndexOf('|') : -1;
+            if (bar > 0 && float.TryParse(entry.Substring(bar + 1), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float amount))
+            {
+                sheet.SetExperience(entry.Substring(0, bar), amount);
+            }
+        }
+
+        foreach (string entry in saved.passions ?? new List<string>())
+        {
+            int bar = entry != null ? entry.LastIndexOf('|') : -1;
+            if (bar > 0 && int.TryParse(entry.Substring(bar + 1), System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out int passion)
+                && System.Enum.IsDefined(typeof(Passion), passion))
+            {
+                sheet.SetPassion(entry.Substring(0, bar), (Passion)passion);
+            }
+        }
+
+        sheet.SetPicksOwed(saved.picksOwed);
+        return sheet;
+    }
+
     private static SlotSaveData ToSlot(int index, ItemStack stack)
     {
         return new SlotSaveData
@@ -266,7 +344,7 @@ public static class SaveMapper
 
         foreach (ResidentRecord record in settlement.Residents)
         {
-            into.residents.Add(new ResidentSaveData { id = record.Resident.Id, workPaused = record.PausedByPlayer, job = record.Job != null ? record.Job.Id : "", raidsAlong = record.RaidsAlong, killsAlong = record.KillsAlong, timesHelpedUp = record.TimesHelpedUp, memory = (int)record.Memory, remembers = ToSaved(record.Remembers), forgotten = ToSaved(record.Forgotten), stranger = record.IsStranger, comingBack = (int)record.ComingBack, allCameBack = record.AllCameBack, workDone = record.WorkDone, taughtSinceRaid = record.TaughtSinceRaid, home = record.Home ?? "", homeChosen = record.HomeChosen ?? "", workplace = record.Workplace ?? "", workQueue = record.WorkQueue ?? "", haulDone = record.HaulDone, workGear = record.WorkGear != null ? record.WorkGear.Id : "", wishMet = record.WishMet, meal = (int)record.Meal, bruised = record.Bruised });
+            into.residents.Add(new ResidentSaveData { id = record.Resident.Id, workPaused = record.PausedByPlayer, job = record.Job != null ? record.Job.Id : "", raidsAlong = record.RaidsAlong, killsAlong = record.KillsAlong, timesHelpedUp = record.TimesHelpedUp, memory = (int)record.Memory, remembers = ToSaved(record.Remembers), forgotten = ToSaved(record.Forgotten), stranger = record.IsStranger, comingBack = (int)record.ComingBack, allCameBack = record.AllCameBack, workDone = record.WorkDone, taughtSinceRaid = record.TaughtSinceRaid, home = record.Home ?? "", homeChosen = record.HomeChosen ?? "", workplace = record.Workplace ?? "", workQueue = record.WorkQueue ?? "", haulDone = record.HaulDone, workGear = record.WorkGear != null ? record.WorkGear.Id : "", wishMet = record.WishMet, meal = (int)record.Meal, bruised = record.Bruised , talents = TalentsOf(record.Talents), marks = new List<string>(record.Marks), deeds = Pairs(record.Deeds), feelings = Pairs(record.Feelings), inspiration = (int)record.Inspiration, inspiredOn = record.InspiredOn, kitWeapon = KitSlot(record.KitWeapon), kitBody = KitSlot(record.KitBody), kitWeaponRaids = record.KitWeaponRaids, kitBodyRaids = record.KitBodyRaids });
         }
 
         foreach (KeyValuePair<string, List<string>> house in settlement.HouseComforts)
@@ -287,7 +365,12 @@ public static class SaveMapper
         into.heldQuestsStarted = settlement.HeldQuestsStarted;
         foreach (FallenRecord record in settlement.Fallen)
         {
-            into.fallen.Add(new FallenSaveData { id = record.Resident.Id, where = record.Where, atExtraction = record.AtExtraction, raidsAlong = record.RaidsAlong, forgotten = ToSaved(record.Forgotten), home = record.Home });
+            into.fallen.Add(new FallenSaveData { id = record.Resident.Id, where = record.Where, atExtraction = record.AtExtraction, raidsAlong = record.RaidsAlong, forgotten = ToSaved(record.Forgotten), home = record.Home, talents = TalentsOf(record.Talents), kitWeapon = KitSlot(record.KitWeapon), kitBody = KitSlot(record.KitBody), marks = new List<string>(record.Marks) });
+        }
+
+        foreach (KeyValuePair<string, float> pair in settlement.Standings.Values)
+        {
+            into.standings.Add(pair.Key + "|" + pair.Value.ToString("R", System.Globalization.CultureInfo.InvariantCulture));
         }
 
         foreach (JobDefinition job in settlement.VacantJobs)
@@ -345,6 +428,7 @@ public static class SaveMapper
                 outputAmount = queue.OutputAmount,
                 workerCrafts = queue.WorkerCrafts,
                 water = queue.Water,
+                lifts = new List<string>(queue.Lifts),
             };
             foreach ((UnityEngine.Object waiting, int amount) in queue.MoreOutput)
             {
@@ -439,6 +523,39 @@ public static class SaveMapper
                 restored.Bruised = entry.bruised;
                 restored.Meal = System.Enum.IsDefined(typeof(ResidentMeal), entry.meal) ? (ResidentMeal)entry.meal : ResidentMeal.Fed;
                 restored.WorkGear = string.IsNullOrEmpty(entry.workGear) ? null : Resolve(content.FindItem(entry.workGear), "item", entry.workGear, missing);
+                // Talents as saved; a save from before them keeps the written start, with the old rank's level in the job (once).
+                TalentSheet talents = TalentsFrom(entry.talents);
+                if (talents != null)
+                {
+                    restored.Talents.CopyFrom(talents);
+                    ResidentTalents.Seed(restored.Talents, resident);
+                }
+                else
+                {
+                    ResidentTalents.FromOldRank(restored, entry.workDone);
+                }
+
+                foreach (string mark in entry.marks ?? new List<string>())
+                {
+                    restored.AddMark(mark);
+                }
+
+                foreach ((string key, int value) in FromPairs(entry.deeds))
+                {
+                    restored.AddDeed(key, value);
+                }
+
+                foreach ((string key, int value) in FromPairs(entry.feelings))
+                {
+                    restored.Feel(key, value);
+                }
+
+                restored.Inspiration = System.Enum.IsDefined(typeof(Inspiration), entry.inspiration) ? (Inspiration)entry.inspiration : Inspiration.None;
+                restored.InspiredOn = entry.inspiredOn;
+                restored.KitWeapon = KitFrom(entry.kitWeapon, content, missing);
+                restored.KitBody = KitFrom(entry.kitBody, content, missing);
+                restored.KitWeaponRaids = Math.Max(0, entry.kitWeaponRaids);
+                restored.KitBodyRaids = Math.Max(0, entry.kitBodyRaids);
             }
         }
 
@@ -467,7 +584,27 @@ public static class SaveMapper
         settlement.RestoreHeldQuests(saved.heldQuestsHomecoming, saved.heldQuestsStarted);
         foreach (FallenSaveData entry in saved.fallen ?? new List<FallenSaveData>())
         {
-            settlement.RestoreFallen(Resolve(content.FindResident(entry?.id), "resident", entry?.id, missing), entry?.where, entry != null ? entry.atExtraction : 0, entry != null ? entry.raidsAlong : 0, FromSaved(entry?.forgotten), entry?.home);
+            FallenRecord lost = settlement.RestoreFallen(Resolve(content.FindResident(entry?.id), "resident", entry?.id, missing), entry?.where, entry != null ? entry.atExtraction : 0, entry != null ? entry.raidsAlong : 0, FromSaved(entry?.forgotten), entry?.home, TalentsFrom(entry?.talents));
+            if (lost != null && entry != null)
+            {
+                lost.KitWeapon = KitFrom(entry.kitWeapon, content, missing);
+                lost.KitBody = KitFrom(entry.kitBody, content, missing);
+                lost.Marks = new List<string>(entry.marks ?? new List<string>());
+            }
+        }
+
+        // Standings as saved; a save from before them keeps the written friends and frictions every newcomer was given.
+        if (saved.standings != null && saved.standings.Count > 0)
+        {
+            settlement.Standings.Clear();
+            foreach (string entry in saved.standings)
+            {
+                int bar = entry != null ? entry.LastIndexOf('|') : -1;
+                if (bar > 0 && float.TryParse(entry.Substring(bar + 1), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float value))
+                {
+                    settlement.Standings.Restore(entry.Substring(0, bar), value);
+                }
+            }
         }
 
         foreach (string job in saved.vacantJobs ?? new List<string>())
@@ -573,6 +710,7 @@ public static class SaveMapper
             queue.OutputSlots = 1 + more.Count;
             queue.Restore(jobs, entry.progress, output, entry.outputAmount, more);
             queue.WorkerCrafts = Math.Max(0, entry.workerCrafts);
+            queue.Lifts.AddRange(entry.lifts ?? new List<string>());
             // Saved before fields needed water: they start watered, so nothing grows slower for the update.
             queue.Water = entry.water < 0f ? (queue.Type == CraftingStationType.Farm ? FarmSettings.Current.WateredSeconds : 0f) : entry.water;
             foreach (StationOutputSaveData supply in entry.supplies ?? new List<StationOutputSaveData>())

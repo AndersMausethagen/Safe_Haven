@@ -54,10 +54,11 @@ public static class HavenPeople
         if (job != null)
         {
             entry.Details.Add(new HavenDetail(job.DisplayName, JobText(job)));
-            SettlementSettings people = SettlementSettings.Current;
             if (job.WorkOrders.Count > 0)
             {
-                entry.Details.Add(new HavenDetail("Rank", $"{people.RankFor(record.WorkDone).name} ({record.WorkDone} made)"));
+                ProficiencyDefinition skill = ResidentTalents.JobSkill(record);
+                entry.Details.Add(new HavenDetail("Rank", skill != null ? $"{ResidentTalents.RankName(record)} ({skill.DisplayName} {ResidentTalents.LevelOf(record, skill)}, {record.WorkDone} made)"
+                    : $"{ResidentTalents.RankName(record)} ({record.WorkDone} made)"));
             }
 
             if (job.Teaches != null)

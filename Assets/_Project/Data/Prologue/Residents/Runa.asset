@@ -50,6 +50,24 @@ MonoBehaviour:
     lines:
     - The forest doesn't hate us. It doesn't notice us. That's worse. Next time I pick the way.
   returningLines: []
+  talents:
+  - skill: {fileID: 11400000, guid: cada299a42945b04b8c891d31b0c5351, type: 2}
+    level: 24
+    passion: 2
+  - skill: {fileID: 11400000, guid: c02bc5ecd6589b94daa2ae6d5320cfb6, type: 2}
+    level: 17
+    passion: 0
+  - skill: {fileID: 11400000, guid: 4fde8ce0d82ef0d42b6bc607ec3f9a7a, type: 2}
+    level: 14
+    passion: 0
+  - skill: {fileID: 11400000, guid: d50f36a74b08c1b4a81b1f363a882045, type: 2}
+    level: 9
+    passion: 1
+  traits:
+  - {fileID: 11400000, guid: 0c99f3543d0a0e84eb0f02e4ae008628, type: 2}
+  - {fileID: 11400000, guid: f476e68c961b14a4b9b2d6dc1738ffeb, type: 2}
+  friend: {fileID: 11400000, guid: 9f83966b2e3c8fe42a58fd9d130cb08e, type: 2}
+  friction: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
   jobs:
   - {fileID: 11400000, guid: 6af8ca180b22423448d6e1e307037eb6, type: 2}
   questLine:

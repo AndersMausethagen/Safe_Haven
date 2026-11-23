@@ -145,11 +145,15 @@ public static class HomeLife
     /// How much faster this resident works at their own station for their home: its level's speed, and more when it has
     /// what they like. 0 for anyone without a house.
     /// </summary>
-    public static float WorkBonus(ResidentRecord record)
+    public static float WorkBonus(ResidentRecord record) => WorkBonus(record, ResidentTalents.JobSkill(record));
+
+    /// <summary>The same, at work with <paramref name="skill"/> (a scaffold's Construction, a ring's Woodcutting): who they are counts
+    /// for the skill the work is done with (PeopleWork).</summary>
+    public static float WorkBonus(ResidentRecord record, ProficiencyDefinition skill)
     {
         // What they ate this morning (ResidentMeals) and a foray's bruises (Forays) count with or without a home.
         float bruised = record != null && record.Bruised ? -ForaySettings.Current.BruisedWork : 0f;
-        return HomeBonus(record) + ResidentMeals.WorkBonus(record) + bruised;
+        return HomeBonus(record) + ResidentMeals.WorkBonus(record) + bruised + PeopleWork.Bonus(record, skill);
     }
 
     /// <summary>What their home alone adds to their work: its level, and being content in it (the window's "faster for it").</summary>

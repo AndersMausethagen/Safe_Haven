@@ -183,8 +183,10 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
         }
     }
 
-    // A worker gets better at their job with every craft: a new rank speeds their station, and a practised hand may get
-    // one more out of what they make.
+    // A worker gets better at their job with every craft (their talent in its skill: a higher level speeds their station), and a
+    // practised hand may get one more out of what they make.
+    private const int MostLifts = 8;
+
     private static void WorkerLearned(StationQueue station, RecipeDefinition recipe)
     {
         // This station's own worker (two fishers at two docks: each learns at their own).
@@ -194,15 +196,22 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
             return;
         }
 
-        SettlementSettings settings = SettlementSettings.Current;
-        int before = settings.RankIndex(worker.WorkDone);
+        // Their talent in the craft's skill grows with it (ResidentTalents, which tells of a new rank).
         worker.WorkDone++;
-        if (settings.RankIndex(worker.WorkDone) > before && worker.Job != null)
+        ResidentTalents.PractiseCraft(worker, recipe);
+        // Gear: their own hand's quality, and an inspired morning's finer piece, wait for whoever collects it (ResidentTalents).
+        string finer = ResidentTalents.WorkerPiece(worker, recipe, UnityEngine.Random.value);
+        if (finer != null)
         {
-            GameMessages.Post($"{worker.Resident.DisplayName} is now a {settings.RankFor(worker.WorkDone).name} {worker.Job.DisplayName}.", MessageKind.Gain);
+            station.Lifts.Add(finer);
+            // Never more waiting than a station can hold (gear taken out some other way leaves no lift behind for long).
+            while (station.Lifts.Count > MostLifts)
+            {
+                station.Lifts.RemoveAt(0);
+            }
         }
-
-        float own = settings.RankFor(worker.WorkDone).extraChance;
+        float own = ResidentTalents.ExtraChance(worker)
+                    + (station.Type == CraftingStationType.Farm ? Mathf.Max(0f, ResidentTraits.Sum(worker, TraitEffectKind.ExtraHarvest)) : 0f);
         float roll = UnityEngine.Random.value;
         if (recipe.Output != null && !recipe.Output.HasDurability && roll < own + station.ExtraChance && station.AddExtra(recipe.Output, 1) && roll >= own)
         {

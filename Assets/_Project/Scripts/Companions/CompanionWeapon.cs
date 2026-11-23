@@ -22,6 +22,15 @@ public sealed class CompanionWeapon
     private float strikeAt = -1f;
     private MonsterAI striking;
 
+    /// <summary>What the weapon in their hand makes of their kind's damage: the player's gift against the kind's own (CompanionKit). 1 with none.</summary>
+    public float DamageScale { get; set; } = 1f;
+
+    /// <summary>A share more (or less) against one foe: their traits and marks (Troll-wary, Afraid of Widows: ResidentTraits.DamageAgainst).</summary>
+    public Func<MonsterAI, float> Against { get; set; }
+
+    private float DamageFor(MonsterAI target, float damage) =>
+        damage * DamageScale * Mathf.Max(0.1f, 1f + (Against != null && target != null ? Against(target) : 0f));
+
     public CompanionWeapon(Transform self, Combatant combatant, CompanionDefinition definition, CompanionBody body, Predicate<MonsterAI> isFoe)
     {
         this.self = self;
@@ -126,7 +135,7 @@ public sealed class CompanionWeapon
             Vector3 direction = target.transform.position - self.position;
             direction.y = 0f;
             direction = direction.sqrMagnitude > 0.0001f ? direction.normalized : self.forward;
-            AttackResolver.Execute(combatant, definition.Attack, definition.WeaponDamage, self.position, direction, ~0);
+            AttackResolver.Execute(combatant, definition.Attack, DamageFor(target, definition.WeaponDamage), self.position, direction, ~0);
         }
 
         AudioManager.Play(definition.AttackSound, self.position);
@@ -146,6 +155,6 @@ public sealed class CompanionWeapon
         float speed = definition.ArrowSpeed * arrow.SpeedMultiplier;
         Vector3 direction = ArcheryRules.LaunchDirection(origin, aim, speed, Physics.gravity.magnitude * arrow.GravityScale);
         ArrowProjectile projectile = PrefabPool.Spawn(arrow.Projectile, origin, Quaternion.LookRotation(direction));
-        projectile.Launch(combatant, definition.Attack, arrowItem, arrow.Damage * definition.ArrowDamageShare, direction * speed);
+        projectile.Launch(combatant, definition.Attack, arrowItem, DamageFor(target, arrow.Damage * definition.ArrowDamageShare), direction * speed);
     }
 }

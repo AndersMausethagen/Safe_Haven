@@ -418,10 +418,12 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         {
             danger = false;
         }
-        ResidentActivity next = ResidentRoutine.InTheCold(ResidentRoutine.Decide(hour, settings.ResidentHours, hasWorkplace, danger), hour, PlayerWarmth.ColdNow());
+        // Their own day: an early riser up and at work sooner, a Night Eyes or a tireless one working later (their traits).
+        ResidentHours hours = ResidentRoutine.HoursOf(npc.Record, settings.ResidentHours);
+        ResidentActivity next = ResidentRoutine.InTheCold(ResidentRoutine.Decide(hour, hours, hasWorkplace, danger), hour, PlayerWarmth.ColdNow());
         // A builder with a scaffold waiting builds in working hours rather than standing at their workplace, going out or, with no
         // workplace built yet, sitting at the fire.
-        bool workTime = ResidentRoutine.InTheCold(ResidentRoutine.Decide(hour, settings.ResidentHours, true, danger), hour, PlayerWarmth.ColdNow())
+        bool workTime = ResidentRoutine.InTheCold(ResidentRoutine.Decide(hour, hours, true, danger), hour, PlayerWarmth.ColdNow())
             == ResidentActivity.Work;
         Construction scaffold = workTime && Festivals.Now == null ? ScaffoldToBuild() : null;
         if (scaffold != null)
@@ -1397,13 +1399,17 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
             return GoToNextTree();
         }
 
-        chopLeft -= Time.deltaTime * BuildRate(npc.Record) * 2f;
+        PeopleSettings people = PeopleSettings.Current;
+        ProficiencyDefinition ringSkill = ringAt.IsRock ? people.QuarrySkill : people.FellingSkill;
+        chopLeft -= Time.deltaTime * WorkRate(npc.Record, ringSkill) * 2f;
         if (chopLeft > 0f)
         {
             return true;
         }
 
-        // Down it comes: what it gives into the chests (what won't fit at their feet), and a sapling where a tree stood.
+        // Down it comes: what it gives into the chests (what won't fit at their feet), and a sapling where a tree stood. The feller's
+        // Woodcutting (or the quarrier's Mining) grows with it.
+        ResidentTalents.Practise(npc.Record, ringSkill, 1, LevelingSettings.Current.TierExperience(1) * people.RingPractice);
         RingTarget target = ringAt;
         ReleaseTree();
         WorkerSettings settings = WorkerSettings.Current;
@@ -1646,16 +1652,24 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         // Only the game that keeps the Haven counts the work (co-op: a friend's copy shows them hammering).
         if (!HavenVisit.IsVisiting)
         {
-            building.AddWork(Time.deltaTime * BuildRate(npc.Record) * ResidentBuilders.ShareOf(npc.Record));
+            float hammered = Time.deltaTime * BuildRate(npc.Record) * ResidentBuilders.ShareOf(npc.Record);
+            building.AddWork(hammered);
+            // Their Construction grows with every blow (ResidentTalents), counted as the work is.
+            ResidentTalents.Practise(npc.Record, PeopleSettings.Current.BuildingSkill, 1,
+                hammered / Mathf.Max(0.01f, HomeLifeSettings.Current.BuilderWorkPerSecond) * PeopleSettings.Current.BuildPracticePerSecond);
         }
 
         return true;
     }
 
-    /// <summary>Seconds of hammering a builder puts in each second at home: HomeLifeSettings › Builder Work Per Second and their home's
-    /// work bonus (HomeLife), so a good home makes a quicker builder.</summary>
-    public static float BuildRate(ResidentRecord record) =>
-        HomeLifeSettings.Current.BuilderWorkPerSecond * (1f + (record != null ? HomeLife.WorkBonus(record) + SmallScenes.CheerOf(record.Resident) : 0f));
+    /// <summary>Seconds of hammering a builder puts in each second at home: HomeLifeSettings › Builder Work Per Second, their home's
+    /// work bonus (HomeLife), so a good home makes a quicker builder, and their Construction (ResidentTalents).</summary>
+    public static float BuildRate(ResidentRecord record) => WorkRate(record, PeopleSettings.Current.BuildingSkill);
+
+    /// <summary>The same for work done with <paramref name="skill"/>: Woodcutting in a felling ring, Mining in a quarry.</summary>
+    public static float WorkRate(ResidentRecord record, ProficiencyDefinition skill) =>
+        HomeLifeSettings.Current.BuilderWorkPerSecond * (1f + (record != null ? HomeLife.WorkBonus(record, skill) + SmallScenes.CheerOf(record.Resident) : 0f))
+        * (record != null ? ResidentTalents.SpeedAt(record, skill) : 1f);
 
     /// <summary>
     /// A knock at the door of the house they are asleep in (HouseDoor): they come out to the door and stand there a while for

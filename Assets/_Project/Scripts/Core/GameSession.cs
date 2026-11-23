@@ -264,6 +264,8 @@ public static class GameSession
         RingWork.ForgetGame();
         HavenHorn.ForgetGame();
         SmallScenes.ForgetGame();
+        ResidentSpirits.ForgetGame();
+        PeopleStandings.ForgetGame();
         Forays.ForgetGame();
     }
 }

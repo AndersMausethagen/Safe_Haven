@@ -43,6 +43,7 @@ MonoBehaviour:
       least: 2
       most: 4
       chance: 0.4
+    skill: {fileID: 11400000, guid: 4fde8ce0d82ef0d42b6bc607ec3f9a7a, type: 2}
   - id: misty-woods-2
     raid: {fileID: 11400000, guid: 4c3002f5090022648994d853c2583c8b, type: 2}
     tier: 2
@@ -69,6 +70,7 @@ MonoBehaviour:
       least: 2
       most: 3
       chance: 0.5
+    skill: {fileID: 11400000, guid: e9528bdd6784e9d4eaa85d8753dfa51c, type: 2}
   - id: troll-valley-2
     raid: {fileID: 11400000, guid: cf0ccb14a6b57b643943133b2b29878a, type: 2}
     tier: 2
@@ -91,6 +93,7 @@ MonoBehaviour:
       least: 1
       most: 2
       chance: 0.4
+    skill: {fileID: 11400000, guid: e9528bdd6784e9d4eaa85d8753dfa51c, type: 2}
   - id: misty-woods-3
     raid: {fileID: 11400000, guid: 4c3002f5090022648994d853c2583c8b, type: 2}
     tier: 3
@@ -117,6 +120,7 @@ MonoBehaviour:
       least: 1
       most: 1
       chance: 0.2
+    skill: {fileID: 11400000, guid: a277ba53f2eae0648aa06826e44cbfd8, type: 2}
   - id: moss-marsh-3
     raid: {fileID: 11400000, guid: 1db618a31f9ad294ba8fe8cc857a15f3, type: 2}
     tier: 3
@@ -147,6 +151,7 @@ MonoBehaviour:
       least: 1
       most: 1
       chance: 0.15
+    skill: {fileID: 11400000, guid: 4fde8ce0d82ef0d42b6bc607ec3f9a7a, type: 2}
   - id: troll-valley-4
     raid: {fileID: 11400000, guid: cf0ccb14a6b57b643943133b2b29878a, type: 2}
     tier: 4
@@ -169,6 +174,7 @@ MonoBehaviour:
       least: 1
       most: 1
       chance: 0.15
+    skill: {fileID: 11400000, guid: e9528bdd6784e9d4eaa85d8753dfa51c, type: 2}
   mostMembers: 4
   basePower: 10
   powerPerRank: 5

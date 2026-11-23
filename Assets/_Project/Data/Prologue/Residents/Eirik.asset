@@ -50,6 +50,24 @@ MonoBehaviour:
     lines:
     - That many, and I'm still here. Don't tell the young ones. They'll want to try it.
   returningLines: []
+  talents:
+  - skill: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
+    level: 24
+    passion: 2
+  - skill: {fileID: 11400000, guid: 71d286514cbbbe149ba663b354b4f1ae, type: 2}
+    level: 12
+    passion: 0
+  - skill: {fileID: 11400000, guid: 088b48bc19cfef1429d3cde1d9bc6f5e, type: 2}
+    level: 11
+    passion: 0
+  - skill: {fileID: 11400000, guid: b7b0a5e2ce2709341b1d81708498a315, type: 2}
+    level: 8
+    passion: 1
+  traits:
+  - {fileID: 11400000, guid: 5e3f4d2e51fb96442a61f45b2bb5f93e, type: 2}
+  - {fileID: 11400000, guid: c8a5006c0e4b2e84496605574d37585d, type: 2}
+  friend: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
+  friction: {fileID: 11400000, guid: f8b63bb3e2db2fb44947d33b612f80f3, type: 2}
   jobs:
   - {fileID: 11400000, guid: f918ba89b7b235448905310320940c70, type: 2}
   questLine:

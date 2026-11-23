@@ -141,6 +141,7 @@ public static class RingWork
         ClaimedRocks.Clear();
         ClaimedPainted.Clear();
         Near.Clear();
+        awayWorkers = null;
     }
 
     /// <summary>A woodcutter takes this tree (until <see cref="Release"/>).</summary>
@@ -530,11 +531,15 @@ public static class RingWork
                 continue;
             }
 
-            speed += kind == RingKind.Quarry ? settings.AwayQuarryShare : settings.AwayFellingShare;
+            // A practised feller or quarrier counts for more (their Woodcutting or Mining: ResidentTalents).
+            float share = kind == RingKind.Quarry ? settings.AwayQuarryShare : settings.AwayFellingShare;
+            speed += share * ResidentTalents.SpeedAt(record, SkillOf(kind));
+            (awayWorkers ??= new List<ResidentRecord>()).Add(record);
         }
 
         if (speed <= 0f)
         {
+            awayWorkers?.Clear();
             return;
         }
 
@@ -553,6 +558,13 @@ public static class RingWork
             {
                 clock -= each;
                 ring.PendingFells++;
+                // Each who worked it learns a share of the tree or rock (ResidentTalents).
+                foreach (ResidentRecord worker in awayWorkers)
+                {
+                    ResidentTalents.Practise(worker, SkillOf(kind), 1,
+                        LevelingSettings.Current.TierExperience(1) * PeopleSettings.Current.RingPractice / awayWorkers.Count);
+                }
+
                 IEnumerable<ItemAmount> gives = kind == RingKind.Quarry ? settings.AwayRockYield : Logs(settings.AverageTreeHeight, settings, () => Random.value);
                 foreach (ItemAmount given in gives)
                 {
@@ -565,9 +577,18 @@ public static class RingWork
             }
 
             AwayClock[ring] = clock;
+            awayWorkers.Clear();
             return;
         }
+
+        awayWorkers?.Clear();
     }
+
+    // Who worked the rings this stretch away, for their practice; cleared after each.
+    private static List<ResidentRecord> awayWorkers;
+
+    private static ProficiencyDefinition SkillOf(RingKind kind) =>
+        kind == RingKind.Quarry ? PeopleSettings.Current.QuarrySkill : PeopleSettings.Current.FellingSkill;
 
     /// <summary>
     /// At home again: the trees felled and rocks broken while away are laid down (nearest the centre first, none a ring worker is already

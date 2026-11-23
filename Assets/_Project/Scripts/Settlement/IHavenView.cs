@@ -75,6 +75,8 @@ public interface IHavenView
     float JobBonus(Func<JobDefinition, float> bonus);
 
     IReadOnlyList<FallenRecord> Fallen { get; }
+    /// <summary>How two residents stand with each other, by their ids: -2.5 (Rival) to 2.5 (Friend) (PeopleStandings).</summary>
+    float StandingOf(string a, string b);
     FallenRecord LostToFind { get; }
     bool IsFallen(ResidentDefinition resident);
     FallenRecord RecentLoss(int raidsItLasts);

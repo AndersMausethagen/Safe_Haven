@@ -41,6 +41,10 @@ public sealed class ResidentDefender
         }
 
         guard = Companion.SpawnAs(prefab, who, how, here.position, false, false);
+        // Who they are counts at the ward too: talents, traits, marks and their own kit (CompanionPeople).
+        ResidentRecord record = GameSession.Here.Find(who);
+        guard.KitWeapon = how == who.RaidCompanion ? CompanionKit.ShownWeapon(record) : null;
+        CompanionPeople.Apply(guard, record, true, false);
         guard.Command(CompanionOrder.Stay, post);
         Show(false);
     }

@@ -383,9 +383,9 @@ public sealed class KeeperHud : MonoBehaviour
     {
         if (thing is ResidentNpc person)
         {
-            // Their rank in their work, as a badge before the job (SettlementSettings › Worker Ranks).
+            // Their rank in their work, as a badge before the job (their job skill's level: ResidentTalents).
             ResidentRecord record = person.Resident != null ? GameSession.Here.Find(person.Resident) : null;
-            string rank = record != null && person.Job != null ? SettlementSettings.Current.RankFor(record.WorkDone).name : "";
+            string rank = record != null && person.Job != null ? ResidentTalents.RankName(record) : "";
             string job = person.Job != null ? (string.IsNullOrEmpty(rank) ? person.Job.DisplayName : $"{rank} {person.Job.DisplayName}") : "No work yet";
             return person.TryGetComponent(out ResidentLife life) ? $"{job} · {Doing(life)}" : job;
         }

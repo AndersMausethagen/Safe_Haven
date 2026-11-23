@@ -42,6 +42,17 @@ public sealed class ResidentDefinition : ScriptableObject, IQuestTarget
     [Tooltip("What they say when a memory the forest took comes back, in their own words. A kind left out uses Settlement Settings' general lines.")]
     [SerializeField] private System.Collections.Generic.List<CompanionMemoryLines> returningLines = new System.Collections.Generic.List<CompanionMemoryLines>();
 
+    [Header("Who they are")]
+    [Tooltip("Where they start in the skills they had before the forest (the player's scale: 10 is ordinary), and what they love. " +
+             "Every skill left out starts at People Settings › Unlisted Level (Docs/PeopleResearch_2026-11-23.md §3.1).")]
+    [SerializeField] private System.Collections.Generic.List<TalentStart> talents = new System.Collections.Generic.List<TalentStart>();
+    [Tooltip("Their two or three traits (§3.3): what they do differently, each with its tell.")]
+    [SerializeField] private System.Collections.Generic.List<ResidentTraitDefinition> traits = new System.Collections.Generic.List<ResidentTraitDefinition>();
+    [Tooltip("The one they get on with from the start (§3.5): they begin Friendly, once both live here.")]
+    [SerializeField] private ResidentDefinition friend;
+    [Tooltip("The one they rub up against from the start: they begin Cool, and argue now and then.")]
+    [SerializeField] private ResidentDefinition friction;
+
     [Header("Jobs")]
     [Tooltip("Jobs they can be given at home. The first is suggested.")]
     [SerializeField] private JobDefinition[] jobs = new JobDefinition[0];
@@ -71,4 +82,32 @@ public sealed class ResidentDefinition : ScriptableObject, IQuestTarget
     public System.Collections.Generic.IReadOnlyList<CompanionMemoryLines> MemoryLines => memoryLines;
     public System.Collections.Generic.IReadOnlyList<CompanionMemoryLines> ReturningLines => returningLines;
     public JobDefinition[] Jobs => jobs;
+    public System.Collections.Generic.IReadOnlyList<TalentStart> Talents => talents;
+    public System.Collections.Generic.IReadOnlyList<ResidentTraitDefinition> Traits => traits;
+    public ResidentDefinition Friend => friend;
+    public ResidentDefinition Friction => friction;
+
+    /// <summary>Their written start in <paramref name="skill"/>, or one with no skill when it isn't listed.</summary>
+    public TalentStart TalentFor(ProficiencyDefinition skill)
+    {
+        foreach (TalentStart start in talents)
+        {
+            if (start.skill != null && start.skill == skill)
+            {
+                return start;
+            }
+        }
+
+        return default;
+    }
+
+    /// <summary>Sets who they are (content tools and tests).</summary>
+    public void SetIdentity(System.Collections.Generic.IEnumerable<TalentStart> starts, System.Collections.Generic.IEnumerable<ResidentTraitDefinition> theirTraits,
+        ResidentDefinition getsOnWith = null, ResidentDefinition rubsAgainst = null)
+    {
+        talents = new System.Collections.Generic.List<TalentStart>(starts ?? new TalentStart[0]);
+        traits = new System.Collections.Generic.List<ResidentTraitDefinition>(theirTraits ?? new ResidentTraitDefinition[0]);
+        friend = getsOnWith;
+        friction = rubsAgainst;
+    }
 }

@@ -209,7 +209,7 @@ public static class Inscriptions
 
     /// <summary>How many Runecraft levels past the player's own the carver at home can carve, by her rank. 0 without one.</summary>
     public static int CarverReach(ResidentRecord carver) =>
-        carver == null ? 0 : carver.Job.CarvesPastAt(SettlementSettings.Current.RankIndex(carver.WorkDone));
+        carver == null ? 0 : carver.Job.CarvesPastAt(ResidentTalents.RankIndex(carver));
 
     /// <summary>
     /// Whether the enchantment can be carved now, and by whom: the player's own hand, or the carver's. <paramref name="problem"/> says
@@ -252,6 +252,7 @@ public static class Inscriptions
         EssenceSettings settings = EssenceSettings.Current;
         from.RemoveAt(slot, 1);
         carver.WorkDone += settings.WorkPerInscriptionGiven;
+        ResidentTalents.PractiseWork(carver, settings.WorkPerInscriptionGiven, stack.Item != null ? stack.Item.Tier : 1);
         Learn(stack.Enchantment, player, "given");
         Study(stack.Enchantment, settings.StudyWork);
         GameEvents.Raise(new GameEvent(GameEventKind.InscriptionGiven, stack.Enchantment, 1, player, detail: carver.Resident));

@@ -322,6 +322,84 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
         }
     }
 
+    // Who they are, in talk (Docs/PeopleResearch_2026-11-23.md): a passion to grow once a bond rank is reached (the player chooses one of
+    // two), the kit they fight with (a weapon or body piece from the bag that suits them, and taking theirs back to mend it), and a hard
+    // mark healed by what heals it. In one's own Haven only: a guest's changes lived on the copy of the host's.
+    private void AddPeopleTopics(MenuPage page, ResidentRecord record, DialogueSpeaker speaker, Action afterAnswer)
+    {
+        Player player = Player.Current;
+        if (record == null || player == null || player.Bag == null || HavenVisit.InHostsHaven)
+        {
+            return;
+        }
+
+        if (record.Talents.PicksOwed > 0)
+        {
+            foreach ((ProficiencyDefinition skill, Passion to) in ResidentTalents.PickOffers(record))
+            {
+                page.Add(new MenuAction(to == Passion.Burning ? $"Help their love of {skill.DisplayName} burn" : $"Help them find a love of {skill.DisplayName}",
+                    to == Passion.Burning ? "Keen to Burning: they learn it faster and shine at it" : "A new passion: they learn it faster and are happier at it",
+                    true, () =>
+                    {
+                        bool picked = ResidentTalents.Pick(record, skill, to);
+                        DialogueBox.Current.Say(speaker, picked
+                            ? to == Passion.Burning ? $"{skill.DisplayName}. Yes. I think it was always that, under everything." : $"{skill.DisplayName}? I'd never thought of it. I will now."
+                            : "Another time.", afterAnswer);
+                    }));
+            }
+        }
+
+        ItemContainer bag = player.Bag.Container;
+        var offered = new HashSet<ItemDefinition>();
+        for (int i = 0; i < bag.SlotCount; i++)
+        {
+            ItemStack stack = bag.GetSlot(i);
+            if (stack.IsEmpty || stack.IsBroken || !offered.Add(stack.Item))
+            {
+                continue;
+            }
+
+            int slot = i;
+            bool weapon = CompanionKit.Fits(record, stack.Item, true);
+            if (weapon || CompanionKit.Fits(record, stack.Item, false))
+            {
+                page.Add(new MenuAction($"Give them your {stack.DisplayName} to fight with", weapon ? "Their weapon beside you and at the ward" : "Their body piece beside you and at the ward",
+                    true, () =>
+                    {
+                        bool given = CompanionKit.Give(record, bag, slot, GameSession.Stash != null ? GameSession.Stash.Items : null, player.transform);
+                        DialogueBox.Current.Say(speaker, given ? $"A {stack.Item.DisplayName}. I'll bring it home, and you with it." : "That won't do for me.", afterAnswer);
+                    }));
+            }
+
+            MarkDefinition healed = ResidentMarks.HealedBy(record, stack.Item);
+            if (healed != null)
+            {
+                page.Add(new MenuAction($"Give them your {stack.Item.DisplayName}", $"For their {healed.DisplayName.ToLowerInvariant()}", true, () =>
+                {
+                    bool used = bag.Remove(stack.Item, 1) > 0 && ResidentMarks.Heal(record, healed);
+                    DialogueBox.Current.Say(speaker, used ? $"That's better. That's... better. Thank you." : "Not now.", afterAnswer);
+                }));
+            }
+        }
+
+        foreach (bool weapon in new[] { true, false })
+        {
+            ItemStack had = weapon ? record.KitWeapon : record.KitBody;
+            if (had.IsEmpty)
+            {
+                continue;
+            }
+
+            string name = CompanionKit.NameOf(record, weapon);
+            page.Add(new MenuAction($"Take back the {name}", had.IsBroken ? "It's broken: mend it and give it back" : $"{Mathf.RoundToInt(had.Durability * 100f)}% sound",
+                true, () =>
+                {
+                    CompanionKit.TakeBack(record, weapon, bag, GameSession.Stash != null ? GameSession.Stash.Items : null, player.transform);
+                    DialogueBox.Current.Say(speaker, CompanionKit.IsTheirs(record, weapon) ? "Mend it well. It knows my hand." : "Here.", afterAnswer);
+                }));
+        }
+    }
+
     // What a piece of worker gear does, in a few words.
     private static string GearLine(ItemDefinition gear)
     {
@@ -396,6 +474,7 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
 
         // Worker gear (WorkerSettings): something from the player's bag to carry more or work faster. Given in person, in their own Haven.
         AddGearTopics(page, GameSession.Here.Find(resident), speaker, afterAnswer);
+        AddPeopleTopics(page, GameSession.Here.Find(resident), speaker, afterAnswer);
 
         // A lesson in their job's skill, once between raids; in their own Haven only (as Liv's carving): a guest's "taught" mark
         // lived on the copy of the host's settlement, undone by the host's next word, and the lesson could be taken again and again.
@@ -403,8 +482,9 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
         if (current != null && current.Teaches != null && record != null && !HavenVisit.InHostsHaven)
         {
             ProficiencyDefinition skill = current.Teaches;
-            string why = record.TaughtSinceRaid ? "Another, after your next raid survived." : $"What a {SettlementSettings.Current.RankFor(record.WorkDone).name} {current.DisplayName} knows";
-            page.Add(new MenuAction($"Ask for a lesson in {skill.DisplayName}", why, !record.TaughtSinceRaid, () =>
+            bool more = record.TaughtSinceRaid && record.Inspiration == Inspiration.Lesson;
+            string why = more ? "They have more to teach today." : record.TaughtSinceRaid ? "Another, after your next raid survived." : $"What a {ResidentTalents.RankName(record)} {current.DisplayName} knows ({skill.DisplayName} {ResidentTalents.LevelOf(record, skill)})";
+            page.Add(new MenuAction($"Ask for a lesson in {skill.DisplayName}", why, !record.TaughtSinceRaid || more, () =>
             {
                 int learned = ExperienceTracker.TakeLesson(record);
                 DialogueBox.Current.Say(speaker, learned > 0

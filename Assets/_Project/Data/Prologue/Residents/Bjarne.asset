@@ -30,6 +30,24 @@ MonoBehaviour:
   raidCompanion: {fileID: 11400000, guid: 60d284aaf3c06f24fba9e928940c43c5, type: 2}
   memoryLines: []
   returningLines: []
+  talents:
+  - skill: {fileID: 11400000, guid: 8d43d0e08472c694fa5c6c56cdcdb5a8, type: 2}
+    level: 24
+    passion: 2
+  - skill: {fileID: 11400000, guid: 088b48bc19cfef1429d3cde1d9bc6f5e, type: 2}
+    level: 18
+    passion: 1
+  - skill: {fileID: 11400000, guid: e9528bdd6784e9d4eaa85d8753dfa51c, type: 2}
+    level: 12
+    passion: 0
+  - skill: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
+    level: 13
+    passion: 0
+  traits:
+  - {fileID: 11400000, guid: 6eec78a8f4fcf3b40b04394917aa2e40, type: 2}
+  - {fileID: 11400000, guid: 36c653f3ad1969c4c985a01613303669, type: 2}
+  friend: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
+  friction: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
   jobs:
   - {fileID: 11400000, guid: be5a576d696f9f6459c1667a3521f7b8, type: 2}
   questLine:

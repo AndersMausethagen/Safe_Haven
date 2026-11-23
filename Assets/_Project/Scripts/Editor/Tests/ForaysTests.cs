@@ -55,8 +55,13 @@ public sealed class ForaysTests
 
         // Rank, raids along and gear each add power: level, experience, equipment.
         var novice = new ResidentRecord(People(1)[0]);
-        var veteran = new ResidentRecord(People(1)[0]) { WorkDone = 100000, RaidsAlong = 5 };
-        Assume.That(SettlementSettings.Current.RankIndex(veteran.WorkDone) > 0);
+        var veteran = new ResidentRecord(People(1)[0]) { RaidsAlong = 5 };
+        foreach (ProficiencyDefinition skill in LevelingSettings.Current.Skills)
+        {
+            veteran.Talents.SetExperience(skill.Id, LevelingSettings.Current.TotalExperienceFor(LevelingSettings.Current.MaxLevel));
+        }
+
+        Assert.Greater(ResidentTalents.RankIndex(veteran), 0, "a master of their work");
         Assert.AreEqual(Settings.BasePower, Forays.PowerOf(novice, Settings), 0.001f);
         Assert.Greater(Forays.PowerOf(veteran, Settings), Forays.PowerOf(novice, Settings) + 5f * Settings.PowerPerRaid);
     }

@@ -98,6 +98,18 @@ public sealed class Companion : MonoBehaviour, IConversationTopics, IQuestPerson
 
     public CompanionDefinition Definition => definition;
 
+    /// <summary>More chance of reading a blow and stepping aside: who they are (CompanionPeople), kept under PeopleSettings › Most Dodge.</summary>
+    public float DodgeBonus { get; set; }
+
+    /// <summary>A share further they notice foes in the dark (Night Eyes: CompanionPeople).</summary>
+    public float NightSight { get; set; }
+
+    /// <summary>Their swings and arrows (CompanionPeople sets the kit's damage on it).</summary>
+    public CompanionWeapon Weapon => weapon;
+
+    /// <summary>The weapon the player gave them, shown in their hand instead of their kind's (CompanionKit). Set before they arm.</summary>
+    public ItemDefinition KitWeapon { get; set; }
+
     /// <summary>Its body (animations, weapon), for a practice duel that borrows it (CompanionSpar).</summary>
     public CompanionBody Body => body;
     public CompanionOrder Order { get; private set; }
@@ -108,6 +120,9 @@ public sealed class Companion : MonoBehaviour, IConversationTopics, IQuestPerson
     /// <summary>What this raid has been for them, kept for when they get home.</summary>
     public int TimesHelpedUp { get; private set; }
     public int Kills { get; private set; }
+
+    /// <summary>Foes felled, by the creature's id (marks earned by deeds: ResidentMarks).</summary>
+    public System.Collections.Generic.Dictionary<string, int> KillsBy { get; } = new System.Collections.Generic.Dictionary<string, int>();
 
     /// <summary>On a raid: they were down too long and the forest has them (SettlementState.LoseResident).</summary>
     public bool IsLost { get; private set; }
@@ -259,7 +274,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics, IQuestPerson
     private void Update()
     {
         leader.Follow(Player.Current);
-        body.Arm(definition);
+        body.Arm(definition, KitWeapon);
         bool talking = !IsDowned && ((talkable != null && talkable.IsTalking) || DialogueBox.IsTalkingTo(transform)) &&
             !MonsterAI.AnyHuntingPlayerSide();
         body.SetSheathed(talking);
@@ -492,7 +507,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics, IQuestPerson
 
             watching = monster;
             watchAgainAt = Time.time + attack.HitDelay + 0.5f;
-            if (UnityEngine.Random.value >= definition.ReadsAttacks)
+            if (UnityEngine.Random.value >= Mathf.Min(PeopleSettings.Current.MostDodge, definition.ReadsAttacks + DodgeBonus))
             {
                 continue;
             }
@@ -577,7 +592,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics, IQuestPerson
         threatMonsters.Clear();
         IDamageable leaderBody = leader.Player.Health;
         MonsterAI leaderTarget = leader.Target;
-        float awareness = definition.Awareness;
+        float awareness = definition.Awareness * (NightSettings.IsDark ? 1f + NightSight : 1f);
         Vector3 self = transform.position;
         Vector3 leaderPosition = leader.Player.transform.position;
         foreach (MonsterAI monster in MonsterAI.Active)
@@ -612,6 +627,11 @@ public sealed class Companion : MonoBehaviour, IConversationTopics, IQuestPerson
         if (result.Killed && damage.Source == combatant)
         {
             Kills++;
+            string kind = victim is Component part && part.TryGetComponent(out MonsterAI monster) && monster.Definition != null ? monster.Definition.Id : null;
+            if (kind != null)
+            {
+                KillsBy[kind] = KillsBy.TryGetValue(kind, out int had) ? had + 1 : 1;
+            }
         }
     }
 

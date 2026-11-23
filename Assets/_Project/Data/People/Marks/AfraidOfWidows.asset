@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76e0c92852a3914498e494feab24c1f5, type: 3}
+  m_Name: AfraidOfWidows
+  m_EditorClassIdentifier: SafeHaven::MarkDefinition
+  id: afraid_of_widows
+  displayName: Afraid of Widows
+  icon: Drop
+  description: 'Went down with legs all round them and still dreams of it: a tenth softer against spiders.'
+  good: 0
+  effects:
+  - kind: 24
+    amount: -0.1
+    skill: {fileID: 0}
+    partySize: 0
+    creature: widow
+  cause: 2
+  chance: 0.15
+  creature: widow
+  count: 5
+  healedBy: {fileID: 0}
+  friendsHeal: 0
+  turnsInto: {fileID: 11400000, guid: 06600b4c15f0a8b4a846f763d4f77eef, type: 2}
+  heldByTheForest: 0
+  line: Too many legs. I don't want to talk about it.

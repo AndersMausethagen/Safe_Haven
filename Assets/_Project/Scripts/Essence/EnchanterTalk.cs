@@ -34,7 +34,7 @@ public static class EnchanterTalk
 
         int reach = Inscriptions.CarverReach(carver);
         int own = Inscriptions.RunecraftLevel();
-        page.Add(new MenuAction("Ask what she can carve", $"{SettlementSettings.Current.RankFor(carver.WorkDone).name}: Runecraft {own + reach}", true,
+        page.Add(new MenuAction("Ask what she can carve", $"{ResidentTalents.RankName(carver)}: Runecraft {own + reach}", true,
             () => DialogueBox.Current.Say(speaker,
                 $"With my hands on the chisel, marks up to Runecraft {own + reach}: {reach} past your own. Every inscription you bring me teaches me " +
                 "something, even one you already know. And every mark we cut together.", afterAnswer)));

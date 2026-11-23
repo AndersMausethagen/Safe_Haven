@@ -104,9 +104,9 @@ public sealed class CompanionBody
         }
     }
 
-    /// <summary>Puts the definition's weapon in the hand at its grip (a bow in the left hand). Once; later calls do
-    /// nothing.</summary>
-    public void Arm(CompanionDefinition definition)
+    /// <summary>Puts the definition's weapon in the hand at its grip (a bow in the left hand), or <paramref name="given"/>, the one the
+    /// player gave them (CompanionKit). Once; later calls do nothing.</summary>
+    public void Arm(CompanionDefinition definition, ItemDefinition given = null)
     {
         if (IsArmed)
         {
@@ -114,7 +114,7 @@ public sealed class CompanionBody
         }
 
         IsArmed = true;
-        ItemDefinition weapon = definition.Weapon;
+        ItemDefinition weapon = given != null ? given : definition.Weapon;
         if (weapon == null || animator == null || !animator.isHuman)
         {
             return;

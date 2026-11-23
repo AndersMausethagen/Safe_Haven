@@ -15,6 +15,9 @@ MonoBehaviour:
   scenes:
   - first: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
     second: {fileID: 11400000, guid: f8b63bb3e2db2fb44947d33b612f80f3, type: 2}
+    kind: 0
+    cleared: 
+    hardened: 
     doing: Laughing
     at: 0
     lines:
@@ -24,6 +27,9 @@ MonoBehaviour:
     - Then the snow and I agree on something.
   - first: {fileID: 11400000, guid: ec38b2d8e58d6d84899dfeda6a4f8aeb, type: 2}
     second: {fileID: 11400000, guid: 15e2a45207d23dd49a4a3a93e8bb8161, type: 2}
+    kind: 0
+    cleared: 
+    hardened: 
     doing: Talking
     at: 0
     lines:
@@ -33,6 +39,9 @@ MonoBehaviour:
     - A farmer who counts. I like you less already.
   - first: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
     second: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
+    kind: 0
+    cleared: 
+    hardened: 
     doing: Telling a story
     at: 0
     lines:
@@ -42,6 +51,9 @@ MonoBehaviour:
     - Fewer. Not none.
   - first: {fileID: 11400000, guid: 9f83966b2e3c8fe42a58fd9d130cb08e, type: 2}
     second: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
+    kind: 0
+    cleared: 
+    hardened: 
     doing: Talking
     at: 1
     lines:
@@ -51,6 +63,9 @@ MonoBehaviour:
     - I saw where it stopped to rest. Twice.
   - first: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
     second: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
+    kind: 0
+    cleared: 
+    hardened: 
     doing: Singing
     at: 0
     lines:
@@ -60,6 +75,9 @@ MonoBehaviour:
     - We both have hammers, Bjarne.
   - first: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
     second: {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}
+    kind: 0
+    cleared: 
+    hardened: 
     doing: Talking
     at: 1
     lines:
@@ -69,6 +87,9 @@ MonoBehaviour:
     - No. But it's honest.
   - first: {fileID: 11400000, guid: 9f83966b2e3c8fe42a58fd9d130cb08e, type: 2}
     second: {fileID: 11400000, guid: 15e2a45207d23dd49a4a3a93e8bb8161, type: 2}
+    kind: 0
+    cleared: 
+    hardened: 
     doing: Laughing
     at: 0
     lines:
@@ -78,6 +99,9 @@ MonoBehaviour:
     - I cooked for a jarl once. He never once complained about the boar.
   - first: {fileID: 11400000, guid: ec38b2d8e58d6d84899dfeda6a4f8aeb, type: 2}
     second: {fileID: 11400000, guid: f8b63bb3e2db2fb44947d33b612f80f3, type: 2}
+    kind: 0
+    cleared: 
+    hardened: 
     doing: Singing
     at: 1
     lines:
@@ -87,6 +111,9 @@ MonoBehaviour:
     - There. Now the ground knows your voice.
   - first: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
     second: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
+    kind: 0
+    cleared: 
+    hardened: 
     doing: Talking
     at: 0
     lines:
@@ -94,6 +121,162 @@ MonoBehaviour:
     - Then I'll stand at the end of it tonight.
     - Not alone.
     - Never alone. That's the whole point of a wall.
+  - first: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
+    second: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
+    kind: 1
+    cleared: 
+    hardened: 
+    doing: Talking
+    at: 0
+    lines:
+    - Thirty years I've cut wood. You're the first smith who didn't call it soft.
+    - It is soft. That's why it needs good nails.
+    - You'll have my best oak for your hammer handles. Till I'm dead.
+    - Then cut slowly, old man.
+  - first: {fileID: 11400000, guid: f8b63bb3e2db2fb44947d33b612f80f3, type: 2}
+    second: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
+    kind: 1
+    cleared: 
+    hardened: 
+    doing: Talking
+    at: 1
+    lines:
+    - I've been watching how you set a beam. You were right about the snow.
+    - Say that again. Slowly. I want to remember it.
+    - Once. That was the once.
+    - Then I'll build you something stone can't do. A boat.
+  - first: {fileID: 11400000, guid: ec38b2d8e58d6d84899dfeda6a4f8aeb, type: 2}
+    second: {fileID: 11400000, guid: 15e2a45207d23dd49a4a3a93e8bb8161, type: 2}
+    kind: 1
+    cleared: 
+    hardened: 
+    doing: Laughing
+    at: 0
+    lines:
+    - I planted a row of the old barley. From home. Only six seeds were left.
+    - Then the first loaf from it is yours, and nobody else's.
+    - We'll eat it together. My mother would have liked you.
+    - Everyone's mother liked me. It was the stew.
+  - first: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
+    second: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
+    kind: 1
+    cleared: 
+    hardened: 
+    doing: Telling a story
+    at: 0
+    lines:
+    - When the stones broke, you went back for Liv. I never thanked you.
+    - You were busy holding the rest of us together.
+    - I'm thanking you now.
+    - Then I'll go back for anyone. Tell them that.
+  - first: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
+    second: {fileID: 11400000, guid: 9f83966b2e3c8fe42a58fd9d130cb08e, type: 2}
+    kind: 1
+    cleared: 
+    hardened: 
+    doing: Talking
+    at: 1
+    lines:
+    - You walk like the woods taught you. Quiet on the outside of the foot.
+    - Nobody taught me. Everything that didn't learn it is dead.
+    - Then walk with me tonight. Two sets of eyes.
+    - One more set is a crowd. Fine. Tonight.
+  - first: {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}
+    second: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
+    kind: 1
+    cleared: 
+    hardened: 
+    doing: Talking
+    at: 0
+    lines:
+    - You read the stones better than I ever did. Tell me what they say about the curse.
+    - That it remembers. Like us. That it can be argued with.
+    - Then we argue. Together, at the altar, tomorrow.
+    - Bring the old book. And don't hide the last page this time.
+  - first: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
+    second: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
+    kind: 2
+    cleared: Show me the mark. Slowly. With words a smith knows.
+    hardened: Stay away from my forge.
+    doing: Arguing
+    at: 0
+    lines:
+    - You've been at my anvil with chalk again.
+    - The marks on it were wrong. Your iron cracks because of them.
+    - My iron cracks because it's cold. Not because of your scratching.
+    - Then explain the three blades that broke on the same mark.
+  - first: {fileID: 11400000, guid: 15e2a45207d23dd49a4a3a93e8bb8161, type: 2}
+    second: {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}
+    kind: 2
+    cleared: Next time ask. And wash it twice.
+    hardened: Then buy your own, and keep your hands off mine.
+    doing: Arguing
+    at: 0
+    lines:
+    - Something in my pot smelled of bog this morning.
+    - I borrowed it for an hour. The draught needed a wide pot.
+    - My pot is for food. Your swamp water goes in your own.
+    - Mine is cracked. Would you rather I let them bleed?
+  - first: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
+    second: {fileID: 11400000, guid: 9f83966b2e3c8fe42a58fd9d130cb08e, type: 2}
+    kind: 2
+    cleared: Tell me what you saw out there, then. I'll listen first.
+    hardened: Then don't expect anyone to come looking.
+    doing: Arguing
+    at: 0
+    lines:
+    - You went past the north stones alone again.
+    - I always go alone. That's why I come back.
+    - We go out together and come back together. That's the rule here.
+    - Your rule. The woods have their own.
+  - first: {fileID: 11400000, guid: f8b63bb3e2db2fb44947d33b612f80f3, type: 2}
+    second: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
+    kind: 2
+    cleared: Then I'll build it high enough for you to stand behind. Properly.
+    hardened: Then stand somewhere else.
+    doing: Arguing
+    at: 0
+    lines:
+    - You leaned your shield on my new wall. It's not dry.
+    - It's a wall. It'll be leaned on worse than that.
+    - By trolls. Not by the Haven's own warden.
+    - Walls don't stop what's coming. People at walls do.
+  - first: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
+    second: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
+    kind: 2
+    cleared: Start an hour later and I'll find you better ore than you've ever had.
+    hardened: Then don't ask me what's out there tonight.
+    doing: Arguing
+    at: 0
+    lines:
+    - The hammering starts before light. Every day.
+    - Iron is best worked at dawn. Always has been.
+    - I come home at dawn. I sleep at dawn.
+    - Then sleep further from the forge.
+  - first: {fileID: 11400000, guid: 9f83966b2e3c8fe42a58fd9d130cb08e, type: 2}
+    second: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
+    kind: 2
+    cleared: Leave the old ones standing, then. Cut the young. I'll show you which.
+    hardened: Then I'll sleep in a tree. Further from you.
+    doing: Arguing
+    at: 0
+    lines:
+    - You felled the old pine by the east path. The deer used it.
+    - The Haven used it. For a roof over your head.
+    - I had a roof over my head for twenty years. The trees.
+    - And look how warm that kept you.
+  - first: {fileID: 11400000, guid: ec38b2d8e58d6d84899dfeda6a4f8aeb, type: 2}
+    second: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
+    kind: 2
+    cleared: Thank you. For whatever it was. Go round anyway.
+    hardened: Then guard the fence from outside it.
+    doing: Arguing
+    at: 0
+    lines:
+    - Your boots were in my beds again. The flax won't stand now.
+    - There was something by the fence at night. I went the short way.
+    - The short way is round. Round the beds.
+    - Next time I'll let it eat the flax.
   restSeconds: 300
   lineSeconds: 4.5
   lingerSeconds: 25

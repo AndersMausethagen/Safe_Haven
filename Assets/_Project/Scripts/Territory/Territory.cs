@@ -625,6 +625,8 @@ public static class Territory
         foreach ((LandPartyKind kind, string region, ResidentRecord who) in parties)
         {
             string name = who.Resident.DisplayName;
+            // The leader's job skill grows with the time out (ResidentTalents), the share of it that was spent.
+            ResidentTalents.Practise(who, ResidentTalents.JobSkill(who), 1, LevelingSettings.Current.TierExperience(1) * PeopleSettings.Current.PartyPractice * share);
             if (kind == LandPartyKind.Scout)
             {
                 told.Add($"{name} scouted {region} while you were away" + (PushOn(region) ? ", and has seen the forest gathering there." : ": all quiet."));
