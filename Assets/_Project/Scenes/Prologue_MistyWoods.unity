@@ -25238,10 +25238,10 @@ MonoBehaviour:
         position: {x: 1840, y: 400}
         target: {fileID: 686312984}
         destination: {fileID: 884433736}
-        seconds: 8
-        animationSpeed: 1.6
+        seconds: 11.2
+        animationSpeed: 2.5
         waitUntilArrived: 1
-        followGround: 0
+        followGround: 1
     - rid: 2623126109533504147
       type: {class: SetActiveNode, ns: , asm: SafeHaven}
       data:
@@ -25263,10 +25263,10 @@ MonoBehaviour:
         position: {x: 1840, y: 570}
         target: {fileID: 446123412}
         destination: {fileID: 1735763006}
-        seconds: 8
-        animationSpeed: 1.6
+        seconds: 11.9
+        animationSpeed: 2.5
         waitUntilArrived: 1
-        followGround: 0
+        followGround: 1
     - rid: 2623126109533504150
       type: {class: SetActiveNode, ns: , asm: SafeHaven}
       data:
@@ -25288,10 +25288,10 @@ MonoBehaviour:
         position: {x: 1840, y: 740}
         target: {fileID: 89604669}
         destination: {fileID: 62053078}
-        seconds: 8
-        animationSpeed: 1.6
+        seconds: 10.8
+        animationSpeed: 2.5
         waitUntilArrived: 1
-        followGround: 0
+        followGround: 1
     - rid: 2623126109533504153
       type: {class: SetActiveNode, ns: , asm: SafeHaven}
       data:
@@ -28064,7 +28064,7 @@ Terrain:
   m_ScaleInLightmap: 0.10451156
   m_LightmapParameters: {fileID: 15203, guid: 0000000000000000f000000000000000, type: 0}
   m_GroupingID: 0
-  m_RenderingLayerMask: 1
+  m_RenderingLayerMask: 257
   m_AllowAutoConnect: 1
   m_EnableHeightmapRayTracing: 1
   m_EnableTreesAndDetailsRayTracing: 0
@@ -40757,6 +40757,7 @@ MonoBehaviour:
       fromTier: 0
       toTier: 0
       fixedAmount: 0
+      onlyInRaid: {fileID: 0}
     - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
       resource: {fileID: 0}
       minQuantity: 1
@@ -40765,6 +40766,7 @@ MonoBehaviour:
       fromTier: 0
       toTier: 0
       fixedAmount: 0
+      onlyInRaid: {fileID: 0}
     - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
       resource: {fileID: 0}
       minQuantity: 2
@@ -40773,6 +40775,7 @@ MonoBehaviour:
       fromTier: 0
       toTier: 0
       fixedAmount: 0
+      onlyInRaid: {fileID: 0}
   lockPins: 3
   fullVisual: {fileID: 1208768822}
   emptyVisual: {fileID: 993608490}
@@ -105749,10 +105752,6 @@ PrefabInstance:
       propertyPath: id
       value: 7410715367ce434c9fb065069e43fbb2
       objectReference: {fileID: 0}
-    - target: {fileID: 4057995115595459978, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 2100000, guid: 01db36992e73b4e488d73b98ab76ce62, type: 2}
     - target: {fileID: 5332423549510025971, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -105761,10 +105760,6 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5586429046834746374, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 2100000, guid: 01db36992e73b4e488d73b98ab76ce62, type: 2}
     - target: {fileID: 8875997469976927249, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -109143,7 +109138,7 @@ Terrain:
   m_ScaleInLightmap: 1
   m_LightmapParameters: {fileID: 15203, guid: 0000000000000000f000000000000000, type: 0}
   m_GroupingID: 0
-  m_RenderingLayerMask: 1
+  m_RenderingLayerMask: 257
   m_AllowAutoConnect: 1
   m_EnableHeightmapRayTracing: 1
   m_EnableTreesAndDetailsRayTracing: 0
