@@ -51,6 +51,13 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     private float stuckSince = -1f;
     private float nextGestureAt;
     private float ringAngle;
+    // A habit of theirs at work now (PeopleHabits): where it takes them.
+    private bool inHabit;
+    private int habitKey = -1;
+    private bool habitFound;
+    private HabitPlace habitPlace;
+    private Vector3 habitAt;
+    private Quaternion habitFacing;
     private float workShift;
     private GameObject tool;
     private ItemDefinition toolItem;
@@ -462,12 +469,30 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         // Two friends meeting (SmallScenes): their free time at the spot the scene chose, facing each other.
         bool scene = next == ResidentActivity.Fire && !danger && Festivals.Now == null && npc.Resident != null
             && SmallScenes.SpotFor(npc.Resident, out sceneAt, out sceneLook);
-        if (next == activity && scaffold == building && ring == fellingRing && scene == inScene && started && !atOnce && !again)
+        // A habit of one of their traits (PeopleHabits): free time, or a meal, spent where it says, not at the fire.
+        TraitHabit doing = default;
+        bool habit = !scene && !danger && Festivals.Now == null && PeopleHabits.Now(npc.Record, hour, next, out doing);
+        if (habit)
+        {
+            // Found once for a habit (the lanes once a half hour), not every think: places are looked up in the scene.
+            int key = (int)doing.place * 100 + (doing.place == HabitPlace.Lanes ? Mathf.FloorToInt(hour * 2f) : 0);
+            if (key != habitKey || !inHabit)
+            {
+                habitKey = key;
+                habitFound = HabitSpot(doing.place, hour, out habitAt, out habitFacing);
+            }
+
+            habit = habitFound;
+        }
+        HabitPlace place0 = habit ? doing.place : habitPlace;
+        if (next == activity && scaffold == building && ring == fellingRing && scene == inScene && habit == inHabit && place0 == habitPlace && started && !atOnce && !again)
         {
             return;
         }
 
         inScene = scene;
+        inHabit = habit;
+        habitPlace = place0;
 
         building = scaffold;
         if (ring != fellingRing || ring == null)
@@ -523,6 +548,11 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
                 place = workSpot;
                 facing = workFacing;
                 break;
+            case ResidentActivity.Fire when inHabit:
+            case ResidentActivity.Meal when inHabit:
+                place = habitAt;
+                facing = habitFacing;
+                break;
             case ResidentActivity.Fire when inScene:
                 place = sceneAt;
                 Vector3 toFriend = sceneLook - sceneAt;
@@ -531,7 +561,7 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
                 break;
             default:
                 Vector3 centre = Gathering(next, settings);
-                Vector3 round = Quaternion.Euler(0f, ringAngle, 0f) * Vector3.forward;
+                Vector3 round = Quaternion.Euler(0f, SeatAngle(), 0f) * Vector3.forward;
                 place = centre + round * RingRadius;
                 facing = Quaternion.LookRotation(-round);
                 break;
@@ -563,6 +593,151 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
 
     // Where they gather: the fire nearest their home if there is one, else the portal. In danger, always the portal: it is the
     // heart of the place.
+    // Their place round the fire: beside a friend sitting there (Friendly or better), across from a rival; else their own seat.
+    private float SeatAngle()
+    {
+        ResidentRecord record = npc.Record;
+        if (record == null || HavenVisit.IsVisiting)
+        {
+            return ringAngle;
+        }
+
+        float rival = float.NaN;
+        foreach (ResidentLife other in Living)
+        {
+            if (other == this || other.npc == null || other.npc.Record == null || other.inHabit || other.inScene
+                || (other.activity != ResidentActivity.Fire && other.activity != ResidentActivity.Meal))
+            {
+                continue;
+            }
+
+            int level = PeopleStandings.LevelOf(GameSession.Here, record, other.npc.Record);
+            if (level >= 1)
+            {
+                return other.ringAngle + 24f;
+            }
+
+            if (level <= -1 && float.IsNaN(rival))
+            {
+                rival = other.ringAngle + 180f;
+            }
+        }
+
+        return float.IsNaN(rival) ? ringAngle : rival;
+    }
+
+    // Where a habit takes them now (PeopleHabits), from their home and the Haven's places. False where there is no such place.
+    private bool HabitSpot(HabitPlace kind, float hour, out Vector3 at, out Quaternion facingThere)
+    {
+        at = default;
+        facingThere = transform.rotation;
+        Vector3 portal = HomePortal.Current != null ? HomePortal.Current.transform.position : home;
+        Vector3 from = npc.TryGetHome(out Vector3 door, out _, out _) ? door : home;
+        Vector3 look = portal;
+        switch (kind)
+        {
+            case HabitPlace.Edge:
+            {
+                Vector3 out0 = from - portal;
+                out0.y = 0f;
+                out0 = out0.sqrMagnitude > 1f ? out0.normalized : Quaternion.Euler(0f, ringAngle, 0f) * Vector3.forward;
+                at = portal + out0 * ((from - portal).magnitude + 18f);
+                look = at + out0;
+                break;
+            }
+            case HabitPlace.Stones:
+            {
+                OfferingStone nearest = null;
+                float best = 190f * 190f;
+                foreach (OfferingStone stone in FindObjectsByType<OfferingStone>())
+                {
+                    float distance = (stone.transform.position - from).sqrMagnitude;
+                    if (distance < best)
+                    {
+                        best = distance;
+                        nearest = stone;
+                    }
+                }
+
+                if (nearest == null)
+                {
+                    return false;
+                }
+
+                look = nearest.transform.position;
+                Vector3 back = from - look;
+                back.y = 0f;
+                at = look + (back.sqrMagnitude > 0.01f ? back.normalized : Vector3.forward) * 2.5f;
+                break;
+            }
+            case HabitPlace.Water:
+                if (!SmallScenes.Shore(from, out at))
+                {
+                    return false;
+                }
+
+                look = at + (at - from);
+                break;
+            case HabitPlace.Lanes:
+            {
+                // Door to door as the hours pass: the house for this half hour.
+                var houses = new List<BuildingObject>();
+                foreach (BuildingObject building in BuildingObject.Active)
+                {
+                    if (building != null && building.Beds > 0)
+                    {
+                        houses.Add(building);
+                    }
+                }
+
+                if (houses.Count == 0)
+                {
+                    return false;
+                }
+
+                BuildingObject passing = houses[Mathf.Abs(Mathf.FloorToInt(hour * 2f) + Living.IndexOf(this)) % houses.Count];
+                Vector3 doorOut = passing.Door(out Quaternion outward) ;
+                Vector3 away = outward * Vector3.forward;
+                at = doorOut + away * 3f;
+                look = at + away;
+                break;
+            }
+            case HabitPlace.Watch:
+            {
+                IReadOnlyList<Vector3> posts = GameSession.Here.Posts;
+                if (posts.Count == 0)
+                {
+                    return HabitSpot(HabitPlace.Edge, hour, out at, out facingThere);
+                }
+
+                at = posts[0];
+                foreach (Vector3 post in posts)
+                {
+                    if ((post - from).sqrMagnitude < (at - from).sqrMagnitude)
+                    {
+                        at = post;
+                    }
+                }
+
+                Vector3 outward = at - portal;
+                outward.y = 0f;
+                look = at + (outward.sqrMagnitude > 0.01f ? outward.normalized : Vector3.forward);
+                break;
+            }
+        }
+
+        if (!NavMesh.SamplePosition(at, out NavMeshHit hit, 6f, NavMesh.AllAreas))
+        {
+            return false;
+        }
+
+        at = hit.position;
+        Vector3 toward = look - at;
+        toward.y = 0f;
+        facingThere = toward.sqrMagnitude > 0.01f ? Quaternion.LookRotation(toward) : transform.rotation;
+        return true;
+    }
+
     private Vector3 Gathering(ResidentActivity next, SettlementSettings settings)
     {
         if (Festivals.Now != null && next != ResidentActivity.Shelter)

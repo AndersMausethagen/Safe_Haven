@@ -26,3 +26,8 @@ MonoBehaviour:
   lines:
   - Something moved by the fence last night. I heard it.
   excludes: []
+  habits:
+  - place: 4
+    from: 21
+    until: 22
+    atMeals: 0

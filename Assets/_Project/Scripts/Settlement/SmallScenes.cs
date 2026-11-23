@@ -499,7 +499,7 @@ public sealed class SmallScenes : MonoBehaviour
     }
 
     // A step inland of the still water's shore nearest the first one, if one is near (else the scene is by a fire).
-    private static bool Shore(Vector3 from, out Vector3 at)
+    internal static bool Shore(Vector3 from, out Vector3 at)
     {
         at = default;
         float best = float.MaxValue;

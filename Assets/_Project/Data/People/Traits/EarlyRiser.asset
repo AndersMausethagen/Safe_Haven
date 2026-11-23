@@ -26,3 +26,8 @@ MonoBehaviour:
   lines:
   - Best hour of the day, this. Nobody talking.
   excludes: []
+  habits:
+  - place: 2
+    from: 5.5
+    until: 7
+    atMeals: 0

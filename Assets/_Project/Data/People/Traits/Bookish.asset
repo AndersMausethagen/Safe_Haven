@@ -37,3 +37,8 @@ MonoBehaviour:
   - This stone says something different in the rain. I'm sure of it.
   - Read first. Lift later.
   excludes: []
+  habits:
+  - place: 1
+    from: 18
+    until: 20.5
+    atMeals: 0

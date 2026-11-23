@@ -103,6 +103,8 @@ public sealed class ResidentTraitDefinition : ScriptableObject
     [SerializeField, TextArea] private string[] lines = new string[0];
     [Tooltip("Traits nobody has together with this one.")]
     [SerializeField] private List<ResidentTraitDefinition> excludes = new List<ResidentTraitDefinition>();
+    [Tooltip("Where it takes them in their free time, and when (PeopleHabits): its tell in what they do.")]
+    [SerializeField] private List<TraitHabit> habits = new List<TraitHabit>();
 
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
@@ -112,6 +114,9 @@ public sealed class ResidentTraitDefinition : ScriptableObject
     public IReadOnlyList<TraitEffect> Effects => effects;
     public IReadOnlyList<string> Lines => lines;
     public IReadOnlyList<ResidentTraitDefinition> Excludes => excludes;
+    public IReadOnlyList<TraitHabit> Habits => habits;
+
+    public void SetHabits(IEnumerable<TraitHabit> what) => habits = new List<TraitHabit>(what);
 
     /// <summary>Sets it up (content tools and tests).</summary>
     public void Configure(string traitId, string shownName, string iconName, string about, bool edged, IEnumerable<TraitEffect> changes, IEnumerable<string> said)

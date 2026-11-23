@@ -27,3 +27,8 @@ MonoBehaviour:
   - Count heads. Then count them again.
   - We go out together and we come back together. That's the whole of it.
   excludes: []
+  habits:
+  - place: 4
+    from: 20
+    until: 21
+    atMeals: 0

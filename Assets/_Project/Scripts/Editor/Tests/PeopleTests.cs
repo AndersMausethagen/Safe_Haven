@@ -716,4 +716,31 @@ public sealed class PeopleTests
         report.CompanionLost = true;
         Assert.AreEqual(0, RaidReportCards.CompanionFaces(report).Count, "nothing to show of one the forest has");
     }
+
+    // ----- Habits (Docs/PeopleSystemReview_2026-11-23.md §1.2) -----
+
+    [Test]
+    public void AHabit_TakesThemOutOfTheFire_InItsHours()
+    {
+        ResidentRecord gunnar = Home("Gunnar").Find(Person("Gunnar"));
+        Assert.IsTrue(PeopleHabits.Now(gunnar, 12.5f, ResidentActivity.Meal, out TraitHabit meal), "a loner eats apart");
+        Assert.AreEqual(HabitPlace.Edge, meal.place);
+        Assert.IsTrue(PeopleHabits.Now(gunnar, 20f, ResidentActivity.Fire, out _), "and spends the evening at the edge");
+        Assert.IsFalse(PeopleHabits.Now(gunnar, 15f, ResidentActivity.Fire, out _), "outside its hours");
+        Assert.IsFalse(PeopleHabits.Now(gunnar, 20f, ResidentActivity.Work, out _), "never instead of work");
+        Assert.IsTrue(new TraitHabit(HabitPlace.Lanes, 22f, 2f).At(1f), "a span past midnight");
+        Assert.IsFalse(new TraitHabit(HabitPlace.Lanes, 22f, 2f).At(12f));
+
+        int habits = 0;
+        foreach (ResidentTraitDefinition trait in All<ResidentTraitDefinition>())
+        {
+            foreach (TraitHabit habit in trait.Habits)
+            {
+                habits++;
+                Assert.AreNotEqual(habit.from, habit.until, trait.name + ": an hour or more");
+            }
+        }
+
+        Assert.Greater(habits, 5, "the traits have habits");
+    }
 }

@@ -32,3 +32,8 @@ MonoBehaviour:
   - Measure twice. Then have a cup of something. Then measure again.
   - A good joint takes the time it takes.
   excludes: []
+  habits:
+  - place: 2
+    from: 18
+    until: 20
+    atMeals: 0

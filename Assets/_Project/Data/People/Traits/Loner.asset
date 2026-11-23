@@ -42,3 +42,12 @@ MonoBehaviour:
   - Too many fires in this place. A man can't hear the woods.
   - I'll eat later. Away from the noise.
   excludes: []
+  habits:
+  - place: 0
+    from: 12
+    until: 13
+    atMeals: 1
+  - place: 0
+    from: 19
+    until: 21
+    atMeals: 0

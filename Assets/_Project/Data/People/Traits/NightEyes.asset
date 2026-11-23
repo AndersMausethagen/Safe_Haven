@@ -37,3 +37,8 @@ MonoBehaviour:
   - The marks show best after dark. Everyone else is asleep by then.
   - Mornings are for people who don't see well at night.
   excludes: []
+  habits:
+  - place: 3
+    from: 20
+    until: 23
+    atMeals: 0

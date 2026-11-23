@@ -32,3 +32,8 @@ MonoBehaviour:
   - Sit. Eat something. Tell me.
   excludes:
   - {fileID: 11400000, guid: 3a03e2065b2719b4e97d29ef85942e7e, type: 2}
+  habits:
+  - place: 3
+    from: 18
+    until: 19
+    atMeals: 0
