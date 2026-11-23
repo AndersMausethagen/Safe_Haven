@@ -321,6 +321,9 @@ public sealed class KitButton
     }
 
     /// <summary>Shows this action (none hides the button); <paramref name="name"/> in place of its label when given.</summary>
+    /// <summary>Shows or hides the button (a choice that is only sometimes there).</summary>
+    public void SetActive(bool shown) => root.SetActive(shown);
+
     public void Bind(MenuAction shown, string name = null)
     {
         action = shown;

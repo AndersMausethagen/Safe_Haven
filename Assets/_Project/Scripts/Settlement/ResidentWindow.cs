@@ -33,7 +33,7 @@ public sealed class ResidentWindow : MonoBehaviour
     }
 
     private const int MostTraits = 4;
-    private const int MostStandings = 7;
+    private const int MostStandings = 9;
     private const int MostReasons = 6;
 
     private static ResidentWindow current;
@@ -77,12 +77,20 @@ public sealed class ResidentWindow : MonoBehaviour
     private readonly List<KitStatRow> skillRows = new List<KitStatRow>();
     private readonly List<ProficiencyDefinition> skillOrder = new List<ProficiencyDefinition>();
     private TMP_Text talentNote;
+    private readonly KitButton[] pickButtons = new KitButton[2];
+    private readonly List<(string title, string body, Color colour)> skillTips = new List<(string, string, Color)>();
     private KitStatRow spiritsRow;
+    private TMP_Text spiritsMeans;
     private readonly KitFactRow[] reasonRows = new KitFactRow[MostReasons];
-    private readonly KitFactRow[] standingRows = new KitFactRow[MostStandings];
+    private readonly List<KitPictureCard> standingCards = new List<KitPictureCard>();
+    private readonly List<(string title, string body, Color colour)> standingTips = new List<(string, string, Color)>();
+    private TMP_Text nobodyClose;
     private readonly List<KitPictureCard> markCards = new List<KitPictureCard>();
     private readonly List<(string title, string body, Color colour)> markTips = new List<(string, string, Color)>();
-    private readonly KitFactRow[] kitRows = new KitFactRow[3];
+    private TMP_Text noMarks;
+    private readonly KitPictureCard[] kitCards = new KitPictureCard[2];
+    private TMP_Text kitNote;
+    private KitActionList kitActions;
     private ItemTooltipView tooltip;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -208,6 +216,19 @@ public sealed class ResidentWindow : MonoBehaviour
         RectTransform right = HearthKit.Card(page, "Work Card", rx, 0f, rightWidth, BodyHeight);
         HearthKit.Section(right, "Their work", "Hammer", 22f, 18f);
         jobList = new KitActionList(right, 22f, 58f, rightWidth - 44f, Choose, columns: 1, rowHeight: 62f, nothing: "There is no work here they can do.");
+
+        // The kit they fight with beside the player (CompanionKit): its pictures, what it is on hover, and giving or taking it back here
+        // as in talk (the UX pass of 2026-11-23: the card stood half empty and kit could only be handled by talking).
+        HearthKit.Section(right, "Their kit", "Sword", 22f, 200f);
+        for (int i = 0; i < kitCards.Length; i++)
+        {
+            bool weapon = i == 0;
+            kitCards[i] = new KitPictureCard(right, weapon ? "Kit Weapon" : "Kit Body", 150f, 64f, 2, 15f, () => ShowKitTip(weapon), HideTip);
+            kitCards[i].Place(22f + i * 162f, 240f);
+        }
+
+        kitNote = CodeUI.Paragraph("Kit Note", right, 350f, 244f, rightWidth - 372f, 96f, 16f, style.Muted);
+        kitActions = new KitActionList(right, 22f, 356f, rightWidth - 44f, Choose, columns: 2, rowHeight: 54f, nothing: "");
     }
 
     // Their level in every skill, best first, with its band's name and their passion's flames; a passion to choose, said at the top.
@@ -217,8 +238,14 @@ public sealed class ResidentWindow : MonoBehaviour
         float width = Width - Margin * 2f;
         RectTransform card = HearthKit.Card(page, "Talents Card", 0f, 0f, width, BodyHeight);
         HearthKit.Section(card, "Their talents", "Star", 22f, 18f);
-        talentNote = CodeUI.Label("Note", card, width - 560f, 20f, 536f, 30f, 17f, style.Accent, TextAlignmentOptions.Right);
+        talentNote = CodeUI.Label("Note", card, 300f, 20f, 420f, 30f, 17f, style.Accent, TextAlignmentOptions.Left);
         talentNote.richText = true;
+        // A passion to grow (a bond rank reached): the two offers, chosen right here as in talk.
+        for (int i = 0; i < pickButtons.Length; i++)
+        {
+            pickButtons[i] = new KitButton(card, width - 22f - (2 - i) * 236f + 6f, 10f, 230f, 44f, Choose, KitButtonShape.Row);
+        }
+
         int count = 0;
         foreach (ProficiencyDefinition skill in LevelingSettings.Current.Skills)
         {
@@ -232,11 +259,19 @@ public sealed class ResidentWindow : MonoBehaviour
         {
             float x = 22f + (i / perColumn) * (column + 30f);
             float y = 62f + (i % perColumn) * step;
-            skillRows.Add(new KitStatRow(card, x, y, column, "Skill", "Star", true, 18f, labelWidth: 180f));
+            skillRows.Add(new KitStatRow(card, x, y, column, "Skill", "Star", true, 18f, labelWidth: 220f));
+            // What the level does for them, on hover over the whole row.
+            int index = i;
+            RectTransform hover = CodeUI.At("Skill Hover " + i, card, x, y - 4f, column, step - 4f);
+            Image catcher = hover.gameObject.AddComponent<Image>();
+            catcher.color = Color.clear;
+            var over = hover.gameObject.AddComponent<UIHover>();
+            over.Entered = () => ShowTip(skillTips, index);
+            over.Exited = HideTip;
         }
     }
 
-    // Their spirits and why, how they stand with the others, the marks raids left and the kit they fight with.
+    // Their spirits and why, how they stand with the others (portraits, the standing on hover), and the marks raids left.
     private void BuildBonds(RectTransform page)
     {
         UIStyle style = UIStyle.Current;
@@ -244,18 +279,26 @@ public sealed class ResidentWindow : MonoBehaviour
         const float middleWidth = 372f;
         RectTransform left = HearthKit.Card(page, "Spirits Card", 0f, 0f, leftWidth, BodyHeight);
         HearthKit.Section(left, "Spirits", "Sun", 22f, 18f);
-        spiritsRow = new KitStatRow(left, 22f, 60f, leftWidth - 44f, "Now", "Heart", false, 20f);
+        spiritsRow = new KitStatRow(left, 22f, 58f, leftWidth - 44f, "Now", "Heart", false, 20f);
+        spiritsMeans = CodeUI.Paragraph("Means", left, 24f, 94f, leftWidth - 48f, 44f, 15f, style.Muted);
         for (int i = 0; i < reasonRows.Length; i++)
         {
-            reasonRows[i] = new KitFactRow(left, 22f, 116f + i * 54f, leftWidth - 44f, 250f);
+            reasonRows[i] = new KitFactRow(left, 22f, 146f + i * 54f, leftWidth - 44f, 270f);
         }
 
         RectTransform middle = HearthKit.Card(page, "Standings Card", leftWidth + 16f, 0f, middleWidth, BodyHeight);
         HearthKit.Section(middle, "Friends and rivals", "Bond", 22f, 18f);
-        for (int i = 0; i < standingRows.Length; i++)
+        float portrait = (middleWidth - 44f - 16f) / 3f;
+        for (int i = 0; i < MostStandings; i++)
         {
-            standingRows[i] = new KitFactRow(middle, 22f, 60f + i * 56f, middleWidth - 44f, 180f);
+            int index = i;
+            var card = new KitPictureCard(middle, "Standing " + i, portrait, 84f, 1, 15f, () => ShowTip(standingTips, index), HideTip);
+            card.Place(22f + (i % 3) * (portrait + 8f), 58f + (i / 3) * 136f);
+            standingCards.Add(card);
         }
+
+        nobodyClose = CodeUI.Paragraph("Nobody", middle, 24f, 62f, middleWidth - 48f, 120f, 16f, style.Muted);
+        nobodyClose.text = "Nobody close yet. Scenes at the fire, forays together and work side by side bring people closer.";
 
         float rx = leftWidth + middleWidth + 32f;
         float rightWidth = Width - Margin * 2f - rx;
@@ -265,16 +308,13 @@ public sealed class ResidentWindow : MonoBehaviour
         for (int i = 0; i < 6; i++)
         {
             int index = i;
-            var card = new KitPictureCard(right, "Mark " + i, markWidth, 52f, 2, 14f, () => ShowTip(markTips, index), HideTip);
-            card.Place(22f + (i % 3) * (markWidth + 8f), 58f + (i / 3) * 118f);
+            var card = new KitPictureCard(right, "Mark " + i, markWidth, 64f, 2, 14f, () => ShowTip(markTips, index), HideTip);
+            card.Place(22f + (i % 3) * (markWidth + 8f), 58f + (i / 3) * 130f);
             markCards.Add(card);
         }
 
-        HearthKit.Section(right, "Their kit", "Sword", 22f, 302f);
-        for (int i = 0; i < kitRows.Length; i++)
-        {
-            kitRows[i] = new KitFactRow(right, 22f, 342f + i * 44f, rightWidth - 44f, 120f);
-        }
+        noMarks = CodeUI.Paragraph("No Marks", right, 24f, 62f, rightWidth - 48f, 120f, 16f, style.Muted);
+        noMarks.text = "No marks yet. Raids beside you leave them: a steadier hand, an old wound, a fear to face down.";
     }
 
     // Laid over the content, as the raid planner's: the words of a trait or mark on hover.
@@ -303,6 +343,22 @@ public sealed class ResidentWindow : MonoBehaviour
         tooltip = holder.AddComponent<ItemTooltipView>();
         tooltip.Configure(tip, title, body);
         holder.SetActive(true);
+    }
+
+    // Their kit's piece as the bag shows it, with how long it has been with them.
+    private void ShowKitTip(bool weapon)
+    {
+        ResidentRecord record = who != null ? GameSession.Here.Find(who) : null;
+        ItemStack piece = record == null ? ItemStack.Empty : weapon ? record.KitWeapon : record.KitBody;
+        if (tooltip == null || piece.IsEmpty)
+        {
+            return;
+        }
+
+        int raids = CompanionKit.RaidsWith(record, weapon);
+        tooltip.Show(piece, CompanionKit.IsTheirs(record, weapon)
+            ? $"{CompanionKit.NameOf(record, weapon)}: {raids} raids with them."
+            : $"Theirs by name after {PeopleSettings.Current.KitNamedAfter} raids along ({raids} so far).");
     }
 
     private void ShowTip(List<(string title, string body, Color colour)> tips, int index)
@@ -441,6 +497,7 @@ public sealed class ResidentWindow : MonoBehaviour
                 ShowTraits(record, style);
                 chips.Show(Traits(record, style));
                 jobList.Show(JobActions(record));
+                RefreshKit(record, style);
                 break;
             case Tab.Talents:
                 RefreshTalents(record, style);
@@ -793,60 +850,141 @@ public sealed class ResidentWindow : MonoBehaviour
     {
         skillOrder.Clear();
         skillOrder.AddRange(ResidentTalents.BestFirst(record));
+        skillTips.Clear();
+        ProficiencyDefinition job = ResidentTalents.JobSkill(record);
         for (int i = 0; i < skillRows.Count; i++)
         {
             ProficiencyDefinition skill = i < skillOrder.Count ? skillOrder[i] : null;
             if (skill == null)
             {
+                skillTips.Add((null, null, style.Text));
                 continue;
             }
 
             int level = ResidentTalents.LevelOf(record, skill);
-            string flames = ResidentTalents.Flames(ResidentTalents.PassionOf(record, skill));
-            skillRows[i].SetName(skill.DisplayName, IconOf(skill));
-            skillRows[i].Set($"{flames} {level} {ResidentTalents.RankNameAt(level)}", ResidentTalents.LevelShare(record, skill),
-                skill == ResidentTalents.JobSkill(record) ? style.Accent : style.Info, style.Info);
+            Passion passion = ResidentTalents.PassionOf(record, skill);
+            bool works = skill == job && record.Job != null;
+            skillRows[i].SetName(works ? $"{skill.DisplayName} · their work" : skill.DisplayName, IconOf(skill));
+            skillRows[i].Set($"{ResidentTalents.Flames(passion)} {level} {ResidentTalents.RankNameAt(level)}", ResidentTalents.LevelShare(record, skill),
+                works ? style.Accent : style.Info, style.Info);
+            skillTips.Add(($"{skill.DisplayName} {level}", SkillWords(record, skill, level, passion, works), works ? style.Accent : style.Text));
         }
 
-        string note = record.Talents.PicksOwed > 0 ? $"{HearthKit.InlineIcon(ResidentTalents.PassionIcon)} A passion to grow: talk to them" : "";
-        if (record.Inspiration != Inspiration.None)
+        // A passion to grow: the offers as buttons; else what they are inspired with, if anything.
+        List<(ProficiencyDefinition skill, Passion to)> offers = record.Talents.PicksOwed > 0 && !HavenVisit.InHostsHaven
+            ? ResidentTalents.PickOffers(record) : new List<(ProficiencyDefinition, Passion)>();
+        for (int i = 0; i < pickButtons.Length; i++)
         {
-            note = $"{HearthKit.InlineIcon("Spark")} {Inspirations.NameOf(record.Inspiration)}" + (note.Length > 0 ? "   " + note : "");
+            bool shown = i < offers.Count;
+            pickButtons[i].SetActive(shown);
+            if (shown)
+            {
+                (ProficiencyDefinition skill, Passion to) = offers[i];
+                pickButtons[i].Bind(new MenuAction(to == Passion.Burning ? $"{skill.DisplayName}: burn" : $"{skill.DisplayName}: love it",
+                    null, true, () => ResidentTalents.Pick(record, skill, to)) { Icon = ResidentTalents.PassionIcon });
+            }
+        }
+
+        string note = offers.Count > 0 ? $"{HearthKit.InlineIcon(ResidentTalents.PassionIcon)} A passion to grow: choose one" : "";
+        if (record.Inspiration != Inspiration.None && offers.Count == 0)
+        {
+            note = $"{HearthKit.InlineIcon("Spark")} {Inspirations.NameOf(record.Inspiration)}";
         }
 
         talentNote.text = note;
     }
 
+    // What a skill's level does for them, in a few short lines: their work, beside you, how they learn it, and how far to the next level.
+    private static string SkillWords(ResidentRecord record, ProficiencyDefinition skill, int level, Passion passion, bool works)
+    {
+        PeopleSettings people = PeopleSettings.Current;
+        var lines = new List<string> { ResidentTalents.RankNameAt(level) + (passion == Passion.Burning ? ", and they burn for it" : passion == Passion.Keen ? ", and they love it" : "") };
+        if (works)
+        {
+            lines.Add($"Their work runs at x{ResidentTalents.StationSpeed(record):0.00}; {ResidentTalents.ExtraChance(record) * 100f:0}% chance of one more.");
+        }
+        else if (skill == people.BuildingSkill || skill == people.FellingSkill || skill == people.QuarrySkill)
+        {
+            lines.Add($"At a scaffold or a ring: x{ResidentTalents.SpeedAt(record, skill):0.00}.");
+        }
+
+        if (record.Resident != null && record.Resident.RaidCompanion != null && skill == ResidentTalents.FightSkill(record))
+        {
+            lines.Add($"Beside you: +{ResidentTalents.CompanionDamage(record) * 100f:0}% damage.");
+        }
+
+        if (skill == people.MeleeSkill && ResidentTalents.CompanionDodge(record) > 0f)
+        {
+            lines.Add($"Steps aside from blows {ResidentTalents.CompanionDodge(record) * 100f:0}% more often.");
+        }
+
+        float learning = people.LearningFor(passion) * ResidentTraits.LearningOf(record, skill);
+        lines.Add($"Learns it at x{learning:0.##}" + (ResidentTalents.Joy(record, skill) > 0f ? $", {ResidentTalents.Joy(record, skill) * 100f:0}% quicker at it for the joy." : "."));
+        if (level < LevelingSettings.Current.MaxLevel)
+        {
+            lines.Add($"{ResidentTalents.LevelShare(record, skill) * 100f:0}% of the way to {level + 1}.");
+        }
+
+        return string.Join("\n", lines);
+    }
+
     private void RefreshBonds(ResidentRecord record, UIStyle style)
     {
         Spirits spirits = ResidentSpirits.Of(record);
-        spiritsRow.Set($"{HearthKit.InlineIcon(ResidentSpirits.IconOf(spirits))} {ResidentSpirits.NameOf(spirits)}", 0f,
+        spiritsRow.SetName("Now", ResidentSpirits.IconOf(spirits));
+        spiritsRow.Set(ResidentSpirits.NameOf(spirits), 0f,
             spirits == Spirits.Bright ? style.Good : spirits == Spirits.Low ? style.Warning : style.Text, style.Warning);
+        spiritsMeans.text = spirits == Spirits.Bright ? "Bright: any morning may bring an inspired day."
+            : spirits == Spirits.Low ? $"Low: {PeopleSettings.Current.LowWork * 100f:0}% slower at work, and no inspired days."
+            : "Steady: one more lift than lower makes them Bright.";
+        string good = ColorUtility.ToHtmlStringRGB(style.Good), bad = ColorUtility.ToHtmlStringRGB(style.Warning);
         List<SpiritReason> reasons = ResidentSpirits.ReasonsOf(record);
         for (int i = 0; i < reasonRows.Length; i++)
         {
             bool shown = i < reasons.Count;
-            reasonRows[i].Set(shown ? $"{HearthKit.InlineIcon(reasons[i].Icon)} {reasons[i].Words}" : "", shown ? (reasons[i].Steps > 0 ? "+" : "-") : "");
+            reasonRows[i].Set(shown ? $"{HearthKit.InlineIcon(reasons[i].Icon)} {reasons[i].Words}" : "",
+                shown ? $"<color=#{(reasons[i].Steps > 0 ? good : bad)}>{(reasons[i].Steps > 0 ? "+" : "")}{reasons[i].Steps}</color>" : "");
         }
 
-        var standings = new List<(string name, int level)>();
+        var standings = new List<(ResidentRecord other, int level)>();
         foreach (ResidentRecord other in GameSession.Here.Residents)
         {
             int level = PeopleStandings.LevelOf(GameSession.Here, record, other);
             if (other != record && level != 0)
             {
-                standings.Add((other.Resident.DisplayName, level));
+                standings.Add((other, level));
             }
         }
 
         standings.Sort((a, b) => b.level.CompareTo(a.level));
-        for (int i = 0; i < standingRows.Length; i++)
+        nobodyClose.gameObject.SetActive(standings.Count == 0);
+        standingTips.Clear();
+        PeopleSettings people = PeopleSettings.Current;
+        for (int i = 0; i < standingCards.Count; i++)
         {
             bool shown = i < standings.Count;
-            standingRows[i].Set(shown ? standings[i].name : i == 0 ? "Nobody close yet" : "", shown ? PeopleStandings.NameOf(standings[i].level) : "");
+            standingCards[i].SetActive(shown);
+            if (!shown)
+            {
+                standingTips.Add((null, null, style.Text));
+                continue;
+            }
+
+            (ResidentRecord other, int level) = standings[i];
+            Color colour = level > 0 ? style.Good : style.Warning;
+            standingCards[i].ShowPicture(other.Resident.Portrait, "Bond", colour);
+            standingCards[i].SetName(other.Resident.DisplayName);
+            standingCards[i].SetBadge(PeopleStandings.NameOf(level));
+            standingCards[i].SetLook(false, colour);
+            string means = level > 0
+                ? $"Working near each other: {people.FriendNearWork * 100f:0}% quicker. On a foray together: {people.ForayFriends * 100f:0}% stronger. Missed if the forest takes them."
+                : level <= -2 ? "As neighbours they sour each other's homes. Now and then they have it out at the fire: it clears the air, or hardens."
+                : "Now and then they have it out at the fire: it clears the air, or hardens.";
+            standingTips.Add(($"{other.Resident.DisplayName}: {PeopleStandings.NameOf(level)}", means, colour));
         }
 
         List<MarkDefinition> marks = ResidentMarks.Of(record);
+        noMarks.gameObject.SetActive(marks.Count == 0);
         markTips.Clear();
         for (int i = 0; i < markCards.Count; i++)
         {
@@ -861,16 +999,85 @@ public sealed class ResidentWindow : MonoBehaviour
             Color colour = mark.Good ? style.Good : style.Warning;
             markCards[i].ShowPicture(null, mark.Icon, colour);
             markCards[i].SetName(mark.DisplayName);
+            markCards[i].SetLook(false, colour);
             string way = mark.Good ? "" : mark.HeldByTheForest && record.Forgotten.Count > 0 ? "\nIt stays until every memory is back."
                 : mark.HealedBy != null ? $"\nA {mark.HealedBy.DisplayName} would ease it." : mark.FriendsHeal ? "\nAn evening with a friend would ease it."
                 : mark.TurnsInto != null ? $"\nFaced down, it becomes {mark.TurnsInto.DisplayName}." : "";
             markTips.Add((mark.DisplayName, mark.Description + way, colour));
         }
+    }
 
-        kitRows[0].Set("Weapon", record.KitWeapon.IsEmpty ? "Their own" : $"{CompanionKit.NameOf(record, true)} ({Mathf.RoundToInt(record.KitWeapon.Durability * 100f)}%)");
-        kitRows[1].Set("Body", record.KitBody.IsEmpty ? "Their own" : $"{CompanionKit.NameOf(record, false)} ({Mathf.RoundToInt(record.KitBody.Durability * 100f)}%)");
-        kitRows[2].Set("Theirs after", record.KitWeapon.IsEmpty && record.KitBody.IsEmpty ? "Give them kit in talk"
-            : $"{Mathf.Max(CompanionKit.RaidsWith(record, true), CompanionKit.RaidsWith(record, false))} of {PeopleSettings.Current.KitNamedAfter} raids");
+    // Their kit: the two pieces as pictures (or empty hands), and giving or taking back here (as in talk; one's own Haven only).
+    private void RefreshKit(ResidentRecord record, UIStyle style)
+    {
+        bool fights = record.Resident.RaidCompanion != null;
+        for (int i = 0; i < kitCards.Length; i++)
+        {
+            bool weapon = i == 0;
+            ItemStack piece = weapon ? record.KitWeapon : record.KitBody;
+            kitCards[i].SetActive(fights);
+            if (!fights)
+            {
+                continue;
+            }
+
+            kitCards[i].ShowPicture(piece.IsEmpty ? null : piece.Item.Icon, weapon ? "Sword" : "Bags");
+            kitCards[i].SetName(piece.IsEmpty ? (weapon ? "Their own weapon" : "Their own clothes") : CompanionKit.NameOf(record, weapon));
+            kitCards[i].SetBadge(piece.IsEmpty ? "" : $"{Mathf.RoundToInt(piece.Durability * 100f)}%");
+            kitCards[i].SetLook(piece.IsEmpty, piece.IsBroken ? style.Warning : (Color?)null);
+        }
+
+        kitNote.text = !fights ? "They stay home when you raid." : record.KitWeapon.IsEmpty && record.KitBody.IsEmpty
+            ? "Give them a weapon that suits how they fight, and a body piece: theirs by name after enough raids."
+            : $"Wears with every raid along. Mend it by taking it back. Theirs by name after {PeopleSettings.Current.KitNamedAfter} raids.";
+        kitActions.Show(fights && !HavenVisit.InHostsHaven ? KitActions(record) : new List<MenuAction>());
+    }
+
+    // Take back what they carry, and give the best piece in the bag that suits them, for each hand.
+    private List<MenuAction> KitActions(ResidentRecord record)
+    {
+        var actions = new List<MenuAction>();
+        Player player = Player.Current;
+        ItemContainer bag = player != null && player.Bag != null ? player.Bag.Container : null;
+        ItemContainer stash = GameSession.Stash != null ? GameSession.Stash.Items : null;
+        for (int hand = 0; hand < 2; hand++)
+        {
+            bool weapon = hand == 0;
+            int best = -1;
+            float bestScore = float.MinValue;
+            for (int i = 0; bag != null && i < bag.SlotCount; i++)
+            {
+                ItemStack stack = bag.GetSlot(i);
+                if (stack.IsEmpty || stack.IsBroken || !CompanionKit.Fits(record, stack.Item, weapon))
+                {
+                    continue;
+                }
+
+                float score = (weapon ? stack.Item.Weapon.Damage : stack.Item.Tier) + (int)stack.Quality * 0.5f + stack.Durability * 0.1f;
+                if (score > bestScore)
+                {
+                    best = i;
+                    bestScore = score;
+                }
+            }
+
+            if (best >= 0)
+            {
+                int slot = best;
+                ItemStack offered = bag.GetSlot(best);
+                actions.Add(new MenuAction(weapon ? "Give a weapon" : "Give armour", offered.DisplayName, true,
+                    () => CompanionKit.Give(record, bag, slot, stash, player.transform)) { Icon = weapon ? "Sword" : "Bags" });
+            }
+
+            ItemStack had = weapon ? record.KitWeapon : record.KitBody;
+            if (!had.IsEmpty && bag != null)
+            {
+                actions.Add(new MenuAction("Take it back", had.IsBroken ? $"{had.Item.DisplayName}, broken" : $"{had.Item.DisplayName}, {Mathf.RoundToInt(had.Durability * 100f)}%", true,
+                    () => CompanionKit.TakeBack(record, weapon, bag, stash, player.transform)) { Icon = "Return" });
+            }
+        }
+
+        return actions;
     }
 
     // A kit icon for a skill, by what it trains.
