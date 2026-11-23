@@ -344,7 +344,7 @@ public static class SaveMapper
 
         foreach (ResidentRecord record in settlement.Residents)
         {
-            into.residents.Add(new ResidentSaveData { id = record.Resident.Id, workPaused = record.PausedByPlayer, job = record.Job != null ? record.Job.Id : "", raidsAlong = record.RaidsAlong, killsAlong = record.KillsAlong, timesHelpedUp = record.TimesHelpedUp, memory = (int)record.Memory, remembers = ToSaved(record.Remembers), forgotten = ToSaved(record.Forgotten), stranger = record.IsStranger, comingBack = (int)record.ComingBack, allCameBack = record.AllCameBack, workDone = record.WorkDone, taughtSinceRaid = record.TaughtSinceRaid, home = record.Home ?? "", homeChosen = record.HomeChosen ?? "", workplace = record.Workplace ?? "", workQueue = record.WorkQueue ?? "", haulDone = record.HaulDone, workGear = record.WorkGear != null ? record.WorkGear.Id : "", wishMet = record.WishMet, meal = (int)record.Meal, bruised = record.Bruised , talents = TalentsOf(record.Talents), marks = new List<string>(record.Marks), deeds = Pairs(record.Deeds), feelings = Pairs(record.Feelings), inspiration = (int)record.Inspiration, inspiredOn = record.InspiredOn, kitWeapon = KitSlot(record.KitWeapon), kitBody = KitSlot(record.KitBody) });
+            into.residents.Add(new ResidentSaveData { id = record.Resident.Id, workPaused = record.PausedByPlayer, job = record.Job != null ? record.Job.Id : "", raidsAlong = record.RaidsAlong, killsAlong = record.KillsAlong, timesHelpedUp = record.TimesHelpedUp, memory = (int)record.Memory, remembers = ToSaved(record.Remembers), forgotten = ToSaved(record.Forgotten), stranger = record.IsStranger, comingBack = (int)record.ComingBack, allCameBack = record.AllCameBack, workDone = record.WorkDone, taughtSinceRaid = record.TaughtSinceRaid, home = record.Home ?? "", homeChosen = record.HomeChosen ?? "", workplace = record.Workplace ?? "", workQueue = record.WorkQueue ?? "", haulDone = record.HaulDone, workGear = record.WorkGear != null ? record.WorkGear.Id : "", wishMet = record.WishMet, meal = (int)record.Meal, bruised = record.Bruised , talents = TalentsOf(record.Talents), marks = new List<string>(record.Marks), deeds = Pairs(record.Deeds), feelings = Pairs(record.Feelings), bond = record.Bond, inspiration = (int)record.Inspiration, inspiredOn = record.InspiredOn, kitWeapon = KitSlot(record.KitWeapon), kitBody = KitSlot(record.KitBody) });
         }
 
         foreach (KeyValuePair<string, List<string>> house in settlement.HouseComforts)
@@ -552,6 +552,7 @@ public static class SaveMapper
 
                 restored.Inspiration = System.Enum.IsDefined(typeof(Inspiration), entry.inspiration) ? (Inspiration)entry.inspiration : Inspiration.None;
                 restored.InspiredOn = entry.inspiredOn;
+                restored.Bond = entry.bond >= 0f ? entry.bond : entry.raidsAlong;
                 restored.KitWeapon = KitFrom(entry.kitWeapon, content, missing);
                 restored.KitBody = KitFrom(entry.kitBody, content, missing);
             }

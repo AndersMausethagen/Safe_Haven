@@ -50,15 +50,33 @@ public static class PeopleDay
         }
     }
 
+    /// <summary>The people's morning now (a cheat for playtests: PeopleCheats), as a dawn at home brings it.</summary>
+    public static void MorningNow(SettlementState home) => Morning(home);
+
     private static void Morning(SettlementState home)
     {
         PeopleStandings.Dawn(home);
+        int bright = 0, low = 0, steady = 0;
+        foreach (ResidentRecord record in home.Residents)
+        {
+            Spirits spirits = ResidentSpirits.Of(record, home);
+            bright += spirits == Spirits.Bright ? 1 : 0;
+            low += spirits == Spirits.Low ? 1 : 0;
+            steady += spirits == Spirits.Steady ? 1 : 0;
+        }
+
+        if (home.Residents.Count > 0)
+        {
+            PlaytestLogger.Note(PlaytestLog.Spirits, "haven", bright, $"low {low} steady {steady}");
+        }
+
         foreach (ResidentRecord inspired in Inspirations.Dawn(home, () => Random.value))
         {
+            PlaytestLogger.Note(PlaytestLog.PersonInspired, inspired.Resident.Id, 0, inspired.Inspiration.ToString());
             string news = Inspirations.News(inspired);
             if (!string.IsNullOrEmpty(news))
             {
-                GameMessages.Post(news, MessageKind.Gain);
+                PeopleNews.Tell(news, MessageKind.Gain);
             }
 
             if (inspired.Inspiration == Inspiration.Story)

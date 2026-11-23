@@ -608,6 +608,9 @@ public static class Cheats
 
     private static GameObject PlayerObject() => Player.Current != null ? Player.Current.gameObject : null;
 
+    /// <summary>A cheat done elsewhere (PeopleCheats): the run's log marks it, as every cheat here does.</summary>
+    internal static string Done(string cheat, string words) => Did(cheat, words);
+
     private static string Did(string cheat, string words)
     {
         Used?.Invoke(cheat);

@@ -26,7 +26,7 @@ public sealed class CheatWindow : MonoBehaviour
     private const float EndClockSeconds = 10f;
     private const float SpawnDistance = 7f;
 
-    private static readonly string[] TabNames = { "Player", "Items", "Raid", "Spawn", "World" };
+    private static readonly string[] TabNames = { "Player", "Items", "Raid", "Spawn", "World", "People" };
     private static readonly int[] Amounts = { 1, 10, 50, 99 };
     private static readonly int[] Counts = { 1, 3, 5 };
     private static readonly (string Name, float Hour)[] Hours = { ("Dawn", 6f), ("Noon", 12f), ("Dusk", 19.2f), ("Night", 23f) };
@@ -217,6 +217,7 @@ public sealed class CheatWindow : MonoBehaviour
         BuildRaid(pages[2].transform, style);
         BuildSpawn(pages[3].transform, style);
         BuildWorld(pages[4].transform, style);
+        BuildPeople(pages[5].transform, style);
 
         Hairline(panel, Margin, Height - 80f, Width - Margin * 2f, 1f, style);
         status = Label("Status", panel, Margin, Height - 66f, Width - Margin * 2f - 190f, 46f, 19f, style.Text);
@@ -602,6 +603,29 @@ public sealed class CheatWindow : MonoBehaviour
             });
             index++;
         }
+    }
+
+    // The people's states a playtest must reach quickly (PeopleCheats).
+    private void BuildPeople(Transform page, UIStyle style)
+    {
+        const float wide = 544f;
+        float right = Margin + wide + ButtonGap * 2f;
+        Title("Your people", page, 8f, style);
+        float y = 40f;
+        Action(page, "Everyone inspired now", Margin, y, wide, PeopleCheats.InspireEveryone);
+        Action(page, "A people's morning now", right, y, wide, PeopleCheats.MorningNow);
+        y += RowStep;
+        Action(page, "+10 levels in each one's job skill", Margin, y, wide, () => PeopleCheats.JobLevels(10));
+        Action(page, "A passion to grow for each", right, y, wide, PeopleCheats.PickEach);
+        y += RowStep;
+        Action(page, "Bond +3 for each (to Trusted)", Margin, y, wide, () => PeopleCheats.BondEach(3f));
+        Action(page, "A small scene as soon as may be", right, y, wide, PeopleCheats.SceneSoon);
+        y += RowStep;
+        Action(page, "Friends become Friends, frictions Rivals", Margin, y, wide, PeopleCheats.Extremes);
+        Action(page, "Heal every hard mark", right, y, wide, PeopleCheats.HealEveryMark);
+        y += RowStep;
+        Action(page, "Everyone: Old Wound", Margin, y, wide, () => PeopleCheats.MarkEach("old_wound"));
+        Action(page, "Everyone: Troll-wary", right, y, wide, () => PeopleCheats.MarkEach("troll_wary"));
     }
 
     private void BuildWorld(Transform page, UIStyle style)

@@ -52,6 +52,9 @@ public sealed class ResidentDefinition : ScriptableObject, IQuestTarget
     [SerializeField] private ResidentDefinition friend;
     [Tooltip("The one they rub up against from the start: they begin Cool, and argue now and then.")]
     [SerializeField] private ResidentDefinition friction;
+    [Tooltip("Two things they love to be given (PeopleGifts): given in talk, a gift lifts their spirits for a few days and grows their bond " +
+             "with the player.")]
+    [SerializeField] private System.Collections.Generic.List<ItemDefinition> loves = new System.Collections.Generic.List<ItemDefinition>();
 
     [Header("Jobs")]
     [Tooltip("Jobs they can be given at home. The first is suggested.")]
@@ -86,6 +89,10 @@ public sealed class ResidentDefinition : ScriptableObject, IQuestTarget
     public System.Collections.Generic.IReadOnlyList<ResidentTraitDefinition> Traits => traits;
     public ResidentDefinition Friend => friend;
     public ResidentDefinition Friction => friction;
+    public System.Collections.Generic.IReadOnlyList<ItemDefinition> Loves => loves;
+
+    /// <summary>Sets what they love to be given (content tools and tests).</summary>
+    public void SetLoves(System.Collections.Generic.IEnumerable<ItemDefinition> items) => loves = new System.Collections.Generic.List<ItemDefinition>(items);
 
     /// <summary>Their written start in <paramref name="skill"/>, or one with no skill when it isn't listed.</summary>
     public TalentStart TalentFor(ProficiencyDefinition skill)

@@ -122,6 +122,7 @@ public static class ResidentMarks
 
         // Earned by deeds, once: pushed out later by others, it doesn't come back every raid after.
         record.AddDeed(EarnedKey(mark), 1);
+        PlaytestLogger.Note(PlaytestLog.PersonMark, record.Resident != null ? record.Resident.Id : "", 1, mark.Id);
         if (mark.TurnsInto != null && !string.IsNullOrEmpty(mark.Creature))
         {
             record.ForgetDeed(SinceKey(mark));
@@ -258,6 +259,8 @@ public static class ResidentMarks
 
         record.RemoveMark(mark.Id);
         record.ForgetDeed(SinceKey(mark));
+        PlaytestLogger.Note(PlaytestLog.PersonMark, record.Resident != null ? record.Resident.Id : "", -1, mark.Id);
+        PeopleBond.Grow(record, PeopleSettings.Current.BondMarkHealed, "mark healed");
         return true;
     }
 

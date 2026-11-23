@@ -54,6 +54,7 @@ public sealed class HomeWishes : MonoBehaviour
     private static void Meet(ResidentRecord record)
     {
         record.WishMet = true;
+        PeopleBond.Grow(record, PeopleSettings.Current.BondWish, "wish met");
         HomeLifeSettings.Liking liking = HomeLifeSettings.Current.LikingOf(record.Resident);
         string name = record.Resident.DisplayName;
         string thanks = liking != null && !string.IsNullOrWhiteSpace(liking.thanks) ? liking.thanks : "\"That's what a home wants. Thank you.\"";

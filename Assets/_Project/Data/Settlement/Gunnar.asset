@@ -54,6 +54,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e3b3804e66822fa42a16d0507f192e1a, type: 2}
   friend: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
   friction: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
+  loves:
+  - {fileID: 11400000, guid: d223892dc77348c4e921cc0139490553, type: 2}
+  - {fileID: 11400000, guid: f502c59e5645f1c4f98fbca7982042d4, type: 2}
   jobs:
   - {fileID: 11400000, guid: 9d8e9d72cc07d544c975b891d5c740e6, type: 2}
   - {fileID: 11400000, guid: e9647a52d2bdeec478f332bf63b64731, type: 2}

@@ -71,6 +71,7 @@ public sealed class SystemsEditorWindow : EditorWindow
             new LootAndRarityPage(),
             new GearScorePage(),
             new SkillsPage(),
+            new PeoplePage(),
             new UIStylePage(),
             new PlaytestPage(),
             new MultiplayerPage(),

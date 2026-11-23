@@ -120,6 +120,10 @@ public sealed class ResidentRecord
     private int inspiredOn = -1;
     private ItemStack kitWeapon;
     private ItemStack kitBody;
+    private float bond;
+
+    /// <summary>Their bond with the player (PeopleBond): raids along and more. The bond ranks read it.</summary>
+    public float Bond { get => bond; set => Change(ref bond, UnityEngine.Mathf.Max(0f, value)); }
 
     /// <summary>The marks raids have left on them, by id, oldest first (ResidentMarks; PeopleSettings › Marks).</summary>
     public IReadOnlyList<string> Marks => marks;
@@ -1318,11 +1322,11 @@ public sealed class SettlementState : IHavenView
             return false;
         }
 
-        CompanionBondRank before = CompanionBond.RankFor(record.RaidsAlong, ranks);
         record.RaidsAlong++;
         record.KillsAlong += kills;
         record.TimesHelpedUp += timesHelpedUp;
-        bool rose = CompanionBond.RankFor(record.RaidsAlong, ranks) != before;
+        // A raid along is the bond's biggest step (PeopleBond: lessons, asks, gifts and more grow it too); its rank owes a passion pick.
+        bool rose = PeopleBond.Grow(record, PeopleSettings.Current.BondRaid, "raid along");
         record.Memory = CompanionBond.Remember(extracted, bossesBeaten, timesHelpedUp, rose, secondsLeft, kills);
         Keep(record, record.Memory);
         // One at a time, and not over one they haven't had the chance to say.
@@ -1407,6 +1411,8 @@ public sealed class SettlementState : IHavenView
         PeopleStandings.Found(this, resident);
         // A written friend or friction who came home while they were lost: set now (pairs already standing are kept).
         PeopleStandings.Welcome(this, found);
+        // Their friends' bond with the player who brought them home.
+        PeopleBond.FriendBroughtHome(this, resident);
         Changed?.Invoke();
         return true;
     }

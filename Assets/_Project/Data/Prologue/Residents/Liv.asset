@@ -48,6 +48,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f476e68c961b14a4b9b2d6dc1738ffeb, type: 2}
   friend: {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}
   friction: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
+  loves:
+  - {fileID: 11400000, guid: cbe9df10f8fa88f47be2f012ec678577, type: 2}
+  - {fileID: 11400000, guid: c7138267f80f6644fb98ef1cc46e7dab, type: 2}
   jobs:
   - {fileID: 11400000, guid: e68d6cc3611cddc4ab1e165871f1a4ae, type: 2}
   questLine:

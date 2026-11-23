@@ -99,6 +99,11 @@ public static class ResidentSpirits
             reasons.Add(new SpiritReason("Inspired", "Spark", 1));
         }
 
+        if (PeopleGifts.Glad(record, today))
+        {
+            reasons.Add(new SpiritReason("A gift they loved", "Heart", 1));
+        }
+
         int kind = PeopleStandings.KindWordsFor(here, record);
         if (kind > 0)
         {
@@ -191,6 +196,7 @@ public static class ResidentSpirits
         steps -= record.Bruised ? 1 : 0;
         steps += record.Job != null && !record.WorkPaused && ResidentTalents.PassionOf(record, ResidentTalents.JobSkill(record)) != Passion.None ? 1 : 0;
         steps += record.Inspiration != Inspiration.None ? 1 : 0;
+        steps += PeopleGifts.Glad(record, here != null ? here.DaysPassed : 0) ? 1 : 0;
         steps += PeopleStandings.KindWordsFor(here, record) > 0 ? 1 : 0;
         steps += PeopleStandings.FriendNearWork(record) ? 1 : 0;
         steps -= PeopleStandings.RivalNextDoor(record) && !ResidentTraits.Has(record, TraitEffectKind.RivalsDontBother) ? 1 : 0;

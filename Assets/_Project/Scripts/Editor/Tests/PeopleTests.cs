@@ -507,6 +507,7 @@ public sealed class PeopleTests
             () => tor.Feel(ResidentSpirits.LostFeeling + "someone", home.DaysPassed + 1),
             () => tor.AddMark("old_wound"),
             () => home.AssignJob(tor.Resident, tor.Resident.Jobs[0]),
+            () => PeopleGifts.Give(tor, tor.Resident.Loves[0], home.DaysPassed),
         };
         int checkedStates = 0;
         foreach (Action change in states)
@@ -572,5 +573,93 @@ public sealed class PeopleTests
         }
 
         Assert.Greater(checkedRanks, 1);
+    }
+
+    // ----- Bond, gifts, news (Docs/PeopleSystemReview_2026-11-23.md) -----
+
+    [Test]
+    public void TheBond_GrowsFromMoreThanRaids_AndItsRankOwesAPick()
+    {
+        SettlementState home = Home("Yrsa");
+        ResidentRecord yrsa = home.Find(Person("Yrsa"));
+        IReadOnlyList<CompanionBondRank> ranks = SettlementSettings.Current.BondRanks;
+        Assert.IsNull(PeopleBond.Rank(yrsa), "no bond yet");
+        Assert.AreEqual(0, yrsa.RaidsAlong);
+        int grown = 0;
+        while (PeopleBond.Rank(yrsa) == null && grown < 100)
+        {
+            PeopleBond.Grow(yrsa, People.BondWish, "probe");
+            grown++;
+        }
+
+        Assert.AreEqual(ranks[0].name, PeopleBond.Rank(yrsa).name, "a cook who never raided reaches the first rank");
+        Assert.AreEqual(Mathf.CeilToInt(ranks[0].raids / People.BondWish - 0.0001f), grown);
+        Assert.AreEqual(1, yrsa.Talents.PicksOwed, "and a passion to grow");
+        Assert.IsFalse(PeopleBond.Grow(yrsa, 0f, "nothing"));
+    }
+
+    [Test]
+    public void AGiftTheyLove_LiftsTheirSpirits_OnceADay()
+    {
+        SettlementState home = Home("Hild");
+        ResidentRecord hild = home.Find(Person("Hild"));
+        Assert.AreEqual(2, hild.Resident.Loves.Count, "two things they love");
+        ItemDefinition other = All<ItemDefinition>().First(item => !hild.Resident.Loves.Contains(item));
+        int today = home.DaysPassed;
+        Assert.IsFalse(PeopleGifts.Give(hild, other, today), "not something they love");
+        int before = ResidentSpirits.StepsOf(hild, home);
+        float bond = hild.Bond;
+        Assert.IsTrue(PeopleGifts.Give(hild, hild.Resident.Loves[0], today));
+        Assert.AreEqual(before + 1, ResidentSpirits.StepsOf(hild, home));
+        Assert.AreEqual(bond + People.BondGift, hild.Bond, 0.0001f);
+        Assert.IsFalse(PeopleGifts.Give(hild, hild.Resident.Loves[1], today), "one a day");
+        Assert.IsTrue(PeopleGifts.Give(hild, hild.Resident.Loves[1], today + 1));
+        Assert.IsFalse(PeopleGifts.Glad(hild, today + 1 + People.GiftDays), "it fades");
+
+        int people = 0;
+        foreach (ResidentDefinition who in All<ResidentDefinition>().Where(one => one.Talents.Count > 0))
+        {
+            people++;
+            Assert.AreEqual(2, who.Loves.Count(item => item != null), who.name + " loves two things");
+        }
+
+        Assert.GreaterOrEqual(people, 11);
+    }
+
+    [Test]
+    public void AnOldSave_StartsTheBondAtItsRaidsAlong()
+    {
+        SettlementState home = Home("Eirik");
+        ResidentDefinition eirik = Person("Eirik");
+        home.Find(eirik).RaidsAlong = 5;
+        var content = AssetDatabase.LoadAssetAtPath<ContentDatabase>("Assets/_Project/Resources/ContentDatabase.asset");
+        SaveData data = SaveMapper.ToSaveData(null, null, "SafeHaven", null, DateTime.UtcNow, settlement: home);
+        data.settlement.residents[0].bond = -1f;
+        ResidentRecord read = SaveMapper.FromSaveData(JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(data)), content).Settlement.Find(eirik);
+        Assert.AreEqual(5f, read.Bond, 0.0001f);
+    }
+
+    [Test]
+    public void NewsAway_WaitsForTheHomecoming_AFewLinesAtMost()
+    {
+        PeopleNews.ForgetGame();
+        try
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                PeopleNews.Tell("news " + i);
+            }
+
+            // Edit mode is no Haven of one's own: kept for the homecoming.
+            List<string> lines = PeopleNews.TakeAway(2);
+            Assert.AreEqual(2, lines.Count);
+            StringAssert.StartsWith("news 3", lines[0]);
+            StringAssert.Contains("3 more", lines[1]);
+            Assert.AreEqual(0, PeopleNews.TakeAway(2).Count, "taken once");
+        }
+        finally
+        {
+            PeopleNews.ForgetGame();
+        }
     }
 }

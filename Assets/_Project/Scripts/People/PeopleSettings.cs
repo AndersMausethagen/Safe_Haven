@@ -119,6 +119,23 @@ public sealed class PeopleSettings : GameSettings<PeopleSettings>
     [Tooltip("The mark being found again leaves (held until every memory is back).")]
     [SerializeField] private MarkDefinition forestMark;
 
+    [Header("Bond with the player")]
+    [Tooltip("What grows a resident's bond with the player (PeopleBond); the bond ranks (Settlement Settings › Bond Ranks) read it, a raid " +
+             "along being Bond Raid.")]
+    [SerializeField, Min(0f)] private float bondRaid = 1f;
+    [SerializeField, Min(0f)] private float bondLesson = 0.25f;
+    [SerializeField, Min(0f)] private float bondAsk = 0.5f;
+    [SerializeField, Min(0f)] private float bondWish = 0.5f;
+    [SerializeField, Min(0f)] private float bondKit = 0.25f;
+    [SerializeField, Min(0f)] private float bondGift = 0.35f;
+    [SerializeField, Min(0f)] private float bondMarkHealed = 0.5f;
+    [SerializeField, Min(0f)] private float bondHelpedUp = 0.5f;
+    [SerializeField, Min(0f)] private float bondFriendHome = 1f;
+
+    [Header("Gifts")]
+    [Tooltip("Days a gift they love lifts their spirits; one gift a day counts.")]
+    [SerializeField, Min(1)] private int giftDays = 3;
+
     [Header("Their own kit")]
     [Tooltip("Raids gone along on with a weapon or body piece the player gave them, after which it is theirs, by name.")]
     [SerializeField, Min(1)] private int kitNamedAfter = 8;
@@ -158,6 +175,16 @@ public sealed class PeopleSettings : GameSettings<PeopleSettings>
     public int MostMarks => mostMarks;
     public MarkDefinition ForestMark => forestMark;
     public int KitNamedAfter => kitNamedAfter;
+    public float BondRaid => bondRaid;
+    public float BondLesson => bondLesson;
+    public float BondAsk => bondAsk;
+    public float BondWish => bondWish;
+    public float BondKit => bondKit;
+    public float BondGift => bondGift;
+    public float BondMarkHealed => bondMarkHealed;
+    public float BondHelpedUp => bondHelpedUp;
+    public float BondFriendHome => bondFriendHome;
+    public int GiftDays => giftDays;
     public float KitWearPerRaid => kitWearPerRaid;
     public float KitWearFailed => kitWearFailed;
     public float SpeedPerLevel => speedPerLevel;

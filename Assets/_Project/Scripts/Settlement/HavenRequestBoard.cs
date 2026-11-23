@@ -239,6 +239,7 @@ public sealed class HavenRequestBoard : MonoBehaviour
         SettlementState settlement = GameSession.Home;
         settlement.RemoveRequest(request.Id);
         settlement.RecordRequestAnswered(request.Renown);
+        PeopleBond.Grow(request.Asker != null ? settlement.Find(request.Asker) : null, PeopleSettings.Current.BondAsk, "ask answered");
         var given = new List<string>();
         // An asker whose traits make much of a kept word pays more (Hammer-Gruff: ResidentTraits, AskReward).
         float more = 1f + Mathf.Max(0f, ResidentTraits.Sum(request.Asker != null ? settlement.Find(request.Asker) : null, TraitEffectKind.AskReward));

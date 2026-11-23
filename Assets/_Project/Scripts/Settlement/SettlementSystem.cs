@@ -65,8 +65,9 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
         // Only off a visit (above), where one's own Haven is the one here.
         SettlementState settlement = GameSession.Home;
         bool atHome = HomePortal.Current != null;
-        // A morning for the people that waited for home (dawns passed on a raid: PeopleDay).
+        // A morning for the people that waited for home (dawns passed on a raid: PeopleDay), and their news in turn (PeopleNews).
         PeopleDay.Tick(settlement, Time.timeSinceLevelLoad);
+        PeopleNews.Tick();
         // Away, no workplace is loaded: each worker is taken to be at their station (StationQueue.WorkerHere).
         settlement.Workshops.AwayFromHome = !atHome;
         ResidentDefinition along = GameSession.ActiveRaid != null ? GameSession.ActiveRaid.Companion : null;
@@ -215,7 +216,7 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
             // Spent only when it gave something: a full output slot keeps it for the next craft.
             if (added > 0 && Inspirations.Use(worker, Inspiration.Craft))
             {
-                GameMessages.Post($"{worker.Resident.DisplayName}'s inspired morning at the bench: +{added} {recipe.Output.DisplayName}.", MessageKind.Gain);
+                PeopleNews.Tell($"{worker.Resident.DisplayName}'s inspired morning at the bench: +{added} {recipe.Output.DisplayName}.", MessageKind.Gain);
             }
         }
 

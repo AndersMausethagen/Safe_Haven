@@ -267,6 +267,7 @@ public static class GameSession
         ResidentSpirits.ForgetGame();
         PeopleStandings.ForgetGame();
         PeopleDay.ForgetGame();
+        PeopleNews.ForgetGame();
         Forays.ForgetGame();
     }
 }

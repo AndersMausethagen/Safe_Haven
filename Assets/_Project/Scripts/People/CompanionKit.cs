@@ -73,6 +73,14 @@ public static class CompanionKit
             ItemDelivery.Give(from, before, stash, dropAt);
         }
 
+        // A first gift of this kind of piece grows the bond (once an item: handing the same blade back and forth doesn't).
+        string key = "kitgiven:" + given.Item.Id;
+        if (record.DeedOf(key) == 0)
+        {
+            record.AddDeed(key, 1);
+            PeopleBond.Grow(record, PeopleSettings.Current.BondKit, "kit given");
+        }
+
         return true;
     }
 

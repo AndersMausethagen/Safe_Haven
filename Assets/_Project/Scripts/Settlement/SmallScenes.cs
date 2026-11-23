@@ -37,6 +37,14 @@ public sealed class SmallScenes : MonoBehaviour
     private bool telling;
     private int line;
 
+    /// <summary>A scene as soon as two who may are free (a playtest cheat: PeopleCheats), whatever was played today.</summary>
+    public void Soon()
+    {
+        nextAt = 0f;
+        nextLook = 0f;
+        PlayedOn.Clear();
+    }
+
     /// <summary>The scene under way at home now, if any.</summary>
     public static SmallScenes Current { get; private set; }
 
@@ -393,7 +401,7 @@ public sealed class SmallScenes : MonoBehaviour
                 MarkDefinition mark = ResidentMarks.EasedByFriends(eased);
                 if (mark != null)
                 {
-                    GameMessages.Post($"An evening with a friend eased {eased.Resident.DisplayName}'s {mark.DisplayName.ToLowerInvariant()}.", MessageKind.Gain);
+                    PeopleNews.Tell($"An evening with a friend eased {eased.Resident.DisplayName}'s {mark.DisplayName.ToLowerInvariant()}.", MessageKind.Gain);
                 }
             }
         }
@@ -418,8 +426,17 @@ public sealed class SmallScenes : MonoBehaviour
             DialogueBox.Current.Bark(new DialogueSpeaker(scene.first.DisplayName, life.transform, null, 0f, null, life.transform), last, null);
         }
 
-        GameMessages.Post(cleared ? $"{scene.first.DisplayName} and {scene.second.DisplayName} had it out at the fire, and laughed after: the air is cleared."
-            : $"{scene.first.DisplayName} and {scene.second.DisplayName} had it out at the fire. It went badly.", cleared ? MessageKind.Gain : MessageKind.Info);
+        string said = cleared ? $"{scene.first.DisplayName} and {scene.second.DisplayName} had it out at the fire, and laughed after: the air is cleared."
+            : $"{scene.first.DisplayName} and {scene.second.DisplayName} had it out at the fire. It went badly.";
+        // Overheard, it is said now; else it comes as news, in its turn (PeopleNews).
+        if (told)
+        {
+            GameMessages.Post(said, cleared ? MessageKind.Gain : MessageKind.Info);
+        }
+        else
+        {
+            PeopleNews.Tell(said, cleared ? MessageKind.Gain : MessageKind.Info);
+        }
     }
 
     private static bool Content(ResidentDefinition who)

@@ -238,9 +238,15 @@ public static class ResidentTalents
         amount = Capped(record.Talents, skill.Id, day, amount, settings);
         record.Talents.SetExperience(skill.Id, record.Talents.ExperienceOf(skill.Id) + amount);
         int after = LevelOf(record, skill);
+        if (after > before && record.Resident != null)
+        {
+            PlaytestLogger.Note(PlaytestLog.PersonLevel, record.Resident.Id, after, skill.Id);
+        }
+
         if (after > before && skill == JobSkill(record) && RankIndex(record) > rankBefore && record.Job != null)
         {
-            GameMessages.Post($"{record.Resident.DisplayName} is now a {RankName(record)} {record.Job.DisplayName} ({skill.DisplayName} {after}).", MessageKind.Gain);
+            PlaytestLogger.Note(PlaytestLog.PersonRank, record.Resident.Id, after, RankName(record));
+            PeopleNews.Tell($"{record.Resident.DisplayName} is now a {RankName(record)} {record.Job.DisplayName} ({skill.DisplayName} {after}).", MessageKind.Gain);
         }
 
         return after - before;
@@ -358,7 +364,7 @@ public static class ResidentTalents
         if (Inspirations.Use(record, Inspiration.Craft))
         {
             quality = quality < ItemQuality.Masterwork ? quality + 1 : quality;
-            GameMessages.Post($"{record.Resident.DisplayName}'s inspired morning at the bench: a {quality} {recipe.Output.DisplayName} waits to be collected.", MessageKind.Gain);
+            PeopleNews.Tell($"{record.Resident.DisplayName}'s inspired morning at the bench: a {quality} {recipe.Output.DisplayName} waits to be collected.", MessageKind.Gain);
         }
 
         return quality == ItemQuality.Plain ? null : (int)quality + "|" + record.Resident.DisplayName + "|" + recipe.Output.Id;
@@ -453,6 +459,7 @@ public static class ResidentTalents
 
         record.Talents.SetPassion(skill.Id, to);
         record.Talents.SetPicksOwed(record.Talents.PicksOwed - 1);
+        PlaytestLogger.Note(PlaytestLog.PassionPick, record.Resident != null ? record.Resident.Id : "", (int)to, skill.Id);
         return true;
     }
 

@@ -351,12 +351,25 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
 
         ItemContainer bag = player.Bag.Container;
         var offered = new HashSet<ItemDefinition>();
+        int today = GameSession.Home.DaysPassed;
         for (int i = 0; i < bag.SlotCount; i++)
         {
             ItemStack stack = bag.GetSlot(i);
             if (stack.IsEmpty || stack.IsBroken || !offered.Add(stack.Item))
             {
                 continue;
+            }
+
+            // Something they love (PeopleGifts): a gift, once a day.
+            if (PeopleGifts.Loves(record, stack.Item))
+            {
+                ItemDefinition loved = stack.Item;
+                bool counts = PeopleGifts.CountsToday(record, today);
+                page.Add(new MenuAction($"Give them your {loved.DisplayName}", counts ? "They love it" : "They had a gift today", counts, () =>
+                {
+                    bool glad = bag.Remove(loved, 1) > 0 && PeopleGifts.Give(record, loved, today);
+                    DialogueBox.Current.Say(speaker, glad ? $"{loved.DisplayName}? For me? ...You remembered." : "Another day.", afterAnswer);
+                }) { Icon = "Heart" });
             }
 
             int slot = i;

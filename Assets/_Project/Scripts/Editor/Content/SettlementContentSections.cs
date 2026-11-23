@@ -48,6 +48,72 @@ public sealed class JobSection : ContentSection
         "Purification Altar) look for someone with their job. The resident stands by the workplace once it is built.";
 }
 
+/// <summary>A resident's traits (Docs/PeopleResearch_2026-11-23.md §3.3): what they do differently, each effect asked for by kind.</summary>
+public sealed class ResidentTraitSection : ContentSection
+{
+    public override string Title => "Traits";
+    public override string Noun => "Trait";
+    public override string SidebarGroup => "Settlement";
+    public override Type AssetType => typeof(ResidentTraitDefinition);
+    public override string Folder => "Assets/_Project/Data/People/Traits";
+    public override string Help =>
+        "One of a resident's two or three traits: its icon and name on their card, what it means on hover, lines they say of it, and its " +
+        "effects (each kind is read by one system: ARCHITECTURE.md \"People\"). Give a resident theirs in their Who they are.";
+
+    public override List<string> FindProblems(Object asset, IList<Object> all)
+    {
+        List<string> problems = base.FindProblems(asset, all);
+        var trait = (ResidentTraitDefinition)asset;
+        if (trait.Effects.Count == 0)
+        {
+            problems.Add("Changes nothing: give it at least one effect.");
+        }
+
+        if (string.IsNullOrWhiteSpace(trait.Description))
+        {
+            problems.Add("Says nothing on hover: write what it means.");
+        }
+
+        return problems;
+    }
+}
+
+/// <summary>The marks raids leave on people (§3.6): good ones, and hard ones with a way back.</summary>
+public sealed class MarkSection : ContentSection
+{
+    public override string Title => "Marks";
+    public override string Noun => "Mark";
+    public override string SidebarGroup => "Settlement";
+    public override Type AssetType => typeof(MarkDefinition);
+    public override string Folder => "Assets/_Project/Data/People/Marks";
+    public override string Help =>
+        "What a raid (or a breach, a foray, a night) leaves on someone: what causes it and how likely, its effects, and for a hard mark its " +
+        "way back. A mark is given only once it is in People Settings › Marks.";
+
+    public override List<string> FindProblems(Object asset, IList<Object> all)
+    {
+        List<string> problems = base.FindProblems(asset, all);
+        var mark = (MarkDefinition)asset;
+        if (!mark.Good && mark.HealedBy == null && !mark.FriendsHeal && mark.TurnsInto == null)
+        {
+            problems.Add("A hard mark with no way back: give it an item, a friend's scene or what it turns into.");
+        }
+
+        bool listed = false;
+        foreach (MarkDefinition had in PeopleSettings.Current.Marks)
+        {
+            listed |= had == mark;
+        }
+
+        if (!listed)
+        {
+            problems.Add("Not in People Settings › Marks, so it never comes.");
+        }
+
+        return problems;
+    }
+}
+
 /// <summary>Announced defenses of Safe Haven (GDD §6.6–6.9).</summary>
 public sealed class WardBreachSection : ContentSection
 {

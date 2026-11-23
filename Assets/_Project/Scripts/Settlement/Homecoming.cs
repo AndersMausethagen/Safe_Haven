@@ -86,6 +86,17 @@ public static class Homecoming
         }
 
         List<string> lines = Compose(Player.Current, GameSession.Home);
+        // What happened among the people while away (PeopleNews: ranks, inspired mornings, marks, friends made), two lines at most.
+        foreach (string news in PeopleNews.TakeAway(2))
+        {
+            lines.Insert(System.Math.Min(lines.Count, 1), news);
+        }
+
+        if (lines.Count > MostLines)
+        {
+            lines.RemoveRange(MostLines, lines.Count - MostLines);
+        }
+
         // One good thing that happened while they were away (HomecomingSettings), heading the card.
         HomecomingSettings gifts = HomecomingSettings.Current;
         string gift = gifts != null && awaySeconds >= gifts.MinAwaySeconds

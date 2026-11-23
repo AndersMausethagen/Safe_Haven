@@ -103,6 +103,23 @@ public static class PlaytestLog
     public const string Stock = "Stock";
     /// <summary>The gathering nodes standing a few seconds into a raid: subject the node's id, amount how many.</summary>
     public const string RaidNodes = "RaidNodes";
+    // People (Docs/PeopleSystemReview_2026-11-23.md §2.9), for tuning their pace and spirits:
+    /// <summary>A resident rose a level: subject their id, amount the new level, detail the skill's id.</summary>
+    public const string PersonLevel = "PersonLevel";
+    /// <summary>A resident's job skill reached a new rank: subject their id, amount the level, detail the rank's name.</summary>
+    public const string PersonRank = "PersonRank";
+    /// <summary>A resident woke inspired: subject their id, detail the kind.</summary>
+    public const string PersonInspired = "PersonInspired";
+    /// <summary>A mark came (amount 1) or was healed (-1): subject their id, detail the mark's id.</summary>
+    public const string PersonMark = "PersonMark";
+    /// <summary>Two residents' standing changed level: subject "idA|idB", amount the new level (-2..2), detail why.</summary>
+    public const string Standing = "Standing";
+    /// <summary>The player grew a passion: subject their id, amount the passion (1 Keen, 2 Burning), detail the skill's id.</summary>
+    public const string PassionPick = "PassionPick";
+    /// <summary>A people's morning: subject "haven", amount how many were Bright, detail "low N steady N".</summary>
+    public const string Spirits = "Spirits";
+    /// <summary>A resident's bond with the player grew: subject their id, amount the bond in hundredths, detail why.</summary>
+    public const string Bond = "Bond";
     // Why players leave a raid (Docs/RaidLoopResearch_2026-11-22.md #1):
     /// <summary>A danger stage began: subject the stage, amount the seconds left on the clock, detail "exit N m" (to the nearest open one).</summary>
     public const string StageBegan = "StageBegan";

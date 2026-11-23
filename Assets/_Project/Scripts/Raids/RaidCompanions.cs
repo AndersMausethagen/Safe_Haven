@@ -53,7 +53,7 @@ public sealed class RaidCompanions
         Companion.FormationOffset = new Vector3(2f, 0f, -3f);
         // One's own companion, from one's own Haven: on a raid followed with a host, the Haven here is still the host's.
         ResidentRecord record = GameSession.Home.Find(session.Companion);
-        companionRank = record != null ? CompanionBond.RankFor(record.RaidsAlong, SettlementSettings.Current.BondRanks) : null;
+        companionRank = PeopleBond.Rank(record);
         // Who they are: their talents, traits, marks, an inspired fighting heart and the kit given them (CompanionPeople).
         Companion.KitWeapon = CompanionKit.ShownWeapon(record);
         CompanionPeople.Apply(Companion, record, false, true);
@@ -120,7 +120,7 @@ public sealed class RaidCompanions
                     Companion.TimesHelpedUp, session.TimeRemaining, Companion.Kills, SettlementSettings.Current.MemoryReturnsEvery);
                 // Read back from where it was written (Home): from the Haven here, a guest's would be the host's record, or none.
                 ResidentRecord record = GameSession.Home.Find(session.Companion);
-                report.CompanionNewRank = rose && record != null ? CompanionBond.RankFor(record.RaidsAlong, SettlementSettings.Current.BondRanks)?.name : null;
+                report.CompanionNewRank = rose && record != null ? PeopleBond.Rank(record)?.name : null;
                 SettlePerson(record, session, extracted, rose);
             }
         }
@@ -145,7 +145,7 @@ public sealed class RaidCompanions
         };
         foreach (MarkDefinition mark in ResidentMarks.AfterRaid(record, facts, () => UnityEngine.Random.value))
         {
-            GameMessages.Post($"{record.Resident.DisplayName} came home {(mark.Good ? "with" : "carrying")} something new: {mark.DisplayName}.",
+            PeopleNews.Tell($"{record.Resident.DisplayName} came home {(mark.Good ? "with" : "carrying")} something new: {mark.DisplayName}.",
                 mark.Good ? MessageKind.Gain : MessageKind.Info);
         }
 
@@ -154,10 +154,7 @@ public sealed class RaidCompanions
         {
             Inspirations.Use(record, Inspiration.FightingHeart);
         }
-        if (rose)
-        {
-            ResidentTalents.OwePick(record, CompanionBond.RankFor(record.RaidsAlong, SettlementSettings.Current.BondRanks)?.name);
-        }
+        // (A bond rank reached owed its passion pick as it rose: PeopleBond.Grow.)
     }
 
     // Home with the player when they get out, alive and still following, however far behind: as a rescued traveller is

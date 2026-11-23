@@ -236,6 +236,8 @@ public sealed class ContentEditorWindow : EditorWindow, IContentEditorHost
             new EliteAffixSection(),
             new ResidentSection(),
             new JobSection(),
+            new ResidentTraitSection(),
+            new MarkSection(),
             new WardBreachSection(),
             new QuestSection(),
             new QuestEventSection(),

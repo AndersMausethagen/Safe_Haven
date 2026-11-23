@@ -236,6 +236,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         int tier = LessonTier(teacher);
         Practise(skill, tier, Rules.TierExperience(tier) * SettlementSettings.Current.LessonWork, false);
         teacher.TaughtSinceRaid = true;
+        PeopleBond.Grow(teacher, PeopleSettings.Current.BondLesson, "lesson");
         return GameSession.Progress.ExperienceOf(skill) - before;
     }
 

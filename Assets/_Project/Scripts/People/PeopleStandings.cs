@@ -109,9 +109,31 @@ public static class PeopleStandings
             by *= Mathf.Max(0.1f, 1f + gain);
         }
 
+        int before = LevelOf(home.Standings.ValueOf(a.Resident.Id, b.Resident.Id));
         float now = home.Standings.ValueOf(a.Resident.Id, b.Resident.Id) + by;
         home.SetStanding(a.Resident.Id, b.Resident.Id, now);
-        return LevelOf(home.Standings.ValueOf(a.Resident.Id, b.Resident.Id));
+        int after = LevelOf(home.Standings.ValueOf(a.Resident.Id, b.Resident.Id));
+        Logged(a, b, before, after, by > 0f ? "closer" : "apart");
+        return after;
+    }
+
+    // A standing's level changed: a playtest row, and news when two become Friends or Rivals.
+    private static void Logged(ResidentRecord a, ResidentRecord b, int before, int after, string why)
+    {
+        if (before == after)
+        {
+            return;
+        }
+
+        PlaytestLogger.Note(PlaytestLog.Standing, StandingsState.Key(a.Resident.Id, b.Resident.Id), after, why);
+        if (after == 2 && before < 2)
+        {
+            PeopleNews.Tell($"{a.Resident.DisplayName} and {b.Resident.DisplayName} are friends now.", MessageKind.Gain);
+        }
+        else if (after == -2 && before > -2)
+        {
+            PeopleNews.Tell($"{a.Resident.DisplayName} and {b.Resident.DisplayName} can't abide each other now.", MessageKind.Info);
+        }
     }
 
     /// <summary>A small scene shared: they grow closer.</summary>
@@ -141,8 +163,10 @@ public static class PeopleStandings
         float bold = 1f + Mathf.Max(ResidentTraits.Sum(a, TraitEffectKind.BoldWords), ResidentTraits.Sum(b, TraitEffectKind.BoldWords));
         bool cleared = roll < settings.ClearedAirChance;
         float by = cleared ? settings.ClearedAir * bold : -settings.Hardened * bold;
+        int before = LevelOf(home.Standings.ValueOf(a.Resident.Id, b.Resident.Id));
         float now = home.Standings.ValueOf(a.Resident.Id, b.Resident.Id) + by;
         home.SetStanding(a.Resident.Id, b.Resident.Id, now);
+        Logged(a, b, before, LevelOf(home.Standings.ValueOf(a.Resident.Id, b.Resident.Id)), cleared ? "cleared the air" : "hardened");
         return cleared;
     }
 

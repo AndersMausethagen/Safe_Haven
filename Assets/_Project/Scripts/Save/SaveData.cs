@@ -285,6 +285,8 @@ public sealed class ResidentSaveData
     /// <summary>Inspiration (0 none) and the day it came.</summary>
     public int inspiration;
     public int inspiredOn = -1;
+    /// <summary>Their bond with the player (PeopleBond). Missing in older saves (-1): their raids along.</summary>
+    public float bond = -1f;
     /// <summary>The kit the player gave them (CompanionKit). Missing in older saves: none.</summary>
     public SlotSaveData kitWeapon;
     public SlotSaveData kitBody;

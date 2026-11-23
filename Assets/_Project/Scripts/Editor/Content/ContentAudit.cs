@@ -58,6 +58,8 @@ public static class ContentAudit
         "EssenceSettings.blankParchment",
         // A hard mark healed by an item given in talk, used up (ResidentMarks: Old Wound and a Mending Draught).
         "MarkDefinition.healedBy",
+        // A gift a resident loves, given in talk and used up (PeopleGifts).
+        "ResidentDefinition.loves[]",
         // A comfort bought for a house from a resident's window (HomeLife.Furnish).
         "HomeLifeSettings.comforts[].cost[].item",
         // A boss encounter's gate takes its price (the Hearth Ember into Guardian's Hollow).

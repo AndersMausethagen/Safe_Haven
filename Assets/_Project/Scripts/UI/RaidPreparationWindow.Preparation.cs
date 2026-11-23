@@ -46,8 +46,9 @@ public sealed partial class RaidPreparationWindow
         companionBond.text = "";
         if (plan.Companion != null)
         {
-            int raids = GameSession.Here.Find(plan.Companion)?.RaidsAlong ?? 0;
-            string rank = CompanionBond.RankFor(raids, SettlementSettings.Current.BondRanks)?.name;
+            ResidentRecord along = GameSession.Here.Find(plan.Companion);
+            int raids = along?.RaidsAlong ?? 0;
+            string rank = PeopleBond.Rank(along)?.name;
             companionBond.text = raids == 0 ? "No raids together yet" : $"{(string.IsNullOrEmpty(rank) ? "" : rank + ", ")}{raids} raid{(raids == 1 ? "" : "s")} together";
         }
 
