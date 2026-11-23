@@ -529,6 +529,11 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         // What it introduces is learned now, announced across the screen (BigNotice): one building per quest.
         BuildingGate.TeachOnStart(quest, Player.Current != null ? Player.Current.gameObject : null);
         BuildingModules.AnnounceLearned(quest.UnlocksModules, quest);
+        if (quest.TeachesAtStart.Count > 0 && Player.Current != null && Player.Current.Crafting != null)
+        {
+            Player.Current.Crafting.Unlock(quest.TeachesAtStart);
+        }
+
         if (quest.AnnounceStart)
             GameMessages.Post(QuestMarkerSettings.NewQuestText(quest), MessageKind.Info);
         GameEvents.Raise(new GameEvent(GameEventKind.QuestStarted, quest));

@@ -15,6 +15,7 @@ MonoBehaviour:
   id: hardwood
   displayName: Hardwood
   tier: 2
+  spawnWeight: 1
   yields:
     entries:
     - item: {fileID: 11400000, guid: 183fddc5567e8b8479fcb1618e73496c, type: 2}
@@ -22,6 +23,19 @@ MonoBehaviour:
       minQuantity: 2
       maxQuantity: 3
       probability: 1
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+      onlyInRaid: {fileID: 0}
+    - item: {fileID: 11400000, guid: a74ced39f6a083047955bfe7834c61f0, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.5
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+      onlyInRaid: {fileID: 11400000, guid: 4c3002f5090022648994d853c2583c8b, type: 2}
   gatherTool: 1
   requiredToolTier: 2
   gatherAnimation: 4

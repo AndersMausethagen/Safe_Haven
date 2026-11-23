@@ -641,7 +641,7 @@ public sealed class ItemTooltipView : MonoBehaviour
                 .Append(held ? " Right-click to use." : "").Append("</color>");
             if (item.HasBoon)
             {
-                builder.Append($"\n<color={UIStyle.Current.AccentHex}>{(item.IsTonic ? "Tonic" : "Meal")}: {DescribeBonuses(item.BoonBonuses)} for {RaidStats.FormatTime(item.BoonSeconds)}.</color>");
+                builder.Append($"\n<color={UIStyle.Current.AccentHex}>{(item.IsCoating ? "Coating" : item.IsTonic ? "Tonic" : "Meal")}: {DescribeBonuses(item.BoonBonuses)} for {RaidStats.FormatTime(item.BoonSeconds)}.</color>");
                 string family = MealFamily(item.BoonBonuses);
                 if (family.Length > 0)
                 {

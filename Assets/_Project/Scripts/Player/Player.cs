@@ -58,6 +58,7 @@ public sealed class Player : MonoBehaviour
         PlayerWarmth.AddTo(gameObject);
         CarriedGrime.AddTo(gameObject); // blood and mud from a fight, washed off by rain and water
         PlayerGlow.AddTo(gameObject); // a soft light round them in the dark
+        CoatedBladeView.AddTo(gameObject); // flames on the weapon while a coating's fire is on it (Ember Pitch)
         NeededNearby.AddTo(gameObject); // what a quest or home needs, pointed out when it grows near
         OffScreenWarnings.AddTo(gameObject); // a strike winding up at them from out of view, at the screen's edge
         if (Current != null && Current != this)

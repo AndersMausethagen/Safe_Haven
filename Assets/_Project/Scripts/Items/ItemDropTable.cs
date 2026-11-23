@@ -24,8 +24,14 @@ public sealed class ItemDropEntry
     [SerializeField, Range(0, Tiers.Max)] private int toTier;
     [Tooltip("Never scaled by the raid's loot multiplier: a trophy stays one trophy at every tier.")]
     [SerializeField] private bool fixedAmount;
+    [Tooltip("Drops only on this raid's map (Cursed Sap from the Misty Woods' trees, not the Haven's). Empty: anywhere.")]
+    [SerializeField] private RaidDefinition onlyInRaid;
 
     public ItemDefinition Item => item;
+    public RaidDefinition OnlyInRaid => onlyInRaid;
+
+    /// <summary>False on a map other than its Only In Raid (and at home, when it has one).</summary>
+    public bool DropsHere => onlyInRaid == null || (GameSession.ActiveRaid != null && GameSession.ActiveRaid.Definition == onlyInRaid);
     public ResourceDefinition Resource => item == null ? resource : null;
     public int MinQuantity => minQuantity;
     public int MaxQuantity => maxQuantity;
@@ -124,7 +130,7 @@ public sealed class ItemDropTable
         results ??= new List<ItemAmount>();
         foreach (ItemDropEntry entry in entries)
         {
-            if (entry != null && entry.AppearsAt(tier) && entry.TryRoll(out ItemAmount drop))
+            if (entry != null && entry.AppearsAt(tier) && entry.DropsHere && entry.TryRoll(out ItemAmount drop))
             {
                 int amount = entry.Scaled(drop.Amount, multiplier, Random.value);
                 if (amount > 0)
@@ -143,7 +149,7 @@ public sealed class ItemDropTable
         results ??= new List<ResourceAmount>();
         foreach (ItemDropEntry entry in entries)
         {
-            if (entry != null && entry.AppearsAt(tier) && entry.TryRoll(out ResourceAmount drop))
+            if (entry != null && entry.AppearsAt(tier) && entry.DropsHere && entry.TryRoll(out ResourceAmount drop))
             {
                 int amount = entry.Scaled(drop.Amount, multiplier, Random.value);
                 if (amount > 0)

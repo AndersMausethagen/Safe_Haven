@@ -120,4 +120,9 @@ public enum StatType
     SlashResistance = 57,
     /// <summary>Resistance to piercing blows (StrikeKind.Stab), arrows included. Below zero is a weakness.</summary>
     StabResistance = 58,
+    /// <summary>Share of a weapon swing's damage added as a blow of fire (a weapon coating: Ember Pitch). 0.25 adds a quarter of the
+    /// swing again, as fire: armour doesn't stop it, fire resistance does, and a fire weakness makes it more.</summary>
+    MeleeFireDamage = 59,
+    /// <summary>Chance from 0 to 1 that a weapon swing that lands sets what it strikes alight (Burning).</summary>
+    MeleeIgniteChance = 60,
 }

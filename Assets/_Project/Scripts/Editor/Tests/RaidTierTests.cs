@@ -193,7 +193,8 @@ public sealed class RaidTierTests
         foreach (RaidDifficulty tier in Raid.Difficulties)
         {
             GearBalance.Kit kit = GearBalance.KitOf(tier.tier, gear);
-            GearBalance.Kit stacked = GearBalance.StackedKitOf(tier.tier, gear, enchanted: false);
+            // A coating has a budget of its own (Coatings_AddAtMostTheirBudget), as enchantments do.
+            GearBalance.Kit stacked = GearBalance.StackedKitOf(tier.tier, gear, enchanted: false, coated: false);
             Assert.That(stacked.Toughness / kit.Toughness, Is.LessThanOrEqualTo(StackedToughnessReach),
                 $"tier {tier.tier}: stacked toughness {stacked.Toughness:0} against the kit's {kit.Toughness:0}");
             Assert.That(stacked.Damage / kit.Damage, Is.LessThanOrEqualTo(StackedDamageReachAt(tier.tier)),
@@ -206,6 +207,24 @@ public sealed class RaidTierTests
     // out, as attack speed and sustain are; their numbers count.
     public const float EnchantedToughnessReach = 1.12f;
     public const float EnchantedDamageReach = 1.08f;
+
+    [Test]
+    public void Coatings_AddAtMostTheirBudget()
+    {
+        List<GearBalance.Kit> coated = new List<GearBalance.Kit>();
+        List<ItemDefinition> gear = GearBalance.AllGear();
+        foreach (RaidDifficulty tier in Raid.Difficulties)
+        {
+            GearBalance.Kit without = GearBalance.StackedKitOf(tier.tier, gear, enchanted: false, coated: false);
+            GearBalance.Kit with = GearBalance.StackedKitOf(tier.tier, gear, enchanted: false, coated: true);
+            string coating = string.Join(", ", with.Food.Where(f => f.IsCoating).Select(f => f.name));
+            Assert.That(with.Damage / without.Damage, Is.LessThanOrEqualTo(PowerCurveSettings.Current.CoatingDamage), $"tier {tier.tier}: {coating}");
+            coated.Add(with);
+        }
+
+        // Canary: the budget is measured on something. With no coating in the game this test would pass on nothing.
+        Assert.IsTrue(coated.Any(kit => kit.Food.Any(f => f.IsCoating)), "some tier's stacked kit carries a coating");
+    }
 
     [Test]
     public void Enchantments_AddAtMostTheirBudget()

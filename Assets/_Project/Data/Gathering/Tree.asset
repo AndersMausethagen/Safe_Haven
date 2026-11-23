@@ -15,6 +15,7 @@ MonoBehaviour:
   id: tree
   displayName: Tree
   tier: 1
+  spawnWeight: 1
   yields:
     entries:
     - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
@@ -22,11 +23,28 @@ MonoBehaviour:
       minQuantity: 1
       maxQuantity: 1
       probability: 1
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+      onlyInRaid: {fileID: 0}
     - item: {fileID: 11400000, guid: 9fd41ebfb0b7848419e49298716c7565, type: 2}
       resource: {fileID: 0}
       minQuantity: 1
       maxQuantity: 1
       probability: 1
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+      onlyInRaid: {fileID: 0}
+    - item: {fileID: 11400000, guid: a74ced39f6a083047955bfe7834c61f0, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.5
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+      onlyInRaid: {fileID: 11400000, guid: 4c3002f5090022648994d853c2583c8b, type: 2}
   gatherTool: 1
   requiredToolTier: 1
   gatherAnimation: 4

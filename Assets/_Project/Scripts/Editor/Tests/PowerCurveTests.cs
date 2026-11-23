@@ -43,11 +43,14 @@ public sealed class PowerCurveTests
         foreach (int tier in tiers)
         {
             GearBalance.Kit plain = GearBalance.KitOf(tier, gear);
-            GearBalance.Kit stacked = GearBalance.StackedKitOf(tier, gear, true, tier, true, GearBalance.FoodSlots.Every);
+            // The food's reach without the coating, which has a budget of its own on top (PowerCurveSettings › Coating Damage).
+            GearBalance.Kit stacked = GearBalance.StackedKitOf(tier, gear, true, tier, true, GearBalance.FoodSlots.Every, coated: false);
+            GearBalance.Kit coated = GearBalance.StackedKitOf(tier, gear, true, tier, true, GearBalance.FoodSlots.Every, coated: true);
             string what = string.Join(", ", stacked.Food.Select(food => food.name));
             Assert.Greater(stacked.Toughness, plain.Toughness, $"the canary: stacking adds at tier {tier}");
             Assert.LessOrEqual(stacked.Toughness / plain.Toughness, Reach.StackedToughness, $"tier {tier} toughness, eating {what}");
             Assert.LessOrEqual(stacked.Damage / plain.Damage, Reach.StackedDamageAt(tier), $"tier {tier} damage, eating {what}");
+            Assert.LessOrEqual(coated.Damage / plain.Damage, Reach.StackedDamageAt(tier) * Reach.CoatingDamage, $"tier {tier} damage with a coating");
             // One of each family, however many slots (BoonFamily).
             var families = stacked.Food.Where(f => !f.IsTonic).Select(f => BoonFamily.Of(f.BoonBonuses)).Where(f => f.Length > 0).ToList();
             Assert.AreEqual(families.Count, families.Distinct().Count(), $"tier {tier}: one meal of each family ({what})");

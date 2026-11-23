@@ -255,7 +255,7 @@ public sealed partial class MonsterAI
     // brought it down (Monster Definition › Poise Growth: the next needs more). One that ends a Topple After strike (forStrike), or comes
     // while one is under way (a poise break, a stagger, a backstab during the Heartroot's Take Root), lasts that strike's Open After
     // whatever brought it on: the finale's kill window comes however its hold ends, and every game lies as long (IsToppledByStrike).
-    private void Topple(Vector3 blowDirection, float seconds, bool grows, bool forStrike = false)
+    private void Topple(Vector3 blowDirection, float seconds, bool grows, bool forStrike = false, ToppleCause cause = ToppleCause.Blows)
     {
         float strikes = ToppleAfterNow;
         if (strikes > 0f)
@@ -287,7 +287,26 @@ public sealed partial class MonsterAI
         }
 
         pose?.Hit(blowDirection, 1.2f, Time.time);
+        LastToppleCause = forStrike ? ToppleCause.Strike : cause;
         BeganTopple(seconds);
+    }
+
+    /// <summary>What brought its last topple on (the boss's try row: PlaytestLog.BossTry). Read it when Toppled is raised.</summary>
+    public ToppleCause LastToppleCause { get; private set; }
+
+    /// <summary>
+    /// Every summon of one call killed in time (Monster Attack › Bond Topple Seconds: the Heartroot's Rootlings): the roots it called tear
+    /// out of it and it topples for <paramref name="seconds"/>, its heart open. Its poise doesn't grow: the call's cooldown already keeps
+    /// these apart. Not on a friend's copy (the host's game decides, and the topple comes back from there).
+    /// </summary>
+    public void ToppleFromBond(float seconds)
+    {
+        if (IsRemote || !Topples || CurrentState == State.Staggered)
+        {
+            return;
+        }
+
+        Topple(-transform.forward, seconds, false, false, ToppleCause.Bond);
     }
 
     // What every game shows of a topple, the host's and a friend's copy alike: the heart opens to one strike, the crack and the shake,
@@ -406,7 +425,7 @@ public sealed partial class MonsterAI
         }
 
         poise?.Break(Time.time);
-        Topple(blowDirection, definition.ToppleSeconds, true);
+        Topple(blowDirection, definition.ToppleSeconds, true, false, ToppleCause.Crush);
     }
 
     /// <summary>

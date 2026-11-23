@@ -71,6 +71,9 @@ MonoBehaviour:
   reelingBarColor: {r: 1, g: 0.55, b: 0.15, a: 1}
   furyEffect: {fileID: 5697260504565289270, guid: ea417f5788ec80b4c9b4b074524ffb57, type: 3}
   huntersMarkColor: {r: 0.55, g: 1, b: 0.75, a: 0.55}
+  coatedFlames: {fileID: 856958082518358719, guid: befce660dfda34f48929f23ce911599f, type: 3}
+  coatedFlamesAtRest: 14
+  coatedFlamesSwinging: 90
   dodgeTrailColor:
     serializedVersion: 2
     key0: {r: 0.6, g: 0.85, b: 1, a: 0.55}

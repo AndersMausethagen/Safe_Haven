@@ -116,6 +116,9 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     [SerializeField, Min(0f)] private float boonSeconds = 300f;
     [Tooltip("A tonic: its bonuses take no meal slot.")]
     [SerializeField] private bool tonic;
+    [Tooltip("A weapon coating (Ember Pitch): rubbed on the blade, not eaten. Its bonuses take no meal or tonic slot, and one coating " +
+             "works at a time: a new one takes the old one's place. Made and used as a tonic is (Alchemy, Tonic Duration).")]
+    [SerializeField] private bool coating;
     [Tooltip("Status effects it takes away: an antidote cures Poison.")]
     [SerializeField] private List<StatusEffectDefinition> cures = new List<StatusEffectDefinition>();
     [Tooltip("A repair kit: share of full durability every worn piece gets back. 0.3 means 30%.")]
@@ -283,6 +286,10 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public IReadOnlyList<StatBonus> BoonBonuses => boonBonuses;
     public float BoonSeconds => boonSeconds;
     public bool IsTonic => tonic;
+    /// <summary>A weapon coating: a boon of its own slot, one at a time (PlayerBoons).</summary>
+    public bool IsCoating => coating;
+    /// <summary>A meal: a boon that is neither a tonic nor a coating.</summary>
+    public bool IsMeal => HasBoon && !tonic && !coating;
     public IReadOnlyList<StatusEffectDefinition> Cures => cures;
     /// <summary>True when eating it gives timed bonuses.</summary>
     public bool HasBoon => boonBonuses.Count > 0 && boonSeconds > 0f;

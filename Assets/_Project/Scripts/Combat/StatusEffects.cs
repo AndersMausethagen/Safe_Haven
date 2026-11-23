@@ -87,6 +87,7 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
                 if (effects[e] == definition)
                 {
                     active.RemoveAt(i);
+                    Ended(definition);
                     Changed?.Invoke(definition, false);
                     cured++;
                     break;
@@ -136,10 +137,16 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
 
     private void Add(StatusEffectDefinition effect, Combatant source)
     {
+        // Resting after it ended (Rest Seconds): the next ring of a volley can't take hold of a player who has just torn free.
+        if (restUntil.TryGetValue(effect, out float resting) && !StatusTiming.MayTakeHold(Time.time, resting))
+        {
+            return;
+        }
+
         Active entry = Find(effect);
         if (entry != null)
         {
-            entry.EndsAt = Time.time + effect.Seconds;
+            entry.EndsAt = StatusTiming.EndsAt(effect, true, entry.EndsAt, Time.time);
             entry.Source = source;
             entry.Scale = DamageCalculator.BonusScale(source);
             return;
@@ -147,16 +154,51 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
 
         active.Add(new Active
         {
-            Definition = effect, Source = source, Scale = DamageCalculator.BonusScale(source), EndsAt = Time.time + effect.Seconds,
+            Definition = effect, Source = source, Scale = DamageCalculator.BonusScale(source), EndsAt = StatusTiming.EndsAt(effect, false, 0f, Time.time),
             NextTick = Time.time + TickSeconds,
         });
         UpdateSpeed();
         if (movement != null)
         {
-            GameMessages.Post($"{effect.DisplayName}!", MessageKind.Warning);
+            GameMessages.Post(effect.TakesHoldLine, MessageKind.Warning);
         }
 
         Changed?.Invoke(effect, true);
+    }
+
+    // When each effect that ended may take hold again (Status Effect › Rest Seconds).
+    private readonly Dictionary<StatusEffectDefinition, float> restUntil = new Dictionary<StatusEffectDefinition, float>();
+
+    private void Ended(StatusEffectDefinition effect)
+    {
+        if (effect != null && effect.RestSeconds > 0f)
+        {
+            restUntil[effect] = StatusTiming.RestUntil(effect, Time.time);
+        }
+    }
+
+    /// <summary>A roll tears the player free of what a roll ends (Status Effect › Ends On Dodge: Roots). Returns how many it ended.</summary>
+    public int EndOnDodge()
+    {
+        int ended = 0;
+        for (int i = active.Count - 1; i >= 0; i--)
+        {
+            StatusEffectDefinition definition = active[i].Definition;
+            if (definition != null && definition.EndsOnDodge)
+            {
+                active.RemoveAt(i);
+                Ended(definition);
+                Changed?.Invoke(definition, false);
+                ended++;
+            }
+        }
+
+        if (ended > 0)
+        {
+            UpdateSpeed();
+        }
+
+        return ended;
     }
 
     private void Update()
@@ -167,6 +209,7 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
             if (target == null || !target.IsAlive || Time.time >= entry.EndsAt)
             {
                 active.RemoveAt(i);
+                Ended(entry.Definition);
                 UpdateSpeed();
                 Changed?.Invoke(entry.Definition, false);
             }

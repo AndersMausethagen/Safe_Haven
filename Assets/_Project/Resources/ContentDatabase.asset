@@ -280,6 +280,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c1b0820dabd6ea743a1ab412a359310c, type: 2}
   - {fileID: 11400000, guid: 92179f516b64dce4482c9d696da5dc41, type: 2}
   - {fileID: 11400000, guid: 7b474eec64e460840bbcadb1a0fa3cf8, type: 2}
+  - {fileID: 11400000, guid: 67e9007d1cac072429d0fd5249e1bcbb, type: 2}
+  - {fileID: 11400000, guid: a74ced39f6a083047955bfe7834c61f0, type: 2}
   resourceCatalog: {fileID: 11400000, guid: 82528be8462042341acfc62489e5c91f, type: 2}
   recipeBook: {fileID: 11400000, guid: cd7724124d8b393439143345d7f2b45f, type: 2}
   saveablePrefabs:
@@ -509,6 +511,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 002e81b2272f9d94ba3274891dd390d6, type: 2}
   - {fileID: 11400000, guid: 43d140c7ce0db8248af73e619971f999, type: 2}
   - {fileID: 11400000, guid: eebb289a3dca56448b8f1e8823cc1ca8, type: 2}
+  - {fileID: 11400000, guid: 974fa4eab9d545645a9733f74c28fbcd, type: 2}
   - {fileID: 11400000, guid: d1cd1e12e7d99414ea3e75c867fa6f79, type: 2}
   - {fileID: 11400000, guid: 571e6ab5abe7e304dbc8874605ee77f4, type: 2}
   - {fileID: 11400000, guid: ffa2fdcd52de08740b9d0a2ce621cb54, type: 2}

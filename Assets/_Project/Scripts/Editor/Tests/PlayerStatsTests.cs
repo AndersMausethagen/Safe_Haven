@@ -158,7 +158,8 @@ public sealed class PlayerStatsTests
     {
         foreach (ItemDefinition item in AssetDatabase.FindAssets("t:ItemDefinition").Select(guid => AssetDatabase.LoadAssetAtPath<ItemDefinition>(AssetDatabase.GUIDToAssetPath(guid))))
         {
-            if (item == null || item.BoonBonuses == null || item.BoonBonuses.Count == 0)
+            // A coating (Ember Pitch) has a slot of its own and shares no family with food (PlayerBoons).
+            if (item == null || item.BoonBonuses == null || item.BoonBonuses.Count == 0 || item.IsCoating)
             {
                 continue;
             }

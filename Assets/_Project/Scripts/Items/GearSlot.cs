@@ -325,6 +325,8 @@ public static class StatNames
             case StatType.BluntResistance: return "Blunt Resistance";
             case StatType.SlashResistance: return "Slash Resistance";
             case StatType.StabResistance: return "Stab Resistance";
+            case StatType.MeleeFireDamage: return "Fire on Swings";
+            case StatType.MeleeIgniteChance: return "Chance to Ignite";
             default: return stat.ToString();
         }
     }

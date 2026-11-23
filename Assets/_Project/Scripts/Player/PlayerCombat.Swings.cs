@@ -813,6 +813,8 @@ public sealed partial class PlayerCombat
         // A charge: at a gallop the blow knocks the struck off their feet.
         DamageResult result = AttackResolver.Apply(combatant, pending.Attack, pending.WeaponDamage, pending.Hit, pending.Origin, pending.Direction, damage,
             poise * PlayerRiding.ChargePoise(gameObject), technique, critical);
+        // A coated blade (Ember Pitch): the swing's fire after it, and now and then a burn.
+        CoatedFire.AfterSwing(combatant, target, result, pending.WeaponDamage, pending.Hit.Point, pending.Direction);
         if (monster != null && target.IsAlive)
         {
             // Only a blow that struck home crushes: not one it hopped clear of or parried. Its poise breaks as a blow's would: a stagger, or

@@ -357,6 +357,13 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [SerializeField, Min(0f)] private float huntersMarkSeconds = 6f;
     [SerializeField, Min(1f)] private float huntersMarkPoise = 1.5f;
 
+    [Header("Fire on swings (a weapon coating: Ember Pitch)")]
+    [Tooltip("A creature a coated swing sets alight (Stat › Melee Ignite Chance) burns for this share of the weapon's damage each " +
+             "second, as a fire arrow's burn does: before the player's damage scale and bonus, which Burning adds.")]
+    [SerializeField, Min(0f)] private float meleeBurnShare = 0.35f;
+    [Tooltip("Seconds a creature set alight by a coated swing burns.")]
+    [SerializeField, Min(0f)] private float meleeBurnSeconds = 4f;
+
     public float ChainGrace => chainGrace;
     public float RhythmEarly => rhythmEarly;
     public float RhythmLate => rhythmLate;
@@ -513,5 +520,7 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float ArtCooldown => artCooldown;
     public float HuntersMarkSeconds => huntersMarkSeconds;
     public float HuntersMarkPoise => huntersMarkPoise;
+    public float MeleeBurnShare => meleeBurnShare;
+    public float MeleeBurnSeconds => meleeBurnSeconds;
     public float StaggeredDamageTaken => staggeredDamageTaken;
 }

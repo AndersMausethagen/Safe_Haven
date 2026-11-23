@@ -253,10 +253,21 @@ public static class QuestReachability
 
         // A quest's own start teaches what it introduces (BuildingGate), as do the quests done before it.
         reach.Known.UnionWith(quest.UnlocksBuildings.Where(b => b != null));
+        // And the recipes it teaches as it starts (Quest › Teaches At Start), as do the quests done before it.
+        foreach (RecipeDefinition recipe in quest.TeachesAtStart.Where(r => r != null))
+        {
+            reach.Recipes.Add(recipe);
+        }
+
         foreach (QuestDefinition done in reach.Done)
         {
             reach.Known.UnionWith(done.UnlocksBuildings.Where(b => b != null));
             foreach (RecipeDefinition recipe in done.RewardRecipes.Where(r => r != null))
+            {
+                reach.Recipes.Add(recipe);
+            }
+
+            foreach (RecipeDefinition recipe in done.TeachesAtStart.Where(r => r != null))
             {
                 reach.Recipes.Add(recipe);
             }

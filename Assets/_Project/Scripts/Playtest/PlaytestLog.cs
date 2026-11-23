@@ -134,6 +134,14 @@ public static class PlaytestLog
     public const string BagAtEnd = "BagAtEnd";
     /// <summary>A raid's nodes, as it ended: subject the node's id, amount how many the player gathered, detail "standing N".</summary>
     public const string NodesMined = "NodesMined";
+    // Boss fights (Docs/HeartrootPlaytest_2026-11-23.md P0: the first hand try left no trace of the boss's side):
+    /// <summary>A boss fight ended: subject the boss's id, amount its health left in percent, detail the outcome (won, died, left), the
+    /// seconds from its waking, the stage reached, topples by cause, heart strikes, interrupts, calls and bound summons killed, the
+    /// player's damage to it by kind of blow, draughts drunk and what struck the last blow on the player.</summary>
+    public const string BossTry = "BossTry";
+    /// <summary>A moment in a boss fight: subject what (wake, stage, topple), amount its health in percent, detail the seconds since it
+    /// woke and, for a topple, its cause and length.</summary>
+    public const string Boss = "Boss";
     /// <summary>Someone stranded: subject the resident's id, amount the seconds left, detail freed, sent home, extracted or fell.</summary>
     public const string Rescue = "Rescue";
     /// <summary>The playtester's one tap on the results screen (RaidResultsScreen, playtests only): subject the reason.</summary>

@@ -245,6 +245,11 @@ public sealed class PlayerDodge : MonoBehaviour
         }
 
         DodgeStarted?.Invoke(style, shape);
+        // A roll tears free of what holds the feet (Status Effect › Ends On Dodge: Roots).
+        if (TryGetComponent(out StatusEffects holds) && holds.EndOnDodge() > 0)
+        {
+            GameMessages.Post("You tear free.", MessageKind.Gain);
+        }
 
         SetTrail(true);
         Dodged?.Invoke(direction);

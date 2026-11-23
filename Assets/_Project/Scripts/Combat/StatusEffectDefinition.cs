@@ -28,6 +28,18 @@ public sealed class StatusEffectDefinition : ScriptableObject, IDisplayName
     [Tooltip("Share of normal speed the player moves at while it lasts: 1 is unhindered, 0 holds them in place.")]
     [SerializeField, Range(0f, 1f)] private float moveSpeed = 1f;
 
+    [Header("Getting free (Docs/HeartrootPlaytest_2026-11-23.md P5)")]
+    [Tooltip("A new hit while it is at work restarts its time. Off: it runs out on its first time, so a volley's later blows (Root " +
+             "Eruption's three rings) can't hold the player longer than the first did.")]
+    [SerializeField] private bool refreshes = true;
+    [Tooltip("A roll tears the player free of it at once (Roots).")]
+    [SerializeField] private bool endsOnDodge;
+    [Tooltip("After it ends (run out, torn free or cured), it can't take hold again for this long, in seconds: the next ring of a volley " +
+             "can't root the player who has just rolled clear. 0: at once.")]
+    [SerializeField, Min(0f)] private float restSeconds;
+    [Tooltip("What the player is told when it takes hold, so they know the way out (\"Rooted! Roll to tear free.\"). Empty: its name.")]
+    [SerializeField] private string takesHoldLine;
+
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public string Description => description;
@@ -37,4 +49,8 @@ public sealed class StatusEffectDefinition : ScriptableObject, IDisplayName
     public float DamagePerSecond => damagePerSecond;
     public DamageType DamageType => damageType;
     public float MoveSpeed => moveSpeed;
+    public bool Refreshes => refreshes;
+    public bool EndsOnDodge => endsOnDodge;
+    public float RestSeconds => restSeconds;
+    public string TakesHoldLine => string.IsNullOrWhiteSpace(takesHoldLine) ? $"{DisplayName}!" : takesHoldLine;
 }

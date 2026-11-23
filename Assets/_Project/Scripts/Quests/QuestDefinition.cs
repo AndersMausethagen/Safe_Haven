@@ -114,6 +114,9 @@ public sealed class QuestDefinition : ScriptableObject
     [SerializeField] private List<ItemAmount> rewardItems = new List<ItemAmount>();
     [SerializeField] private List<ResourceAmount> rewardResources = new List<ResourceAmount>();
     [SerializeField] private List<RecipeDefinition> rewardRecipes = new List<RecipeDefinition>();
+    [Tooltip("Recipes it teaches as it starts, so one of its objectives can ask for the thing made (What the Old Wood Fears teaches " +
+             "Ember Pitch, then asks for one). Rewards come at the end; these come at once.")]
+    [SerializeField] private List<RecipeDefinition> teachesAtStart = new List<RecipeDefinition>();
     [Tooltip("Enchantments taught for good (a teacher shows how): Liv's quests (Docs/EnchantingResearch.md #6).")]
     [SerializeField] private List<EnchantmentDefinition> rewardEnchantments = new List<EnchantmentDefinition>();
     [Tooltip("Someone at home the quest rewards: their job skill grows by Reward Work (Liv's rank from her own quests), and they may be given a " +
@@ -193,6 +196,7 @@ public sealed class QuestDefinition : ScriptableObject
     public int Experience => experience;
     public IReadOnlyList<ResourceAmount> RewardResources => rewardResources;
     public IReadOnlyList<RecipeDefinition> RewardRecipes => rewardRecipes;
+    public IReadOnlyList<RecipeDefinition> TeachesAtStart => teachesAtStart;
     public IReadOnlyList<BuildingDefinition> UnlocksBuildings => unlocksBuildings;
     public IReadOnlyList<BuildingModuleDefinition> UnlocksModules => unlocksModules;
     public IReadOnlyList<EnchantmentDefinition> RewardEnchantments => rewardEnchantments;

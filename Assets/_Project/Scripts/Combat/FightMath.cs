@@ -23,6 +23,9 @@ public static class FightMath
         public float MeleeDamage;
         /// <summary>Share of a physical blow taken away: Physical Resistance, and a third of each strike kind's (blunt, slash, stab).</summary>
         public float Resist;
+        /// <summary>Share of each swing added as fire (a coating), and the chance a swing sets the struck alight.</summary>
+        public float MeleeFire;
+        public float IgniteChance;
 
         public Totals Copy() => (Totals)MemberwiseClone();
 
@@ -41,6 +44,8 @@ public static class FightMath
                 case StatType.PhysicalCritDamage: CritDamage += value; break;
                 case StatType.DamageBonus: DamageBonus += value; break;
                 case StatType.MeleeDamage: MeleeDamage += value; break;
+                case StatType.MeleeFireDamage: MeleeFire += value; break;
+                case StatType.MeleeIgniteChance: IgniteChance += value; break;
                 case StatType.PhysicalResistance: Resist += value; break;
                 // The reference creature's blows are of every kind: a strike kind's resistance stops a third of them.
                 case StatType.BluntResistance: case StatType.SlashResistance: case StatType.StabResistance: Resist += value / 3f; break;
@@ -56,7 +61,21 @@ public static class FightMath
         /// <summary>Everything that multiplies a weapon's damage, as one share (1 = the weapon as it is).</summary>
         public float DamageShare(CombatRules rules) =>
             Mathf.Max(0f, 1f + (Strength * rules.PowerPerStrength + Power) * rules.DamagePerPower) * Mathf.Max(0f, 1f + DamageBonus)
-            * Mathf.Max(0f, 1f + MeleeDamage) * (1f + Mathf.Clamp01(CritChance) * Mathf.Max(0f, CritDamage));
+            * Mathf.Max(0f, 1f + MeleeDamage) * (1f + Mathf.Clamp01(CritChance) * Mathf.Max(0f, CritDamage))
+            * (1f + Mathf.Max(0f, MeleeFire) + Mathf.Clamp01(IgniteChance) * BurnPerIgnite);
+
+        /// <summary>
+        /// A burn's worth, in swings of the weapon (CombatTechniqueSettings › Melee Burn Share × Seconds): what one ignite adds on
+        /// average. An upper bound: a burn restarted before it ends gives less, as one creature burns once at a time.
+        /// </summary>
+        public static float BurnPerIgnite
+        {
+            get
+            {
+                CombatTechniqueSettings rules = CombatTechniqueSettings.Current;
+                return rules != null ? rules.MeleeBurnShare * rules.MeleeBurnSeconds : 0f;
+            }
+        }
 
         /// <summary>How much damage it takes to kill: health over what armour and resistance let through.</summary>
         public float Toughness(CombatRules rules) => FullHealth / Mathf.Max(0.01f, (1f - rules.GetArmorReduction(Armor)) * (1f - Mathf.Clamp(Resist, 0f, 0.9f)));
@@ -70,6 +89,7 @@ public static class FightMath
             Armor = stats.Get(StatType.Armor), Health = maxHealth, Strength = stats.Get(StatType.Strength), Power = stats.Get(StatType.PhysicalPower),
             CritChance = stats.Get(StatType.PhysicalCritChance), CritDamage = stats.Get(StatType.PhysicalCritDamage),
             DamageBonus = stats.Get(StatType.DamageBonus), MeleeDamage = stats.Get(StatType.MeleeDamage),
+            MeleeFire = stats.Get(StatType.MeleeFireDamage), IgniteChance = stats.Get(StatType.MeleeIgniteChance),
             Resist = stats.Get(StatType.PhysicalResistance)
                      + (stats.Get(StatType.BluntResistance) + stats.Get(StatType.SlashResistance) + stats.Get(StatType.StabResistance)) / 3f,
         };

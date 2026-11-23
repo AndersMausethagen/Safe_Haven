@@ -201,7 +201,13 @@ public static class GearBalance
         OneMoreOfEach,
     }
 
-    public static Kit StackedKitOf(int tier, IReadOnlyList<ItemDefinition> gear, bool enchanted, int reached, bool consumables, FoodSlots slots)
+    /// <summary>A stacked kit with or without its coating (Ember Pitch): a coating has a budget of its own, as enchantments do
+    /// (RaidTierTests: PowerCurveSettings › Coating Damage).</summary>
+    public static Kit StackedKitOf(int tier, IReadOnlyList<ItemDefinition> gear, bool enchanted, bool coated) =>
+        StackedKitOf(tier, gear, enchanted, tier, true, FoodSlots.Base, coated);
+
+    public static Kit StackedKitOf(int tier, IReadOnlyList<ItemDefinition> gear, bool enchanted, int reached, bool consumables, FoodSlots slots,
+        bool coated = true)
     {
         Kit plain = KitOf(tier, gear);
         var kit = new Kit { Tier = tier, Score = plain.Score, SkillDamage = plain.SkillDamage };
@@ -287,7 +293,7 @@ public static class GearBalance
         var families = new HashSet<string>();
         void Eat(bool tonics, int slots)
         {
-            var left = food.Where(item => item.IsTonic == tonics && !families.Contains(BoonFamily.Of(item.BoonBonuses))).ToList();
+            var left = food.Where(item => (tonics ? item.IsTonic : item.IsMeal) && !families.Contains(BoonFamily.Of(item.BoonBonuses))).ToList();
             for (int i = 0; i < slots && left.Count > 0; i++)
             {
                 ItemDefinition pick = left.OrderByDescending(item => { FightMath.Totals t = totals.Copy(); Take(item.BoonBonuses, t); return Worth(t); })
@@ -320,6 +326,16 @@ public static class GearBalance
 
             Eat(false, (survival != null ? survival.MealSlots : 2) + extraMeals);
             Eat(true, (survival != null ? survival.TonicSlots : 1) + extraTonics);
+            // A weapon coating (Ember Pitch): a slot of its own, one at a time, sharing no family (PlayerBoons).
+            ItemDefinition coating = food.Where(item => item.IsCoating)
+                .OrderByDescending(item => { FightMath.Totals t = totals.Copy(); Take(item.BoonBonuses, t); return Worth(t); })
+                .ThenBy(item => item.name, StringComparer.Ordinal).FirstOrDefault();
+            if (coated && coating != null)
+            {
+                Take(coating.BoonBonuses, totals);
+                kit.Food.Add(coating);
+            }
+
             // Well Rested (Docs/BaseProgression.md › Endurance): +10% health.
             totals.HealthShare += WellRestedHealth;
         }

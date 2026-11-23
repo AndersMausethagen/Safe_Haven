@@ -71,6 +71,8 @@ MonoBehaviour:
     comboGap: 0.3
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -91,6 +93,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -98,6 +102,9 @@ MonoBehaviour:
     summonCount: 0
     summonRadius: 0
     summonLimit: 0
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
     lobSeconds: 1.1
     lobScatter: 2
   - attack: {fileID: 11400000, guid: fc04e0fb92cf2094a8f44b7d7a8774ae, type: 2}
@@ -129,6 +136,8 @@ MonoBehaviour:
     comboGap: 0.3
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -149,6 +158,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -156,6 +167,9 @@ MonoBehaviour:
     summonCount: 0
     summonRadius: 0
     summonLimit: 0
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
     lobSeconds: 1.1
     lobScatter: 2
   - attack: {fileID: 11400000, guid: 8b8fb1c1cf4eb1d418ec703c81e62251, type: 2}
@@ -186,6 +200,8 @@ MonoBehaviour:
     comboGap: 0.3
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -206,6 +222,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -213,6 +231,9 @@ MonoBehaviour:
     summonCount: 0
     summonRadius: 0
     summonLimit: 0
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
     lobSeconds: 1.1
     lobScatter: 2
   - attack: {fileID: 11400000, guid: ec517eb1764eab644afa3dd22f15556f, type: 2}
@@ -243,6 +264,8 @@ MonoBehaviour:
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 3
@@ -263,6 +286,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -270,6 +295,9 @@ MonoBehaviour:
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
     lobSeconds: 1
     lobScatter: 2.5
   - attack: {fileID: 11400000, guid: bda696c62e232594a9300471c41dfe88, type: 2}
@@ -300,6 +328,8 @@ MonoBehaviour:
     comboGap: 0.3
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -320,6 +350,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -327,6 +359,9 @@ MonoBehaviour:
     summonCount: 0
     summonRadius: 0
     summonLimit: 0
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
     lobSeconds: 1.1
     lobScatter: 2
   - attack: {fileID: 11400000, guid: f32e46b509dc9dd4dad36e1d0e1ec153, type: 2}
@@ -357,6 +392,8 @@ MonoBehaviour:
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -377,6 +414,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: calls up its roots, and its heart lies open!
@@ -384,6 +423,9 @@ MonoBehaviour:
     summonCount: 2
     summonRadius: 3
     summonLimit: 3
+    bondPoiseShare: 0.3
+    bondToppleSeconds: 4
+    bondWithin: 12
     lobSeconds: 1.1
     lobScatter: 2
   - attack: {fileID: 11400000, guid: c80bd2e5c156c29499534bfe375edbc7, type: 2}
@@ -414,6 +456,8 @@ MonoBehaviour:
     comboGap: 0.3
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -434,6 +478,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -441,6 +487,9 @@ MonoBehaviour:
     summonCount: 0
     summonRadius: 0
     summonLimit: 0
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
     lobSeconds: 1.1
     lobScatter: 2
   - attack: {fileID: 11400000, guid: ded5c36ea12f75e47aaac3b533258edc, type: 2}
@@ -471,6 +520,8 @@ MonoBehaviour:
     comboGap: 0.3
     comboFromTier: 0
     holdChance: 0.4
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -491,6 +542,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -498,6 +551,9 @@ MonoBehaviour:
     summonCount: 0
     summonRadius: 0
     summonLimit: 0
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
     lobSeconds: 1.1
     lobScatter: 2
   - attack: {fileID: 11400000, guid: fc04e0fb92cf2094a8f44b7d7a8774ae, type: 2}
@@ -530,6 +586,8 @@ MonoBehaviour:
     comboGap: 0.3
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -550,6 +608,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -557,6 +617,9 @@ MonoBehaviour:
     summonCount: 0
     summonRadius: 0
     summonLimit: 0
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
     lobSeconds: 1.1
     lobScatter: 2
   - attack: {fileID: 11400000, guid: 2262720174b6c014c9279cb8f0154559, type: 2}
@@ -587,6 +650,8 @@ MonoBehaviour:
     comboGap: 0.3
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -607,6 +672,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -614,6 +681,9 @@ MonoBehaviour:
     summonCount: 0
     summonRadius: 0
     summonLimit: 0
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
     lobSeconds: 1.1
     lobScatter: 2
   - attack: {fileID: 11400000, guid: 0ea8338d7bde79e45b359467a33d0f0e, type: 2}
@@ -644,6 +714,8 @@ MonoBehaviour:
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -664,6 +736,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: draws sap from the deep roots and mends. Strike it to break the draw!
@@ -671,6 +745,9 @@ MonoBehaviour:
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
     lobSeconds: 1.1
     lobScatter: 2
   - attack: {fileID: 11400000, guid: e037e659b8313ce45b50986650d8838f, type: 2}
@@ -701,6 +778,8 @@ MonoBehaviour:
     comboGap: 0.3
     comboFromTier: 0
     holdChance: 0.35
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -721,6 +800,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -728,6 +809,9 @@ MonoBehaviour:
     summonCount: 0
     summonRadius: 0
     summonLimit: 0
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
     lobSeconds: 1.1
     lobScatter: 2
   - attack: {fileID: 11400000, guid: df0493656ad4c2e44b2ca7938fd999f6, type: 2}
@@ -758,6 +842,8 @@ MonoBehaviour:
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 6
@@ -778,6 +864,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -785,6 +873,9 @@ MonoBehaviour:
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
     lobSeconds: 1.2
     lobScatter: 4
   - attack: {fileID: 11400000, guid: df0493656ad4c2e44b2ca7938fd999f6, type: 2}
@@ -815,6 +906,8 @@ MonoBehaviour:
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 4
@@ -835,6 +928,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -842,6 +937,9 @@ MonoBehaviour:
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
     lobSeconds: 1.2
     lobScatter: 2.5
   - attack: {fileID: 11400000, guid: fc04e0fb92cf2094a8f44b7d7a8774ae, type: 2}
@@ -875,6 +973,8 @@ MonoBehaviour:
     comboGap: 0.3
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -895,6 +995,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -902,6 +1004,9 @@ MonoBehaviour:
     summonCount: 0
     summonRadius: 0
     summonLimit: 0
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
     lobSeconds: 1.1
     lobScatter: 2
   - attack: {fileID: 11400000, guid: 0ea8338d7bde79e45b359467a33d0f0e, type: 2}
@@ -932,6 +1037,8 @@ MonoBehaviour:
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -952,6 +1059,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: draws sap from the deep roots and mends. Strike it to break the draw!
@@ -959,6 +1068,9 @@ MonoBehaviour:
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
     lobSeconds: 1.1
     lobScatter: 2
   - attack: {fileID: 11400000, guid: a726a6748051fe6428075fb65ef601f7, type: 2}
@@ -989,6 +1101,8 @@ MonoBehaviour:
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -1009,6 +1123,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: drives its roots into the hollow, and the whole floor rises against you!
@@ -1016,6 +1132,9 @@ MonoBehaviour:
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
     lobSeconds: 1.1
     lobScatter: 2
   - attack: {fileID: 11400000, guid: 3662486d21d9a6f41bdf0bf4376c1054, type: 2}
@@ -1046,6 +1165,8 @@ MonoBehaviour:
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 4774033439812504928, guid: 0341f72fdde922a42ab1f9b82b288aba, type: 3}
     burstCount: 4
@@ -1066,6 +1187,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -1073,6 +1196,9 @@ MonoBehaviour:
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
     lobSeconds: 1.1
     lobScatter: 2
   movementTactic: 0
@@ -1089,6 +1215,7 @@ MonoBehaviour:
   idleGrazeChance: 0
   idleSleepChance: 0
   idleSleepAttention: 0.3
+  swims: 0
   timid: 0
   boltSeconds: 7
   thief: 0
@@ -1097,6 +1224,8 @@ MonoBehaviour:
   corneredSeconds: 4
   canBeFinished: 0
   flankSpread: 0
+  flanksFromTier: 0
+  flankSound: {fileID: 0}
   breaksWalls: 0
   spottedPause: 0
   guardAfterBlows: 0
@@ -1137,7 +1266,7 @@ MonoBehaviour:
   shadeVariation: 0
   portrait: {fileID: 21300000, guid: 1f56c95d2bef296448cb6503a55551f3, type: 3}
   journalLore: The first of the guardians, grown old and vast under its hollow. It was set here to keep the forest. Nobody has told it the forest is gone.
-  journalAdvice: 'It wakes slowly, and the fight changes as it goes on: it learns new things at each stage. Parries and heavy blows shake its footing, and enough of them floor it: get behind it then, where its heart lies open. Roots rise at its call, so don''t stand still. Its black sap rots the blood: bring an Antidote, and food. What it gives when it falls is knowledge, and you keep that even if you die on the way home.'
+  journalAdvice: 'It wakes slowly, and the fight changes as it goes on: it learns new things at each stage. Parries and heavy blows shake its footing, and enough of them floor it: get behind it then, where its heart lies open. The Rootlings it calls are tied to it by sap: kill them quickly and the roots tear out of it, and it falls. Its old wood fears fire: Ember Pitch on your blade, or fire arrows. Its black sap rots the blood: bring an Antidote, and food. What it gives when it falls is knowledge, and you keep that even if you die on the way home.'
   journalHabitat: Under its hollow, at the heart of the Misty Woods
   journalKillsToKnow: 1
   deathSound: {fileID: 11400000, guid: c1b20528b0c96cd42914b3230c77041e, type: 2}

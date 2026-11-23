@@ -70,7 +70,7 @@ public sealed partial class MonsterAI
                 {
                     if (Topples)
                     {
-                        Topple(-transform.forward, definition.ToppleSeconds, true);
+                        Topple(-transform.forward, definition.ToppleSeconds, true, false, ToppleCause.Parry);
                     }
                     else
                     {
@@ -117,7 +117,7 @@ public sealed partial class MonsterAI
     }
 
     /// <summary>Wears its poise down without a blow (a shield block knocking it back); a break staggers it as a blow's would.</summary>
-    public void TakePoise(float amount)
+    public void TakePoise(float amount, ToppleCause cause = ToppleCause.Blows)
     {
         if (IsRemote || poise == null || amount <= 0f || CurrentState == State.Staggered || CurrentState == State.Dead)
         {
@@ -128,7 +128,7 @@ public sealed partial class MonsterAI
         {
             if (Topples)
             {
-                Topple(-transform.forward, definition.ToppleSeconds, true);
+                Topple(-transform.forward, definition.ToppleSeconds, true, false, cause);
             }
             else
             {

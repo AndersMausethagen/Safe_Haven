@@ -1,0 +1,134 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
+  m_Name: WhatTheOldWoodFears
+  m_EditorClassIdentifier: SafeHaven::QuestDefinition
+  id: whattheoldwoodfears
+  displayName: What the Old Wood Fears
+  description: 'The portal knows the guardian under the roots. It is old wood, and old wood fears one thing: fire. The Misty Woods'' trees weep a black sap when they fall. Boil it down around an ember from your hearth, rub it on your blade, and every blow will burn.'
+  chain: The Hearth and the Door
+  journalNotes: 'Fell trees in the Misty Woods: about half of them weep Cursed Sap. Two of it and a Hearth Ember make Ember Pitch at any campfire. Use it from the bag like a tonic: for five minutes your blows carry fire, and now and then set what they strike alight. A fight with the Heartroot lasts longer than one coat: bring two.'
+  rank: 2
+  availableObjective: 
+  announceStart: 1
+  announceCompletion: 1
+  showTimerInHud: 0
+  prerequisites:
+  - {fileID: 11400000, guid: 5b96808e29f58414c97811c3ec9f1a0a, type: 2}
+  startedFirst: []
+  start: 0
+  startEvent: {fileID: 0}
+  startWhen:
+    type: 0
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
+  closedBy: {fileID: 11400000, guid: bd7dd70969be8174c8acfefd449bf963, type: 2}
+  startDelay: 0
+  startsInAFight: 0
+  startsWithoutWaiting: 1
+  onStarted: []
+  objectivesInOrder: 1
+  objectives:
+  - type: 0
+    description: Fell trees in the Misty Woods for Cursed Sap
+    amount: 2
+    item: {fileID: 11400000, guid: a74ced39f6a083047955bfe7834c61f0, type: 2}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
+  - type: 4
+    description: Boil Ember Pitch at a campfire
+    amount: 1
+    item: {fileID: 11400000, guid: 67e9007d1cac072429d0fd5249e1bcbb, type: 2}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
+  unlocksBuildings: []
+  unlocksModules: []
+  turnInToGiver: 0
+  turnInTo: 
+  rewardItems:
+  - item: {fileID: 11400000, guid: 67e9007d1cac072429d0fd5249e1bcbb, type: 2}
+    amount: 1
+  rewardResources: []
+  rewardRecipes: []
+  teachesAtStart:
+  - {fileID: 11400000, guid: bf8327a352752bc47b85aef7edea7951, type: 2}
+  rewardEnchantments: []
+  rewardWorkFor: {fileID: 0}
+  rewardWork: 0
+  rewardPassion: 0
+  rewardMark: {fileID: 0}
+  experience: 60
+  completionEvent: {fileID: 0}
+  onCompleted: []

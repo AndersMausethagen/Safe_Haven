@@ -86,7 +86,7 @@ public static class CraftedWork
             return CraftedGoods.Tools;
         }
 
-        if (item.IsTonic || item.Cures.Count > 0)
+        if (item.IsTonic || item.IsCoating || item.Cures.Count > 0)
         {
             return CraftedGoods.Tonics;
         }

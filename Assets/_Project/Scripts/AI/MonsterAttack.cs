@@ -161,6 +161,15 @@ public sealed class MonsterAttack
     [Min(0.5f)] public float summonRadius = 3f;
     [Tooltip("The most of its summons alive at once.")]
     [Min(1)] public int summonLimit = 4;
+    [Tooltip("Bound summons (the Heartroot's Rootlings; Docs/HeartrootPlaytest_2026-11-23.md P1): each one of this call that dies sends a " +
+             "shock up the sap line that ties it to the summoner, taking this share of the summoner's own poise (a parry takes 0.4). 0: " +
+             "the summons are free, with no line.")]
+    [Range(0f, 1f)] public float bondPoiseShare;
+    [Tooltip("When every summon of one call has died within Bond Within seconds of the call, the summoner topples for this long, its " +
+             "heart open: the roots it called tear out of it. 0: no topple, only the shocks.")]
+    [Min(0f)] public float bondToppleSeconds;
+    [Tooltip("Seconds after the call within which killing all of its summons topples the summoner.")]
+    [Min(0f)] public float bondWithin = 12f;
     [Header("Lob (aimed at the ground where its foe stands)")]
     [Tooltip("Seconds between the throw and the landing, while the ring on the ground fills: the time to step out. " +
              "The attack's Range is the ring's radius (give it an Arc of 360). Burst Count lobs fall one after another, each " +

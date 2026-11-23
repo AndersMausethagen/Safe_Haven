@@ -795,7 +795,7 @@ public sealed class RecipeSection : ContentSection
 
         foreach (QuestDefinition quest in ResourceCatalogTools.LoadAll<QuestDefinition>())
         {
-            if (Contains(quest.RewardRecipes, recipe))
+            if (Contains(quest.RewardRecipes, recipe) || Contains(quest.TeachesAtStart, recipe))
             {
                 teachers.Add("the quest " + quest.DisplayName);
             }

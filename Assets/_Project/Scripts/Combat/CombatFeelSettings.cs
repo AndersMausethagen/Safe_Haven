@@ -146,6 +146,14 @@ public sealed class CombatFeelSettings : ScriptableObject
     [Tooltip("The thin ring at the feet of a creature marked by Hunter's Mark (a bow's perfect release).")]
     [SerializeField] private Color huntersMarkColor = new Color(0.55f, 1f, 0.75f, 0.55f);
 
+    [Header("A coated blade (a weapon coating: Ember Pitch)")]
+    [Tooltip("Looping flames on the weapon in hand while a coating's fire is on it (CoatedBladeView): its shape is set to the weapon's " +
+             "own mesh, it smoulders at rest and roars through a swing.")]
+    [SerializeField] private GameObject coatedFlames;
+    [Tooltip("Flames a second at rest, and through a swing.")]
+    [SerializeField, Min(0f)] private float coatedFlamesAtRest = 14f;
+    [SerializeField, Min(0f)] private float coatedFlamesSwinging = 90f;
+
     [Header("Dodge")]
     [Tooltip("Trail left behind while dodging. Uses the telegraph material.")]
     [SerializeField] private Gradient dodgeTrailColor = DefaultTrail();
@@ -426,6 +434,9 @@ public sealed class CombatFeelSettings : ScriptableObject
     public float OpeningReach => openingReach;
     public float OpeningWidth => openingWidth;
     public GameObject ReelingEffect => reelingEffect;
+    public GameObject CoatedFlames => coatedFlames;
+    public float CoatedFlamesAtRest => coatedFlamesAtRest;
+    public float CoatedFlamesSwinging => coatedFlamesSwinging;
     public float ReelingSway => reelingSway;
     public float ReelingSwayRate => reelingSwayRate;
     public Color ReelingBarColor => reelingBarColor;

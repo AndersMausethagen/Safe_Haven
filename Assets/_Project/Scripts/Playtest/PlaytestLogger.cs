@@ -53,6 +53,8 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
             ExperienceTracker.Gained += OnGained;
             Damageable.AnyDamaged += OnAnyDamaged;
             ResourceSource.Harvested += OnHarvested;
+            // Boss fights: a Boss row at each moment, a BossTry row as each try ends.
+            BossTryLog.Listen();
         }
     }
 

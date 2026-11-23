@@ -8,6 +8,36 @@ This is analysis and proposals. Nothing is built. It follows `Docs/HeartrootBoss
 changes C1 to C10 are all in the game now. The numbers come from the user's run log `Playtests/20261121-151353.csv`, session 7,
 2026-11-22 22:00 local (rows 7334 to 7655), and from the live assets.
 
+## Status: built 2026-11-23 (the user: "do p0 and p5 and make killing the saplings be a key to a topple", plus a fire recipe)
+
+- **P0, boss rows:** `BossTryLog` and `BossTryTally`. A `Boss` row at its waking, each stage and each topple (with its cause), and
+  one `BossTry` row as a try ends (won, died, left). The row has the health left, the seconds, the stage, topples by cause, heart
+  strikes, interrupts, calls, summons killed, the player's damage by kind of blow, draughts drunk and the last blow on the player.
+- **P5, no root lock:** Status Effect › Refreshes, Ends On Dodge, Rest Seconds and Takes Hold Line (`StatusTiming`). Roots no longer
+  restart on a volley's later rings, a roll tears free, it rests 1.5 s after it ends, and the player is told "Rooted! Roll to tear
+  free."
+- **P1, Rootlings as the key:** Monster Attack › Bond Poise Share 0.3, Bond Topple Seconds 4, Bond Within 12 on the Heartroot's
+  Call Roots (`BoundSummons`, `SummonBondLedger`).
+  - Sap lines tie each Rootling to its chest.
+  - Each Rootling killed takes 30% of its poise.
+  - A whole call killed within 12 s topples it for 4 s.
+  - A Rootling killed by its own slam counts.
+  - Not built: the lines on a friend's copy in co-op (summons are made in the host's game).
+- **The fire weakness, as a recipe the portal teaches (the user's design):**
+  - **The errand:** "What the Old Wood Fears", bronze, from the portal (a whisper after What Breathes'). It starts with The
+    Breathing Hollow done, and closes when The Road North starts.
+  - **What it asks:** it teaches Ember Pitch as it starts (Quest › Teaches At Start, new). Then it asks for 2 Cursed Sap and one
+    Ember Pitch, and rewards a second pitch.
+  - **Cursed Sap:** half the felled Tree, Oak and Hardwood trees in the Misty Woods give one (Drop Entry › Only In Raid, new).
+  - **Ember Pitch:** 2 Cursed Sap and a Hearth Ember at a campfire. A coating (Item › Coating): its own slot, one at a time, used as
+    a tonic for 5 minutes. Every landed swing on a creature adds 25% of itself as Fire (`CoatedFire`), and 5% set it alight
+    (Burning, as fire arrows do). Flames on the blade smoulder at rest and roar through a swing (`CoatedBladeView`, Coated Flames).
+  - **Counted:** in `FightMath` and the stacked kit, under a coating budget of its own (×1.35, PowerCurveSettings). See
+    Docs/BuffBalance_2026-11-23.md.
+  - **Borrowed icons:** Ember Pitch uses the Hearth Ember's, and Cursed Sap uses Rootling Bark's.
+  - **Not voiced yet:** the portal's new line.
+- **Not played by hand.** P2 (bigger topples), P3 (falls at the stage marks) and P4 (braziers) are not built.
+
 ## The short answer
 
 - **You were right: the fight has no vulnerability stage you can see or reach.** Its only big opening is the topple. A topple comes

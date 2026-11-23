@@ -9,15 +9,19 @@ public readonly struct BoonRecord
     public readonly string Name;
     public readonly bool IsMeal;
     public readonly bool IsTonic;
+    /// <summary>A weapon coating (Ember Pitch): its own slot, one at a time.</summary>
+    public readonly bool IsCoating;
     public readonly float SecondsLeft;
     public readonly IReadOnlyList<StatBonus> Bonuses;
 
-    public BoonRecord(string id, string name, bool isMeal, float secondsLeft, IReadOnlyList<StatBonus> bonuses, bool isTonic = false)
+    public BoonRecord(string id, string name, bool isMeal, float secondsLeft, IReadOnlyList<StatBonus> bonuses, bool isTonic = false,
+        bool isCoating = false)
     {
         Id = id;
         Name = name;
         IsMeal = isMeal;
         IsTonic = isTonic;
+        IsCoating = isCoating;
         SecondsLeft = secondsLeft;
         Bonuses = bonuses;
     }
@@ -38,6 +42,7 @@ public sealed class PlayerBoons : MonoBehaviour
         public string Name;
         public bool IsMeal;
         public bool IsTonic;
+        public bool IsCoating;
         public float SecondsLeft;
         public IReadOnlyList<StatBonus> Bonuses;
     }
@@ -57,7 +62,7 @@ public sealed class PlayerBoons : MonoBehaviour
         var records = new List<BoonRecord>(active.Count);
         foreach (Entry entry in active)
         {
-            records.Add(new BoonRecord(entry.Id, entry.Name, entry.IsMeal, entry.SecondsLeft, entry.Bonuses, entry.IsTonic));
+            records.Add(new BoonRecord(entry.Id, entry.Name, entry.IsMeal, entry.SecondsLeft, entry.Bonuses, entry.IsTonic, entry.IsCoating));
         }
 
         return records;
@@ -76,8 +81,13 @@ public sealed class PlayerBoons : MonoBehaviour
         }
     }
 
-    /// <summary>Starts a boon, or restarts it when one with this id is at work. Returns false when it gives nothing.</summary>
-    public bool Add(string id, string displayName, IReadOnlyList<StatBonus> bonuses, float seconds, bool isMeal, bool isTonic = false)
+    /// <summary>
+    /// Starts a boon, or restarts it when one with this id is at work. Returns false when it gives nothing. A coating (Ember Pitch) has a
+    /// slot of its own beside the meals and the tonics: one coating at a time, and it shares no family with them, so it adds to a fed
+    /// and dosed player rather than taking their food's place.
+    /// </summary>
+    public bool Add(string id, string displayName, IReadOnlyList<StatBonus> bonuses, float seconds, bool isMeal, bool isTonic = false,
+        bool isCoating = false)
     {
         if (bonuses == null || bonuses.Count == 0 || seconds <= 0f)
         {
@@ -105,8 +115,19 @@ public sealed class PlayerBoons : MonoBehaviour
         {
             MakeRoomForTonic();
         }
+        else if (isCoating)
+        {
+            for (int i = active.Count - 1; i >= 0; i--)
+            {
+                if (active[i].IsCoating)
+                {
+                    GameMessages.Post($"{active[i].Name} is wiped off for the new coating.");
+                    Stop(i);
+                }
+            }
+        }
 
-        Begin(new Entry { Id = id, Name = displayName, IsMeal = isMeal, IsTonic = isTonic, SecondsLeft = seconds, Bonuses = bonuses });
+        Begin(new Entry { Id = id, Name = displayName, IsMeal = isMeal, IsTonic = isTonic, IsCoating = isCoating, SecondsLeft = seconds, Bonuses = bonuses });
         Changed?.Invoke();
         return true;
     }
@@ -121,7 +142,8 @@ public sealed class PlayerBoons : MonoBehaviour
 
         foreach (BoonRecord record in records)
         {
-            Begin(new Entry { Id = record.Id, Name = record.Name, IsMeal = record.IsMeal, IsTonic = record.IsTonic, SecondsLeft = record.SecondsLeft, Bonuses = record.Bonuses });
+            Begin(new Entry { Id = record.Id, Name = record.Name, IsMeal = record.IsMeal, IsTonic = record.IsTonic, IsCoating = record.IsCoating,
+                SecondsLeft = record.SecondsLeft, Bonuses = record.Bonuses });
         }
 
         Changed?.Invoke();
@@ -214,13 +236,14 @@ public sealed class PlayerBoons : MonoBehaviour
         }
     }
 
-    /// <summary>Ends every meal and tonic at work (a fall under the death rules: HomeFalls); other boons and hindrances go on. Returns how many.</summary>
+    /// <summary>Ends every meal, tonic and coating at work (a fall under the death rules: HomeFalls); other boons and hindrances go
+    /// on. Returns how many.</summary>
     public int EndMealsAndTonics()
     {
         int ended = 0;
         for (int i = active.Count - 1; i >= 0; i--)
         {
-            if (active[i].IsMeal || active[i].IsTonic)
+            if (active[i].IsMeal || active[i].IsTonic || active[i].IsCoating)
             {
                 Stop(i);
                 ended++;

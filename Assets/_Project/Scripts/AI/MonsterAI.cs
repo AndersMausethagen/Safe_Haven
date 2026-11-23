@@ -302,6 +302,9 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     /// lies: its bark breaks (CreatureWounds), a boss's heart glows and its line goes up (BossEncounter). On a friend's copy too.</summary>
     public event Action<float> Toppled;
 
+    /// <summary>A call of its brought these summons up (MonsterAttacks): BoundSummons ties the bound ones to it.</summary>
+    public event Action<MonsterAttack, System.Collections.Generic.List<GameObject>> Summoned;
+
     /// <summary><see cref="Toppled"/> for every monster (game-wide: the playtest log's topples).</summary>
     public static event Action<MonsterAI, float> AnyToppled;
 
@@ -478,6 +481,9 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
         idleDriver = new MonsterIdleDriver(transform, definition, idleLife, movement, senses, pose, ApplySpeed);
         positioning = new MonsterPositioning(transform, movement, senses, definition);
         attacks = new MonsterAttacks(transform, definition, combatant, movement, targetLayers);
+        attacks.Summoned += (action, roots) => Summoned?.Invoke(action, roots);
+        // Summons tied to it by sap lines (Monster Attack › Bond Poise Share / Bond Topple Seconds: the Heartroot's Rootlings).
+        BoundSummons.AddIfBound(this, definition);
         CombatTechniqueSettings technique = CombatTechniqueSettings.Current;
         // A boss's poise can wait longer before it comes back (Monster Definition › Poise Recovery Delay), so it builds across exchanges.
         poise = new PoiseMeter(definition.Poise > 0f ? definition.Poise : technique.DefaultPoise,

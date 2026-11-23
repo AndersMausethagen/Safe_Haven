@@ -816,6 +816,9 @@ public sealed class MonsterAttacks
         LobStrike.Throw(combatant, action, self.position + Vector3.up * 2.2f + self.forward * 0.6f, point, targetLayers);
     }
 
+    /// <summary>A call brought these summons up (bound ones are tied to the summoner: BoundSummons).</summary>
+    public event System.Action<MonsterAttack, List<GameObject>> Summoned;
+
     // Others of its kind rise around it and go for the player. A raid gives them its own strength.
     private void Summon()
     {
@@ -834,6 +837,7 @@ public sealed class MonsterAttacks
 
         summoned.RemoveAll(IsGone);
         int called = 0;
+        var thisCall = new List<GameObject>(action.summonCount);
         Player player = Player.Current;
         for (int i = 0; i < action.summonCount && summoned.Count < action.summonLimit; i++)
         {
@@ -845,6 +849,7 @@ public sealed class MonsterAttacks
 
             GameObject root = Object.Instantiate(action.summonPrefab, hit.position, self.rotation, self.parent);
             summoned.Add(root);
+            thisCall.Add(root);
             called++;
             if (RaidDirector.Current != null)
             {
@@ -861,6 +866,7 @@ public sealed class MonsterAttacks
 
         if (called > 0)
         {
+            Summoned?.Invoke(action, thisCall);
             GameMessages.Post(string.IsNullOrWhiteSpace(action.announce) ? $"{definition.DisplayName} calls up its kin!" : $"{definition.DisplayName} {action.announce}", MessageKind.Warning);
         }
     }

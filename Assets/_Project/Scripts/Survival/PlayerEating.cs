@@ -204,7 +204,7 @@ public sealed class PlayerEating : MonoBehaviour, IPlayerActivity
 
         // A cook knows how to make a meal last, an alchemist a tonic (the Cooking and Alchemy skills).
         float boonSeconds = item.BoonSeconds * BoonScale(item);
-        if (item.HasBoon && boons != null && boons.Add(item.Id, item.DisplayName, item.BoonBonuses, boonSeconds, !item.IsTonic, item.IsTonic))
+        if (item.HasBoon && boons != null && boons.Add(item.Id, item.DisplayName, item.BoonBonuses, boonSeconds, item.IsMeal, item.IsTonic, item.IsCoating))
         {
             GameMessages.Post($"{item.DisplayName}: {ItemTooltipView.DescribeBonuses(item.BoonBonuses)} for {RaidStats.FormatTime(boonSeconds)}", MessageKind.Gain);
         }
@@ -261,6 +261,6 @@ public sealed class PlayerEating : MonoBehaviour, IPlayerActivity
 
     private float BoonScale(ItemDefinition item) =>
         TryGetComponent(out Combatant self)
-            ? Mathf.Max(0.1f, 1f + self.Stats.Get(item.IsTonic ? StatType.TonicDuration : StatType.MealDuration))
+            ? Mathf.Max(0.1f, 1f + self.Stats.Get(item.IsTonic || item.IsCoating ? StatType.TonicDuration : StatType.MealDuration))
             : 1f;
 }
