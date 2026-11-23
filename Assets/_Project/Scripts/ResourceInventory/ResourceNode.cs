@@ -181,7 +181,7 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
     /// </summary>
     public static int RegrowDay(int afterDays, int today, bool atHome) => afterDays > 0 && atHome ? today + afterDays : 0;
 
-    private static bool AtOwnHome => RaidDirector.Current == null && PrologueDirector.Current == null && !HavenVisit.IsVisiting;
+    private static bool AtOwnHome => Place.AtHome;
 
     // True once the home day it waits for has come.
     private bool DayHasCome => regrowOnDay > 0 && GameSession.Home.DaysPassed >= regrowOnDay;

@@ -83,7 +83,17 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         ToStation,
         /// <summary>A Farmer to the nearest water (Fields), then back to the plots with it.</summary>
         ToWater,
+        /// <summary>In free time, to a station nobody works whose finished work waits (Haul), then on to the chests with it.</summary>
+        ToOutput,
+        OutputToChest,
     }
+
+    // The station whose output is being carried to the chests in free time (Trip.ToOutput, OutputToChest), and when to look again.
+    private StationQueue hauling;
+    private CraftingStation haulingFrom;
+    private float nextHaulLook;
+    private const float HaulLookSeconds = 12f;
+    private const float HaulReach = 70f;
 
     private const float TripLookSeconds = 1.5f;
     private const float CarriedScale = 0.8f;
@@ -1070,6 +1080,10 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         {
             return;
         }
+        else if (activity == ResidentActivity.Fire && !inScene && Time.time >= nextHaulLook && MaybeHaul())
+        {
+            return;
+        }
 
         JobDefinition job = activity == ResidentActivity.Work ? npc.Job : null;
         if (job != null && job.WorkSound != null)
@@ -1241,7 +1255,8 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
             return false;
         }
 
-        bool back = WorkerProduction.HasWorkToTakeBack(queue) && (queue.IsIdle || queue.Blocked) && CanTakeBack(queue);
+        bool back = WorkerProduction.HasWorkToTakeBack(queue) && CanTakeBack(queue)
+                    && WorkerProduction.WorthATrip(queue.OutputAmount, FullLoad(queue), queue.IsIdle, queue.Blocked);
         bool fetch = queue.IsIdle && WorkerProduction.PlanFetch(record.Job, queue, GameSession.Stash, Limits(queue)).Count > 0;
         if (!back && !fetch)
         {
@@ -1282,6 +1297,12 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     // station, so nothing is lost to a save or a change of plan on the way). At the station: what was picked out is put by it.
     private void ArrivedOnTrip()
     {
+        if (trip == Trip.ToOutput || trip == Trip.OutputToChest)
+        {
+            ArrivedOnHaul();
+            return;
+        }
+
         ResidentRecord record = npc.Record;
         StationQueue queue = record != null ? WorkerProduction.QueueOf(GameSession.Here, record) : null;
         if (queue == null || HavenVisit.IsVisiting)
@@ -1353,6 +1374,114 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         EndTrip();
     }
 
+    // Free time at home: a station nobody works whose finished work waits, near enough, with a chest beside it that has room, is emptied
+    // into the chests (the user, 2026-11-23). True when they set off.
+    private bool MaybeHaul()
+    {
+        nextHaulLook = Time.time + HaulLookSeconds * Random.Range(0.8f, 1.3f);
+        if (!started || agent == null || HavenVisit.IsVisiting || npc == null || npc.Record == null || Festivals.Now != null
+            || (talkable != null && talkable.IsTalking))
+        {
+            return false;
+        }
+
+        CraftingStation best = null;
+        StationQueue bestQueue = null;
+        float bestDistance = HaulReach * HaulReach;
+        foreach (CraftingStation station in CraftingStation.Active)
+        {
+            StationQueue queue = station != null ? GameSession.Here.Workshops.Find(station.Id) : null;
+            float distance = station != null ? (station.transform.position - transform.position).sqrMagnitude : float.MaxValue;
+            if (queue == null || distance > bestDistance || !WorkerProduction.HasWorkToTakeBack(queue) || Staffed(queue) || HauledByAnother(queue)
+                || !(queue.Output is ItemDefinition item) || GameSession.Stash.Items.SpaceFor(item) <= 0
+                || StashChest.Nearest(station.transform.position, WorkerSettings.Current.ChestReach) == null)
+            {
+                continue;
+            }
+
+            best = station;
+            bestQueue = queue;
+            bestDistance = distance;
+        }
+
+        if (best == null)
+        {
+            return false;
+        }
+
+        hauling = bestQueue;
+        haulingFrom = best;
+        trip = Trip.ToOutput;
+        GoTo(SpotBeside(best.transform, out facing));
+        return true;
+    }
+
+    // Someone works this station: its finished work is theirs to take back (MaybeStartTrip).
+    private static bool Staffed(StationQueue queue)
+    {
+        foreach (ResidentLife life in Living)
+        {
+            if (life != null && life.npc != null && life.npc.Record != null && life.npc.Record.WorkQueue == queue.StationId)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool HauledByAnother(StationQueue queue)
+    {
+        foreach (ResidentLife life in Living)
+        {
+            if (life != null && life != this && life.hauling == queue)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // At the station: the work is picked up (it leaves the station only at the chest, so nothing is lost to a change of plan); at the chest:
+    // into the stash, as much as they carry.
+    private void ArrivedOnHaul()
+    {
+        if (hauling == null || haulingFrom == null || HavenVisit.IsVisiting)
+        {
+            EndHaul();
+            return;
+        }
+
+        if (trip == Trip.ToOutput)
+        {
+            StashChest chest = WorkerProduction.HasWorkToTakeBack(hauling)
+                ? StashChest.Nearest(haulingFrom.transform.position, WorkerSettings.Current.ChestReach) : null;
+            if (chest == null)
+            {
+                EndHaul();
+                return;
+            }
+
+            tripChest = chest;
+            trip = Trip.OutputToChest;
+            ShowTool(hauling.Output as ItemDefinition, CarriedScale);
+            GoTo(SpotBeside(chest.transform, out facing));
+            return;
+        }
+
+        WorkerProduction.TakeBack(npc.Record, hauling, GameSession.Stash, WorkerCarry.ByHand(npc.Record, WorkerSettings.Current));
+        EndHaul();
+    }
+
+    private void EndHaul()
+    {
+        hauling = null;
+        haulingFrom = null;
+        EndTrip();
+        Rethink();
+    }
+
     // A Farmer with a growing plot running low round theirs walks to the nearest water (FarmSettings › Water Reach) and back with it.
     private bool MaybeFetchWater(ResidentRecord record)
     {
@@ -1408,6 +1537,9 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         return watered;
     }
 
+    // What one trip carries of the station's finished work: a full load of it.
+    private int FullLoad(StationQueue queue) => queue.Output is ItemDefinition item ? WorkerCarry.CanTake(item, 9999, Limits(queue)) : 0;
+
     // Whether any of the finished work can go back: they can lift one, and the chests have room (else they'd pace there and back).
     private bool CanTakeBack(StationQueue queue)
     {
@@ -1440,6 +1572,8 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         carrying.Clear();
         carryingBack = false;
         carryingWater = false;
+        hauling = null;
+        haulingFrom = null;
         LetGoOfCart();
         if (was)
         {
