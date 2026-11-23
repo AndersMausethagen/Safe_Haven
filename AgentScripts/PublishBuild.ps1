@@ -35,7 +35,7 @@ if (-not $butler) { $butler = Join-Path $env:LOCALAPPDATA 'butler/butler.exe' }
 if (-not (Test-Path $butler)) { throw 'butler is not installed (see Docs/PlaytestDiscord.md).' }
 
 $build = Join-Path $Project 'Build/Windows'
-if (-not (Test-Path (Join-Path $build 'Safe Haven.exe'))) { throw "No build in $build: run BuildWindows.ps1 first." }
+if (-not (Test-Path (Join-Path $build 'Safe Haven.exe'))) { throw "No build in ${build}: run BuildWindows.ps1 first." }
 
 Push-Location $Project
 $commit = (git rev-parse --short HEAD).Trim()
@@ -43,6 +43,15 @@ $since = if ($config.published) { "$($config.published)..HEAD" } else { 'HEAD~10
 $subjects = @(git log --format=%s $since)
 Pop-Location
 $version = "$(Get-Date -Format 'yyyy-MM-dd')-$commit"
+
+# The game's "Send my reports" posts straight to #playtest-logs with this (PlaytestReportWindow.UploadAddress). It goes only into the
+# build that is shipped, never into the project.
+if ($config.logs) {
+    $streaming = Join-Path $build 'Safe Haven_Data/StreamingAssets'
+    New-Item -ItemType Directory -Force $streaming | Out-Null
+    Set-Content -Path (Join-Path $streaming 'playtest-upload.txt') -Value $config.logs -NoNewline -Encoding ASCII
+    Write-Output '[Publish] The build sends reports to #playtest-logs.'
+}
 
 Write-Output "[Publish] butler push $build -> $($config.itch):windows ($version)"
 & $butler push $build "$($config.itch):windows" --userversion $version --ignore 'Safe Haven_BackUpThisFolder_ButDontShipItWithYourGame'

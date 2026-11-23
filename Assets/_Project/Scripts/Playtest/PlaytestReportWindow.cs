@@ -7,6 +7,7 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -15,7 +16,11 @@ using UnityEngine.UI;
 /// in the Escape menu, takes a screenshot of the moment and opens a short form: Bug, Idea, Confusing or Liked, a few words, and the
 /// tester's name (remembered). Saved to Reports beside the saves: the words and where it was (scene, position, quests, raid, minute
 /// of the run) as JSON, and the screenshot. "Send my reports" zips the reports with the run logs and Unity's logs, and opens the
-/// folder to drop the zip in Discord. Tools/Playtest/analyse.py reads those zips with Claude; no key or network is in the game.
+/// folder to drop the zip in Discord. Tools/Playtest/analyse.py reads those zips with Claude.
+/// <para>Sending it straight to the playtest Discord (the user, 2026-11-23): when the build holds the #playtest-logs webhook
+/// (StreamingAssets/playtest-upload.txt, written by AgentScripts/PublishBuild.ps1, never in the project), the first click says what goes
+/// and the second sends the zip there. Without it, over Discord's size limit, or if the upload fails, the folder opens as before. Unity's
+/// log goes with the PC's user name blanked out (it holds file paths).</para>
 /// </summary>
 public sealed class PlaytestReportWindow : MonoBehaviour
 {
@@ -25,6 +30,13 @@ public sealed class PlaytestReportWindow : MonoBehaviour
     private const string NameKey = "SafeHaven.Playtest.ReporterName";
     // Each log file goes in at most this much from its end (Discord takes 10 MB a file without Nitro).
     private const int LogTail = 1_500_000;
+    // Discord takes files up to 10 MB on a server without Boosts: a little under, to be safe.
+    private const long MostUpload = 9_500_000;
+    private const string UploadFile = "playtest-upload.txt";
+    private const float ConfirmSeconds = 15f;
+    private TMP_Text sendLabel;
+    private float confirmUntil = -1f;
+    private bool sending;
 
     private static readonly string[] Kinds = { "Bug", "Idea", "Confusing", "Liked" };
 
@@ -226,7 +238,8 @@ public sealed class PlaytestReportWindow : MonoBehaviour
         reporter.characterLimit = 32;
 
         status = CodeUI.Label("Status", panel, Margin, 446f, Width - Margin * 2f, 30f, 17f, style.Muted);
-        CodeUI.AddButton("Send", panel, Margin, Height - 74f, 260f, UIRole.Kind.Button, SendAll, out _).text = "Send my reports";
+        sendLabel = CodeUI.AddButton("Send", panel, Margin, Height - 74f, 260f, UIRole.Kind.Button, SendAll, out _);
+        sendLabel.text = "Send my reports";
         CodeUI.AddButton("Cancel", panel, Width - Margin - 400f, Height - 74f, 180f, UIRole.Kind.Button, () => window.Close(), out _).text = "Cancel";
         CodeUI.AddButton("Save", panel, Width - Margin - 200f, Height - 74f, 200f, UIRole.Kind.PrimaryButton, Save, out _).text = "Save report";
 
@@ -353,6 +366,24 @@ public sealed class PlaytestReportWindow : MonoBehaviour
 
     private void SendAll()
     {
+        if (sending)
+        {
+            return;
+        }
+
+        string address = UploadAddress();
+        // Sending asks first: what goes, and a second click to send it.
+        if (address != null && Time.unscaledTime > confirmUntil)
+        {
+            confirmUntil = Time.unscaledTime + ConfirmSeconds;
+            sendLabel.text = "Yes, send it";
+            status.text = "This sends your reports, their screenshots and your play logs (your PC's user name left out) to the Safe Haven " +
+                          "playtest Discord. Click again to send.";
+            return;
+        }
+
+        confirmUntil = -1f;
+        sendLabel.text = "Send my reports";
         if (!string.IsNullOrWhiteSpace(words.text))
         {
             Save();
@@ -360,16 +391,93 @@ public sealed class PlaytestReportWindow : MonoBehaviour
 
         try
         {
-            string zip = MakeZip(string.IsNullOrWhiteSpace(reporter.text) ? PlayerPrefs.GetString(NameKey, "") : reporter.text.Trim());
-            Application.OpenURL("file:///" + Path.GetDirectoryName(zip).Replace('\\', '/'));
-            GUIUtility.systemCopyBuffer = zip;
-            GameMessages.Post($"Your reports and logs are zipped: {Path.GetFileName(zip)}. Drop it in the playtest Discord channel.", MessageKind.Gain);
-            window.Close();
+            string name = string.IsNullOrWhiteSpace(reporter.text) ? PlayerPrefs.GetString(NameKey, "") : reporter.text.Trim();
+            string zip = MakeZip(name);
+            if (address != null && new FileInfo(zip).Length <= MostUpload)
+            {
+                StartCoroutine(Upload(address, zip, name));
+                return;
+            }
+
+            if (address != null)
+            {
+                GameMessages.Post("Your reports are too big to send from the game: drop the zip in #playtest-logs instead.", MessageKind.Warning);
+            }
+
+            OpenZipFolder(zip);
         }
         catch (Exception e)
         {
             status.text = $"<color={UIStyle.Current.DangerHex}>Couldn't make the zip: {e.Message}</color>";
             Debug.LogWarning($"Playtest report zip failed: {e}");
+        }
+    }
+
+    // The folder with the zip opens, its path is copied: the tester drops it in Discord by hand.
+    private void OpenZipFolder(string zip)
+    {
+        Application.OpenURL("file:///" + Path.GetDirectoryName(zip).Replace('\\', '/'));
+        GUIUtility.systemCopyBuffer = zip;
+        GameMessages.Post($"Your reports and logs are zipped: {Path.GetFileName(zip)}. Drop it in the playtest Discord channel.", MessageKind.Gain);
+        window.Close();
+    }
+
+    // Sends the zip to #playtest-logs through its webhook; on any failure the folder opens instead, so nothing is lost.
+    private IEnumerator Upload(string address, string zip, string name)
+    {
+        sending = true;
+        status.text = "Sending to the playtest Discord.";
+        string who = string.IsNullOrWhiteSpace(name) ? "a tester" : name;
+        string payload = "{\"content\":\"Reports from **" + Json(who) + "** (build " + Json(Application.version) + ")\",\"allowed_mentions\":{\"parse\":[]}}";
+        var form = new List<IMultipartFormSection>
+        {
+            new MultipartFormDataSection("payload_json", payload),
+            new MultipartFormFileSection("files[0]", File.ReadAllBytes(zip), Path.GetFileName(zip), "application/zip"),
+        };
+        using (UnityWebRequest request = UnityWebRequest.Post(address, form))
+        {
+            request.timeout = 120;
+            yield return request.SendWebRequest();
+            sending = false;
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                GameMessages.Post("Your reports are in the playtest Discord. Thank you!", MessageKind.Gain);
+                window.Close();
+            }
+            else
+            {
+                Debug.LogWarning($"Playtest report upload failed: {request.responseCode} {request.error}");
+                GameMessages.Post("Couldn't send them from the game: the zip's folder is open, drop it in #playtest-logs.", MessageKind.Warning);
+                OpenZipFolder(zip);
+            }
+        }
+    }
+
+    // The #playtest-logs webhook: in a build, the file PublishBuild.ps1 writes beside the game; in the Editor, the local config
+    // (AgentScripts/discord.local.json, "logs"), for testing. Null when there is none: the zip is dropped by hand.
+    private static string UploadAddress()
+    {
+        try
+        {
+#if UNITY_EDITOR
+            string config = Path.Combine(Path.GetDirectoryName(Application.dataPath) ?? "", "AgentScripts", "discord.local.json");
+            if (!File.Exists(config))
+            {
+                return null;
+            }
+
+            System.Text.RegularExpressions.Match found = System.Text.RegularExpressions.Regex.Match(File.ReadAllText(config), "\"logs\"\\s*:\\s*\"([^\"]+)\"");
+            string address = found.Success ? found.Groups[1].Value : null;
+#else
+            string file = Path.Combine(Application.streamingAssetsPath, UploadFile);
+            string address = File.Exists(file) ? File.ReadAllText(file).Trim() : null;
+#endif
+            return address != null && address.StartsWith("https://discord.com/api/webhooks/") ? address : null;
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"Playtest upload address unreadable: {e.Message}");
+            return null;
         }
     }
 
@@ -417,7 +525,7 @@ public sealed class PlaytestReportWindow : MonoBehaviour
                 string file = Path.Combine(Application.persistentDataPath, log);
                 if (File.Exists(file))
                 {
-                    Add(zip, "logs/" + log, Read(file, LogTail));
+                    Add(zip, "logs/" + log, WithoutUserName(Read(file, LogTail)));
                 }
             }
         }
@@ -456,6 +564,21 @@ public sealed class PlaytestReportWindow : MonoBehaviour
 
             return data;
         }
+    }
+
+    // Unity's log names the PC's user in its file paths: blanked before it leaves the PC.
+    private static byte[] WithoutUserName(byte[] log)
+    {
+        string user = Environment.UserName;
+        if (string.IsNullOrEmpty(user) || user.Length < 2)
+        {
+            return log;
+        }
+
+        string text = Encoding.UTF8.GetString(log);
+        text = System.Text.RegularExpressions.Regex.Replace(text, System.Text.RegularExpressions.Regex.Escape(user), "<user>",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        return Encoding.UTF8.GetBytes(text);
     }
 
     private static string Json(string s) => (s ?? "").Replace("\\", "\\\\").Replace("\"", "\\\"");
