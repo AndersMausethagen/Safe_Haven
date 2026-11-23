@@ -29,4 +29,15 @@ public sealed class BushRegrowthTests
             Assert.AreEqual(ToolType.None, node.GatherTool, $"{node.name} is picked by hand");
         }
     }
+
+    [Test]
+    public void APickedBush_KeepsOrGetsItsDay_OnlyWithItsOwner()
+    {
+        Assert.AreEqual(14, ResourceNode.RestoredRegrowDay(14, 0, 3, 12, true), "the owner keeps the day the save holds");
+        Assert.AreEqual(15, ResourceNode.RestoredRegrowDay(0, 0, 3, 12, true),
+            "picked by a friend (their copy holds no day) or saved before bushes counted days: the owner counts from today");
+        Assert.AreEqual(13, ResourceNode.RestoredRegrowDay(0, 13, 3, 12, true), "a day it already had isn't pushed back by a state without one");
+        Assert.AreEqual(0, ResourceNode.RestoredRegrowDay(14, 0, 3, 12, false), "a friend's copy never regrows by day: the host's state grows it back");
+        Assert.AreEqual(0, ResourceNode.RestoredRegrowDay(0, 0, 0, 12, true), "a node without days follows the usual rule");
+    }
 }

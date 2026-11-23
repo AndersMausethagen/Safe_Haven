@@ -183,3 +183,41 @@ Researched by a subagent (web only), with what it could confirm marked:
 
 In the project: `GearBalance` (RaidTierEditor.cs), `FightMath`, `PowerCurveSettings`, every boon item, RaidTierTests, PowerCurveTests,
 and Docs/PlayerStatsResearch.md.
+
+## New ingredients and dishes (built 2026-11-23)
+
+The user: "add a bunch more ingredients and recipes. all with a different touch and effect. make new ingredients drop as well if
+needed. or new plants or animals". Each dish gives what no food or tonic gave before, so it opens a way to play rather than a
+bigger number of an old one.
+
+| Ingredient | Where |
+| --- | --- |
+| Venison | Deer 1-2, Stag 2-3 (they gave only hide and bone) |
+| Mistwing Egg | Mistwings, 40% |
+| Ramsons (wild garlic) | Misty Woods; Haven woods and meadows (16) |
+| Lingonberries | Misty Woods, Troll Valley; Haven (16, two just outside the camp) |
+| Bog Myrtle | Moss Marsh; Haven, near water (12) |
+| Angelica | Troll Valley, Moss Marsh; Haven, near water (12) |
+
+The four plants grow back at home after 3 days, as berry bushes do. Their models come from Tools/Blender/plant_nodes.py.
+
+| Dish | Station | Made from | Gives | Family |
+| --- | --- | --- | --- | --- |
+| Venison Steak | Campfire | 2 Venison | Arrow damage +20%, draw speed +15% | Cunning |
+| Stalker's Jerky | Campfire | 2 Venison, Bog Myrtle | Sneak noise and visibility −30%, ambush damage +30% | Cunning |
+| Blood Sausage | Kitchen | Venison, Barley, Ramsons | Lifesteal 5% | Hearty |
+| Ramsons Soup | Kitchen | 3 Ramsons, Wild Turnip, Water | Blight resistance +25%, cures Poison | Warding |
+| Bog Myrtle Ale | Kitchen | 2 Bog Myrtle, Barley, Water | Swings cost 25% less stamina, blocks 20% more | Swift |
+| Bone Broth | Kitchen | 2 Bone, Wild Turnip, Water | Blocks cost 30% less stamina | Swift |
+| Angelica Tea | Kitchen | 2 Angelica, Honey, Water | +15% experience | none (work) |
+| Venison with Lingonberries | Kitchen | 2 Venison, 2 Lingonberries, Flour | Crit chance +15%, crit damage +30% | Fierce |
+| Lingonberry Porridge | Kitchen | Barley, 2 Lingonberries, Water | Felling and mining yield +15%, tool wear −25% | none (work) |
+| Mist Custard | Kitchen | 2 Mistwing Eggs, Honey, Cloudberries | Spell damage +20%, spells cost 20% less | Cunning |
+| Angler's Flatbread | Campfire | Flour, Ramsons | Line control +30% (ReelZone) | none (work) |
+| Rider's Draught (tonic) | Cauldron | Angelica, 2 Lingonberries | Horse bond +30%, lasso hold +30%, gallop stamina −20% | none (work) |
+
+Families (BoonFamily) keep "one of each boon": lifesteal is Hearty, stamina costs are Swift, crits are Fierce, and a new
+**Cunning** family holds arrows, stealth, ambushes and spells. Work boons (learning, fishing, yields, tool care, horses) have
+no family and replace nothing; every other boon stat must have one (PlayerStatsTests). Only the crit dish enters the
+balance model (FightMath). As a Fierce tier III meal it comes to about +15%, under Trout in Cream, so no tier's entry kit
+changed (RaidTierTests, PowerCurveTests).

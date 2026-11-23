@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2bdc7bfe8797f544855a0ab7846c453, type: 3}
+  m_Name: Lingonberries
+  m_EditorClassIdentifier: Assembly-CSharp::GatheringNodeDefinition
+  id: lingonberries
+  displayName: Lingonberries
+  tier: 1
+  spawnWeight: 1
+  yields:
+    entries:
+    - item: {fileID: 11400000, guid: 74c0a8be248a5264aaf67f85d390ee8b, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 3
+      maxQuantity: 5
+      probability: 1
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+      onlyInRaid: {fileID: 0}
+  gatherTool: 0
+  requiredToolTier: 1
+  gatherAnimation: 1
+  gatherSeconds: 1.5
+  swings: 3
+  swingSpeed: 1
+  gatherRange: 1.5
+  depleteOnGather: 1
+  respawnSeconds: 240
+  regrowsAtHomeAfterDays: 3
+  inSeasons:
+  - Summer
+  - Autumn
+  - Winter
+  burstPieces: 0
+  fracture: {fileID: 0}
+  burstYields:
+    entries: []
+  feedback: {fileID: 11400000, guid: 5e19753f3a66da744ae5d17004fb63d5, type: 2}
+  worldModelPrefab: {fileID: 6011404960141278932, guid: 8d8c397cb8b175948b9a9b12f8226fe6, type: 3}
+  worldPrefab: {fileID: 8775155884352199117, guid: b268996ecbdee934aa75aa16e9c67242, type: 3}
+  modelVariants:
+  - {fileID: 2067347570875576674, guid: 6d573d52742f9b04d9cfa2ad0a8c93f9, type: 3}
+  variantScale: {x: 0.9, y: 1.1}

@@ -57,9 +57,14 @@ public sealed class StationProgressBars : MonoBehaviour
 
     private void OnDisable()
     {
+        // When the scene unloads, the bars' canvas may go before this does (Unity destroys a scene's objects in no set order): a
+        // bar already gone has nothing to hide.
         foreach (Widget widget in widgets)
         {
-            widget.Root.gameObject.SetActive(false);
+            if (widget.Root != null)
+            {
+                widget.Root.gameObject.SetActive(false);
+            }
         }
     }
 

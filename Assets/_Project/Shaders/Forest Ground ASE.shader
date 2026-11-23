@@ -4243,8 +4243,6 @@ Shader "Safe Haven/Forest Ground ASE"
 
 	CustomEditor "UnityEditor.ShaderGraphLitGUI"
 	FallBack "Hidden/Shader Graph/FallbackError"
-	
-	Fallback "False"
 }
 /*ASEBEGIN
 Version=19914

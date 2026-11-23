@@ -381,6 +381,18 @@ MonoBehaviour:
       minPerGroup: 0
       fromTier: 3
       toTier: 0
+    - prefab: {fileID: 8775155884352199117, guid: 13af7ac7ef84e424588ca48ed7024c4a, type: 3}
+      weight: 4
+      maxPerGroup: 1
+      minPerGroup: 0
+      fromTier: 3
+      toTier: 0
+    - prefab: {fileID: 6288032578105571644, guid: 6d34854cb1a99c9428c2bdfaff94d738, type: 3}
+      weight: 2
+      maxPerGroup: 1
+      minPerGroup: 0
+      fromTier: 3
+      toTier: 0
   - name: Supply Caches
     category: 2
     pointGroups:

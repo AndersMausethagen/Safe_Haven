@@ -40,7 +40,7 @@ public static class CodeUI
         text.alignment = alignment;
         text.raycastTarget = false;
         text.textWrappingMode = TextWrappingModes.NoWrap;
-        text.overflowMode = TextOverflowModes.Ellipsis;
+        text.overflowMode = TextOverflowModes.Truncate; // Not Ellipsis: the fonts have no "…" (TMP warned and truncated anyway), and the UI shows none.
         return text;
     }
 

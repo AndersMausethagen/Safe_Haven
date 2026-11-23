@@ -16,6 +16,10 @@ and bend away from the player like the ferns and shrubs. Two levels of detail dr
 - Cloudberries: a low patch of round, lobed leaves with amber berries made of beads.
 - Wild Barley: straw stalks, grass blades, drooping bearded ears.
 - Wild Turnips: purple-shouldered white roots at the ground under a rosette of lobed leaves.
+- Ramsons (2026-11-23): wild garlic, broad glossy leaves and white star-flower umbels.
+- Angelica: a tall purple-flushed stalk with ball-shaped green-white umbels over a rosette of divided leaves.
+- Lingonberries: a low mat of small glossy dark leaves with clusters of red berries.
+- Bog Myrtle: a knee-high shrub of reddish twigs, narrow grey-green leaves and brown catkins.
 
 One 1024 texture set each: the sprites in its bottom three quarters (their alpha is the leaf shape), the solid parts'
 own baked islands in the top quarter. Albedo (with alpha), Normal (veins, ridges) and ORM; Emission for Huldra Silk;
@@ -23,7 +27,8 @@ Height and BlendMask only for the Chanterelles. Writes Assets/_Project/Art/Gathe
 path given, and Plants.blend beside this script.
 
 Run: blender -b --factory-startup --python Tools/Blender/plant_nodes.py -- <project root> <preview.png> [asset ...]
-(assets: bush, herb, flax, silk, nettle, chanterelle, cloudberry, barley, turnip; all when none are named).
+(assets: bush, herb, flax, silk, nettle, chanterelle, cloudberry, barley, turnip, ramsons, angelica,
+lingonberry, myrtle; all when none are named).
 """
 import math
 import os
@@ -934,6 +939,214 @@ def chanterelles(coll):
     return lows
 
 
+def ramsons(coll):
+    """Wild garlic (ramsons): a clump of broad, glossy, upright-arching leaves, and thin stems above them with round heads of
+    white star-shaped flowers (cards facing up and out)."""
+    leaf = varied("Ramsons Leaf (bake)", [(0.0, (0.06, 0.15, 0.03)), (0.5, (0.1, 0.24, 0.05)), (1.0, (0.16, 0.3, 0.07))],
+                  midrib=0.7, roughness=0.35, sheen=0.5)
+    stalk = varied("Ramsons Stem (bake)", [(0.0, (0.14, 0.22, 0.08)), (1.0, (0.2, 0.28, 0.1))], roughness=0.6)
+    bloom = varied("Ramsons Flower (bake)", [(0.0, (0.8, 0.82, 0.78)), (0.8, (0.92, 0.93, 0.9)), (1.0, (0.85, 0.9, 0.75))],
+                   roughness=0.7)
+    materials = (leaf, stalk, bloom)
+    sheet = Sheet(2, 2)
+    rng = random.Random(9)
+    for cell in (0, 1):
+        sheet.leaf(sheet.rect(cell), (0.5, 0.02), 0.0, 0.96, 0.55, OVATE, 0, rng.random())
+    for cell in (2, 3):
+        # An umbel from above: a dozen small six-pointed stars round its middle.
+        rect = sheet.rect(cell)
+        for _ in range(12):
+            a, r = rng.uniform(0, 6.28), 0.3 * math.sqrt(rng.random())
+            sheet.disc(rect, (0.5 + math.cos(a) * r, 0.5 + math.sin(a) * r), 0.11, 6, 2, rng.random(), rng)
+    variants = []
+    for key, seed in (("A", 681), ("B", 682)):
+        rng = random.Random(seed)
+        solids, cards = Kit(), Kit(cards=True)
+        height = 0.42
+        for base, lean in tuft(rng, 16, 0.22):
+            # A broad leaf rising from the ground on a short stalk, arching out.
+            d = (lean + Vector((rng.uniform(-0.6, 0.6), rng.uniform(-0.6, 0.6), 0.9))).normalized()
+            side = d.cross(UP)
+            up = side.cross(d).normalized() if side.length > 1e-4 else Vector((1, 0, 0))
+            length = rng.uniform(0.24, 0.32)
+            cards.card(base, d, up, length, length * 0.42, sheet.rect(rng.randrange(2)), rng.random(), bend=0.2,
+                       droop=0.22, flex=0.7)
+        for base, lean in tuft(rng, 6, 0.16):
+            points = ring_points(base, lean, rng.uniform(0.32, 0.42), 4, bend=0.02, rng=rng)
+            phase = rng.random()
+            solids.stem(points, 0.003, 0.0025, 1, rng.random(), phase, sides=3)
+            top = points[-1] + UP * 0.004
+            size = rng.uniform(0.07, 0.09)
+            facing = (lean + UP).normalized()
+            side = facing.orthogonal().normalized()
+            cards.card(top - side * size * 0.5, side, facing, size, size, sheet.rect(2 + rng.randrange(2)), phase, bend=-0.1)
+        variants.append(plant(f"Ramsons {key}", height, solids, cards, sheet, coll, materials))
+    return plant_asset(variants, sheet.object("Ramsons Sheet", coll, materials))
+
+
+def angelica(coll):
+    """Angelica: a tall, hollow, purple-flushed stalk from a rosette of big divided leaves, branching at its top into round,
+    ball-shaped umbels of tiny green-white flowers (cards round a ball, so they read as globes from any side)."""
+    # Green all over: GREEN's last stop is a straw yellow that showed as pale wedges on the big leaflets.
+    leaf = varied("Angelica Leaf (bake)", [(0.0, (0.06, 0.13, 0.03)), (0.6, (0.1, 0.19, 0.05)), (1.0, (0.14, 0.23, 0.06))],
+                  veins=0.6, midrib=0.8, rim_dark=0.1)
+    stalk = varied("Angelica Stalk (bake)", [(0.0, (0.26, 0.12, 0.16)), (0.5, (0.2, 0.24, 0.1)), (1.0, (0.24, 0.3, 0.12))],
+                   roughness=0.5, sheen=0.4)
+    bloom = varied("Angelica Umbel (bake)", [(0.0, (0.42, 0.5, 0.26)), (0.7, (0.6, 0.66, 0.42)), (1.0, (0.78, 0.8, 0.62))],
+                   roughness=0.8)
+    materials = (leaf, stalk, bloom)
+    sheet = Sheet(2, 2)
+    rng = random.Random(10)
+    for cell in (0, 1):
+        # A divided leaf: a stalk with three pairs of saw-edged leaflets and one at the tip.
+        rect = sheet.rect(cell)
+        sheet.line(rect, [(0.5, 0.0), (0.5, 0.9)], 0.03, 0, 0.3)
+        for k, t in enumerate((0.3, 0.52, 0.74)):
+            for sign in (-1, 1):
+                sheet.leaf(rect, (0.5, t), sign * rng.uniform(0.9, 1.2), 0.3 - 0.04 * k, 0.45, OVATE, 0, rng.random(),
+                           serrate=0.15)
+        sheet.leaf(rect, (0.5, 0.86), 0.0, 0.14, 0.5, OVATE, 0, rng.random(), serrate=0.15)
+    for cell in (2, 3):
+        rect = sheet.rect(cell)
+        for _ in range(40):
+            a, r = rng.uniform(0, 6.28), 0.42 * math.sqrt(rng.random())
+            sheet.disc(rect, (0.5 + math.cos(a) * r, 0.5 + math.sin(a) * r), 0.05, 5, 2, rng.random(), rng)
+    variants = []
+    for key, seed in (("A", 691), ("B", 692)):
+        rng = random.Random(seed)
+        solids, cards = Kit(), Kit(cards=True)
+        height = 1.35
+        for k in range(9):
+            a = 2 * math.pi * k / 9 + rng.uniform(-0.25, 0.25)
+            out = Vector((math.cos(a), math.sin(a), rng.uniform(0.5, 1.0))).normalized()
+            length = rng.uniform(0.38, 0.5)
+            cards.card(Vector((0, 0, 0.03)), out, UP, length, length * 0.8, sheet.rect(rng.randrange(2)), rng.random(),
+                       bend=0.2, droop=0.3, flex=0.5)
+        for s in range(rng.randint(1, 2)):
+            base = Vector((rng.uniform(-0.05, 0.05), rng.uniform(-0.05, 0.05), -0.02))
+            lean = Vector((rng.uniform(-0.12, 0.12), rng.uniform(-0.12, 0.12), 1.0)).normalized()
+            tall = rng.uniform(1.05, 1.3) * (1.0 if s == 0 else 0.8)
+            points = ring_points(base, lean, tall, 8, bend=0.02, rng=rng)
+            phase = rng.random()
+            solids.stem(points, 0.016, 0.009, 1, rng.random(), phase, sides=6, flex0=0.0, flex1=0.6)
+            # Spokes at the top, each holding a ball of flowers.
+            top = points[-1]
+            for b in range(rng.randint(4, 6)):
+                ang = rng.uniform(0, 6.28)
+                d = Vector((math.cos(ang) * 0.6, math.sin(ang) * 0.6, 1.0)).normalized()
+                spoke = [top, top + d * 0.06, top + d * 0.12]
+                solids.stem(spoke, 0.004, 0.003, 1, rng.random(), phase, sides=3, flex0=0.6, flex1=1.0)
+                ball, radius = spoke[-1] + d * 0.045, rng.uniform(0.045, 0.06)
+                for c in range(8):
+                    n = Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-0.2, 1))).normalized()
+                    side = n.orthogonal().normalized()
+                    cards.card(ball + n * radius * 0.8 - side * radius, side, n, radius * 2, radius * 2,
+                               sheet.rect(2 + rng.randrange(2)), phase, bend=-0.15)
+            for i in (3, 5):
+                d = Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), 0.6)).normalized()
+                length = rng.uniform(0.22, 0.3)
+                cards.card(points[i], d, UP, length, length * 0.8, sheet.rect(rng.randrange(2)), phase, bend=0.2, droop=0.25)
+        variants.append(plant(f"Angelica {key}", height, solids, cards, sheet, coll, materials))
+    return plant_asset(variants, sheet.object("Angelica Sheet", coll, materials))
+
+
+def lingonberries(coll):
+    """Lingonberry: a low, dense mat of short woody stems with small glossy dark oval leaves, and clusters of bright red
+    berries nodding at the stem tips."""
+    leaf = varied("Lingonberry Leaf (bake)", DARK_GREEN, midrib=0.5, roughness=0.3, sheen=0.6)
+    twig = varied("Lingonberry Twig (bake)", [(0.0, (0.2, 0.13, 0.08)), (1.0, (0.3, 0.2, 0.1))], roughness=0.8)
+    berry = varied("Lingonberry (bake)", [(0.0, (0.55, 0.02, 0.03)), (0.6, (0.75, 0.05, 0.05)), (1.0, (0.88, 0.14, 0.08))],
+                   roughness=0.2, sheen=0.7)
+    materials = (leaf, twig, berry)
+    sheet = Sheet(2, 2)
+    rng = random.Random(11)
+    for cell in range(4):
+        # A shoot: a twig with small oval leaves all along it.
+        rect = sheet.rect(cell)
+        sheet.line(rect, [(0.5, 0.0), (0.5 + rng.uniform(-0.05, 0.05), 0.9)], 0.03, 1, rng.random())
+        for k in range(8):
+            t = 0.1 + 0.8 * k / 7
+            side = -1 if k % 2 else 1
+            sheet.leaf(rect, (0.5, t * 0.92), side * rng.uniform(0.6, 1.1), 0.22 * (1.1 - t * 0.3), 0.7, OVATE, 0,
+                       min(0.95, rng.gauss(0.5, 0.15)))
+    variants = []
+    for key, seed in (("A", 701), ("B", 702)):
+        rng = random.Random(seed)
+        solids, cards = Kit(), Kit(cards=True)
+        height = 0.26
+        # Many short shoots (a lingonberry leaf is about a centimetre and a half: shoots of 6-10 cm read as a mat of them). A
+        # berry's faces each bake to their own island (three vertices a triangle): the mat's many cards keep the whole within the
+        # foliage budget (ModelBudgetTests), with eight clusters of three or four berries.
+        for base, lean in tuft(rng, 180, 0.32):
+            length = rng.uniform(0.06, 0.1)
+            d = (lean + Vector((rng.uniform(-0.5, 0.5), rng.uniform(-0.5, 0.5), 0.4))).normalized()
+            side = d.cross(UP)
+            up = side.cross(d).normalized() if side.length > 1e-4 else Vector((1, 0, 0))
+            cards.card(base, d, up, length * 1.3, length * 0.9, sheet.rect(rng.randrange(4)), rng.random(), bend=0.1,
+                       droop=0.1, flex=0.6)
+        for base, lean in tuft(rng, 8, 0.26):
+            # Low, among the leaves (a lingonberry's clusters nod at its shoot tips, not on stalks above the mat).
+            top = base + UP * rng.uniform(0.06, 0.1) + lean * 0.03
+            phase = rng.random()
+            solids.stem([base, base.lerp(top, 0.5), top], 0.003, 0.002, 1, rng.random(), phase, sides=3)
+            hang = Vector((rng.uniform(-0.6, 0.6), rng.uniform(-0.6, 0.6), -0.5)).normalized()
+            # Berries a little over life size (1 cm), so they read from the game's camera.
+            for k in range(rng.randint(3, 4)):
+                at = top + hang * 0.012 + Vector((rng.uniform(-0.02, 0.02), rng.uniform(-0.02, 0.02), rng.uniform(-0.02, 0.005)))
+                solids.blob(at, rng.uniform(0.011, 0.014), 2, rng.random(), phase, flex=0.9, subdivisions=1)
+        variants.append(plant(f"Lingonberries {key}", height, solids, cards, sheet, coll, materials))
+    return plant_asset(variants, sheet.object("Lingonberries Sheet", coll, materials))
+
+
+def bog_myrtle(coll):
+    """Bog myrtle (sweet gale): a knee-high shrub of upright, reddish-brown twigs with narrow, grey-green, toothed leaves
+    towards their tips and short brown catkins on the bare wood."""
+    bark = bark_material("Myrtle Bark (bake)", tint=(0.55, 0.35, 0.28))
+    leaf = varied("Myrtle Leaf (bake)", GREY_GREEN, midrib=0.6, rim_dark=0.1, roughness=0.65)
+    catkin = varied("Myrtle Catkin (bake)", [(0.0, (0.3, 0.17, 0.1)), (1.0, (0.45, 0.28, 0.14))], roughness=0.85)
+    materials = (bark, leaf, catkin)
+    sheet = Sheet(2, 2)
+    rng = random.Random(12)
+    for cell in range(4):
+        rect = sheet.rect(cell)
+        sheet.line(rect, [(0.5, 0.0), (0.5 + rng.uniform(-0.04, 0.04), 0.92)], 0.025, 0, rng.random())
+        for k in range(9):
+            t = 0.12 + 0.82 * k / 8
+            side = -1 if k % 2 else 1
+            sheet.leaf(rect, (0.5, t * 0.9), side * rng.uniform(0.35, 0.7), 0.32 * (1.15 - t * 0.5), 0.35, NARROW, 1,
+                       min(0.95, rng.gauss(0.5, 0.15)), serrate=0.1)
+    variants = []
+    for key, seed, height, stems in (("A", 711, 0.7, 14), ("B", 712, 0.62, 12)):
+        rng = random.Random(seed)
+        solids, cards = Kit(), Kit(cards=True)
+        for base, lean in tuft(rng, stems, 0.2):
+            tall = height * rng.uniform(0.7, 1.0)
+            points = ring_points(base, (lean + Vector((0, 0, 1.5))).normalized(), tall, 6, bend=0.03, rng=rng)
+            phase = rng.random()
+            solids.stem(points, 0.008, 0.003, 0, rng.random(), phase, sides=5, flex0=0.0, flex1=0.8)
+            # Twigs off the upper half, each tipped with a spray of leaves; catkins on the bare wood between.
+            for i in range(2, 7):
+                if rng.random() < 0.85:
+                    d = (lean + Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), 0.9))).normalized()
+                    twig = [points[i], points[i] + d * 0.08, points[i] + d * 0.15]
+                    solids.stem(twig, 0.004, 0.002, 0, rng.random(), phase, sides=4, flex0=0.6)
+                    up = (UP - d * d.z).normalized() if abs(d.z) < 0.99 else Vector((1, 0, 0))
+                    cards.card(twig[0] + d * 0.02, d, up, rng.uniform(0.2, 0.26), 0.16, sheet.rect(rng.randrange(4)), phase,
+                               bend=0.1, droop=0.05)
+                    side = d.cross(UP).normalized() if abs(d.z) < 0.99 else Vector((1, 0, 0))
+                    cards.card(twig[1], (d + side * 0.8).normalized(), up, rng.uniform(0.16, 0.2), 0.13,
+                               sheet.rect(rng.randrange(4)), phase, bend=0.1, droop=0.05)
+                elif rng.random() < 0.7:
+                    out = Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), 0.8)).normalized()
+                    solids.blob(points[i] + out * 0.012, 0.008, 2, rng.random(), phase, flex=0.8, squash=(0.8, 0.8, 2.0),
+                                subdivisions=1, lumpy=0.2, seed=rng.random() * 40)
+            tip = (points[-1] - points[-2]).normalized()
+            cards.card(points[-1] - tip * 0.06, tip, Vector((1, 0, 0)), rng.uniform(0.18, 0.24), 0.14,
+                       sheet.rect(rng.randrange(4)), phase, bend=0.1)
+        variants.append(plant(f"Bog Myrtle {key}", height, solids, cards, sheet, coll, materials))
+    return plant_asset(variants, sheet.object("Bog Myrtle Sheet", coll, materials))
+
+
 # key, asset, builder, cards (Tree Wind) or solid (Layered Lit), glow
 PLANTS = (
     ("bush", "Berry Bush", berry_bush, True, False),
@@ -943,6 +1156,10 @@ PLANTS = (
     ("nettle", "Nettle", nettle, True, False),
     ("cloudberry", "Cloudberries", cloudberries, True, False),
     ("barley", "Wild Barley", wild_barley, True, False),
+    ("ramsons", "Ramsons", ramsons, True, False),
+    ("angelica", "Angelica", angelica, True, False),
+    ("lingonberry", "Lingonberries", lingonberries, True, False),
+    ("myrtle", "Bog Myrtle", bog_myrtle, True, False),
 )
 
 

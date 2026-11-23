@@ -168,7 +168,7 @@ public sealed class ModuleCues : MonoBehaviour
         label.color = style.Text;
         label.alignment = TextAlignmentOptions.MidlineLeft;
         label.textWrappingMode = TextWrappingModes.NoWrap;
-        label.overflowMode = TextOverflowModes.Ellipsis;
+        label.overflowMode = TextOverflowModes.Truncate; // Not Ellipsis: the fonts have no "…" (TMP warned and truncated anyway), and the UI shows none.
         label.raycastTarget = false;
         cue.Label = label;
         return cue;

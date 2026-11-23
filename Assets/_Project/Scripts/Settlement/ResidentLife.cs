@@ -521,13 +521,7 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         }
         repathed = false;
         // A new plan ends any trip: what they carried never left the chest or the station.
-        trip = Trip.None;
-        tripChest = null;
-        cartWanted = null;
-        carrying.Clear();
-        carryingBack = false;
-        carryingWater = false;
-        LetGoOfCart();
+        ResetTrip();
 
         // Their house, if one is theirs: they sleep inside it, going in at its door.
         bool housed = npc.TryGetHome(out Vector3 door, out Quaternion outward, out BuildingObject house);
@@ -1392,8 +1386,11 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         {
             StationQueue queue = station != null ? GameSession.Here.Workshops.Find(station.Id) : null;
             float distance = station != null ? (station.transform.position - transform.position).sqrMagnitude : float.MaxValue;
+            // As a worker's own trip asks (CanTakeBack), by hand: they must be able to lift some of it, or they'd walk there and back
+            // every look with nothing.
             if (queue == null || distance > bestDistance || !WorkerProduction.HasWorkToTakeBack(queue) || Staffed(queue) || HauledByAnother(queue)
                 || !(queue.Output is ItemDefinition item) || GameSession.Stash.Items.SpaceFor(item) <= 0
+                || WorkerCarry.CanTake(item, queue.OutputAmount, WorkerCarry.ByHand(npc.Record, WorkerSettings.Current)) <= 0
                 || StashChest.Nearest(station.transform.position, WorkerSettings.Current.ChestReach) == null)
             {
                 continue;
@@ -1416,12 +1413,13 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         return true;
     }
 
-    // Someone works this station: its finished work is theirs to take back (MaybeStartTrip).
+    // Someone works this station: its finished work is theirs to take back (MaybeStartTrip). Asked as their own trips ask it
+    // (WorkerProduction.QueueOf), so a worker whose station is found by their job's kind (no Work Queue of their own) counts too.
     private static bool Staffed(StationQueue queue)
     {
         foreach (ResidentLife life in Living)
         {
-            if (life != null && life.npc != null && life.npc.Record != null && life.npc.Record.WorkQueue == queue.StationId)
+            if (life != null && life.npc != null && life.npc.Record != null && WorkerProduction.QueueOf(GameSession.Here, life.npc.Record) == queue)
             {
                 return true;
             }
@@ -1552,20 +1550,12 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     }
 
     // The trip's state cleared, the cart let go, nothing else (the scene going).
-    private void ClearTrip()
-    {
-        trip = Trip.None;
-        tripChest = null;
-        cartWanted = null;
-        carrying.Clear();
-        carryingBack = false;
-        LetGoOfCart();
-    }
+    private void ClearTrip() => ResetTrip();
 
-    // Done, or the day moved on (a meal, the night, danger): nothing carried is lost, as nothing left its place before arriving.
-    private void EndTrip()
+    // Every piece of a trip's state, in one place: a trip ended by a new plan or the scene going once kept its haul claim (the
+    // station stayed "being hauled" until their next trip, a whole day for someone without a job).
+    private void ResetTrip()
     {
-        bool was = trip != Trip.None;
         trip = Trip.None;
         tripChest = null;
         cartWanted = null;
@@ -1575,6 +1565,13 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         hauling = null;
         haulingFrom = null;
         LetGoOfCart();
+    }
+
+    // Done, or the day moved on (a meal, the night, danger): nothing carried is lost, as nothing left its place before arriving.
+    private void EndTrip()
+    {
+        bool was = trip != Trip.None;
+        ResetTrip();
         if (was)
         {
             ShowTool(null, 1f);

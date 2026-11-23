@@ -35,6 +35,7 @@ public sealed class PlayerMovement : MonoBehaviour
     private Vector3 lungeVelocity;
     private float lungeUntil = -1f;
     private float lungeSeconds;
+    private bool lungeEased;
     private readonly System.Collections.Generic.Dictionary<object, float> speedScales = new System.Collections.Generic.Dictionary<object, float>();
 
     /// <summary>Who slows (or speeds) the player now (a swing's wind-up, crafting by hand, a status): what LeaseWatch looks at.</summary>
@@ -205,9 +206,11 @@ public sealed class PlayerMovement : MonoBehaviour
 
     /// <summary>
     /// A short push on top of normal movement, without counting as a dash (an attack stepping into its swing). Faces
-    /// the way it pushes.
+    /// the way it pushes. <paramref name="eased"/> (a swing's step) starts quick and eases to nothing over the same distance
+    /// (<see cref="LungeShape"/>); otherwise the push is flat, as pushes renewed every frame need (the lasso's drag, the step
+    /// onto a horse): an eased one restarted each frame would stay at its first, quickest part.
     /// </summary>
-    public void Lunge(Vector3 velocity, float duration)
+    public void Lunge(Vector3 velocity, float duration, bool eased = false)
     {
         velocity.y = 0f;
         if (velocity.sqrMagnitude < 0.0001f || duration <= 0f)
@@ -218,6 +221,18 @@ public sealed class PlayerMovement : MonoBehaviour
         lungeVelocity = velocity;
         lungeUntil = Time.time + duration;
         lungeSeconds = duration;
+        lungeEased = eased;
+    }
+
+    /// <summary>
+    /// The share of an eased lunge's way covered from <paramref name="from"/> to <paramref name="to"/> (shares of its time, 0 to
+    /// 1): the shape's integral, 1.5 (s - s³/3), so a frame moves exactly its part whatever the frame rate (sampling the shape
+    /// once a frame overshot by a fifth at 30 fps).
+    /// </summary>
+    public static float EasedLungeCovered(float from, float to)
+    {
+        float a = Mathf.Clamp01(from), b = Mathf.Clamp01(to);
+        return 1.5f * (b - b * b * b / 3f) - 1.5f * (a - a * a * a / 3f);
     }
 
     /// <summary>
@@ -387,10 +402,21 @@ public sealed class PlayerMovement : MonoBehaviour
         horizontalVelocity = direction * speed;
         if (lungeUntil >= 0f)
         {
-            if (Time.time < lungeUntil)
+            if (lungeEased)
             {
-                float share = lungeSeconds > 0f ? 1f - (lungeUntil - Time.time) / lungeSeconds : 1f;
-                horizontalVelocity += lungeVelocity * LungeShape(share);
+                // This frame's part of the way, as a speed over the frame: the last frame takes the remainder, so the step ends
+                // where it should.
+                float start = lungeUntil - lungeSeconds, dt = Mathf.Max(Time.deltaTime, 0.0001f);
+                float covered = EasedLungeCovered((Time.time - dt - start) / lungeSeconds, (Time.time - start) / lungeSeconds);
+                horizontalVelocity += lungeVelocity * (lungeSeconds * covered / dt);
+                if (Time.time >= lungeUntil)
+                {
+                    lungeUntil = -1f;
+                }
+            }
+            else if (Time.time < lungeUntil)
+            {
+                horizontalVelocity += lungeVelocity;
             }
             else
             {

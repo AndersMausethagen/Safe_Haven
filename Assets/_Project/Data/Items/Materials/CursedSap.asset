@@ -21,7 +21,7 @@ MonoBehaviour:
   value: 2
   gearScoreOverride: 0
   raidOnly: 1
-  icon: {fileID: 21300000, guid: 6df1d505092cc34468391e382267b623, type: 3}
+  icon: {fileID: 21300000, guid: 911a04a153201a04fa3791559ee1bb72, type: 3}
   prefab: {fileID: 0}
   heldModel: {fileID: 0}
   heldPosition: {x: 0, y: 0, z: 0}

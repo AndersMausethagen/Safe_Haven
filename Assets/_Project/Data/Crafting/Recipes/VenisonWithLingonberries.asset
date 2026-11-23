@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e984d5700951ee48b9215d668e8218a, type: 3}
+  m_Name: VenisonWithLingonberries
+  m_EditorClassIdentifier: SafeHaven::RecipeDefinition
+  id: venison_lingonberries
+  displayName: 
+  output: {fileID: 11400000, guid: 103ba3ddcfd75784885af6c34f64b282, type: 2}
+  outputResource: {fileID: 0}
+  outputAmount: 1
+  resourceCost: []
+  itemCost:
+  - item: {fileID: 11400000, guid: bc8014e1fda9522409926dc1b279a7df, type: 2}
+    amount: 2
+  - item: {fileID: 11400000, guid: 74c0a8be248a5264aaf67f85d390ee8b, type: 2}
+    amount: 2
+  - item: {fileID: 11400000, guid: 7b474eec64e460840bbcadb1a0fa3cf8, type: 2}
+    amount: 1
+  station: 9
+  craftSeconds: 28
+  knownFromStart: 1
+  minimumStationTier: 0
+  requiredSkill: {fileID: 0}
+  requiredSkillLevel: 0
+  sortOrder: 167
+  needsModule: {fileID: 0}
+  replaces: {fileID: 0}

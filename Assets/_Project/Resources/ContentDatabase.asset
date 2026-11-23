@@ -282,6 +282,24 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7b474eec64e460840bbcadb1a0fa3cf8, type: 2}
   - {fileID: 11400000, guid: 67e9007d1cac072429d0fd5249e1bcbb, type: 2}
   - {fileID: 11400000, guid: a74ced39f6a083047955bfe7834c61f0, type: 2}
+  - {fileID: 11400000, guid: 60f197d85a8882842b5afeddf2230847, type: 2}
+  - {fileID: 11400000, guid: c1a0e8dc56608934790b8f29d7fba0bd, type: 2}
+  - {fileID: 11400000, guid: 74c0a8be248a5264aaf67f85d390ee8b, type: 2}
+  - {fileID: 11400000, guid: 4d806f8c540dab745a40eaf702d37208, type: 2}
+  - {fileID: 11400000, guid: 0fc75b72a687d1546aa398c998e9358c, type: 2}
+  - {fileID: 11400000, guid: bc8014e1fda9522409926dc1b279a7df, type: 2}
+  - {fileID: 11400000, guid: 9a93dba1b3ed82043b5fe010e9766d67, type: 2}
+  - {fileID: 11400000, guid: feb3830a371cb464495ae539a5d4609a, type: 2}
+  - {fileID: 11400000, guid: aa7edb390665a8f48bde2eb9ad616e9a, type: 2}
+  - {fileID: 11400000, guid: 5fa638651d489fb4f985f8ae5275d37b, type: 2}
+  - {fileID: 11400000, guid: bc106920e8763694ea255df418750519, type: 2}
+  - {fileID: 11400000, guid: 34fa458137110d444aa8c6b83d409af1, type: 2}
+  - {fileID: 11400000, guid: 8e6ede873458c364388be7d413735f64, type: 2}
+  - {fileID: 11400000, guid: ea9f8949a6a76f84f96d9698b52a7340, type: 2}
+  - {fileID: 11400000, guid: af53570148bd3354fa29fad721343624, type: 2}
+  - {fileID: 11400000, guid: 515aefd6a6b08894597e42359a19aea9, type: 2}
+  - {fileID: 11400000, guid: 939768c47ce0dbe408f8a7b50a1b497e, type: 2}
+  - {fileID: 11400000, guid: 103ba3ddcfd75784885af6c34f64b282, type: 2}
   resourceCatalog: {fileID: 11400000, guid: 82528be8462042341acfc62489e5c91f, type: 2}
   recipeBook: {fileID: 11400000, guid: cd7724124d8b393439143345d7f2b45f, type: 2}
   saveablePrefabs:
@@ -324,8 +342,11 @@ MonoBehaviour:
   - {fileID: 3468862131618844974, guid: c0e33cebb61125d4ba5a3326b87987f6, type: 3}
   - {fileID: 3468862131618844974, guid: ff93697190dd6f94cb20e5981aed0b02, type: 3}
   - {fileID: 7217363731442406552, guid: e880d4ea2b9be22409acdbd5bf1e6f9e, type: 3}
+  - {fileID: 3542689810195281297, guid: 1184fb565f0cd364bb6365403e7b0363, type: 3}
   - {fileID: 4270365726699466788, guid: a9894d3c3c7fdc349ab56da91f0aac2a, type: 3}
+  - {fileID: 8222769955065994141, guid: 6d34854cb1a99c9428c2bdfaff94d738, type: 3}
   - {fileID: 3694057216285352694, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+  - {fileID: 3694057216285352694, guid: 13af7ac7ef84e424588ca48ed7024c4a, type: 3}
   - {fileID: 6857568534646244953, guid: 7d72b03acb11eb940b67a5ae4063d53c, type: 3}
   - {fileID: 4820954658464857728, guid: c9dcb12e6a28c2d4680da62b63d2deee, type: 3}
   - {fileID: 6751219964937899752, guid: 5e2206bd114732e4da8f8e504471a110, type: 3}
@@ -344,12 +365,14 @@ MonoBehaviour:
   - {fileID: 5370729365447931651, guid: 7b176e5facb909c44a2893050cbcc64a, type: 3}
   - {fileID: 255719446651114345, guid: e010c7c1cd96e8a4cb11aa834ca0a563, type: 3}
   - {fileID: 7687514720534006754, guid: 7bbc1b4511da00c4e81fb9d948fe6784, type: 3}
+  - {fileID: 3694057216285352694, guid: b268996ecbdee934aa75aa16e9c67242, type: 3}
   - {fileID: 1318889157062175519, guid: d30b058cde685564ca6d1e997f261196, type: 3}
   - {fileID: 1486313009535500766, guid: bf3e16d3faa3743469e7a3d035690749, type: 3}
   - {fileID: 1486313009535500766, guid: cc5180439d2510049b5c80b8c390d534, type: 3}
   - {fileID: 5317867585658608980, guid: 15b33c21de24fb7418664d30fe242c26, type: 3}
   - {fileID: 6875522621434293214, guid: a21219cc54991944aa282f3806398111, type: 3}
   - {fileID: 9088902545316183081, guid: 8c73a6bd5fac65d40856f43f9a67962d, type: 3}
+  - {fileID: 8222769955065994141, guid: 0a7f279d328f87249af6223d1fc298c6, type: 3}
   - {fileID: 8407726397120441101, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
   - {fileID: 6719027148405250563, guid: 4cff8733c679b964f97f5aa116eda933, type: 3}
   - {fileID: 2111271593981369704, guid: e8f5ac7427646e942aaf261bf18f6768, type: 3}
@@ -423,7 +446,6 @@ MonoBehaviour:
   - {fileID: 8358629271383303412, guid: d7b2b0e38359eb344ad18712fb6f33db, type: 3}
   - {fileID: 7151286237535332337, guid: 723b6c9c97b51af40bab476852d65df4, type: 3}
   - {fileID: 5328339517679984002, guid: 641fe335760a6644f847cf14288887f7, type: 3}
-  - {fileID: 3542689810195281297, guid: 1184fb565f0cd364bb6365403e7b0363, type: 3}
   quests:
   - {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
   - {fileID: 11400000, guid: 2f76858ea1c6b6043bdee39be76ef0b1, type: 2}
@@ -545,7 +567,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f918ba89b7b235448905310320940c70, type: 2}
   - {fileID: 11400000, guid: cdd8fcb3acc60ec45854efd2eb13a408, type: 2}
   gatheringNodes:
+  - {fileID: 11400000, guid: aa288c1f7d7479249a59c3d8904a19cc, type: 2}
   - {fileID: 11400000, guid: 07c3b9e4b909aa8499906160d424e40d, type: 2}
+  - {fileID: 11400000, guid: 4f7839a727af3b04fa50e3cc9c961356, type: 2}
   - {fileID: 11400000, guid: db342d0f4174d1748b49dc2cdcb859bb, type: 2}
   - {fileID: 11400000, guid: 41a193b72931c40498c94ab9c6edeef6, type: 2}
   - {fileID: 11400000, guid: 73554f3fb638fbf4bbe5fc5e583aef36, type: 2}
@@ -561,6 +585,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3c785907f2c4f734e9dded3f24f5dc7e, type: 2}
   - {fileID: 11400000, guid: 91d9ec419ae83074dabf82f1814f21e7, type: 2}
   - {fileID: 11400000, guid: e77aff8a4e388bd47bdc46d19aab4460, type: 2}
+  - {fileID: 11400000, guid: 98182c7bc5e5add4882ce013d08a96dd, type: 2}
   - {fileID: 11400000, guid: 0f9ee456effddc34eadcc24a1eb3a666, type: 2}
   - {fileID: 11400000, guid: 042ca0d1ffdb83f44b93dc1e02eebe96, type: 2}
   - {fileID: 11400000, guid: 0aa70db3592dfe34e995acaa1c2ff278, type: 2}
@@ -571,6 +596,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ad31a9c04b185e240a379c5709172689, type: 2}
   - {fileID: 11400000, guid: 707ef7af96e1d22429f02e34b83ac9c0, type: 2}
   - {fileID: 11400000, guid: 2f179176c38b2214e9d80a142ebcc33f, type: 2}
+  - {fileID: 11400000, guid: 16c9c5044c288d842b084f7606796f62, type: 2}
   - {fileID: 11400000, guid: 5182aff1ad3931d4997a7a780b6ec0e8, type: 2}
   - {fileID: 11400000, guid: 6cd4516a036ee9d4bbc3c2703f702a65, type: 2}
   - {fileID: 11400000, guid: 67001cdb00fa76a4ca674fbd8fe7b0b8, type: 2}

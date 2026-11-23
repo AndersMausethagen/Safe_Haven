@@ -189,7 +189,7 @@ public sealed class PartyHud : MonoBehaviour
         text.alignment = alignment;
         text.raycastTarget = false;
         text.textWrappingMode = TextWrappingModes.NoWrap;
-        text.overflowMode = TextOverflowModes.Ellipsis;
+        text.overflowMode = TextOverflowModes.Truncate; // Not Ellipsis: the fonts have no "…" (TMP warned and truncated anyway).
         return text;
     }
 

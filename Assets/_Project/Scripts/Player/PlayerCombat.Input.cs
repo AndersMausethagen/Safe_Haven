@@ -333,14 +333,17 @@ public sealed partial class PlayerCombat
     // The bounded buffer (SwingMotion.Buffers): a press is kept for the next swing only in the last moments before the swing in
     // progress can chain, or before a dodge, flinch or broken guard ends. A rush out of a dodge is the dodge's own attack, kept
     // at any point of it.
+    private bool BlowResolved => activeAttack != null && !hitPending;
+
     private bool BufferOpen(SwingKind kind)
     {
         if (activeKind != SwingKind.None)
         {
             // Once the blow has landed, a press is kept for the next swing wherever it comes (the user, 2026-11-23: "sometimes when I
             // want to combo, it just restarts at the first attack": a press in the follow-through was dropped). In the wind-up it is
-            // still only kept in the buffer's last moments, so mashing doesn't queue swings.
-            return !hitPending || SwingMotion.Buffers(ActiveElapsed, RecoverAt(activeAttack, activeSpeed), Rules);
+            // still only kept in the buffer's last moments, so mashing doesn't queue swings. "Landed" needs a blow that was due: a swing
+            // with no attack never has one pending, and must not keep presses from its first frame.
+            return BlowResolved || SwingMotion.Buffers(ActiveElapsed, RecoverAt(activeAttack, activeSpeed), Rules);
         }
 
         if (dodge != null && dodge.IsDodging)

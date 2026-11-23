@@ -164,7 +164,7 @@ public sealed class PlayerStatsTests
                 continue;
             }
 
-            bool fights = item.BoonBonuses.Any(bonus => bonus.stat != StatType.GatherYield && bonus.stat != StatType.ForageYield);
+            bool fights = item.BoonBonuses.Any(bonus => !BoonFamily.IsWork(bonus.stat));
             if (fights)
             {
                 Assert.IsNotEmpty(ItemTooltipView.MealFamily(item.BoonBonuses), item.name);

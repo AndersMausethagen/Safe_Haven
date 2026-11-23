@@ -56,4 +56,28 @@ public sealed class SwingHoldTests
         Assert.AreEqual(0f, PlayerMovement.LungeShape(1f), 1e-4f, "nothing left at its end: no dead stop");
         Assert.Greater(PlayerMovement.LungeShape(0f), PlayerMovement.LungeShape(0.5f), "quick first, easing off");
     }
+
+    [Test]
+    public void AnEasedLunge_CoversItsWayExactly_AtAnyFrameRate()
+    {
+        foreach (float fps in new[] { 24f, 30f, 60f, 144f })
+        {
+            // 0.12 s, as a charged blow's step: frames that don't divide it evenly, the last one past its end.
+            const float seconds = 0.12f;
+            float dt = 1f / fps, covered = 0f, firstFrame = 0f;
+            for (float t = dt; t - dt < seconds; t += dt)
+            {
+                float part = PlayerMovement.EasedLungeCovered((t - dt) / seconds, t / seconds);
+                if (firstFrame == 0f)
+                {
+                    firstFrame = part;
+                }
+
+                covered += part;
+            }
+
+            Assert.AreEqual(1f, covered, 1e-4f, $"at {fps} fps it goes exactly its distance (a sample a frame overshot by a fifth at 30)");
+            Assert.Greater(firstFrame, dt / seconds, $"at {fps} fps the first frame moves more than a flat push would: quick, then easing");
+        }
+    }
 }

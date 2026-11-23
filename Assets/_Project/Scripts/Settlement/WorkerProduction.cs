@@ -302,7 +302,6 @@ public static class WorkerProduction
         return weight;
     }
 
-    /// <summary>Whether there is finished work at the station for its worker to take back.</summary>
     /// <summary>
     /// Whether finished work is worth a trip to the chests now (the user, 2026-11-23: "NPC's should automatically move items from crafting
     /// stations output to nearby storage"): the station has stopped (idle or blocked by its full output), or the output already fills a
@@ -311,6 +310,7 @@ public static class WorkerProduction
     public static bool WorthATrip(int outputAmount, int load, bool idle, bool blocked) =>
         outputAmount > 0 && (idle || blocked || (load > 0 && outputAmount >= load));
 
+    /// <summary>Whether there is finished work at the station for its worker to take back.</summary>
     public static bool HasWorkToTakeBack(StationQueue queue) =>
         queue != null && queue.Output is ItemDefinition item && queue.OutputAmount > 0 && !item.KeepsCondition && !item.HasDurability;
 

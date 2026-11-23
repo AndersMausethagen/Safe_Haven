@@ -25,6 +25,7 @@ MonoBehaviour:
       fromTier: 0
       toTier: 0
       fixedAmount: 0
+      onlyInRaid: {fileID: 0}
     - item: {fileID: 11400000, guid: 4f80b5d6098abc64b903316903de5b64, type: 2}
       resource: {fileID: 0}
       minQuantity: 1
@@ -33,3 +34,13 @@ MonoBehaviour:
       fromTier: 0
       toTier: 0
       fixedAmount: 0
+      onlyInRaid: {fileID: 0}
+    - item: {fileID: 11400000, guid: bc8014e1fda9522409926dc1b279a7df, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 1
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+      onlyInRaid: {fileID: 0}

@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Roots
   description: Roots from the ground hold your feet. Roll to tear free; you can still fight.
   color: {r: 0.7, g: 0.6, b: 0.35, a: 1}
-  icon: {fileID: 21300000, guid: 1635a2f3a83860546a6d43ddd48e7965, type: 3}
+  icon: {fileID: 21300000, guid: d61901718534abc48ae514223f09793f, type: 3}
   seconds: 1.6
   damagePerSecond: 0
   damageType: 0

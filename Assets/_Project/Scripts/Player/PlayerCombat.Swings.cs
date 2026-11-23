@@ -680,7 +680,7 @@ public sealed partial class PlayerCombat
         }
 
         float seconds = Mathf.Max(0.05f, secondsLeft);
-        movement.Lunge(activeDirection * (distance / seconds), seconds);
+        movement.Lunge(activeDirection * (distance / seconds), seconds, eased: true);
     }
 
     private int LandSwing()

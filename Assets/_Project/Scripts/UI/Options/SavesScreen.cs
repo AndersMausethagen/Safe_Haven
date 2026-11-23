@@ -273,11 +273,11 @@ public sealed class SavesScreen : MonoBehaviour
         OptionsWidgets.Stretch((RectTransform)name.transform, new Vector2(18f, 44f), new Vector2(-textRight, -8f));
         name.fontStyle = FontStyles.Bold;
         name.textWrappingMode = TextWrappingModes.NoWrap;
-        name.overflowMode = TextOverflowModes.Ellipsis;
+        name.overflowMode = TextOverflowModes.Truncate; // Not Ellipsis: the fonts have no "…" (TMP warned and truncated anyway), and the UI shows none.
         TMP_Text details = OptionsWidgets.Text("Details", row, save.Details, 19f, save.IsReadable ? OptionsWidgets.Muted : new Color(1f, 0.48f, 0.42f), TextAlignmentOptions.TopLeft);
         OptionsWidgets.Stretch((RectTransform)details.transform, new Vector2(18f, 10f), new Vector2(-textRight, -54f));
         details.textWrappingMode = TextWrappingModes.NoWrap;
-        details.overflowMode = TextOverflowModes.Ellipsis;
+        details.overflowMode = TextOverflowModes.Truncate; // Not Ellipsis: the fonts have no "…" (TMP warned and truncated anyway), and the UI shows none.
 
         float x = -14f;
         Action<string, Action, bool> add = (label, clicked, enabled) =>

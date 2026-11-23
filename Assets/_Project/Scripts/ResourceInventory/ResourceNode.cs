@@ -86,7 +86,8 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
             // On the day's own clock (game time): in real time, an hour in the pause menu on a raid grew every node back.
             float away = DayNightCycle.SecondsAwaySince(saved.run, saved.savedAt);
             respawnAt = Time.time + Mathf.Max(0f, saved.respawnRemaining - away);
-            regrowOnDay = saved.regrowOnDay;
+            regrowOnDay = RestoredRegrowDay(saved.regrowOnDay, IsDepleted ? regrowOnDay : 0, node != null ? node.RegrowsAtHomeAfterDays : 0,
+                GameSession.Home.DaysPassed, AtOwnHome);
             SetPresent(false);
         }
         else if (IsDepleted)
@@ -180,6 +181,22 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
     /// prologue or a friend's Haven, whose host keeps its own), else 0. Pure, for tests.
     /// </summary>
     public static int RegrowDay(int afterDays, int today, bool atHome) => afterDays > 0 && atHome ? today + afterDays : 0;
+
+    /// <summary>
+    /// The regrow day a gathered node takes from a saved or synced state. Only the Haven's owner counts days (a friend's copy never
+    /// regrows by day: the host's state grows it back); the owner keeps the day it had or the one that came, and a picked node that
+    /// came with none (a friend picked it, whose copy holds no day, or a save from before bushes counted days) gets one from today,
+    /// or it would never grow back. Pure, for tests.
+    /// </summary>
+    public static int RestoredRegrowDay(int saved, int current, int afterDays, int today, bool owner)
+    {
+        if (!owner)
+        {
+            return 0;
+        }
+
+        return saved > 0 ? saved : current > 0 ? current : RegrowDay(afterDays, today, true);
+    }
 
     private static bool AtOwnHome => Place.AtHome;
 

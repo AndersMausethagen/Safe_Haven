@@ -82,7 +82,7 @@ public static class RecipeBrowserBuilder
         rect.offsetMin = new Vector2(60f, y - height);
         rect.offsetMax = new Vector2(-34f, y);
         label.textWrappingMode = TextWrappingModes.NoWrap;
-        label.overflowMode = TextOverflowModes.Ellipsis;
+        label.overflowMode = TextOverflowModes.Truncate; // Not Ellipsis: the fonts have no "…" (TMP warned and truncated anyway), and the UI shows none.
         return label;
     }
 
@@ -145,9 +145,9 @@ public static class RecipeBrowserBuilder
         TMP_Text nameLabel = StationWindowBuilder.At(StationWindowBuilder.Text("Name", selected, "", 20f, style.Text), 86f, -10f, detailWidth - 98f, 46f);
         style.Title(nameLabel);
         nameLabel.alignment = TextAlignmentOptions.MidlineLeft;
-        nameLabel.overflowMode = TextOverflowModes.Ellipsis;
+        nameLabel.overflowMode = TextOverflowModes.Truncate; // Not Ellipsis: the fonts have no "…" (TMP warned and truncated anyway), and the UI shows none.
         TMP_Text infoLabel = StationWindowBuilder.At(StationWindowBuilder.Text("Info", selected, "", 13f, style.Muted), 86f, -56f, detailWidth - 98f, 22f);
-        infoLabel.overflowMode = TextOverflowModes.Ellipsis;
+        infoLabel.overflowMode = TextOverflowModes.Truncate; // Not Ellipsis: the fonts have no "…" (TMP warned and truncated anyway), and the UI shows none.
 
         RectTransform descriptionArea = StationWindowBuilder.Rect("Description Scroll", selected, Vector2.zero, Vector2.one, new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero);
         descriptionArea.offsetMin = new Vector2(12f, FooterHeight);
@@ -186,7 +186,7 @@ public static class RecipeBrowserBuilder
         TMP_Text problem = StationWindowBuilder.Text("Problem", selected, "", 13f, style.Danger);
         StationWindowBuilder.Place(problem.rectTransform, Vector2.zero, new Vector2(12f, 58f), new Vector2(inner, 24f));
         problem.textWrappingMode = TextWrappingModes.NoWrap;
-        problem.overflowMode = TextOverflowModes.Ellipsis;
+        problem.overflowMode = TextOverflowModes.Truncate; // Not Ellipsis: the fonts have no "…" (TMP warned and truncated anyway), and the UI shows none.
 
         float buttonWidth = (inner - 8f) / 2f;
         Button makeAll = StationWindowBuilder.MakeButton("Make All Button", selected, "Craft all", 15f);
@@ -254,7 +254,7 @@ public static class RecipeBrowserBuilder
         Stretch(name.rectTransform, 30f, -74f);
         name.alignment = TextAlignmentOptions.MidlineLeft;
         name.textWrappingMode = TextWrappingModes.NoWrap;
-        name.overflowMode = TextOverflowModes.Ellipsis;
+        name.overflowMode = TextOverflowModes.Truncate; // Not Ellipsis: the fonts have no "…" (TMP warned and truncated anyway), and the UI shows none.
         TMP_Text amount = StationWindowBuilder.Text("Amount", rect, "", 14f, style.Good);
         StationWindowBuilder.Place(amount.rectTransform, new Vector2(1f, 0.5f), Vector2.zero, new Vector2(70f, 22f));
         amount.alignment = TextAlignmentOptions.MidlineRight;
@@ -302,7 +302,7 @@ public static class RecipeBrowserBuilder
             var footerLabel = footer.GetComponent<TMP_Text>();
             footerLabel.fontSize = 13f;
             footerLabel.textWrappingMode = TextWrappingModes.NoWrap;
-            footerLabel.overflowMode = TextOverflowModes.Ellipsis;
+            footerLabel.overflowMode = TextOverflowModes.Truncate; // Not Ellipsis: the fonts have no "…" (TMP warned and truncated anyway), and the UI shows none.
             StationWindowBuilder.Wire(window, ("recipes", browser));
             PrefabUtility.SaveAsPrefabAsset(root, BagPrefabPath);
         }

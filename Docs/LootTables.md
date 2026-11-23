@@ -2,6 +2,106 @@
 
 Written from the game's data by Safe Haven › Loot › Write Loot Overview; edit the tables in the Content Editor's Loot Tables (Data/Loot), not here. Amounts are before the tier's loot multiplier. ◆ marks a raid-only part.
 
+## Guardian's Hollow
+
+### Tier I (loot ×1, drops up to tier II)
+
+
+**Creatures:**
+
+- Black Widow (BlackWidow): Bog Venom 1 (50%), Cursed Essence 1 (90%)
+- Bog Troll (BogTroll): Old Silver Penny 1-2 (40%), Cursed Essence 3-4
+- Forest-Bitten Wolf (ForestBittenWolf, WolfPack): Rough Hide 1-2, Bone 1 (50%), Wolf Fang 1 (25%), Cursed Essence 1-2 (80%)
+- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2, Mistwing Egg 1 (40%)
+- Rootling (RootlingSwarm): Rootling Bark 1-2 (80%), Cursed Essence 1 (30%)
+- Small Moss Troll (SmallMossTroll): Troll Moss 1-2, Cursed Essence 1-2
+- The Heartroot, placed (TheHeartroot): Heartwood of the First Guardian 1, Hardwood 3-5, Cursed Essence 8-12
+- Troll Runt (TrollRunt): Old Silver Penny 1-2 (60%), Nettle Cord 1-2 (25%), Linen 1 (20%), Copper Ingot 1 (15%), Cursed Essence 1-2
+- Tusse (Tusse): Old Silver Penny 1-3, Tusse's Trinket 1 (30%), Cursed Essence 1-2
+
+**Caches:**
+
+- Only here: no regional loot table.
+- Elites (0-0 a run, relic 0%): nothing
+
+### Tier II (loot ×1.25, drops up to tier III)
+
+
+**Creatures:**
+
+- Black Widow (GiantBlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
+- Blight Boar (BlightBoar): Boar Meat 2-3, Rough Hide 1-2 (80%), Boar Tusk 1 (40%), Cursed Essence 1 (50%), Bone 1-2 (60%)
+- Bog Spitter (BogSpitter): Bog Venom 1 (70%), Cursed Essence 1-2 (90%)
+- Bog Troll (BogTroll): Bog-troll Hide 1-2 (70%), Old Silver Penny 1-2 (40%), Cursed Essence 3-4
+- Forest-Bitten Wolf (ForestBittenWolf, WolfPack): Rough Hide 1-2, Bone 1 (50%), Wolf Fang 1 (25%), Cursed Essence 1-2 (80%)
+- Fossegrim (Fossegrim): Fiddle String 1-2 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
+- Marsh Light (MarshLight): Wisp Ember 1 (60%), Cursed Essence 1-2 (80%)
+- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2, Mistwing Egg 1 (40%)
+- Rootling (RootlingSwarm): Rootling Bark 1-2 (80%), Cursed Essence 1 (30%)
+- Small Moss Troll (SmallMossTroll): Troll Moss 1-2, Cursed Essence 1-2
+- The Heartroot, placed (TheHeartroot): Heartwood of the First Guardian 1, Guardian Heartroot 1, Hardwood 3-5, Thick Hide 1-2 (50%), Cursed Essence 8-12
+- Troll Runt (TrollRunt): Old Silver Penny 1-2 (60%), Nettle Cord 1-2 (25%), Linen 1 (20%), Copper Ingot 1 (15%), Cursed Essence 1-2
+- Tusse (Tusse): Old Silver Penny 1-3, Tusse's Trinket 1 (30%), Cursed Essence 1-2
+
+**Caches:**
+
+- Only here: no regional loot table.
+- Elites (0-0 a run, relic 0%): nothing
+
+### Tier III (loot ×1.5, drops up to tier IV)
+
+
+**Creatures:**
+
+- Berg-jutul (Bergjutul): Jutul Heartstone 1, Cursed Essence 9-12
+- Black Widow (GiantBlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
+- Blight Boar (BlightBoar): Boar Meat 2-3, Rough Hide 1-2 (80%), Boar Tusk 1 (40%), Cursed Essence 1 (50%), Bone 1-2 (60%)
+- Bog Spitter (BogSpitter): Bog Venom 1 (70%), Cursed Essence 1-2 (90%)
+- Bog Troll (BogTroll): Bog-troll Hide 1-2 (70%), Old Silver Penny 1-2 (40%), Cursed Essence 3-4
+- Draug (Draug): Grave Iron 1-2 (70%), Barrow Goods 1 (30%), Old Silver Penny 1-3 (50%), Cursed Essence 2-3
+- Forest-Bitten Wolf (ForestBittenWolf, WolfPack): Rough Hide 1-2, Bone 1 (50%), Wolf Fang 1 (25%), Cursed Essence 1-2 (80%)
+- Fossegrim (Fossegrim): Fiddle String 1-2 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
+- Marsh Light (MarshLight): Wisp Ember 1 (60%), Cursed Essence 1-2 (80%)
+- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2, Mistwing Egg 1 (40%)
+- Root Guardian (RootGuardian): Guardian Heartroot 1, Hardwood 2-4, Thick Hide 1-2 (50%), Cursed Essence 3-4
+- Rootling (RootlingSwarm): Rootling Bark 1-2 (80%), Cursed Essence 1 (30%)
+- Small Moss Troll (SmallMossTroll): Troll Moss 1-2, Cursed Essence 1-2
+- The Heartroot, placed (TheHeartroot): Heartwood of the First Guardian 1, Guardian Heartroot 1, Hardwood 3-5, Thick Hide 1-2 (50%), Cursed Essence 8-12
+- Troll Runt (TrollRunt): Old Silver Penny 1-2 (60%), Nettle Cord 1-2 (25%), Linen 1 (20%), Copper Ingot 1 (15%), Cursed Essence 1-2
+- Tusse (Tusse): Old Silver Penny 1-3, Tusse's Trinket 1 (30%), Cursed Essence 1-2
+
+**Caches:**
+
+- Only here: no regional loot table.
+- Elites (0-0 a run, relic 0%): nothing
+
+### Tier IV (loot ×1.8, drops up to tier V)
+
+
+**Creatures:**
+
+- Berg-jutul (Bergjutul): Trollstone 2-3, Jutul Heartstone 1, Cursed Essence 9-12
+- Black Widow (GiantBlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
+- Blight Boar (BlightBoar): Boar Meat 2-3, Rough Hide 1-2 (80%), Boar Tusk 1 (40%), Cursed Essence 1 (50%), Bone 1-2 (60%)
+- Bog Spitter (BogSpitter): Bog Venom 1 (70%), Cursed Essence 1-2 (90%)
+- Bog Troll (BogTroll): Bog-troll Hide 1-2 (70%), Old Silver Penny 1-2 (40%), Cursed Essence 3-4
+- Draug (Draug): Grave Iron 1-2 (70%), Barrow Goods 1 (30%), Old Silver Penny 1-3 (50%), Cursed Essence 2-3
+- Forest-Bitten Wolf (ForestBittenWolf, WolfPack): Rough Hide 1-2, Bone 1 (50%), Wolf Fang 1 (25%), Cursed Essence 1-2 (80%)
+- Fossegrim (Fossegrim): Fiddle String 1-2 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
+- Marsh Light (MarshLight): Wisp Ember 1 (60%), Cursed Essence 1-2 (80%)
+- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2, Mistwing Egg 1 (40%)
+- Root Guardian (RootGuardian): Guardian Heartroot 1, Hardwood 2-4, Thick Hide 1-2 (50%), Cursed Essence 3-4
+- Rootling (RootlingSwarm): Rootling Bark 1-2 (80%), Cursed Essence 1 (30%)
+- Small Moss Troll (SmallMossTroll): Troll Moss 1-2, Cursed Essence 1-2
+- The Heartroot, placed (TheHeartroot): Heartwood of the First Guardian 1, Guardian Heartroot 1, Hardwood 3-5, Thick Hide 1-2 (50%), Cursed Essence 8-12
+- Troll Runt (TrollRunt): Old Silver Penny 1-2 (60%), Nettle Cord 1-2 (25%), Linen 1 (20%), Copper Ingot 1 (15%), Cursed Essence 1-2
+- Tusse (Tusse): Old Silver Penny 1-3, Tusse's Trinket 1 (30%), Cursed Essence 1-2
+
+**Caches:**
+
+- Only here: no regional loot table.
+- Elites (0-0 a run, relic 0%): nothing
+
 ## Misty Woods
 
 ### Tier I (loot ×1, drops up to tier II)
@@ -9,13 +109,11 @@ Written from the game's data by Safe Haven › Loot › Write Loot Overview; edi
 
 **Creatures:**
 
-- Blight Boar (BlightBoar): Boar Meat 2-3, Rough Hide 1-2 (80%), Boar Tusk 1 (40%), Cursed Essence 1 (50%), Bone 1-2 (60%)
-- Bog Spitter (BogSpitter): Bog Venom 1 (70%), Cursed Essence 1-2 (90%)
+- Black Widow (BlackWidow): Bog Venom 1 (50%), Cursed Essence 1 (90%)
 - Bog Troll (BogTroll): Old Silver Penny 1-2 (40%), Cursed Essence 3-4
 - Forest-Bitten Wolf (WolfPack, Wolf Den, ForestBittenWolf): Rough Hide 1-2, Bone 1 (50%), Wolf Fang 1 (25%), Cursed Essence 1-2 (80%)
-- Fossegrim (Fossegrim): Old Silver Penny 1-2 (50%), Cursed Essence 3-4
 - Marsh Light (MarshLight): Cursed Essence 1-2 (80%)
-- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2
+- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2, Mistwing Egg 1 (40%)
 - Old Moss Troll, placed (OldMossTroll): Moss-troll Tusk 1, Cursed Essence 9-12
 - Rootling (RootlingSwarm): Rootling Bark 1-2 (80%), Cursed Essence 1 (30%)
 - Small Moss Troll (SmallMossTroll): Troll Moss 1-2, Cursed Essence 1-2
@@ -24,10 +122,10 @@ Written from the game's data by Safe Haven › Loot › Write Loot Overview; edi
 
 **Caches:**
 
-- Herb-wife's Basket (Herb-wife's Basket): Healing Herb 2-4 (60%), Cloudberries 1-3 (40%), Honey 1-2 (30%), Healing Draught 1-2 (40%), Antidote 1 (25%), Orb Tincture 1-2 (25%), Life Orb 1 (25%), Barley 1-2 (30%), Wild Turnip 1-2 (30%), Troll Moss 1-2 (25%), Bone Charm 1 (6%), Cursed Essence 1-2 (30%)
+- Herb-wife's Basket (Herb-wife's Basket): Healing Herb 2-4 (60%), Cloudberries 1-3 (40%), Honey 1-2 (30%), Healing Draught 1-2 (40%), Antidote 1 (25%), Orb Tincture 1-2 (25%), Life Orb 1 (25%), Barley 1-2 (30%), Wild Turnip 1-2 (30%), Troll Moss 1-2 (25%), Bone Charm 1 (6%), Cursed Essence 1-2 (30%), Herb Planter Plans 1 (8%), Flower Bed Plans 1 (8%)
 - Hunter's Cache (Hunter's Cache, Wolf Den): Rough Hide 2-4 (60%), Bone 2-3 (50%), Boar Meat 1-2 (30%), Crude Stone Arrow 4-8 (40%), Whistling Arrow 1-2 (15%), Mistwing Feathers 2-4 (25%), Wolf Fang 1-2 (20%), Cured Leather Cap 1 (6%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (35%)
 - Smith's Chest (Smith's Chest): Copper Ingot 1-3 (45%), Charcoal 2-4 (40%), Green Copper Pot 1 (30%), Copper Band 1 (6%), Round Shield 1 (6%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (30%)
-- Traveller's Pack (Traveller's Pack, Abandoned Camp): Linen 1-3 (40%), Nettle Cord 1-3 (40%), Waterskin 1 (30%), Barley 1-2 (30%), Healing Draught 1 (35%), Old Silver Penny 1-4 (55%), Rune Book 1 (12%), Norn's Hourglass 1 (6%), Rune of Plenty 1 (5%), Pact Rune 1 (4%), Copper Band 1 (4%), Cursed Essence 1-2 (30%)
+- Traveller's Pack (Traveller's Pack, Abandoned Camp): Linen 1-3 (40%), Nettle Cord 1-3 (40%), Waterskin 1 (30%), Barley 1-2 (30%), Healing Draught 1 (35%), Old Silver Penny 1-4 (55%), Rune Book 1 (12%), Norn's Hourglass 1 (6%), Rune of Plenty 1 (5%), Pact Rune 1 (4%), Copper Band 1 (4%), Cursed Essence 1-2 (30%), Log Bench Plans 1 (8%), Plank Bench Plans 1 (8%), Trestle Table Plans 1 (8%)
 - Only here, with every cache (Misty Woods finds): Heart of the Forest 1 (2%), Rootling Bark 1-2 (15%), Pact Rune 1 (3%)
 - Elites (1-1 a run, relic 0%): Copper Ore 3-5, Cursed Essence 2-3
 
@@ -36,32 +134,30 @@ Written from the game's data by Safe Haven › Loot › Write Loot Overview; edi
 
 **Creatures:**
 
-- Black Widow (BlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
+- Black Widow (GiantBlackWidow, BlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
 - Blight Boar (BlightBoar): Boar Meat 2-3, Rough Hide 1-2 (80%), Boar Tusk 1 (40%), Cursed Essence 1 (50%), Bone 1-2 (60%)
 - Bog Spitter (BogSpitter): Bog Venom 1 (70%), Cursed Essence 1-2 (90%)
 - Bog Troll (BogTroll): Bog-troll Hide 1-2 (70%), Old Silver Penny 1-2 (40%), Cursed Essence 3-4
-- Fire Knight (Undead Knight Fire): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Cursed Essence 4-6
 - Forest-Bitten Wolf (WolfPack, Wolf Den, ForestBittenWolf): Rough Hide 1-2, Bone 1 (50%), Wolf Fang 1 (25%), Cursed Essence 1-2 (80%)
 - Fossegrim (Fossegrim): Fiddle String 1-2 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
 - Ice Knight (Undead Knight Ice): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Cursed Essence 4-6
 - Marsh Light (MarshLight): Wisp Ember 1 (60%), Cursed Essence 1-2 (80%)
-- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2
+- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2, Mistwing Egg 1 (40%)
 - Moss Shaman (MossShaman): Shaman's Burl 1 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
 - Old Moss Troll, placed (OldMossTroll): Moss-troll Tusk 1, Cursed Essence 9-12
 - Root Guardian (RootGuardian): Guardian Heartroot 1, Hardwood 2-4, Thick Hide 1-2 (50%), Cursed Essence 3-4
 - Rootling (RootlingSwarm): Rootling Bark 1-2 (80%), Cursed Essence 1 (30%)
 - Small Moss Troll (SmallMossTroll): Troll Moss 1-2, Cursed Essence 1-2
-- Toxic Knight (Undead Knight Toxic): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Painted Barding 1 (20%), Cursed Essence 4-6
 - Troll Runt (TrollRunt): Old Silver Penny 1-2 (60%), Nettle Cord 1-2 (25%), Linen 1 (20%), Copper Ingot 1 (15%), Cursed Essence 1-2
 - Tusse (Tusse): Old Silver Penny 1-3, Tusse's Trinket 1 (30%), Cursed Essence 1-2
 
 **Caches:**
 
 - Barrow Chest (Barrow Chest): Barrow Goods 1-2 (60%), Old Silver Penny 2-6 (80%), Grave Iron 1-2 (35%), Runestone Fragment 1 (30%), Rune Book 1 (15%), Pact Rune 1 (6%), Gilded Troll Idol 1 (5%), Cursed Essence 2-4 (60%)
-- Herb-wife's Basket (Herb-wife's Basket): Healing Herb 2-4 (60%), Cloudberries 1-3 (40%), Honey 1-2 (30%), Healing Draught 1-2 (40%), Greater Healing Draught 1 (20%), Antidote 1 (25%), Orb Tincture 1-2 (25%), Life Orb 1 (25%), Barley 1-2 (30%), Wild Turnip 1-2 (30%), Troll Moss 1-2 (25%), Bone Charm 1 (6%), Cursed Essence 1-2 (30%)
+- Herb-wife's Basket (Herb-wife's Basket): Healing Herb 2-4 (60%), Cloudberries 1-3 (40%), Honey 1-2 (30%), Healing Draught 1-2 (40%), Greater Healing Draught 1 (20%), Antidote 1 (25%), Orb Tincture 1-2 (25%), Life Orb 1 (25%), Barley 1-2 (30%), Wild Turnip 1-2 (30%), Troll Moss 1-2 (25%), Bone Charm 1 (6%), Cursed Essence 1-2 (30%), Herb Planter Plans 1 (8%), Flower Bed Plans 1 (8%)
 - Hunter's Cache (Hunter's Cache, Wolf Den): Rough Hide 2-4 (60%), Thick Hide 1-2 (35%), Bone 2-3 (50%), Boar Meat 1-2 (30%), Bodkin Arrow 3-6 (30%), Fire Arrow 2-4 (20%), Whistling Arrow 1-2 (15%), Mistwing Feathers 2-4 (25%), Wolf Fang 1-2 (20%), Cured Leather Cap 1 (6%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (35%)
 - Smith's Chest (Smith's Chest): Copper Ingot 1-3 (45%), Iron Ingot 1-2 (40%), Charcoal 2-4 (40%), Green Copper Pot 1 (30%), Broken Sickle 1 (25%), Copper Band 1 (6%), Round Shield 1 (6%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (30%)
-- Traveller's Pack (Traveller's Pack, Abandoned Camp): Linen 1-3 (40%), Nettle Cord 1-3 (40%), Waterskin 1 (30%), Barley 1-2 (30%), Healing Draught 1 (35%), Old Silver Penny 1-4 (55%), Rune Book 1 (12%), Norn's Hourglass 1 (6%), Rune of Plenty 1 (5%), Pact Rune 1 (4%), Copper Band 1 (4%), Cursed Essence 1-2 (30%)
+- Traveller's Pack (Traveller's Pack, Abandoned Camp): Linen 1-3 (40%), Nettle Cord 1-3 (40%), Waterskin 1 (30%), Barley 1-2 (30%), Healing Draught 1 (35%), Old Silver Penny 1-4 (55%), Rune Book 1 (12%), Norn's Hourglass 1 (6%), Rune of Plenty 1 (5%), Pact Rune 1 (4%), Copper Band 1 (4%), Cursed Essence 1-2 (30%), Log Bench Plans 1 (8%), Plank Bench Plans 1 (8%), Trestle Table Plans 1 (8%)
 - Only here, with every cache (Misty Woods finds): Heart of the Forest 1 (2%), Huldra Silk 1 (5%), Elderwood 1 (6%), Wisp Ember 1 (10%), Rootling Bark 1-2 (15%), Pact Rune 1 (3%)
 - Elites (1-2 a run, relic 5%): Iron Ore 3-5, Cursed Essence 3-4
 
@@ -72,35 +168,33 @@ Written from the game's data by Safe Haven › Loot › Write Loot Overview; edi
 
 - Barrow Shieldbearer (BarrowShieldbearer): Grave Iron 1-2 (70%), Barrow Goods 1 (40%), Old Silver Penny 1-3 (50%), Cursed Essence 2-3
 - Berg-jutul (Bergjutul): Jutul Heartstone 1, Cursed Essence 9-12
-- Black Widow (BlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
+- Black Widow (GiantBlackWidow, BlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
 - Blight Boar (BlightBoar): Boar Meat 2-3, Rough Hide 1-2 (80%), Boar Tusk 1 (40%), Cursed Essence 1 (50%), Bone 1-2 (60%)
 - Bog Spitter (BogSpitter): Bog Venom 1 (70%), Cursed Essence 1-2 (90%)
 - Bog Troll (BogTroll): Bog-troll Hide 1-2 (70%), Old Silver Penny 1-2 (40%), Cursed Essence 3-4
 - Draug (Draug): Grave Iron 1-2 (70%), Barrow Goods 1 (30%), Old Silver Penny 1-3 (50%), Cursed Essence 2-3
-- Fire Knight (Undead Knight Fire): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Blackened Barding 1 (20%), Cursed Essence 4-6
 - Forest-Bitten Wolf (WolfPack, Wolf Den, ForestBittenWolf): Rough Hide 1-2, Bone 1 (50%), Wolf Fang 1 (25%), Cursed Essence 1-2 (80%)
 - Fossegrim (Fossegrim): Fiddle String 1-2 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
 - Ice Knight (Undead Knight Ice): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Cursed Essence 4-6
 - Marsh Light (MarshLight): Wisp Ember 1 (60%), Cursed Essence 1-2 (80%)
-- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2
+- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2, Mistwing Egg 1 (40%)
 - Moss Shaman (MossShaman): Shaman's Burl 1 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
 - Old Moss Troll, placed (OldMossTroll): Moss-troll Tusk 1, Cursed Essence 9-12
 - Root Guardian (RootGuardian): Guardian Heartroot 1, Hardwood 2-4, Thick Hide 1-2 (50%), Cursed Essence 3-4
 - Rootling (RootlingSwarm): Rootling Bark 1-2 (80%), Cursed Essence 1 (30%)
 - Small Moss Troll (SmallMossTroll): Troll Moss 1-2, Cursed Essence 1-2
-- Toxic Knight (Undead Knight Toxic): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Painted Barding 1 (20%), Cursed Essence 4-6
 - Troll Runt (TrollRunt): Old Silver Penny 1-2 (60%), Nettle Cord 1-2 (25%), Linen 1 (20%), Copper Ingot 1 (15%), Cursed Essence 1-2
 - Tusse (Tusse): Old Silver Penny 1-3, Tusse's Trinket 1 (30%), Cursed Essence 1-2
 
 **Caches:**
 
 - Barrow Chest (Barrow Chest): Barrow Goods 1-2 (60%), Old Silver Penny 2-6 (80%), Grave Iron 1-2 (35%), Runestone Fragment 1 (30%), Rune Book 1 (15%), Pact Rune 1 (6%), Gilded Troll Idol 1 (5%), Cursed Essence 2-4 (60%)
-- Herb-wife's Basket (Herb-wife's Basket): Healing Herb 2-4 (60%), Cloudberries 1-3 (40%), Honey 1-2 (30%), Healing Draught 1-2 (40%), Greater Healing Draught 1 (20%), Antidote 1 (25%), Orb Tincture 1-2 (25%), Life Orb 1 (25%), Barley 1-2 (30%), Wild Turnip 1-2 (30%), Troll Moss 1-2 (25%), Bone Charm 1 (6%), Cursed Essence 1-2 (30%)
+- Herb-wife's Basket (Herb-wife's Basket): Healing Herb 2-4 (60%), Cloudberries 1-3 (40%), Honey 1-2 (30%), Healing Draught 1-2 (40%), Greater Healing Draught 1 (20%), Antidote 1 (25%), Orb Tincture 1-2 (25%), Life Orb 1 (25%), Barley 1-2 (30%), Wild Turnip 1-2 (30%), Troll Moss 1-2 (25%), Bone Charm 1 (6%), Cursed Essence 1-2 (30%), Herb Planter Plans 1 (8%), Flower Bed Plans 1 (8%)
 - Hunter's Cache (Hunter's Cache, Wolf Den): Rough Hide 2-4 (60%), Thick Hide 1-2 (35%), Bone 2-3 (50%), Boar Meat 1-2 (30%), Bodkin Arrow 3-6 (30%), Fire Arrow 2-4 (20%), Whistling Arrow 1-2 (15%), Mistwing Feathers 2-4 (25%), Wolf Fang 1-2 (20%), Cured Leather Cap 1 (6%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (35%)
-- Smith's Chest (Smith's Chest): Iron Ingot 1-2 (40%), Moonsilver Ingot 1 (20%), Charcoal 2-4 (40%), Green Copper Pot 1 (30%), Broken Sickle 1 (25%), Copper Band 1 (6%), Round Shield 1 (6%), Field Repair Kit 1 (15%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (30%)
-- Traveller's Pack (Traveller's Pack, Abandoned Camp): Linen 1-3 (40%), Nettle Cord 1-3 (40%), Waterskin 1 (30%), Barley 1-2 (30%), Healing Draught 1 (35%), Old Silver Penny 1-4 (55%), Rune Book 1 (12%), Norn's Hourglass 1 (6%), Rune of Plenty 1 (5%), Pact Rune 1 (4%), Copper Band 1 (4%), Cursed Essence 1-2 (30%)
+- Smith's Chest (Smith's Chest): Iron Ingot 1-2 (40%), Moonsilver Ingot 1 (30%), Charcoal 2-4 (40%), Green Copper Pot 1 (30%), Broken Sickle 1 (25%), Copper Band 1 (6%), Round Shield 1 (6%), Field Repair Kit 1 (15%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (30%)
+- Traveller's Pack (Traveller's Pack, Abandoned Camp): Linen 1-3 (40%), Nettle Cord 1-3 (40%), Waterskin 1 (30%), Barley 1-2 (30%), Healing Draught 1 (35%), Old Silver Penny 1-4 (55%), Rune Book 1 (12%), Norn's Hourglass 1 (6%), Rune of Plenty 1 (5%), Pact Rune 1 (4%), Copper Band 1 (4%), Cursed Essence 1-2 (30%), Log Bench Plans 1 (8%), Plank Bench Plans 1 (8%), Trestle Table Plans 1 (8%)
 - Only here, with every cache (Misty Woods finds): Heart of the Forest 1 (2%), Huldra Silk 1 (5%), Elderwood 1 (6%), Wisp Ember 1 (10%), Rootling Bark 1-2 (15%), Pact Rune 1 (3%)
-- Elites (2-3 a run, relic 10%): Moonsilver Ore 2-4, Cursed Essence 4-6
+- Elites (2-3 a run, relic 10%): Moonsilver Ore 3-4, Cursed Essence 4-6
 
 ### Tier IV (loot ×1.8, drops up to tier V)
 
@@ -109,35 +203,140 @@ Written from the game's data by Safe Haven › Loot › Write Loot Overview; edi
 
 - Barrow Shieldbearer (BarrowShieldbearer): Grave Iron 1-2 (70%), Barrow Goods 1 (40%), Old Silver Penny 1-3 (50%), Cursed Essence 2-3
 - Berg-jutul (Bergjutul): Trollstone 2-3, Jutul Heartstone 1, Cursed Essence 9-12
-- Black Widow (BlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
+- Black Widow (GiantBlackWidow, BlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
 - Blight Boar (BlightBoar): Boar Meat 2-3, Rough Hide 1-2 (80%), Boar Tusk 1 (40%), Cursed Essence 1 (50%), Bone 1-2 (60%)
 - Bog Spitter (BogSpitter): Bog Venom 1 (70%), Cursed Essence 1-2 (90%)
 - Bog Troll (BogTroll): Bog-troll Hide 1-2 (70%), Old Silver Penny 1-2 (40%), Cursed Essence 3-4
 - Draug (Draug): Grave Iron 1-2 (70%), Barrow Goods 1 (30%), Old Silver Penny 1-3 (50%), Cursed Essence 2-3
-- Fire Knight (Undead Knight Fire): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Blackened Barding 1 (20%), Cursed Essence 4-6
 - Forest-Bitten Wolf (WolfPack, Wolf Den, ForestBittenWolf): Rough Hide 1-2, Bone 1 (50%), Wolf Fang 1 (25%), Cursed Essence 1-2 (80%)
 - Fossegrim (Fossegrim): Fiddle String 1-2 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
 - Ice Knight (Undead Knight Ice): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Silvered Barding 1 (20%), Cursed Essence 4-6
 - Marsh Light (MarshLight): Wisp Ember 1 (60%), Cursed Essence 1-2 (80%)
-- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2
+- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2, Mistwing Egg 1 (40%)
 - Moss Shaman (MossShaman): Shaman's Burl 1 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
 - Old Moss Troll, placed (OldMossTroll): Trollstone 2-3, Moss-troll Tusk 1, Cursed Essence 9-12
 - Root Guardian (RootGuardian): Guardian Heartroot 1, Hardwood 2-4, Thick Hide 1-2 (50%), Cursed Essence 3-4
 - Rootling (RootlingSwarm): Rootling Bark 1-2 (80%), Cursed Essence 1 (30%)
 - Small Moss Troll (SmallMossTroll): Troll Moss 1-2, Cursed Essence 1-2
-- Toxic Knight (Undead Knight Toxic): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Painted Barding 1 (20%), Cursed Essence 4-6
 - Troll Runt (TrollRunt): Old Silver Penny 1-2 (60%), Nettle Cord 1-2 (25%), Linen 1 (20%), Copper Ingot 1 (15%), Cursed Essence 1-2
 - Tusse (Tusse): Old Silver Penny 1-3, Tusse's Trinket 1 (30%), Cursed Essence 1-2
 
 **Caches:**
 
 - Barrow Chest (Barrow Chest): Barrow Goods 1-2 (60%), Old Silver Penny 2-6 (80%), Grave Iron 1-2 (35%), Runestone Fragment 1 (30%), Rune Book 1 (15%), Pact Rune 1 (6%), Gilded Troll Idol 1 (5%), Cursed Essence 2-4 (60%)
-- Herb-wife's Basket (Herb-wife's Basket): Healing Herb 2-4 (60%), Cloudberries 1-3 (40%), Honey 1-2 (30%), Healing Draught 1-2 (40%), Greater Healing Draught 1 (20%), Antidote 1 (25%), Orb Tincture 1-2 (25%), Life Orb 1 (25%), Radiant Life Orb 1 (8%), Barley 1-2 (30%), Wild Turnip 1-2 (30%), Troll Moss 1-2 (25%), Bone Charm 1 (6%), Cursed Essence 1-2 (30%)
+- Herb-wife's Basket (Herb-wife's Basket): Healing Herb 2-4 (60%), Cloudberries 1-3 (40%), Honey 1-2 (30%), Healing Draught 1-2 (40%), Greater Healing Draught 1 (20%), Antidote 1 (25%), Orb Tincture 1-2 (25%), Life Orb 1 (25%), Radiant Life Orb 1 (8%), Barley 1-2 (30%), Wild Turnip 1-2 (30%), Troll Moss 1-2 (25%), Bone Charm 1 (6%), Cursed Essence 1-2 (30%), Herb Planter Plans 1 (8%), Flower Bed Plans 1 (8%)
 - Hunter's Cache (Hunter's Cache, Wolf Den): Rough Hide 2-4 (60%), Thick Hide 1-2 (35%), Bone 2-3 (50%), Boar Meat 1-2 (30%), Bodkin Arrow 3-6 (30%), Fire Arrow 2-4 (20%), Whistling Arrow 1-2 (15%), Mistwing Feathers 2-4 (25%), Wolf Fang 1-2 (20%), Cured Leather Cap 1 (6%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (35%)
-- Smith's Chest (Smith's Chest): Iron Ingot 1-2 (40%), Moonsilver Ingot 1 (20%), Charcoal 2-4 (40%), Broken Sickle 1 (25%), Copper Band 1 (6%), Round Shield 1 (6%), Field Repair Kit 1 (15%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (30%)
-- Traveller's Pack (Traveller's Pack, Abandoned Camp): Linen 1-3 (40%), Nettle Cord 1-3 (40%), Waterskin 1 (30%), Barley 1-2 (30%), Healing Draught 1 (35%), Old Silver Penny 1-4 (55%), Rune Book 1 (12%), Norn's Hourglass 1 (6%), Rune of Plenty 1 (5%), Pact Rune 1 (4%), Copper Band 1 (4%), Cursed Essence 1-2 (30%)
+- Smith's Chest (Smith's Chest): Iron Ingot 1-2 (40%), Moonsilver Ingot 1 (30%), Charcoal 2-4 (40%), Broken Sickle 1 (25%), Copper Band 1 (6%), Round Shield 1 (6%), Field Repair Kit 1 (15%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (30%)
+- Traveller's Pack (Traveller's Pack, Abandoned Camp): Linen 1-3 (40%), Nettle Cord 1-3 (40%), Waterskin 1 (30%), Barley 1-2 (30%), Healing Draught 1 (35%), Old Silver Penny 1-4 (55%), Rune Book 1 (12%), Norn's Hourglass 1 (6%), Rune of Plenty 1 (5%), Pact Rune 1 (4%), Copper Band 1 (4%), Cursed Essence 1-2 (30%), Log Bench Plans 1 (8%), Plank Bench Plans 1 (8%), Trestle Table Plans 1 (8%)
 - Only here, with every cache (Misty Woods finds): Heart of the Forest 1 (2%), Huldra Silk 1 (5%), Elderwood 1 (6%), Wisp Ember 1 (10%), Rootling Bark 1-2 (15%), Pact Rune 1 (3%)
-- Elites (3-4 a run, relic 15%): Moonsilver Ore 3-5, Trollstone 1 (10%), Cursed Essence 6-8
+- Elites (3-4 a run, relic 15%): Moonsilver Ore 3-5, Cursed Essence 6-8
+
+### Tier V (loot ×2.1, drops up to tier 6)
+
+
+**Creatures:**
+
+- Barrow Shieldbearer (BarrowShieldbearer): Grave Iron 1-2 (70%), Barrow Goods 1 (40%), Old Silver Penny 1-3 (50%), Cursed Essence 2-3
+- Berg-jutul (Bergjutul): Trollstone 2-3, Jutul Heartstone 1, Cursed Essence 9-12
+- Black Widow (GiantBlackWidow, BlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
+- Blight Boar (BlightBoar): Boar Meat 2-3, Rough Hide 1-2 (80%), Boar Tusk 1 (40%), Cursed Essence 1 (50%), Bone 1-2 (60%)
+- Bog Spitter (BogSpitter): Bog Venom 1 (70%), Cursed Essence 1-2 (90%)
+- Bog Troll (BogTroll): Bog-troll Hide 1-2 (70%), Old Silver Penny 1-2 (40%), Cursed Essence 3-4
+- Draug (Draug): Grave Iron 1-2 (70%), Barrow Goods 1 (30%), Old Silver Penny 1-3 (50%), Cursed Essence 2-3
+- Forest-Bitten Wolf (WolfPack, Wolf Den, ForestBittenWolf): Rough Hide 1-2, Bone 1 (50%), Wolf Fang 1 (25%), Cursed Essence 1-2 (80%)
+- Fossegrim (Fossegrim): Fiddle String 1-2 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
+- Ice Knight (Undead Knight Ice): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Silvered Barding 1 (20%), Cursed Essence 4-6
+- Marsh Light (MarshLight): Wisp Ember 1 (60%), Cursed Essence 1-2 (80%)
+- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2, Mistwing Egg 1 (40%)
+- Moss Shaman (MossShaman): Shaman's Burl 1 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
+- Old Moss Troll, placed (OldMossTroll): Trollstone 2-3, Moss-troll Tusk 1, Cursed Essence 9-12
+- Root Guardian (RootGuardian): Guardian Heartroot 1, Hardwood 2-4, Thick Hide 1-2 (50%), Cursed Essence 3-4
+- Rootling (RootlingSwarm): Rootling Bark 1-2 (80%), Cursed Essence 1 (30%)
+- Small Moss Troll (SmallMossTroll): Troll Moss 1-2, Cursed Essence 1-2
+- Troll Runt (TrollRunt): Old Silver Penny 1-2 (60%), Nettle Cord 1-2 (25%), Linen 1 (20%), Copper Ingot 1 (15%), Cursed Essence 1-2
+- Tusse (Tusse): Old Silver Penny 1-3, Tusse's Trinket 1 (30%), Cursed Essence 1-2
+
+**Caches:**
+
+- Barrow Chest (Barrow Chest): Barrow Goods 1-2 (60%), Old Silver Penny 2-6 (80%), Grave Iron 1-2 (35%), Runestone Fragment 1 (30%), Rune Book 1 (15%), Pact Rune 1 (6%), Gilded Troll Idol 1 (5%), Cursed Essence 2-4 (60%)
+- Herb-wife's Basket (Herb-wife's Basket): Healing Herb 2-4 (60%), Cloudberries 1-3 (40%), Honey 1-2 (30%), Healing Draught 1-2 (40%), Greater Healing Draught 1 (20%), Antidote 1 (25%), Orb Tincture 1-2 (25%), Life Orb 1 (25%), Radiant Life Orb 1 (8%), Barley 1-2 (30%), Wild Turnip 1-2 (30%), Troll Moss 1-2 (25%), Bone Charm 1 (6%), Cursed Essence 1-2 (30%), Herb Planter Plans 1 (8%), Flower Bed Plans 1 (8%)
+- Hunter's Cache (Hunter's Cache, Wolf Den): Rough Hide 2-4 (60%), Thick Hide 1-2 (35%), Bone 2-3 (50%), Boar Meat 1-2 (30%), Bodkin Arrow 3-6 (30%), Fire Arrow 2-4 (20%), Whistling Arrow 1-2 (15%), Mistwing Feathers 2-4 (25%), Wolf Fang 1-2 (20%), Cured Leather Cap 1 (6%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (35%)
+- Smith's Chest (Smith's Chest): Iron Ingot 1-2 (40%), Moonsilver Ingot 1 (30%), Charcoal 2-4 (40%), Broken Sickle 1 (25%), Copper Band 1 (6%), Round Shield 1 (6%), Field Repair Kit 1 (15%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (30%)
+- Traveller's Pack (Traveller's Pack, Abandoned Camp): Linen 1-3 (40%), Nettle Cord 1-3 (40%), Waterskin 1 (30%), Barley 1-2 (30%), Healing Draught 1 (35%), Old Silver Penny 1-4 (55%), Rune Book 1 (12%), Norn's Hourglass 1 (6%), Rune of Plenty 1 (5%), Pact Rune 1 (4%), Copper Band 1 (4%), Cursed Essence 1-2 (30%), Log Bench Plans 1 (8%), Plank Bench Plans 1 (8%), Trestle Table Plans 1 (8%)
+- Only here, with every cache (Misty Woods finds): Heart of the Forest 1 (2%), Huldra Silk 1 (5%), Elderwood 1 (6%), Wisp Ember 1 (10%), Rootling Bark 1-2 (15%), Pact Rune 1 (3%)
+- Elites (4-5 a run, relic 15%): Moonsilver Ore 3-5, Cursed Essence 6-8
+
+## Brukam's Bridge
+
+### Tier II (loot ×1.25, drops up to tier III)
+
+
+**Creatures:**
+
+- Black Widow (GiantBlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
+- Blight Boar (BlightBoar): Boar Meat 2-3, Rough Hide 1-2 (80%), Boar Tusk 1 (40%), Cursed Essence 1 (50%), Bone 1-2 (60%)
+- Bog Troll (BogTroll): Bog-troll Hide 1-2 (70%), Old Silver Penny 1-2 (40%), Cursed Essence 3-4
+- Brukam, placed (Brukam): Brukam's Tusk 1, Iron Ingot 2-4, Old Silver Penny 6-10, Round Shield 1 (25%), Cursed Essence 14-18
+- Forest-Bitten Wolf (ForestBittenWolf): Rough Hide 1-2, Bone 1 (50%), Wolf Fang 1 (25%), Cursed Essence 1-2 (80%)
+- Fossegrim (Fossegrim): Fiddle String 1-2 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
+- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2, Mistwing Egg 1 (40%)
+- Small Moss Troll (SmallMossTroll): Troll Moss 1-2, Cursed Essence 1-2
+- Troll Runt (TrollRunt): Old Silver Penny 1-2 (60%), Nettle Cord 1-2 (25%), Linen 1 (20%), Copper Ingot 1 (15%), Cursed Essence 1-2
+- Trollkjerring (Trollkjerring): Hag's Knot 1 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
+- Tusse (Tusse): Old Silver Penny 1-3, Tusse's Trinket 1 (30%), Cursed Essence 1-2
+
+**Caches:**
+
+- Only here: no regional loot table.
+- Elites (0-0 a run, relic 0%): nothing
+
+### Tier III (loot ×1.5, drops up to tier IV)
+
+
+**Creatures:**
+
+- Berg-jutul (Bergjutul): Jutul Heartstone 1, Cursed Essence 9-12
+- Black Widow (GiantBlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
+- Blight Boar (BlightBoar): Boar Meat 2-3, Rough Hide 1-2 (80%), Boar Tusk 1 (40%), Cursed Essence 1 (50%), Bone 1-2 (60%)
+- Bog Troll (BogTroll): Bog-troll Hide 1-2 (70%), Old Silver Penny 1-2 (40%), Cursed Essence 3-4
+- Brukam, placed (Brukam): Brukam's Tusk 1, Moonsilver Ingot 1-2 (60%), Old Silver Penny 6-10, Round Shield 1 (25%), Cursed Essence 14-18
+- Forest-Bitten Wolf (ForestBittenWolf): Rough Hide 1-2, Bone 1 (50%), Wolf Fang 1 (25%), Cursed Essence 1-2 (80%)
+- Fossegrim (Fossegrim): Fiddle String 1-2 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
+- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2, Mistwing Egg 1 (40%)
+- Small Moss Troll (SmallMossTroll): Troll Moss 1-2, Cursed Essence 1-2
+- Stone Troll (StoneTroll): Stone-troll Knuckle 1, Cursed Essence 9-12
+- Troll Runt (TrollRunt): Old Silver Penny 1-2 (60%), Nettle Cord 1-2 (25%), Linen 1 (20%), Copper Ingot 1 (15%), Cursed Essence 1-2
+- Trollkjerring (Trollkjerring): Hag's Knot 1 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
+- Tusse (Tusse): Old Silver Penny 1-3, Tusse's Trinket 1 (30%), Cursed Essence 1-2
+
+**Caches:**
+
+- Only here: no regional loot table.
+- Elites (0-0 a run, relic 0%): nothing
+
+### Tier IV (loot ×1.8, drops up to tier V)
+
+
+**Creatures:**
+
+- Berg-jutul (Bergjutul): Trollstone 2-3, Jutul Heartstone 1, Cursed Essence 9-12
+- Black Widow (GiantBlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
+- Blight Boar (BlightBoar): Boar Meat 2-3, Rough Hide 1-2 (80%), Boar Tusk 1 (40%), Cursed Essence 1 (50%), Bone 1-2 (60%)
+- Bog Troll (BogTroll): Bog-troll Hide 1-2 (70%), Old Silver Penny 1-2 (40%), Cursed Essence 3-4
+- Brukam, placed (Brukam): Brukam's Tusk 1, Trollstone 2-3, Moonsilver Ingot 1-2 (60%), Old Silver Penny 6-10, Round Shield 1 (25%), Cursed Essence 14-18
+- Forest-Bitten Wolf (ForestBittenWolf): Rough Hide 1-2, Bone 1 (50%), Wolf Fang 1 (25%), Cursed Essence 1-2 (80%)
+- Fossegrim (Fossegrim): Fiddle String 1-2 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
+- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2, Mistwing Egg 1 (40%)
+- Small Moss Troll (SmallMossTroll): Troll Moss 1-2, Cursed Essence 1-2
+- Stone Troll (StoneTroll): Trollstone 2-3, Stone-troll Knuckle 1, Cursed Essence 9-12
+- Troll Runt (TrollRunt): Old Silver Penny 1-2 (60%), Nettle Cord 1-2 (25%), Linen 1 (20%), Copper Ingot 1 (15%), Cursed Essence 1-2
+- Trollkjerring (Trollkjerring): Hag's Knot 1 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
+- Tusse (Tusse): Old Silver Penny 1-3, Tusse's Trinket 1 (30%), Cursed Essence 1-2
+
+**Caches:**
+
+- Only here: no regional loot table.
+- Elites (0-0 a run, relic 0%): nothing
 
 ## Troll Valley
 
@@ -147,7 +346,7 @@ Written from the game's data by Safe Haven › Loot › Write Loot Overview; edi
 **Creatures:**
 
 - Berg-jutul, placed (Bergjutul): Jutul Heartstone 1, Cursed Essence 9-12
-- Black Widow (BlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
+- Black Widow (GiantBlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
 - Blight Boar (BlightBoar): Boar Meat 2-3, Rough Hide 1-2 (80%), Boar Tusk 1 (40%), Cursed Essence 1 (50%), Bone 1-2 (60%)
 - Bog Spitter (BogSpitter): Bog Venom 1 (70%), Cursed Essence 1-2 (90%)
 - Bog Troll (BogTroll): Bog-troll Hide 1-2 (70%), Old Silver Penny 1-2 (40%), Cursed Essence 3-4
@@ -155,7 +354,7 @@ Written from the game's data by Safe Haven › Loot › Write Loot Overview; edi
 - Forest-Bitten Wolf (WolfPack, Wolf Den, ForestBittenWolf): Rough Hide 1-2, Bone 1 (50%), Wolf Fang 1 (25%), Cursed Essence 1-2 (80%)
 - Fossegrim (Fossegrim): Fiddle String 1-2 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
 - Marsh Light (MarshLight): Wisp Ember 1 (60%), Cursed Essence 1-2 (80%)
-- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2
+- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2, Mistwing Egg 1 (40%)
 - Moss Shaman (MossShaman): Shaman's Burl 1 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
 - Small Moss Troll (SmallMossTroll): Troll Moss 1-2, Cursed Essence 1-2
 - Troll Runt (TrollRunt): Old Silver Penny 1-2 (60%), Nettle Cord 1-2 (25%), Linen 1 (20%), Copper Ingot 1 (15%), Cursed Essence 1-2
@@ -164,11 +363,11 @@ Written from the game's data by Safe Haven › Loot › Write Loot Overview; edi
 
 **Caches:**
 
-- Herb-wife's Basket (Herb-wife's Basket): Healing Herb 2-4 (60%), Cloudberries 1-3 (40%), Honey 1-2 (30%), Healing Draught 1-2 (40%), Greater Healing Draught 1 (20%), Antidote 1 (25%), Orb Tincture 1-2 (25%), Life Orb 1 (25%), Barley 1-2 (30%), Wild Turnip 1-2 (30%), Troll Moss 1-2 (25%), Bone Charm 1 (6%), Cursed Essence 1-2 (30%)
+- Herb-wife's Basket (Herb-wife's Basket): Healing Herb 2-4 (60%), Cloudberries 1-3 (40%), Honey 1-2 (30%), Healing Draught 1-2 (40%), Greater Healing Draught 1 (20%), Antidote 1 (25%), Orb Tincture 1-2 (25%), Life Orb 1 (25%), Barley 1-2 (30%), Wild Turnip 1-2 (30%), Troll Moss 1-2 (25%), Bone Charm 1 (6%), Cursed Essence 1-2 (30%), Herb Planter Plans 1 (8%), Flower Bed Plans 1 (8%)
 - Hunter's Cache (Hunter's Cache, Wolf Den): Rough Hide 2-4 (60%), Thick Hide 1-2 (35%), Bone 2-3 (50%), Boar Meat 1-2 (30%), Bodkin Arrow 3-6 (30%), Fire Arrow 2-4 (20%), Whistling Arrow 1-2 (15%), Mistwing Feathers 2-4 (25%), Wolf Fang 1-2 (20%), Cured Leather Cap 1 (6%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (35%)
-- Seter Chest (Seter Chest): Old Churn 1 (35%), Broken Sickle 1 (30%), Linen 1-3 (45%), Honey 1-2 (30%), Barley 1-3 (35%), Cloudberries 1-2 (30%), Waterskin 1 (25%), Nettle Cord 1-3 (35%), Old Silver Penny 1-3 (40%), Healing Draught 1 (25%)
+- Seter Chest (Seter Chest): Old Churn 1 (35%), Broken Sickle 1 (30%), Linen 1-3 (45%), Honey 1-2 (30%), Barley 1-3 (35%), Cloudberries 1-2 (30%), Waterskin 1 (25%), Nettle Cord 1-3 (35%), Old Silver Penny 1-3 (40%), Healing Draught 1 (25%), Rune Stone Plans 1 (8%), Carved Post Plans 1 (8%), Signpost Plans 1 (8%)
 - Smith's Chest (Smith's Chest): Copper Ingot 1-3 (45%), Iron Ingot 1-2 (40%), Charcoal 2-4 (40%), Green Copper Pot 1 (30%), Broken Sickle 1 (25%), Copper Band 1 (6%), Round Shield 1 (6%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (30%)
-- Traveller's Pack (Traveller's Pack, Abandoned Camp): Linen 1-3 (40%), Nettle Cord 1-3 (40%), Waterskin 1 (30%), Barley 1-2 (30%), Healing Draught 1 (35%), Old Silver Penny 1-4 (55%), Rune Book 1 (12%), Norn's Hourglass 1 (6%), Rune of Plenty 1 (5%), Pact Rune 1 (4%), Copper Band 1 (4%), Cursed Essence 1-2 (30%)
+- Traveller's Pack (Traveller's Pack, Abandoned Camp): Linen 1-3 (40%), Nettle Cord 1-3 (40%), Waterskin 1 (30%), Barley 1-2 (30%), Healing Draught 1 (35%), Old Silver Penny 1-4 (55%), Rune Book 1 (12%), Norn's Hourglass 1 (6%), Rune of Plenty 1 (5%), Pact Rune 1 (4%), Copper Band 1 (4%), Cursed Essence 1-2 (30%), Log Bench Plans 1 (8%), Plank Bench Plans 1 (8%), Trestle Table Plans 1 (8%)
 - Troll Hoard (Troll Hoard): Old Silver Penny 4-10, Gilded Troll Idol 1 (25%), Tusse's Trinket 1-2 (30%), Granite 2-4 (50%), Iron Ingot 1-2 (40%), Heart of the Forest 1 (5%), Round Shield 1 (10%), Copper Band 1 (10%), Cured Leather Cap 1 (8%), Bone 2-4 (50%), Cursed Essence 2-4
 - Only here, with every cache (Troll Valley finds): Gilded Troll Idol 1 (6%), Troll Moss 1-2 (20%), Granite 1-3 (25%), Broken Sickle 1 (8%), Old Churn 1 (8%)
 - Elites (1-2 a run, relic 5%): Iron Ore 3-5, Cursed Essence 3-4
@@ -181,7 +380,7 @@ Written from the game's data by Safe Haven › Loot › Write Loot Overview; edi
 - Barrow Shieldbearer (BarrowShieldbearer): Grave Iron 1-2 (70%), Barrow Goods 1 (40%), Old Silver Penny 1-3 (50%), Cursed Essence 2-3
 - Berg-jutul (Bergjutul): Jutul Heartstone 1, Cursed Essence 9-12
 - Berg-jutul, placed (Bergjutul): Jutul Heartstone 1, Cursed Essence 9-12
-- Black Widow (BlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
+- Black Widow (GiantBlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
 - Blight Boar (BlightBoar): Boar Meat 2-3, Rough Hide 1-2 (80%), Boar Tusk 1 (40%), Cursed Essence 1 (50%), Bone 1-2 (60%)
 - Bog Spitter (BogSpitter): Bog Venom 1 (70%), Cursed Essence 1-2 (90%)
 - Bog Troll (BogTroll): Bog-troll Hide 1-2 (70%), Old Silver Penny 1-2 (40%), Cursed Essence 3-4
@@ -190,7 +389,7 @@ Written from the game's data by Safe Haven › Loot › Write Loot Overview; edi
 - Forest-Bitten Wolf (WolfPack, Wolf Den, ForestBittenWolf): Rough Hide 1-2, Bone 1 (50%), Wolf Fang 1 (25%), Cursed Essence 1-2 (80%)
 - Fossegrim (Fossegrim): Fiddle String 1-2 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
 - Marsh Light (MarshLight): Wisp Ember 1 (60%), Cursed Essence 1-2 (80%)
-- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2
+- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2, Mistwing Egg 1 (40%)
 - Moss Shaman (MossShaman): Shaman's Burl 1 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
 - Root Guardian (RootGuardian): Guardian Heartroot 1, Hardwood 2-4, Thick Hide 1-2 (50%), Cursed Essence 3-4
 - Small Moss Troll (SmallMossTroll): Troll Moss 1-2, Cursed Essence 1-2
@@ -201,14 +400,14 @@ Written from the game's data by Safe Haven › Loot › Write Loot Overview; edi
 
 **Caches:**
 
-- Herb-wife's Basket (Herb-wife's Basket): Healing Herb 2-4 (60%), Cloudberries 1-3 (40%), Honey 1-2 (30%), Healing Draught 1-2 (40%), Greater Healing Draught 1 (20%), Antidote 1 (25%), Orb Tincture 1-2 (25%), Life Orb 1 (25%), Barley 1-2 (30%), Wild Turnip 1-2 (30%), Troll Moss 1-2 (25%), Bone Charm 1 (6%), Cursed Essence 1-2 (30%)
+- Herb-wife's Basket (Herb-wife's Basket): Healing Herb 2-4 (60%), Cloudberries 1-3 (40%), Honey 1-2 (30%), Healing Draught 1-2 (40%), Greater Healing Draught 1 (20%), Antidote 1 (25%), Orb Tincture 1-2 (25%), Life Orb 1 (25%), Barley 1-2 (30%), Wild Turnip 1-2 (30%), Troll Moss 1-2 (25%), Bone Charm 1 (6%), Cursed Essence 1-2 (30%), Herb Planter Plans 1 (8%), Flower Bed Plans 1 (8%)
 - Hunter's Cache (Hunter's Cache, Wolf Den): Rough Hide 2-4 (60%), Thick Hide 1-2 (35%), Bone 2-3 (50%), Boar Meat 1-2 (30%), Bodkin Arrow 3-6 (30%), Fire Arrow 2-4 (20%), Whistling Arrow 1-2 (15%), Mistwing Feathers 2-4 (25%), Wolf Fang 1-2 (20%), Cured Leather Cap 1 (6%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (35%)
-- Seter Chest (Seter Chest): Old Churn 1 (35%), Broken Sickle 1 (30%), Linen 1-3 (45%), Honey 1-2 (30%), Barley 1-3 (35%), Cloudberries 1-2 (30%), Waterskin 1 (25%), Nettle Cord 1-3 (35%), Old Silver Penny 1-3 (40%), Healing Draught 1 (25%)
-- Smith's Chest (Smith's Chest): Iron Ingot 1-2 (40%), Moonsilver Ingot 1 (20%), Charcoal 2-4 (40%), Green Copper Pot 1 (30%), Broken Sickle 1 (25%), Copper Band 1 (6%), Round Shield 1 (6%), Field Repair Kit 1 (15%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (30%)
-- Traveller's Pack (Traveller's Pack, Abandoned Camp): Linen 1-3 (40%), Nettle Cord 1-3 (40%), Waterskin 1 (30%), Barley 1-2 (30%), Healing Draught 1 (35%), Old Silver Penny 1-4 (55%), Rune Book 1 (12%), Norn's Hourglass 1 (6%), Rune of Plenty 1 (5%), Pact Rune 1 (4%), Copper Band 1 (4%), Cursed Essence 1-2 (30%)
+- Seter Chest (Seter Chest): Old Churn 1 (35%), Broken Sickle 1 (30%), Linen 1-3 (45%), Honey 1-2 (30%), Barley 1-3 (35%), Cloudberries 1-2 (30%), Waterskin 1 (25%), Nettle Cord 1-3 (35%), Old Silver Penny 1-3 (40%), Healing Draught 1 (25%), Rune Stone Plans 1 (8%), Carved Post Plans 1 (8%), Signpost Plans 1 (8%)
+- Smith's Chest (Smith's Chest): Iron Ingot 1-2 (40%), Moonsilver Ingot 1 (30%), Charcoal 2-4 (40%), Green Copper Pot 1 (30%), Broken Sickle 1 (25%), Copper Band 1 (6%), Round Shield 1 (6%), Field Repair Kit 1 (15%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (30%)
+- Traveller's Pack (Traveller's Pack, Abandoned Camp): Linen 1-3 (40%), Nettle Cord 1-3 (40%), Waterskin 1 (30%), Barley 1-2 (30%), Healing Draught 1 (35%), Old Silver Penny 1-4 (55%), Rune Book 1 (12%), Norn's Hourglass 1 (6%), Rune of Plenty 1 (5%), Pact Rune 1 (4%), Copper Band 1 (4%), Cursed Essence 1-2 (30%), Log Bench Plans 1 (8%), Plank Bench Plans 1 (8%), Trestle Table Plans 1 (8%)
 - Troll Hoard (Troll Hoard): Old Silver Penny 4-10, Gilded Troll Idol 1 (25%), Tusse's Trinket 1-2 (30%), Granite 2-4 (50%), Iron Ingot 1-2 (40%), Moonsilver Ingot 1 (25%), Heart of the Forest 1 (5%), Round Shield 1 (10%), Copper Band 1 (10%), Cured Leather Cap 1 (8%), Bone 2-4 (50%), Cursed Essence 2-4
 - Only here, with every cache (Troll Valley finds): Gilded Troll Idol 1 (6%), Troll Moss 1-2 (20%), Granite 1-3 (25%), Broken Sickle 1 (8%), Old Churn 1 (8%)
-- Elites (2-3 a run, relic 10%): Moonsilver Ore 2-4, Cursed Essence 4-6
+- Elites (2-3 a run, relic 10%): Moonsilver Ore 3-4, Cursed Essence 4-6
 
 ### Tier IV (loot ×1.8, drops up to tier V)
 
@@ -218,7 +417,7 @@ Written from the game's data by Safe Haven › Loot › Write Loot Overview; edi
 - Barrow Shieldbearer (BarrowShieldbearer): Grave Iron 1-2 (70%), Barrow Goods 1 (40%), Old Silver Penny 1-3 (50%), Cursed Essence 2-3
 - Berg-jutul (Bergjutul): Trollstone 2-3, Jutul Heartstone 1, Cursed Essence 9-12
 - Berg-jutul, placed (Bergjutul): Trollstone 2-3, Jutul Heartstone 1, Cursed Essence 9-12
-- Black Widow (BlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
+- Black Widow (GiantBlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
 - Blight Boar (BlightBoar): Boar Meat 2-3, Rough Hide 1-2 (80%), Boar Tusk 1 (40%), Cursed Essence 1 (50%), Bone 1-2 (60%)
 - Bog Spitter (BogSpitter): Bog Venom 1 (70%), Cursed Essence 1-2 (90%)
 - Bog Troll (BogTroll): Bog-troll Hide 1-2 (70%), Old Silver Penny 1-2 (40%), Cursed Essence 3-4
@@ -227,7 +426,7 @@ Written from the game's data by Safe Haven › Loot › Write Loot Overview; edi
 - Forest-Bitten Wolf (WolfPack, Wolf Den, ForestBittenWolf): Rough Hide 1-2, Bone 1 (50%), Wolf Fang 1 (25%), Cursed Essence 1-2 (80%)
 - Fossegrim (Fossegrim): Fiddle String 1-2 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
 - Marsh Light (MarshLight): Wisp Ember 1 (60%), Cursed Essence 1-2 (80%)
-- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2
+- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2, Mistwing Egg 1 (40%)
 - Moss Shaman (MossShaman): Shaman's Burl 1 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
 - Root Guardian (RootGuardian): Guardian Heartroot 1, Hardwood 2-4, Thick Hide 1-2 (50%), Cursed Essence 3-4
 - Small Moss Troll (SmallMossTroll): Troll Moss 1-2, Cursed Essence 1-2
@@ -238,14 +437,149 @@ Written from the game's data by Safe Haven › Loot › Write Loot Overview; edi
 
 **Caches:**
 
-- Herb-wife's Basket (Herb-wife's Basket): Healing Herb 2-4 (60%), Cloudberries 1-3 (40%), Honey 1-2 (30%), Healing Draught 1-2 (40%), Greater Healing Draught 1 (20%), Antidote 1 (25%), Orb Tincture 1-2 (25%), Life Orb 1 (25%), Radiant Life Orb 1 (8%), Barley 1-2 (30%), Wild Turnip 1-2 (30%), Troll Moss 1-2 (25%), Bone Charm 1 (6%), Cursed Essence 1-2 (30%)
+- Herb-wife's Basket (Herb-wife's Basket): Healing Herb 2-4 (60%), Cloudberries 1-3 (40%), Honey 1-2 (30%), Healing Draught 1-2 (40%), Greater Healing Draught 1 (20%), Antidote 1 (25%), Orb Tincture 1-2 (25%), Life Orb 1 (25%), Radiant Life Orb 1 (8%), Barley 1-2 (30%), Wild Turnip 1-2 (30%), Troll Moss 1-2 (25%), Bone Charm 1 (6%), Cursed Essence 1-2 (30%), Herb Planter Plans 1 (8%), Flower Bed Plans 1 (8%)
 - Hunter's Cache (Hunter's Cache, Wolf Den): Rough Hide 2-4 (60%), Thick Hide 1-2 (35%), Bone 2-3 (50%), Boar Meat 1-2 (30%), Bodkin Arrow 3-6 (30%), Fire Arrow 2-4 (20%), Whistling Arrow 1-2 (15%), Mistwing Feathers 2-4 (25%), Wolf Fang 1-2 (20%), Cured Leather Cap 1 (6%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (35%)
-- Seter Chest (Seter Chest): Old Churn 1 (35%), Broken Sickle 1 (30%), Linen 1-3 (45%), Honey 1-2 (30%), Barley 1-3 (35%), Cloudberries 1-2 (30%), Waterskin 1 (25%), Nettle Cord 1-3 (35%), Old Silver Penny 1-3 (40%), Healing Draught 1 (25%)
-- Smith's Chest (Smith's Chest): Iron Ingot 1-2 (40%), Moonsilver Ingot 1 (20%), Charcoal 2-4 (40%), Broken Sickle 1 (25%), Copper Band 1 (6%), Round Shield 1 (6%), Field Repair Kit 1 (15%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (30%)
-- Traveller's Pack (Traveller's Pack, Abandoned Camp): Linen 1-3 (40%), Nettle Cord 1-3 (40%), Waterskin 1 (30%), Barley 1-2 (30%), Healing Draught 1 (35%), Old Silver Penny 1-4 (55%), Rune Book 1 (12%), Norn's Hourglass 1 (6%), Rune of Plenty 1 (5%), Pact Rune 1 (4%), Copper Band 1 (4%), Cursed Essence 1-2 (30%)
+- Seter Chest (Seter Chest): Old Churn 1 (35%), Broken Sickle 1 (30%), Linen 1-3 (45%), Honey 1-2 (30%), Barley 1-3 (35%), Cloudberries 1-2 (30%), Waterskin 1 (25%), Nettle Cord 1-3 (35%), Old Silver Penny 1-3 (40%), Healing Draught 1 (25%), Rune Stone Plans 1 (8%), Carved Post Plans 1 (8%), Signpost Plans 1 (8%)
+- Smith's Chest (Smith's Chest): Iron Ingot 1-2 (40%), Moonsilver Ingot 1 (30%), Charcoal 2-4 (40%), Broken Sickle 1 (25%), Copper Band 1 (6%), Round Shield 1 (6%), Field Repair Kit 1 (15%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (30%)
+- Traveller's Pack (Traveller's Pack, Abandoned Camp): Linen 1-3 (40%), Nettle Cord 1-3 (40%), Waterskin 1 (30%), Barley 1-2 (30%), Healing Draught 1 (35%), Old Silver Penny 1-4 (55%), Rune Book 1 (12%), Norn's Hourglass 1 (6%), Rune of Plenty 1 (5%), Pact Rune 1 (4%), Copper Band 1 (4%), Cursed Essence 1-2 (30%), Log Bench Plans 1 (8%), Plank Bench Plans 1 (8%), Trestle Table Plans 1 (8%)
 - Troll Hoard (Troll Hoard): Old Silver Penny 4-10, Gilded Troll Idol 1 (25%), Tusse's Trinket 1-2 (30%), Granite 2-4 (50%), Iron Ingot 1-2 (40%), Moonsilver Ingot 1 (25%), Trollstone 1 (20%), Heart of the Forest 1 (5%), Round Shield 1 (10%), Copper Band 1 (10%), Cured Leather Cap 1 (8%), Bone 2-4 (50%), Cursed Essence 2-4
 - Only here, with every cache (Troll Valley finds): Gilded Troll Idol 1 (6%), Troll Moss 1-2 (20%), Granite 1-3 (25%), Broken Sickle 1 (8%), Old Churn 1 (8%), Trollstone 1 (4%)
 - Elites (3-4 a run, relic 15%): Moonsilver Ore 3-5, Trollstone 1 (40%), Cursed Essence 6-8, Granite 3-5
+
+### Tier V (loot ×2.1, drops up to tier 6)
+
+
+**Creatures:**
+
+- Barrow Shieldbearer (BarrowShieldbearer): Grave Iron 1-2 (70%), Barrow Goods 1 (40%), Old Silver Penny 1-3 (50%), Cursed Essence 2-3
+- Berg-jutul (Bergjutul): Trollstone 2-3, Jutul Heartstone 1, Cursed Essence 9-12
+- Berg-jutul, placed (Bergjutul): Trollstone 2-3, Jutul Heartstone 1, Cursed Essence 9-12
+- Black Widow (GiantBlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
+- Blight Boar (BlightBoar): Boar Meat 2-3, Rough Hide 1-2 (80%), Boar Tusk 1 (40%), Cursed Essence 1 (50%), Bone 1-2 (60%)
+- Bog Spitter (BogSpitter): Bog Venom 1 (70%), Cursed Essence 1-2 (90%)
+- Bog Troll (BogTroll): Bog-troll Hide 1-2 (70%), Old Silver Penny 1-2 (40%), Cursed Essence 3-4
+- Draug (Draug): Grave Iron 1-2 (70%), Barrow Goods 1 (30%), Old Silver Penny 1-3 (50%), Cursed Essence 2-3
+- Fire Knight (Undead Knight Fire): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Blackened Barding 1 (20%), Cursed Essence 4-6
+- Forest-Bitten Wolf (WolfPack, Wolf Den, ForestBittenWolf): Rough Hide 1-2, Bone 1 (50%), Wolf Fang 1 (25%), Cursed Essence 1-2 (80%)
+- Fossegrim (Fossegrim): Fiddle String 1-2 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
+- Marsh Light (MarshLight): Wisp Ember 1 (60%), Cursed Essence 1-2 (80%)
+- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2, Mistwing Egg 1 (40%)
+- Moss Shaman (MossShaman): Shaman's Burl 1 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
+- Root Guardian (RootGuardian): Guardian Heartroot 1, Hardwood 2-4, Thick Hide 1-2 (50%), Cursed Essence 3-4
+- Small Moss Troll (SmallMossTroll): Troll Moss 1-2, Cursed Essence 1-2
+- Stone Troll (StoneTroll): Trollstone 2-3, Stone-troll Knuckle 1, Cursed Essence 9-12
+- Troll Runt (TrollRunt): Old Silver Penny 1-2 (60%), Nettle Cord 1-2 (25%), Linen 1 (20%), Copper Ingot 1 (15%), Cursed Essence 1-2
+- Trollkjerring (Trollkjerring): Hag's Knot 1 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
+- Tusse (Tusse): Old Silver Penny 1-3, Tusse's Trinket 1 (30%), Cursed Essence 1-2
+
+**Caches:**
+
+- Herb-wife's Basket (Herb-wife's Basket): Healing Herb 2-4 (60%), Cloudberries 1-3 (40%), Honey 1-2 (30%), Healing Draught 1-2 (40%), Greater Healing Draught 1 (20%), Antidote 1 (25%), Orb Tincture 1-2 (25%), Life Orb 1 (25%), Radiant Life Orb 1 (8%), Barley 1-2 (30%), Wild Turnip 1-2 (30%), Troll Moss 1-2 (25%), Bone Charm 1 (6%), Cursed Essence 1-2 (30%), Herb Planter Plans 1 (8%), Flower Bed Plans 1 (8%)
+- Hunter's Cache (Hunter's Cache, Wolf Den): Rough Hide 2-4 (60%), Thick Hide 1-2 (35%), Bone 2-3 (50%), Boar Meat 1-2 (30%), Bodkin Arrow 3-6 (30%), Fire Arrow 2-4 (20%), Whistling Arrow 1-2 (15%), Mistwing Feathers 2-4 (25%), Wolf Fang 1-2 (20%), Cured Leather Cap 1 (6%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (35%)
+- Seter Chest (Seter Chest): Old Churn 1 (35%), Broken Sickle 1 (30%), Linen 1-3 (45%), Honey 1-2 (30%), Barley 1-3 (35%), Cloudberries 1-2 (30%), Waterskin 1 (25%), Nettle Cord 1-3 (35%), Old Silver Penny 1-3 (40%), Healing Draught 1 (25%), Rune Stone Plans 1 (8%), Carved Post Plans 1 (8%), Signpost Plans 1 (8%)
+- Smith's Chest (Smith's Chest): Iron Ingot 1-2 (40%), Moonsilver Ingot 1 (30%), Charcoal 2-4 (40%), Broken Sickle 1 (25%), Copper Band 1 (6%), Round Shield 1 (6%), Field Repair Kit 1 (15%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (30%)
+- Traveller's Pack (Traveller's Pack, Abandoned Camp): Linen 1-3 (40%), Nettle Cord 1-3 (40%), Waterskin 1 (30%), Barley 1-2 (30%), Healing Draught 1 (35%), Old Silver Penny 1-4 (55%), Rune Book 1 (12%), Norn's Hourglass 1 (6%), Rune of Plenty 1 (5%), Pact Rune 1 (4%), Copper Band 1 (4%), Cursed Essence 1-2 (30%), Log Bench Plans 1 (8%), Plank Bench Plans 1 (8%), Trestle Table Plans 1 (8%)
+- Troll Hoard (Troll Hoard): Old Silver Penny 4-10, Gilded Troll Idol 1 (25%), Tusse's Trinket 1-2 (30%), Granite 2-4 (50%), Iron Ingot 1-2 (40%), Moonsilver Ingot 1 (25%), Trollstone 1 (20%), Heart of the Forest 1 (5%), Round Shield 1 (10%), Copper Band 1 (10%), Cured Leather Cap 1 (8%), Bone 2-4 (50%), Cursed Essence 2-4
+- Only here, with every cache (Troll Valley finds): Gilded Troll Idol 1 (6%), Troll Moss 1-2 (20%), Granite 1-3 (25%), Broken Sickle 1 (8%), Old Churn 1 (8%), Trollstone 1 (4%)
+- Elites (4-5 a run, relic 15%): Moonsilver Ore 3-5, Trollstone 1 (40%), Cursed Essence 6-8, Granite 3-5
+
+## Moss Marsh
+
+### Tier III (loot ×1.5, drops up to tier IV)
+
+
+**Creatures:**
+
+- Barrow Shieldbearer (BarrowShieldbearer): Grave Iron 1-2 (70%), Barrow Goods 1 (40%), Old Silver Penny 1-3 (50%), Cursed Essence 2-3
+- Black Widow (GiantBlackWidow, BlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
+- Blight Boar (BlightBoar): Boar Meat 2-3, Rough Hide 1-2 (80%), Boar Tusk 1 (40%), Cursed Essence 1 (50%), Bone 1-2 (60%)
+- Bog Spitter (BogSpitter): Bog Venom 1 (70%), Cursed Essence 1-2 (90%)
+- Bog Troll (BogTroll): Bog-troll Hide 1-2 (70%), Old Silver Penny 1-2 (40%), Cursed Essence 3-4
+- Draug (Draug): Grave Iron 1-2 (70%), Barrow Goods 1 (30%), Old Silver Penny 1-3 (50%), Cursed Essence 2-3
+- Forest-Bitten Wolf (WolfPack, ForestBittenWolf): Rough Hide 1-2, Bone 1 (50%), Wolf Fang 1 (25%), Cursed Essence 1-2 (80%)
+- Huldra (Huldra): Cursed Essence 1-2 (80%), Huldra Silk 1 (30%), Healing Salve 1 (15%)
+- Marsh Light (MarshLight): Wisp Ember 1 (60%), Cursed Essence 1-2 (80%)
+- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2, Mistwing Egg 1 (40%)
+- Moss Shaman (MossShaman): Shaman's Burl 1 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
+- Small Moss Troll (SmallMossTroll): Troll Moss 1-2, Cursed Essence 1-2
+- Toxic Knight (Undead Knight Toxic): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Painted Barding 1 (20%), Cursed Essence 4-6
+- Toxic Knight, placed (Undead Knight Toxic): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Painted Barding 1 (20%), Cursed Essence 4-6
+
+**Caches:**
+
+- Barrow Chest (Barrow Chest): Barrow Goods 1-2 (60%), Old Silver Penny 2-6 (80%), Grave Iron 1-2 (35%), Runestone Fragment 1 (30%), Rune Book 1 (15%), Pact Rune 1 (6%), Gilded Troll Idol 1 (5%), Cursed Essence 2-4 (60%)
+- Drowned Hoard (Drowned Hoard): Offered Blade 1-2 (60%), Old Silver Penny 4-8, Moonsilver Ore 2-4 (50%), Barrow Goods 1 (40%), Gilded Troll Idol 1 (10%), Grave Iron 1-2 (40%), Cursed Essence 2-4
+- Herb-wife's Basket (Herb-wife's Basket): Healing Herb 2-4 (60%), Cloudberries 1-3 (40%), Honey 1-2 (30%), Healing Draught 1-2 (40%), Greater Healing Draught 1 (20%), Antidote 1 (25%), Orb Tincture 1-2 (25%), Life Orb 1 (25%), Barley 1-2 (30%), Wild Turnip 1-2 (30%), Troll Moss 1-2 (25%), Bone Charm 1 (6%), Cursed Essence 1-2 (30%), Herb Planter Plans 1 (8%), Flower Bed Plans 1 (8%)
+- Hunter's Cache (Hunter's Cache): Rough Hide 2-4 (60%), Thick Hide 1-2 (35%), Bone 2-3 (50%), Boar Meat 1-2 (30%), Bodkin Arrow 3-6 (30%), Fire Arrow 2-4 (20%), Whistling Arrow 1-2 (15%), Mistwing Feathers 2-4 (25%), Wolf Fang 1-2 (20%), Cured Leather Cap 1 (6%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (35%)
+- Peat Cutter's Box (Peat Cutter's Box): Troll Moss 2-4 (60%), Linen 1-2 (40%), Charcoal 2-4 (40%), Cloudberries 1-3 (50%), Healing Herb 1-3 (40%), Old Silver Penny 1-3 (40%), Antidote 1 (30%)
+- Smith's Chest (Smith's Chest): Iron Ingot 1-2 (40%), Moonsilver Ingot 1 (30%), Charcoal 2-4 (40%), Green Copper Pot 1 (30%), Broken Sickle 1 (25%), Copper Band 1 (6%), Round Shield 1 (6%), Field Repair Kit 1 (15%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (30%)
+- Traveller's Pack (Traveller's Pack, Abandoned Camp): Linen 1-3 (40%), Nettle Cord 1-3 (40%), Waterskin 1 (30%), Barley 1-2 (30%), Healing Draught 1 (35%), Old Silver Penny 1-4 (55%), Rune Book 1 (12%), Norn's Hourglass 1 (6%), Rune of Plenty 1 (5%), Pact Rune 1 (4%), Copper Band 1 (4%), Cursed Essence 1-2 (30%), Log Bench Plans 1 (8%), Plank Bench Plans 1 (8%), Trestle Table Plans 1 (8%)
+- Only here, with every cache (Moss Marsh finds): Troll Moss 1-3 (30%), Cloudberries 1-2 (25%), Bog Venom 1 (10%), Offered Blade 1 (6%), Nykk's Mane 1-2 (15%)
+- Elites (2-3 a run, relic 10%): Moonsilver Ore 3-4, Cursed Essence 4-6, Offered Blade 1 (50%)
+
+### Tier IV (loot ×1.8, drops up to tier V)
+
+
+**Creatures:**
+
+- Barrow Shieldbearer (BarrowShieldbearer): Grave Iron 1-2 (70%), Barrow Goods 1 (40%), Old Silver Penny 1-3 (50%), Cursed Essence 2-3
+- Black Widow (GiantBlackWidow, BlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
+- Blight Boar (BlightBoar): Boar Meat 2-3, Rough Hide 1-2 (80%), Boar Tusk 1 (40%), Cursed Essence 1 (50%), Bone 1-2 (60%)
+- Bog Spitter (BogSpitter): Bog Venom 1 (70%), Cursed Essence 1-2 (90%)
+- Bog Troll (BogTroll): Bog-troll Hide 1-2 (70%), Old Silver Penny 1-2 (40%), Cursed Essence 3-4
+- Draug (Draug): Grave Iron 1-2 (70%), Barrow Goods 1 (30%), Old Silver Penny 1-3 (50%), Cursed Essence 2-3
+- Forest-Bitten Wolf (WolfPack, ForestBittenWolf): Rough Hide 1-2, Bone 1 (50%), Wolf Fang 1 (25%), Cursed Essence 1-2 (80%)
+- Huldra (Huldra): Cursed Essence 1-2 (80%), Huldra Silk 1 (30%), Healing Salve 1 (15%)
+- Marsh Light (MarshLight): Wisp Ember 1 (60%), Cursed Essence 1-2 (80%)
+- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2, Mistwing Egg 1 (40%)
+- Moss Shaman (MossShaman): Shaman's Burl 1 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
+- Small Moss Troll (SmallMossTroll): Troll Moss 1-2, Cursed Essence 1-2
+- Toxic Knight (Undead Knight Toxic): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Painted Barding 1 (20%), Cursed Essence 4-6
+- Toxic Knight, placed (Undead Knight Toxic): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Painted Barding 1 (20%), Cursed Essence 4-6
+
+**Caches:**
+
+- Barrow Chest (Barrow Chest): Barrow Goods 1-2 (60%), Old Silver Penny 2-6 (80%), Grave Iron 1-2 (35%), Runestone Fragment 1 (30%), Rune Book 1 (15%), Pact Rune 1 (6%), Gilded Troll Idol 1 (5%), Cursed Essence 2-4 (60%)
+- Drowned Hoard (Drowned Hoard): Offered Blade 1-2 (60%), Old Silver Penny 4-8, Moonsilver Ore 2-4 (50%), Barrow Goods 1 (40%), Gilded Troll Idol 1 (10%), Grave Iron 1-2 (40%), Cursed Essence 2-4
+- Herb-wife's Basket (Herb-wife's Basket): Healing Herb 2-4 (60%), Cloudberries 1-3 (40%), Honey 1-2 (30%), Healing Draught 1-2 (40%), Greater Healing Draught 1 (20%), Antidote 1 (25%), Orb Tincture 1-2 (25%), Life Orb 1 (25%), Radiant Life Orb 1 (8%), Barley 1-2 (30%), Wild Turnip 1-2 (30%), Troll Moss 1-2 (25%), Bone Charm 1 (6%), Cursed Essence 1-2 (30%), Herb Planter Plans 1 (8%), Flower Bed Plans 1 (8%)
+- Hunter's Cache (Hunter's Cache): Rough Hide 2-4 (60%), Thick Hide 1-2 (35%), Bone 2-3 (50%), Boar Meat 1-2 (30%), Bodkin Arrow 3-6 (30%), Fire Arrow 2-4 (20%), Whistling Arrow 1-2 (15%), Mistwing Feathers 2-4 (25%), Wolf Fang 1-2 (20%), Cured Leather Cap 1 (6%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (35%)
+- Peat Cutter's Box (Peat Cutter's Box): Troll Moss 2-4 (60%), Linen 1-2 (40%), Charcoal 2-4 (40%), Cloudberries 1-3 (50%), Healing Herb 1-3 (40%), Old Silver Penny 1-3 (40%), Antidote 1 (30%)
+- Smith's Chest (Smith's Chest): Iron Ingot 1-2 (40%), Moonsilver Ingot 1 (30%), Charcoal 2-4 (40%), Broken Sickle 1 (25%), Copper Band 1 (6%), Round Shield 1 (6%), Field Repair Kit 1 (15%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (30%)
+- Traveller's Pack (Traveller's Pack, Abandoned Camp): Linen 1-3 (40%), Nettle Cord 1-3 (40%), Waterskin 1 (30%), Barley 1-2 (30%), Healing Draught 1 (35%), Old Silver Penny 1-4 (55%), Rune Book 1 (12%), Norn's Hourglass 1 (6%), Rune of Plenty 1 (5%), Pact Rune 1 (4%), Copper Band 1 (4%), Cursed Essence 1-2 (30%), Log Bench Plans 1 (8%), Plank Bench Plans 1 (8%), Trestle Table Plans 1 (8%)
+- Only here, with every cache (Moss Marsh finds): Troll Moss 1-3 (30%), Cloudberries 1-2 (25%), Bog Venom 1 (10%), Offered Blade 1 (6%), Moonsilver Ore 1-2 (10%), Nykk's Mane 1-2 (15%)
+- Elites (3-4 a run, relic 15%): Moonsilver Ore 3-5, Lindorm Scale 1 (25%), Cursed Essence 6-8, Offered Blade 1-2 (60%)
+
+### Tier V (loot ×2.1, drops up to tier 6)
+
+
+**Creatures:**
+
+- Barrow Shieldbearer (BarrowShieldbearer): Grave Iron 1-2 (70%), Barrow Goods 1 (40%), Old Silver Penny 1-3 (50%), Cursed Essence 2-3
+- Black Widow (GiantBlackWidow, BlackWidow): Widow Silk 1-2 (60%), Bog Venom 1 (50%), Cursed Essence 1-2 (90%)
+- Blight Boar (BlightBoar): Boar Meat 2-3, Rough Hide 1-2 (80%), Boar Tusk 1 (40%), Cursed Essence 1 (50%), Bone 1-2 (60%)
+- Bog Spitter (BogSpitter): Bog Venom 1 (70%), Cursed Essence 1-2 (90%)
+- Bog Troll (BogTroll): Bog-troll Hide 1-2 (70%), Old Silver Penny 1-2 (40%), Cursed Essence 3-4
+- Draug (Draug): Grave Iron 1-2 (70%), Barrow Goods 1 (30%), Old Silver Penny 1-3 (50%), Cursed Essence 2-3
+- Forest-Bitten Wolf (WolfPack, ForestBittenWolf): Rough Hide 1-2, Bone 1 (50%), Wolf Fang 1 (25%), Cursed Essence 1-2 (80%)
+- Huldra (Huldra): Cursed Essence 1-2 (80%), Huldra Silk 1 (30%), Healing Salve 1 (15%)
+- Marsh Light (MarshLight): Wisp Ember 1 (60%), Cursed Essence 1-2 (80%)
+- Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2, Mistwing Egg 1 (40%)
+- Moss Shaman (MossShaman): Shaman's Burl 1 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
+- Small Moss Troll (SmallMossTroll): Troll Moss 1-2, Cursed Essence 1-2
+- Toxic Knight (Undead Knight Toxic): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Painted Barding 1 (20%), Cursed Essence 4-6
+- Toxic Knight, placed (Undead Knight Toxic): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Painted Barding 1 (20%), Cursed Essence 4-6
+
+**Caches:**
+
+- Barrow Chest (Barrow Chest): Barrow Goods 1-2 (60%), Old Silver Penny 2-6 (80%), Grave Iron 1-2 (35%), Runestone Fragment 1 (30%), Rune Book 1 (15%), Pact Rune 1 (6%), Gilded Troll Idol 1 (5%), Cursed Essence 2-4 (60%)
+- Drowned Hoard (Drowned Hoard): Offered Blade 1-2 (60%), Old Silver Penny 4-8, Moonsilver Ore 2-4 (50%), Barrow Goods 1 (40%), Gilded Troll Idol 1 (10%), Grave Iron 1-2 (40%), Cursed Essence 2-4
+- Herb-wife's Basket (Herb-wife's Basket): Healing Herb 2-4 (60%), Cloudberries 1-3 (40%), Honey 1-2 (30%), Healing Draught 1-2 (40%), Greater Healing Draught 1 (20%), Antidote 1 (25%), Orb Tincture 1-2 (25%), Life Orb 1 (25%), Radiant Life Orb 1 (8%), Barley 1-2 (30%), Wild Turnip 1-2 (30%), Troll Moss 1-2 (25%), Bone Charm 1 (6%), Cursed Essence 1-2 (30%), Herb Planter Plans 1 (8%), Flower Bed Plans 1 (8%)
+- Hunter's Cache (Hunter's Cache): Rough Hide 2-4 (60%), Thick Hide 1-2 (35%), Bone 2-3 (50%), Boar Meat 1-2 (30%), Bodkin Arrow 3-6 (30%), Fire Arrow 2-4 (20%), Whistling Arrow 1-2 (15%), Mistwing Feathers 2-4 (25%), Wolf Fang 1-2 (20%), Cured Leather Cap 1 (6%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (35%)
+- Peat Cutter's Box (Peat Cutter's Box): Troll Moss 2-4 (60%), Linen 1-2 (40%), Charcoal 2-4 (40%), Cloudberries 1-3 (50%), Healing Herb 1-3 (40%), Old Silver Penny 1-3 (40%), Antidote 1 (30%)
+- Smith's Chest (Smith's Chest): Iron Ingot 1-2 (40%), Moonsilver Ingot 1 (30%), Charcoal 2-4 (40%), Broken Sickle 1 (25%), Copper Band 1 (6%), Round Shield 1 (6%), Field Repair Kit 1 (15%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (30%)
+- Traveller's Pack (Traveller's Pack, Abandoned Camp): Linen 1-3 (40%), Nettle Cord 1-3 (40%), Waterskin 1 (30%), Barley 1-2 (30%), Healing Draught 1 (35%), Old Silver Penny 1-4 (55%), Rune Book 1 (12%), Norn's Hourglass 1 (6%), Rune of Plenty 1 (5%), Pact Rune 1 (4%), Copper Band 1 (4%), Cursed Essence 1-2 (30%), Log Bench Plans 1 (8%), Plank Bench Plans 1 (8%), Trestle Table Plans 1 (8%)
+- Only here, with every cache (Moss Marsh finds): Troll Moss 1-3 (30%), Cloudberries 1-2 (25%), Bog Venom 1 (10%), Offered Blade 1 (6%), Moonsilver Ore 1-2 (10%), Nykk's Mane 1-2 (15%)
+- Elites (4-5 a run, relic 15%): Moonsilver Ore 3-5, Lindorm Scale 1 (25%), Cursed Essence 6-8, Offered Blade 1-2 (60%)
 
 ## Creature tables
 
@@ -269,6 +603,16 @@ Trollstone, and its heartstone: the trophy that opens a great building tier.
 | Trollstone ◆ | 2-3 | 100% | any | no |
 | Jutul Heartstone ◆ | 1 (fixed) | 100% | any | no |
 | Cursed Essence | 9-12 | 100% | any | no |
+
+### Black Widow
+
+Its own silk, keeping a little venom.
+
+| Drop | Amount | Chance | Tiers | Home |
+|---|---|---|---|---|
+| Widow Silk ◆ | 1 | 60% | any | no |
+| Bog Venom ◆ | 1 | 50% | any | no |
+| Cursed Essence | 1 | 90% | any | no |
 
 ### Black Widow
 
@@ -337,6 +681,7 @@ Troll Valley's boss at the stone bridge (GDD §10.7): its tusk (the trophy), rar
 |---|---|---|---|---|
 | Rough Hide | 1-2 | 100% | any | yes |
 | Bone | 1-2 | 70% | any | yes |
+| Venison | 1-2 | 100% | any | yes |
 
 ### Draug
 
@@ -429,6 +774,7 @@ Feathers for fletching and quilts; less bone.
 | Mistwing Feathers ◆ | 2-3 | 100% | any | no |
 | Bone | 1 | 50% | any | yes |
 | Cursed Essence | 1-2 | 100% | any | no |
+| Mistwing Egg | 1 | 40% | any | yes |
 
 ### Moss Shaman
 
@@ -496,6 +842,7 @@ Hides, bone and its antler.
 | Rough Hide | 1-2 | 100% | any | yes |
 | Bone | 2-3 | 90% | any | yes |
 | Antler | 1 | 70% | any | yes |
+| Venison | 2-3 | 100% | any | yes |
 
 ### Stone Troll
 
@@ -655,6 +1002,8 @@ Herbs, draughts, honey; the life orbs, and a radiant one deep in.
 | Troll Moss | 1-2 | 25% | any | yes |
 | Bone Charm | 1 | 6% | any | yes |
 | Cursed Essence | 1-2 | 30% | any | no |
+| Herb Planter Plans | 1 (fixed) | 8% | any | yes |
+| Flower Bed Plans | 1 (fixed) | 8% | any | yes |
 
 ### Hunter's Cache
 
@@ -716,6 +1065,9 @@ Troll Valley's ruined summer farms: what the dairymaids left when the trolls cam
 | Nettle Cord | 1-3 | 35% | any | yes |
 | Old Silver Penny | 1-3 | 40% | any | yes |
 | Healing Draught | 1 | 25% | any | yes |
+| Rune Stone Plans | 1 (fixed) | 8% | any | yes |
+| Carved Post Plans | 1 (fixed) | 8% | any | yes |
+| Signpost Plans | 1 (fixed) | 8% | any | yes |
 
 ### Smith's Chest
 
@@ -725,7 +1077,7 @@ Metal by tier, junk that breaks into metal, a smith's tools.
 |---|---|---|---|---|
 | Copper Ingot | 1-3 | 45% | I-II | yes |
 | Iron Ingot | 1-2 | 40% | II-V | no |
-| Moonsilver Ingot | 1 | 20% | III-V | no |
+| Moonsilver Ingot | 1 | 30% | III-V | no |
 | Charcoal | 2-4 | 40% | any | yes |
 | Green Copper Pot | 1 | 30% | I-III | yes |
 | Broken Sickle | 1 | 25% | II-V | no |
@@ -770,6 +1122,9 @@ The one cache table every raid used until the themed caches: kept for the Abando
 | Cured Leather Cap | 1 | 5% | any | yes |
 | Round Shield | 1 | 5% | any | yes |
 | Pact Rune | 1 | 5% | any | yes |
+| Signpost Plans | 1 (fixed) | 8% | any | yes |
+| Carved Post Plans | 1 (fixed) | 8% | any | yes |
+| Lantern Post Plans | 1 (fixed) | 8% | any | yes |
 
 ### Traveller's Pack
 
@@ -789,6 +1144,9 @@ A fallen traveller's pack, no lock: cloth, food, coin, and now and then a book o
 | Pact Rune | 1 | 4% | any | yes |
 | Copper Band | 1 | 4% | any | yes |
 | Cursed Essence | 1-2 | 30% | any | no |
+| Log Bench Plans | 1 (fixed) | 8% | any | yes |
+| Plank Bench Plans | 1 (fixed) | 8% | any | yes |
+| Trestle Table Plans | 1 (fixed) | 8% | any | yes |
 
 ### Troll Hoard
 
@@ -836,6 +1194,7 @@ Ready for the Moss Marsh (Docs/NextRaidResearch_2026-11-17.md): moss, cloudberri
 | Bog Venom ◆ | 1 | 10% | any | no |
 | Offered Blade | 1 | 6% | III-V | no |
 | Moonsilver Ore | 1-2 | 10% | IV-V | no |
+| Nykk's Mane ◆ | 1-2 | 15% | any | no |
 
 ### Troll Valley finds
 
@@ -862,11 +1221,24 @@ What killing an elite gives on top of the creature's own drop, each tier its own
 | Cursed Essence | 2-3 | 100% | I-I | no |
 | Iron Ore | 3-5 | 100% | II-II | no |
 | Cursed Essence | 3-4 | 100% | II-II | no |
-| Moonsilver Ore | 2-4 | 100% | III-III | no |
+| Moonsilver Ore | 3-4 | 100% | III-III | no |
 | Cursed Essence | 4-6 | 100% | III-III | no |
-| Moonsilver Ore | 3-5 | 100% | IV-IV | no |
-| Trollstone ◆ | 1 | 10% | IV-IV | no |
-| Cursed Essence | 6-8 | 100% | IV-IV | no |
+| Moonsilver Ore | 3-5 | 100% | IV-V | no |
+| Cursed Essence | 6-8 | 100% | IV-V | no |
+
+### Moss Marsh elites
+
+What the Moss Marsh's elites carry, by tier: moonsilver and offered blades; at IV scales off the thing in the deep pools (the Lindorm's, until the Lindorm itself carries them).
+
+| Drop | Amount | Chance | Tiers | Home |
+|---|---|---|---|---|
+| Moonsilver Ore | 3-4 | 100% | III-III | no |
+| Cursed Essence | 4-6 | 100% | III-III | no |
+| Offered Blade | 1 | 50% | III-III | no |
+| Moonsilver Ore | 3-5 | 100% | IV-V | no |
+| Lindorm Scale ◆ | 1 | 25% | IV-V | no |
+| Cursed Essence | 6-8 | 100% | IV-V | no |
+| Offered Blade | 1-2 | 60% | IV-V | no |
 
 ### Troll Valley elites
 
@@ -876,12 +1248,12 @@ What killing an elite gives on top of the creature's own drop, each tier its own
 |---|---|---|---|---|
 | Iron Ore | 3-5 | 100% | II-II | no |
 | Cursed Essence | 3-4 | 100% | II-II | no |
-| Moonsilver Ore | 2-4 | 100% | III-III | no |
+| Moonsilver Ore | 3-4 | 100% | III-III | no |
 | Cursed Essence | 4-6 | 100% | III-III | no |
-| Moonsilver Ore | 3-5 | 100% | IV-IV | no |
-| Trollstone ◆ | 1 | 40% | IV-IV | no |
-| Cursed Essence | 6-8 | 100% | IV-IV | no |
-| Granite | 3-5 | 100% | IV-IV | no |
+| Moonsilver Ore | 3-5 | 100% | IV-V | no |
+| Trollstone ◆ | 1 | 40% | IV-V | no |
+| Cursed Essence | 6-8 | 100% | IV-V | no |
+| Granite | 3-5 | 100% | IV-V | no |
 
 ## Other tables
 
@@ -893,6 +1265,18 @@ A breakable barrel's grain and honey.
 |---|---|---|---|---|
 | Barley | 1-3 | 40% | any | yes |
 | Honey | 1 | 15% | any | yes |
+| Rough Plank | 1-2 | 100% | any | yes |
+| Barrels and Crates Plans | 1 (fixed) | 8% | any | yes |
+| Woodpile Plans | 1 (fixed) | 8% | any | yes |
+| Hay Bales Plans | 1 (fixed) | 8% | any | yes |
+
+### Fence Section
+
+A breakable fence section's wood: rough planks (the user, 2026-11-20: wooden breakables give rough planks).
+
+| Drop | Amount | Chance | Tiers | Home |
+|---|---|---|---|---|
+| Rough Plank | 1-2 | 100% | any | yes |
 
 ### Supply Crate
 
@@ -900,7 +1284,8 @@ A breakable crate's planks.
 
 | Drop | Amount | Chance | Tiers | Home |
 |---|---|---|---|---|
-| Oak Plank | 1-2 | 50% | any | yes |
+| Fine Plank | 1-2 | 50% | any | yes |
+| Rough Plank | 1-3 | 100% | any | yes |
 
 ### The Deildegast's thanks
 
