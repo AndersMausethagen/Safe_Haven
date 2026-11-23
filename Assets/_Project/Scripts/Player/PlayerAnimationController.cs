@@ -236,6 +236,7 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
         {
             combat.SwingStarted += OnSwingStarted;
             combat.SwingLanded += OnSwingLanded;
+            combat.SwingHeld += OnSwingHeld;
             combat.WeaponChanged += OnWeaponChanged;
             combat.KnockedDown += OnKnockedDown;
             combat.Flinched += OnFlinched;
@@ -305,6 +306,7 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
             combat.KnockedDown -= OnKnockedDown;
             combat.Flinched -= OnFlinched;
             combat.SwingLanded -= OnSwingLanded;
+            combat.SwingHeld -= OnSwingHeld;
             combat.WeaponChanged -= OnWeaponChanged;
         }
 

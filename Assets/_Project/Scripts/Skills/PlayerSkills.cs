@@ -51,6 +51,19 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     private bool initialised;
 
     private float busyUntil;
+    private float lungeEndsAt = float.NegativeInfinity;
+
+    /// <summary>True while a skill is being cast or its lunge and hit are under way: a swing pressed now waits for it (PlayerCombat).</summary>
+    public bool IsBusy => Time.time < busyUntil;
+
+    /// <summary>Seconds until the skill under way is done.</summary>
+    public float BusyLeft => Mathf.Max(0f, busyUntil - Time.time);
+
+    /// <summary>When the last lunging skill with a blow (Wolf's Lunge) is done: a swing right after it goes on with the chain.</summary>
+    public float LungeEndsAt => lungeEndsAt;
+
+    /// <summary>True from the end of the last lunging skill for <paramref name="seconds"/>.</summary>
+    public bool LungedWithin(float seconds) => Time.time >= lungeEndsAt && Time.time - lungeEndsAt <= seconds;
     private SkillDefinition pendingHit;
     private float pendingHitAt;
     private Vector3 pendingDirection;
@@ -350,6 +363,11 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             pendingHitAt = now + hitAfter + skill.Attack.HitDelay;
             busyUntil = Mathf.Max(busyUntil, pendingHitAt);
             pendingDirection = direction;
+            if (skill.LungeDistance > 0f)
+            {
+                lungeEndsAt = busyUntil;
+            }
+
             GameStateManager gameState = GameStateManager.Current;
             if (gameState != null)
             {

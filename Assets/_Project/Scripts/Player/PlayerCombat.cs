@@ -192,6 +192,10 @@ public sealed partial class PlayerCombat : MonoBehaviour
     private float lastStartTime = float.NegativeInfinity;
     private float lastHitAt;
     private float lastRecoverAt;
+    // The swing waiting on its last pose after its recovery (Swing Hold Seconds), and a lunge whose follow-up has already chained.
+    private bool holdingPose;
+    private float lungeLedFrom = float.NegativeInfinity;
+    private PlayerSkills skills;
     private int lastStep = -1;
 
     // Input.
@@ -340,7 +344,7 @@ public sealed partial class PlayerCombat : MonoBehaviour
 
     // Whether the swing going now gives way to this: its wind-up's cancels before the blow, its recovery's after (the per-move cancel
     // table, SwingMotion).
-    private bool CancelsNow(SwingCancels what) => activeKind == SwingKind.None
+    private bool CancelsNow(SwingCancels what) => activeKind == SwingKind.None || holdingPose
         || ((hitPending ? SwingMotion.WindupCancels(activeAttack, activeKind, Rules) : SwingMotion.RecoveryCancels(activeAttack, Rules)) & what) != 0;
 
     /// <summary>A dodge gets out of a swing when its cancels allow it (by default all through it: Dodge Cancels Windup).</summary>
@@ -372,6 +376,12 @@ public sealed partial class PlayerCombat : MonoBehaviour
 
     /// <summary>Raised when any swing starts, with everything about it. Animation plays here.</summary>
     public event Action<SwingInfo> SwingStarted;
+
+    /// <summary>The swing began (true) or stopped (false) waiting on its last pose after its recovery (Swing Hold Seconds).</summary>
+    public event Action<bool> SwingHeld;
+
+    /// <summary>True while a recovered swing waits on its last pose for the next press.</summary>
+    public bool IsHoldingPose => holdingPose;
 
     /// <summary>Raised when a swing's hit moment comes, with how many targets it hit (0 = a whiff).</summary>
     public event Action<SwingInfo, int> SwingLanded;
@@ -415,6 +425,7 @@ public sealed partial class PlayerCombat : MonoBehaviour
         eating = GetComponent<PlayerEating>();
         focus = GetComponent<PlayerFocus>();
         focusTarget = GetComponent<PlayerFocusTarget>();
+        skills = GetComponent<PlayerSkills>();
         mode = new PlayerCombatMode(transform);
         announcedWeapon = weapon;
     }

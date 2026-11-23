@@ -95,6 +95,18 @@ public static class SwingMotion
         rules.BufferWindow <= 0f || elapsed >= chainAt - rules.BufferWindow;
 
     /// <summary>The same for something that ends by itself (a dodge, a flinch, a broken guard): kept only in its last moments.</summary>
+    /// <summary>
+    /// True while a recovered swing may go on waiting on its last pose (Swing Hold Seconds, the user 2026-11-23): a light, rush or
+    /// uncharged heavy, held for less than <paramref name="holdSeconds"/>, with no attack held, no move pressed, the guard down and no
+    /// roll. Moving or running, a roll or the guard ends it at once.
+    /// </summary>
+    public static bool HoldsPose(SwingKind kind, bool charged, float heldFor, float holdSeconds, bool attackHeld, Vector3 moveInput, bool guarding,
+        bool dodging)
+    {
+        bool holds = kind == SwingKind.Light || kind == SwingKind.Rush || (kind == SwingKind.Heavy && !charged);
+        return holds && holdSeconds > 0f && heldFor < holdSeconds && !attackHeld && moveInput.sqrMagnitude < 0.04f && !guarding && !dodging;
+    }
+
     public static bool BuffersWithin(float secondsLeft, CombatTechniqueSettings rules) =>
         rules.BufferWindow <= 0f || secondsLeft <= rules.BufferWindow;
 }

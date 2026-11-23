@@ -11,6 +11,10 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [Header("Combo chain")]
     [Tooltip("Seconds after a swing's recovery the next press still continues the chain. Later starts it over.")]
     [SerializeField, Min(0f)] private float chainGrace = 0.45f;
+    [Tooltip("Seconds a swing waits on its last pose once it has recovered, while nothing is pressed and the player stands still: the " +
+             "next press still chains, and the chain's grace runs from the end of the wait (the user, 2026-11-23: \"hold the last part of " +
+             "a swing for a bit ... to easier follow up with a combo\"). Moving, running, a roll or the guard ends it at once. 0: no wait.")]
+    [SerializeField, Min(0f)] private float swingHoldSeconds = 0.4f;
     [Tooltip("A press this many seconds before the swing recovers, or up to the late margin after, is on the rhythm.")]
     [SerializeField, Min(0f)] private float rhythmEarly = 0.16f;
     [SerializeField, Min(0f)] private float rhythmLate = 0.1f;
@@ -365,6 +369,7 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [SerializeField, Min(0f)] private float meleeBurnSeconds = 4f;
 
     public float ChainGrace => chainGrace;
+    public float SwingHoldSeconds => swingHoldSeconds;
     public float RhythmEarly => rhythmEarly;
     public float RhythmLate => rhythmLate;
     public int MaxRhythm => maxRhythm;

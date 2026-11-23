@@ -171,8 +171,27 @@ public sealed partial class PlayerAnimationController
     // A swing with its own animation state plays it at once: with the whole body (the legs step into the blow, which is
     // what reads from above) when it starts standing. Started on the move, by a swing that lets the player walk through its
     // wind-up (SwingMotion), it goes on the arms over the walking legs. One without a state uses the stance's older triggered attack.
+    // The swing in hand, for its follow-through speed after a hold on its last pose.
+    private SwingInfo shownSwing;
+    // Nearly still, not frozen: a breath of motion keeps a held pose from reading as a hitch.
+    private const float HeldPoseSpeed = 0.04f;
+
+    // A recovered swing waits on its last pose (PlayerCombat.SwingHeld): the clip all but stops there, and goes on when the wait ends.
+    private void OnSwingHeld(bool holding)
+    {
+        if (holding)
+        {
+            SetFloat(ActionSpeedHash, HeldPoseSpeed);
+        }
+        else if (shownSwing.Attack != null)
+        {
+            SetFloat(ActionSpeedHash, shownSwing.Attack.FollowThroughSpeed * shownSwing.Speed);
+        }
+    }
+
     private void OnSwingStarted(SwingInfo swing)
     {
+        shownSwing = swing;
         string stateName = swing.Attack != null ? swing.Attack.AnimationState : null;
         int standing = fullBodyLayer >= 0 ? fullBodyLayer : upperBodyLayer;
         bool onTheRun = combat != null && combat.WindupMoveShare > 0f && movement.HorizontalSpeed > ArmsOnlySpeed

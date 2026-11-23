@@ -312,7 +312,8 @@ public sealed partial class PlayerCombat
             return false;
         }
 
-        bool busy = activeKind != SwingKind.None || IsFlinching || (dodge != null && dodge.IsDodging) || (guard != null && guard.IsStunned);
+        bool busy = activeKind != SwingKind.None || IsFlinching || (dodge != null && dodge.IsDodging) || (guard != null && guard.IsStunned)
+                    || (skills != null && skills.IsBusy);
         if (busy)
         {
             if (!BufferOpen(kind))
@@ -342,6 +343,12 @@ public sealed partial class PlayerCombat
         if (dodge != null && dodge.IsDodging)
         {
             return kind == SwingKind.Rush || SwingMotion.BuffersWithin(dodge.TimeLeft, Rules);
+        }
+
+        // A skill under way (a lunge in flight): a swing pressed in it follows it, wherever in it the press came.
+        if (skills != null && skills.IsBusy)
+        {
+            return kind == SwingKind.Light || kind == SwingKind.Heavy || SwingMotion.BuffersWithin(skills.BusyLeft, Rules);
         }
 
         if (IsFlinching)

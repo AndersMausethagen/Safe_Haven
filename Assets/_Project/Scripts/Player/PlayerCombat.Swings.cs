@@ -92,6 +92,16 @@ public sealed partial class PlayerCombat
                 // A light swing ends a heavy chain: grown into a heavy it is the weapon's heavy, not its follow-up.
                 lastHeavyEndedAt = float.NegativeInfinity;
                 lastHeavyWasFollowUp = false;
+                // Out of a lunge (Wolf's Lunge) the chain goes on from its second swing, as out of a rush (the user, 2026-11-23: "allow us
+                // to follow up with combo attacks after a lunge attack"). Once per lunge.
+                if (skills != null && skills.LungeEndsAt > lungeLedFrom && skills.LungedWithin(Rules.ChainGrace + Rules.BufferWindow))
+                {
+                    lungeLedFrom = skills.LungeEndsAt;
+                    lastStep = 0;
+                    judge = ChainPress.InTime;
+                    fumbled = false;
+                }
+
                 step = ComboRules.NextStep(lastStep, chain, judge, fumbled);
                 attack = weapon != null ? weapon.ComboStep(step) : null;
                 if (CounterIsReady && weapon != null && weapon.CounterAttack != null)
@@ -384,7 +394,9 @@ public sealed partial class PlayerCombat
         if (activeKind == SwingKind.None)
         {
             bool dodgeInTheWay = dodge != null && dodge.IsDodging && !(queuedKind == SwingKind.Rush && dodge.CanBeCutShort);
-            if (queuedKind != SwingKind.None && !IsFlinching && !dodgeInTheWay && (guard == null || !guard.IsStunned))
+            // A skill under way (Wolf's Lunge in flight): a press made in it waits for it, as one made in a dodge does.
+            bool skillInTheWay = skills != null && skills.IsBusy;
+            if (queuedKind != SwingKind.None && !IsFlinching && !dodgeInTheWay && !skillInTheWay && (guard == null || !guard.IsStunned))
             {
                 Begin(queuedKind, queuedJudge);
             }
@@ -461,6 +473,18 @@ public sealed partial class PlayerCombat
                 return;
             }
 
+            // Nothing pressed, the player still: the swing waits on its last pose (Swing Hold Seconds), the next press still chaining.
+            if (next == SwingKind.None && HoldsPose(elapsed - recoverAt))
+            {
+                if (!holdingPose)
+                {
+                    holdingPose = true;
+                    SwingHeld?.Invoke(true);
+                }
+
+                return;
+            }
+
             EndSwing();
             if (next != SwingKind.None)
             {
@@ -468,6 +492,11 @@ public sealed partial class PlayerCombat
             }
         }
     }
+
+    // True while a recovered swing may go on waiting on its last pose: a light, rush or uncharged heavy, held for less than Swing Hold
+    // Seconds, with no move pressed and the guard down. Moving or running (any move), a roll or the guard ends it at once.
+    private bool HoldsPose(float heldFor) => SwingMotion.HoldsPose(activeKind, (activeTechnique & HitTechnique.Charged) != 0, heldFor,
+        Rules.SwingHoldSeconds, attackHeld, movement.MovementInput, guard != null && guard.IsGuarding, dodge != null && dodge.IsDodging);
 
     // A heavy swing held on waits at the top of its wind-up, where its strike would begin, and everything about it stands still for as
     // long as the button is held (the user, 2026-11-20: "hold a charging attack for as long as he wants"). Full after Heavy Charge
@@ -946,7 +975,9 @@ public sealed partial class PlayerCombat
         {
             lastStartTime = activeStartTime + chargeHeld + heldPastFull + holdWaited;
             lastHitAt = HitAt(activeAttack, activeSpeed);
-            lastRecoverAt = RecoverAt(activeAttack, activeSpeed);
+            // A swing that waited on its last pose: the chain's grace runs from the end of the wait.
+            float waited = holdingPose ? Mathf.Max(0f, ActiveElapsed - RecoverAt(activeAttack, activeSpeed)) : 0f;
+            lastRecoverAt = RecoverAt(activeAttack, activeSpeed) + waited;
             // A heavy that landed can be followed by the heavy follow-up; any other swing that landed ends that chain.
             if (!hitPending && activeKind == SwingKind.Heavy && (activeTechnique & HitTechnique.Charged) == 0)
             {
@@ -961,6 +992,11 @@ public sealed partial class PlayerCombat
         }
 
         activeIsFollowUp = false;
+        if (holdingPose)
+        {
+            holdingPose = false;
+            SwingHeld?.Invoke(false);
+        }
 
         activeKind = SwingKind.None;
         activeAttack = null;
