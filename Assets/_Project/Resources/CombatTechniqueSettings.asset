@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d892a13fd3bffd547b889e347a4d00cd, type: 3}
   m_Name: CombatTechniqueSettings
   m_EditorClassIdentifier: SafeHaven::CombatTechniqueSettings
-  chainGrace: 0.45
+  chainGrace: 0.6
   rhythmEarly: 0.16
   rhythmLate: 0.1
   maxRhythm: 2
@@ -43,7 +43,7 @@ MonoBehaviour:
   heavyHitInvulnerable: 0.3
   showComboHud: 0
   heavyHoldSeconds: 0.22
-  heavyChargeSeconds: 0.9
+  heavyChargeSeconds: 0.818
   heldChargeDrain: 6
   heavyChargeDamage: 1.4
   heavyChargePoise: 1.5

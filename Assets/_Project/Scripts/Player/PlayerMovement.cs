@@ -34,6 +34,7 @@ public sealed class PlayerMovement : MonoBehaviour
     private float dashUntil = -1f;
     private Vector3 lungeVelocity;
     private float lungeUntil = -1f;
+    private float lungeSeconds;
     private readonly System.Collections.Generic.Dictionary<object, float> speedScales = new System.Collections.Generic.Dictionary<object, float>();
 
     /// <summary>Who slows (or speeds) the player now (a swing's wind-up, crafting by hand, a status): what LeaseWatch looks at.</summary>
@@ -216,7 +217,15 @@ public sealed class PlayerMovement : MonoBehaviour
 
         lungeVelocity = velocity;
         lungeUntil = Time.time + duration;
+        lungeSeconds = duration;
     }
+
+    /// <summary>
+    /// A lunge's push at <paramref name="share"/> (0 to 1) of its way, as a share of its average speed: quick at first and easing to
+    /// nothing, the same distance in all (1.5 (1 - s²) averages 1). A push held flat and then cut dead jolted the body at its end (the
+    /// user, 2026-11-23: "that jerky movement" on a charged blow).
+    /// </summary>
+    public static float LungeShape(float share) => 1.5f * (1f - Mathf.Clamp01(share) * Mathf.Clamp01(share));
 
     /// <summary>Stops a lunge still running (a swing lost before its blow).</summary>
     public void CancelLunge() => lungeUntil = -1f;
@@ -380,7 +389,8 @@ public sealed class PlayerMovement : MonoBehaviour
         {
             if (Time.time < lungeUntil)
             {
-                horizontalVelocity += lungeVelocity;
+                float share = lungeSeconds > 0f ? 1f - (lungeUntil - Time.time) / lungeSeconds : 1f;
+                horizontalVelocity += lungeVelocity * LungeShape(share);
             }
             else
             {

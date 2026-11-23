@@ -41,4 +41,19 @@ public sealed class SwingHoldTests
         Assert.IsFalse(Holds(SwingKind.ShieldBash, 0.1f));
         Assert.IsFalse(Holds(SwingKind.Light, 0f, hold: 0f), "a hold of 0 turns it off");
     }
+
+    [Test]
+    public void ALunge_EasesToAStop_CoveringTheSameGround()
+    {
+        float sum = 0f;
+        const int steps = 1000;
+        for (int i = 0; i < steps; i++)
+        {
+            sum += PlayerMovement.LungeShape((i + 0.5f) / steps) / steps;
+        }
+
+        Assert.AreEqual(1f, sum, 0.01f, "the same distance as a flat push");
+        Assert.AreEqual(0f, PlayerMovement.LungeShape(1f), 1e-4f, "nothing left at its end: no dead stop");
+        Assert.Greater(PlayerMovement.LungeShape(0f), PlayerMovement.LungeShape(0.5f), "quick first, easing off");
+    }
 }

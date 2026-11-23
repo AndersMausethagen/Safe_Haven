@@ -337,7 +337,10 @@ public sealed partial class PlayerCombat
     {
         if (activeKind != SwingKind.None)
         {
-            return SwingMotion.Buffers(ActiveElapsed, RecoverAt(activeAttack, activeSpeed), Rules);
+            // Once the blow has landed, a press is kept for the next swing wherever it comes (the user, 2026-11-23: "sometimes when I
+            // want to combo, it just restarts at the first attack": a press in the follow-through was dropped). In the wind-up it is
+            // still only kept in the buffer's last moments, so mashing doesn't queue swings.
+            return !hitPending || SwingMotion.Buffers(ActiveElapsed, RecoverAt(activeAttack, activeSpeed), Rules);
         }
 
         if (dodge != null && dodge.IsDodging)
