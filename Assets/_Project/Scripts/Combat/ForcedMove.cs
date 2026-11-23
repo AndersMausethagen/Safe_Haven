@@ -32,11 +32,31 @@ public sealed class ForcedMove : MonoBehaviour
         Drag(body.transform, source.transform.position, attack.Pull, DragSeconds);
     }
 
+    /// <summary>
+    /// True for what is built, which no blow moves: a building or wall (BuildingObject) or anything struck as a structure (the user,
+    /// 2026-11-23: a breach's trolls knocked the buildings out of place, their pulls and shoves dragging whatever they hit).
+    /// </summary>
+    public static bool IsBuilt(Transform body)
+    {
+        if (body == null)
+        {
+            return false;
+        }
+
+        if (body.GetComponentInParent<BuildingObject>() != null)
+        {
+            return true;
+        }
+
+        IDamageable damageable = body.GetComponentInParent<IDamageable>();
+        return damageable != null && damageable.Category == TargetCategory.Structure;
+    }
+
     /// <summary>Moves <paramref name="body"/> <paramref name="metres"/> toward <paramref name="toward"/> (negative: away)
     /// over <paramref name="seconds"/>, on the flat.</summary>
     public static void Drag(Transform body, Vector3 toward, float metres, float seconds)
     {
-        if (body == null || Mathf.Abs(metres) < 0.01f)
+        if (body == null || Mathf.Abs(metres) < 0.01f || IsBuilt(body))
         {
             return;
         }
