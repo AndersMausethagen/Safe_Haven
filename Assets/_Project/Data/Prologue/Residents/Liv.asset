@@ -51,6 +51,12 @@ MonoBehaviour:
   loves:
   - {fileID: 11400000, guid: cbe9df10f8fa88f47be2f012ec678577, type: 2}
   - {fileID: 11400000, guid: c7138267f80f6644fb98ef1cc46e7dab, type: 2}
+  favouriteDish: {fileID: 11400000, guid: a8a861b083501ca4b9075a3301be4179, type: 2}
+  homeLiking:
+    resident: {fileID: 0}
+    likes: A place to sit
+    line: '"Somewhere to sit and read the stones."'
+    thanks: '"Somewhere to sit. The stones read better when my feet are still."'
   jobs:
   - {fileID: 11400000, guid: e68d6cc3611cddc4ab1e165871f1a4ae, type: 2}
   questLine:

@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dafc92cc79ad39845bc5e18f47753891, type: 3}
+  m_Name: old-wound-salve
+  m_EditorClassIdentifier: SafeHaven::HavenRequestDefinition
+  id: old-wound-salve
+  asker: {fileID: 0}
+  ask: The old wound aches in the damp. Three healing salves and I'd sleep the night through, and maybe stop limping.
+  thanks: That's eased it. I can feel the warmth go in.
+  wanted: {fileID: 11400000, guid: 7400170a621d51d43a051a8899ec5b20, type: 2}
+  count: 3
+  reward: {fileID: 0}
+  rewardCount: 0
+  coins: 20
+  experience: 60
+  easesBlight: 0
+  inSeasons: []
+  quality: 0
+  fromLevel: 0
+  lesson: 0
+  renown: 0
+  whileMarked: {fileID: 11400000, guid: 8b72b361fbedd9641a9d3df328d82fc0, type: 2}
+  whileTrait: {fileID: 0}
+  healsMark: 1

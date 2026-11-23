@@ -800,4 +800,200 @@ public sealed class PeopleTests
         Assert.IsTrue(came.Any(mark => mark.Id == "lost_in_the_mire"));
         Assert.IsTrue(ResidentMarks.AfterEvent(asa, MarkCause.BreachWon, "", () => 0f).Any(mark => mark.Good), "a breach won");
     }
+
+    [Test]
+    public void AFavouriteDish_IsEatenFirst_AndLiftsTheirSpirits()
+    {
+        HomeLifeSettings settings = HomeLifeSettings.Current;
+        SettlementState home = Home("Tor");
+        ResidentRecord tor = home.Find(Person("Tor"));
+        ItemDefinition dish = tor.Resident.FavouriteDish;
+        Assert.IsNotNull(dish, "Tor has a favourite dish");
+        Assert.IsTrue(ResidentMeals.IsFood(dish, settings), "one the people may eat");
+        var bread = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Food/BarleyBread.asset");
+        Assert.AreNotEqual(dish, bread);
+        Assert.Less(bread.Value, dish.Value, "the canary: the bread sorts first by the usual rule");
+
+        var chests = new ItemContainer(10, 6);
+        chests.Add(bread, 3);
+        chests.Add(dish, 1);
+        home.NoteBuilt(settings.MealsFrom, 1);
+        Assert.IsFalse(ResidentSpirits.ReasonsOf(tor, home).Any(reason => reason.Words.Contains("favourite")));
+        ResidentMeals.Eat(home, chests, settings);
+        Assert.AreEqual(0, chests.Count(dish), "their favourite first");
+        Assert.AreEqual(home.DaysPassed, tor.FeelingUntil(ResidentMeals.FavouriteFeeling), "and the day is better for it");
+        Assert.IsTrue(ResidentSpirits.ReasonsOf(tor, home).Any(reason => reason.Words.Contains("favourite") && reason.Steps > 0));
+        Assert.AreEqual(ResidentSpirits.ReasonsOf(tor, home).Sum(reason => reason.Steps), ResidentSpirits.StepsOf(tor, home), "the steps agree");
+
+        // Without it in the chests, nothing is said of it.
+        SettlementState other = Home("Tor");
+        ResidentRecord plainDay = other.Find(Person("Tor"));
+        other.NoteBuilt(settings.MealsFrom, 1);
+        var plain = new ItemContainer(10, 6);
+        plain.Add(bread, 3);
+        ResidentMeals.Eat(other, plain, settings);
+        Assert.Less(plainDay.FeelingUntil(ResidentMeals.FavouriteFeeling), other.DaysPassed);
+    }
+
+    [Test]
+    public void HomeLikings_LiveOnThePerson()
+    {
+        HomeLifeSettings settings = HomeLifeSettings.Current;
+        int count = 0;
+        foreach (ResidentDefinition resident in All<ResidentDefinition>().Where(one => one.HomeLiking != null))
+        {
+            count++;
+            Assert.AreSame(resident.HomeLiking, settings.LikingOf(resident), resident.name);
+            Assert.AreEqual(resident, resident.HomeLiking.resident, $"{resident.name}'s liking names them");
+            Assert.IsTrue(settings.Features.Any(feature => feature.name == resident.HomeLiking.likes), $"{resident.name}: a feature");
+            Assert.IsNotNull(resident.FavouriteDish, $"{resident.name} has a favourite dish");
+        }
+
+        Assert.GreaterOrEqual(count, 11, "the eleven who have a home liking");
+        Assert.AreEqual(count, settings.Likings.Count, "one owner: nothing left in the old list besides");
+    }
+
+    [Test]
+    public void AnAskFromWhoTheyAre_IsAskedOfWhoeverFits_AndOneAskEach()
+    {
+        var requests = AssetDatabase.LoadAssetAtPath<HavenRequestSettings>("Assets/_Project/Resources/HavenRequestSettings.asset");
+        HavenRequestDefinition salve = requests.Find("old-wound-salve");
+        Assert.IsNotNull(salve);
+        Assert.IsTrue(salve.HealsMark && salve.IsPersonal);
+        SettlementState home = Home("Tor", "Asa");
+        Assert.IsFalse(salve.CanAsk(home, "Summer"), "nobody carries the wound");
+        ResidentRecord asa = home.Find(Person("Asa"));
+        ResidentMarks.Give(asa, salve.WhileMarked);
+        Assert.IsTrue(asa.HasMark(salve.WhileMarked.Id));
+        Assert.IsTrue(salve.CanAsk(home, "Summer"));
+        Assert.AreEqual(asa.Resident, salve.AskerIn(home));
+        Assert.AreEqual(asa.Resident.DisplayName, salve.NameIn(home));
+
+        HavenRequestDefinition parchment = requests.Find("bookish-parchment");
+        Assert.IsFalse(parchment.CanAsk(Home("Tor"), "Summer"), "nobody Bookish");
+        Assert.AreEqual(Person("Liv"), parchment.AskerIn(Home("Tor", "Liv")));
+
+        // Everyone home, a wound on everyone: never two asks for one person, by who would ask them.
+        var full = new SettlementState();
+        foreach (ResidentDefinition resident in All<ResidentDefinition>())
+        {
+            if (full.Find(resident) == null)
+            {
+                full.AddResident(resident);
+                ResidentMarks.Give(full.Find(resident), salve.WhileMarked);
+            }
+        }
+
+        bool personal = false;
+        for (int day = 0; day < 30; day++)
+        {
+            var askers = new HashSet<ResidentDefinition>();
+            foreach (HavenRequestDefinition request in HavenRequestSettings.Choose(requests.Requests, null, 3, full, "Summer", day))
+            {
+                personal |= request.WhileMarked != null || request.WhileTrait != null;
+                Assert.IsTrue(!request.IsPersonal || askers.Add(request.AskerIn(full)), $"day {day}: one ask per person");
+            }
+        }
+
+        Assert.IsTrue(personal, "the canary: asks from who they are were chosen at all");
+    }
+
+    [Test]
+    public void PeopleObjectives_CountTheirEvents()
+    {
+        ResidentDefinition tor = Person("Tor"), asa = Person("Asa"), liv = Person("Liv");
+        QuestObjective rank = QuestObjective.People(ObjectiveType.ResidentRank, tor, toRank: 2);
+        Assert.AreEqual(0, rank.Progress(new GameEvent(GameEventKind.PersonRanked, tor, 1)), "an Apprentice isn't a Journeyman");
+        Assert.AreEqual(1, rank.Progress(new GameEvent(GameEventKind.PersonRanked, tor, 2)));
+        Assert.AreEqual(0, rank.Progress(new GameEvent(GameEventKind.PersonRanked, asa, 3)), "someone else");
+
+        QuestObjective friends = QuestObjective.People(ObjectiveType.BecomeFriends, tor, asa);
+        Assert.AreEqual(1, friends.Progress(new GameEvent(GameEventKind.BecameFriends, asa, 1, detail: tor)), "either way round");
+        Assert.AreEqual(0, friends.Progress(new GameEvent(GameEventKind.BecameFriends, asa, 1, detail: liv)));
+        QuestObjective aFriend = QuestObjective.People(ObjectiveType.BecomeFriends, tor);
+        Assert.AreEqual(1, aFriend.Progress(new GameEvent(GameEventKind.BecameFriends, liv, 1, detail: tor)));
+        Assert.AreEqual(0, aFriend.Progress(new GameEvent(GameEventKind.BecameFriends, liv, 1, detail: asa)));
+
+        MarkDefinition wound = Mark("old_wound");
+        MarkDefinition other = People.Marks.First(mark => mark != null && !mark.Good && mark != wound);
+        QuestObjective heal = QuestObjective.People(ObjectiveType.HealMark, null, healed: wound);
+        Assert.AreEqual(1, heal.Progress(new GameEvent(GameEventKind.MarkHealed, wound, 1, detail: asa)));
+        Assert.AreEqual(0, heal.Progress(new GameEvent(GameEventKind.MarkHealed, other, 1, detail: asa)));
+        QuestObjective kit = QuestObjective.People(ObjectiveType.GiveKit, liv);
+        ItemDefinition spear = All<ItemDefinition>().First(item => item.name.Contains("Spear"));
+        Assert.AreEqual(1, kit.Progress(new GameEvent(GameEventKind.KitGiven, spear, 1, detail: liv)));
+        Assert.AreEqual(0, kit.Progress(new GameEvent(GameEventKind.KitGiven, spear, 1, detail: tor)));
+
+        foreach (QuestObjective objective in new[] { rank, friends, aFriend, heal, kit })
+        {
+            Assert.IsNull(objective.FindProblem(), objective.Describe());
+            Assert.IsFalse(objective.Describe().Contains("(no"), objective.Describe());
+            Assert.IsFalse(QuestObjective.CountsInAFriendsHaven(objective.Type), "the people are a Haven's");
+        }
+
+        Assert.IsNotNull(QuestObjective.People(ObjectiveType.HealMark, null, healed: People.Marks.First(mark => mark != null && mark.Good)).FindProblem(),
+            "a good mark isn't healed");
+    }
+
+    [Test]
+    public void BecomingFriends_IsRaised_OnlyForThePlayersOwnPeople()
+    {
+        GameSession.StartNewGame();
+        var raised = new List<GameEvent>();
+        void Heard(GameEvent gameEvent)
+        {
+            if (gameEvent.Kind == GameEventKind.BecameFriends)
+            {
+                raised.Add(gameEvent);
+            }
+        }
+
+        GameEvents.Raised += Heard;
+        try
+        {
+            SettlementState own = GameSession.Home;
+            own.AddResident(Person("Tor"));
+            own.AddResident(Person("Asa"));
+            ResidentRecord tor = own.Find(Person("Tor")), asa = own.Find(Person("Asa"));
+            own.SetStanding(tor.Resident.Id, asa.Resident.Id, 1.45f);
+            Assert.AreEqual(1, PeopleStandings.LevelOf(own, tor, asa), "Friendly, not yet Friends");
+            PeopleStandings.Change(own, tor, asa, 1f);
+            Assert.AreEqual(1, raised.Count, "two of the player's people became Friends");
+
+            SettlementState copy = Home("Tor", "Asa");
+            ResidentRecord theirTor = copy.Find(Person("Tor")), theirAsa = copy.Find(Person("Asa"));
+            copy.SetStanding(theirTor.Resident.Id, theirAsa.Resident.Id, 1.45f);
+            PeopleStandings.Change(copy, theirTor, theirAsa, 1f);
+            Assert.AreEqual(2, PeopleStandings.LevelOf(copy, theirTor, theirAsa), "the canary: they did become Friends");
+            Assert.AreEqual(1, raised.Count, "a copy that isn't the player's own doesn't count");
+        }
+        finally
+        {
+            GameEvents.Raised -= Heard;
+            GameSession.StartNewGame();
+        }
+    }
+
+    [Test]
+    public void TheStablehand_TendsWithHorsemanship_AndAsaCanBeOne()
+    {
+        var job = AssetDatabase.LoadAssetAtPath<JobDefinition>("Assets/_Project/Data/Settlement/Stablehand.asset");
+        Assert.IsNotNull(job);
+        Assert.Greater(job.TendsHorses, 0f);
+        Assert.AreEqual(Skill("Horsemanship"), job.Skill);
+        Assert.IsNotNull(job.Workplace, "worked at the Stable");
+        ResidentDefinition asa = Person("Asa");
+        Assert.IsTrue(asa.Jobs.Contains(job), "Asa's trade");
+
+        SettlementState home = Home("Asa", "Tor");
+        ResidentRecord record = home.Find(asa);
+        Assert.IsNull(Stablehands.BestOf(home, out float none));
+        Assert.AreEqual(0f, none);
+        record.Job = job;
+        Assert.AreEqual(record, Stablehands.BestOf(home, out float tends));
+        Assert.AreEqual(job.TendsHorses * ResidentTalents.StationSpeed(record), tends, 0.0001f, "times her skill's speed");
+        SetLevel(record, Skill("Horsemanship"), 40);
+        Assert.AreEqual(record, Stablehands.BestOf(home, out float better));
+        Assert.Greater(better, tends, "a better hand tends better");
+    }
 }

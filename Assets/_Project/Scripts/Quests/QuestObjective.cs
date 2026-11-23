@@ -57,6 +57,14 @@ public enum ObjectiveType
     FitModule = 23,
     /// <summary>Raise the Haven's portal to a tier (Tier, from 2): Steady the Door, the quest flow review's A15 and C5.</summary>
     RaisePortal = 24,
+    /// <summary>One of the people reaches a rank in their job (Rank: 1 is Apprentice): the person named, or anyone.</summary>
+    ResidentRank = 25,
+    /// <summary>Two people become Friends: the two named, one named and anyone, or any two.</summary>
+    BecomeFriends = 26,
+    /// <summary>Heal a hard mark (Mark): on the person named, or anyone; empty Mark: any hard mark.</summary>
+    HealMark = 27,
+    /// <summary>Give someone a piece of kit to carry on raids: the person named, or anyone; an item named, or any.</summary>
+    GiveKit = 28,
 }
 
 /// <summary>
@@ -121,6 +129,10 @@ public sealed class QuestObjective
     [Tooltip("Only enchantments whose inscriptions come from the Source below count.")]
     [SerializeField] private bool onlySource;
     [SerializeField] private EnchantmentSource source = EnchantmentSource.Elite;
+    [Tooltip("Become Friends: the second of the two. Empty: anyone (with Person), or any two.")]
+    [SerializeField] private ResidentDefinition otherPerson;
+    [Tooltip("Heal Mark: the mark. Empty: any hard mark.")]
+    [SerializeField] private MarkDefinition mark;
 
     public ObjectiveType Type => type;
 
@@ -128,7 +140,8 @@ public sealed class QuestObjective
     public bool CanProgressOnARaid => type != ObjectiveType.CraftItem && type != ObjectiveType.BuildStructure && type != ObjectiveType.QuestEvent
         && type != ObjectiveType.AssignJob && type != ObjectiveType.ReachHavenRank && type != ObjectiveType.StoreItem
         && type != ObjectiveType.RepairItem && type != ObjectiveType.UpgradeBuilding && type != ObjectiveType.EnchantItem
-        && type != ObjectiveType.LearnEnchantment && type != ObjectiveType.GiveInscription && type != ObjectiveType.EmpowerItem;
+        && type != ObjectiveType.LearnEnchantment && type != ObjectiveType.GiveInscription && type != ObjectiveType.EmpowerItem
+        && type != ObjectiveType.ResidentRank && type != ObjectiveType.BecomeFriends && type != ObjectiveType.HealMark && type != ObjectiveType.GiveKit;
     public int Amount => Mathf.Max(1, amount);
     public bool CountAlreadyOwned => countAlreadyOwned && Array.IndexOf(FieldsOf(type), nameof(countAlreadyOwned)) >= 0;
     public ItemDefinition Item => item;
@@ -196,7 +209,19 @@ public sealed class QuestObjective
         objective.target = target as QuestTargetDefinition;
         objective.job = target as JobDefinition;
         objective.breach = target as WardBreachDefinition;
+        objective.mark = target as MarkDefinition;
         return objective;
+    }
+
+    /// <summary>A people objective (Docs/PeopleSystemReview_2026-11-23.md §2.5) for code and tests: <paramref name="who"/> reaches
+    /// <paramref name="toRank"/>, becomes Friends with <paramref name="other"/>, has <paramref name="healed"/> healed, or is given kit.</summary>
+    public static QuestObjective People(ObjectiveType type, ResidentDefinition who, ResidentDefinition other = null, int toRank = 1,
+        MarkDefinition healed = null, ItemDefinition kit = null, bool countReached = true)
+    {
+        return new QuestObjective
+        {
+            type = type, person = who, otherPerson = other, rank = Mathf.Max(1, toRank), mark = healed, item = kit, countAlreadyOwned = countReached,
+        };
     }
 
     /// <summary>A deed objective ("talk to Sigrid", "bring Ingrid home") for code and tools; also used as a quest's or a
@@ -274,6 +299,14 @@ public sealed class QuestObjective
                 return new[] { nameof(item) };
             case ObjectiveType.FitModule:
                 return new[] { nameof(building) };
+            case ObjectiveType.ResidentRank:
+                return new[] { nameof(person), nameof(rank), nameof(countAlreadyOwned) };
+            case ObjectiveType.BecomeFriends:
+                return new[] { nameof(person), nameof(otherPerson), nameof(countAlreadyOwned) };
+            case ObjectiveType.HealMark:
+                return new[] { nameof(person), nameof(mark) };
+            case ObjectiveType.GiveKit:
+                return new[] { nameof(person), nameof(item), nameof(countAlreadyOwned) };
             default:
                 return Array.Empty<string>();
         }
@@ -321,6 +354,11 @@ public sealed class QuestObjective
         [ObjectiveType.FitModule] = false,
         // A Haven's portal is its own.
         [ObjectiveType.RaisePortal] = false,
+        // The people are a Haven's: a friend's grow, make friends, heal and carry kit in their own game.
+        [ObjectiveType.ResidentRank] = false,
+        [ObjectiveType.BecomeFriends] = false,
+        [ObjectiveType.HealMark] = false,
+        [ObjectiveType.GiveKit] = false,
     };
 
     /// <summary>The types the co-op rule covers (for the check that none is missing).</summary>
@@ -407,10 +445,23 @@ public sealed class QuestObjective
                        && (!onlySource || (gameEvent.Subject is EnchantmentDefinition learned && learned.Source == source)) ? 1 : 0;
             case ObjectiveType.GiveInscription:
                 return gameEvent.Kind == GameEventKind.InscriptionGiven && Is(person, gameEvent.Detail, false) ? 1 : 0;
+            case ObjectiveType.ResidentRank:
+                // Amount carries the rank reached, not a count.
+                return gameEvent.Kind == GameEventKind.PersonRanked && Is(person, gameEvent.Subject, false) && gameEvent.Amount >= Rank ? 1 : 0;
+            case ObjectiveType.BecomeFriends:
+                return gameEvent.Kind == GameEventKind.BecameFriends && ArePair(gameEvent.Subject, gameEvent.Detail) ? 1 : 0;
+            case ObjectiveType.HealMark:
+                return gameEvent.Kind == GameEventKind.MarkHealed && Is(mark, gameEvent.Subject, false) && Is(person, gameEvent.Detail, false) ? 1 : 0;
+            case ObjectiveType.GiveKit:
+                return gameEvent.Kind == GameEventKind.KitGiven && Is(item, gameEvent.Subject, false) && Is(person, gameEvent.Detail, false) ? 1 : 0;
             default:
                 return 0;
         }
     }
+
+    // The two named (either way round), one named and anyone, or any two.
+    private bool ArePair(Object one, Object two) =>
+        (Is(person, one, false) && Is(otherPerson, two, false)) || (Is(person, two, false) && Is(otherPerson, one, false));
 
     // The enchantment named, or any; great ones only when asked.
     private bool EnchantmentCounts(Object subject) =>
@@ -471,6 +522,12 @@ public sealed class QuestObjective
             case ObjectiveType.KillMonster:
                 // A boss beaten before the quest (an older save, or the player got there first) counts: it won't come again.
                 return BossBeaten() ? Amount : 0;
+            case ObjectiveType.ResidentRank:
+                return RankedAlready() ? 1 : 0;
+            case ObjectiveType.BecomeFriends:
+                return FriendsAlready() ? 1 : 0;
+            case ObjectiveType.GiveKit:
+                return KitAlready() ? 1 : 0;
             default:
                 return 0;
         }
@@ -489,6 +546,53 @@ public sealed class QuestObjective
     }
 
     private static bool LivesAtHome(ResidentDefinition person) => GameSession.Home.HasResident(person);
+
+    // The person named (or anyone) at the rank asked for already: the player's own people.
+    private bool RankedAlready()
+    {
+        foreach (ResidentRecord record in GameSession.Home.Residents)
+        {
+            if (Is(person, record.Resident, false) && record.Job != null && ResidentTalents.RankIndex(record) >= Rank)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // The two named (or one and anyone, or any two) are Friends already.
+    private bool FriendsAlready()
+    {
+        SettlementState home = GameSession.Home;
+        foreach (ResidentRecord a in home.Residents)
+        {
+            foreach (ResidentRecord b in home.Residents)
+            {
+                if (a != b && ArePair(a.Resident, b.Resident) && PeopleStandings.LevelOf(home, a, b) >= 2)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    // The person named (or anyone) carries the piece named (or any) already.
+    private bool KitAlready()
+    {
+        foreach (ResidentRecord record in GameSession.Home.Residents)
+        {
+            if (Is(person, record.Resident, false)
+                && ((!record.KitWeapon.IsEmpty && Is(item, record.KitWeapon.Item, false)) || (!record.KitBody.IsEmpty && Is(item, record.KitBody.Item, false))))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     // Buildings of the kind (or any) standing at the tier asked for or above.
     private int StandingAtTier()
@@ -604,6 +708,18 @@ public sealed class QuestObjective
             case ObjectiveType.GiveInscription:
                 string carver = person != null ? person.DisplayName : "someone who carves";
                 return Amount == 1 ? $"Give {carver} an inscription" : $"Give {carver} {count} inscriptions";
+            case ObjectiveType.ResidentRank:
+                string ranked = ResidentRankName(Rank);
+                return person != null ? $"Help {person.DisplayName} become {ranked} in their work" : $"Help someone become {ranked} in their work";
+            case ObjectiveType.BecomeFriends:
+                return person != null && otherPerson != null ? $"See {person.DisplayName} and {otherPerson.DisplayName} become friends"
+                    : person != null || otherPerson != null ? $"Help {(person != null ? person : otherPerson).DisplayName} make a friend" : "See two of your people become friends";
+            case ObjectiveType.HealMark:
+                string healed = mark != null ? mark.DisplayName : "a hard mark";
+                return person != null ? $"Heal {person.DisplayName}'s {healed}" : $"Heal someone's {healed}";
+            case ObjectiveType.GiveKit:
+                string piece = item != null ? item.DisplayName : "a piece of kit";
+                return $"Give {(person != null ? person.DisplayName : "someone")} {piece} to carry (talk to them)";
             case ObjectiveType.UpgradeBuilding:
                 string which = building != null ? $"the {building.DisplayName}" : "a building";
                 return Amount == 1 ? $"Raise {which} to Tier {Tiers.ToRoman(Tier)} ({{key:Haven}})" : $"Raise {count} of {which} to Tier {Tiers.ToRoman(Tier)} ({{key:Haven}})";
@@ -636,6 +752,13 @@ public sealed class QuestObjective
                 return ranks != null && Rank >= ranks.Ranks.Count ? $"asks for rank {Rank}, but Safe Haven has only {ranks.Ranks.Count} ranks" : null;
             case ObjectiveType.UpgradeBuilding:
                 return building != null && Tier > building.MaxLevel ? $"asks for Tier {Tiers.ToRoman(Tier)}, but the {building.DisplayName} goes up to Tier {Tiers.ToRoman(building.MaxLevel)}" : null;
+            case ObjectiveType.ResidentRank:
+                int workerRanks = SettlementSettings.Current != null ? SettlementSettings.Current.WorkerRanks.Count : 0;
+                return workerRanks > 0 && Rank >= workerRanks ? $"asks for rank {Rank}, but there are only {workerRanks} worker ranks" : null;
+            case ObjectiveType.BecomeFriends:
+                return person != null && person == otherPerson ? "names the same person twice" : null;
+            case ObjectiveType.HealMark:
+                return mark != null && mark.Good ? $"asks to heal {mark.DisplayName}, a good mark" : null;
             default:
                 return null;
         }
@@ -672,6 +795,12 @@ public sealed class QuestObjective
         SettlementState settlement = GameSession.Home;
         ResidentRecord record = who != null ? settlement.Find(who) : null;
         return record != null && settlement.FillsTrade(record, job);
+    }
+
+    private static string ResidentRankName(int index)
+    {
+        SettlementSettings settings = SettlementSettings.Current;
+        return settings != null && index >= 0 && index < settings.WorkerRanks.Count ? $"a {settings.WorkerRanks[index].name}" : $"rank {index}";
     }
 
     private static string HavenRankName(int index)

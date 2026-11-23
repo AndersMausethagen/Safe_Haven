@@ -125,51 +125,7 @@ MonoBehaviour:
     workSpeed: 0.2
     comfort: 4
     renown: 8
-  likings:
-  - resident: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
-    likes: Warm
-    line: '"A smith''s bones like a warm house. The forge is warm enough by day."'
-    thanks: '"Warm through, for once. My bones thank you before I do."'
-  - resident: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
-    likes: A place to sit
-    line: '"A bench by the door, for the evening and my leg."'
-    thanks: '"A bench by the door. I''ll sit there tonight and admire your work. And mine."'
-  - resident: {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}
-    likes: Water close
-    line: '"Clean water close by, for the work and for washing it off."'
-    thanks: '"Water a few steps off. I can wash the work off before supper now."'
-  - resident: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
-    likes: Lit lane
-    line: '"A lit way home. I''ve seen what waits in the dark."'
-    thanks: '"A lit way home. I walk it slower now, and that''s a good thing."'
-  - resident: {fileID: 11400000, guid: 9f83966b2e3c8fe42a58fd9d130cb08e, type: 2}
-    likes: Near work
-    line: '"Not far to the lodge. Meat won''t cure itself."'
-    thanks: '"The lodge is close. The meat will thank you, and so do I."'
-  - resident: {fileID: 11400000, guid: ec38b2d8e58d6d84899dfeda6a4f8aeb, type: 2}
-    likes: Water close
-    line: '"Water near, for the beds and the flax."'
-    thanks: '"Water by the beds. The barley drinks, and I don''t carry it as far."'
-  - resident: {fileID: 11400000, guid: 15e2a45207d23dd49a4a3a93e8bb8161, type: 2}
-    likes: Warm
-    line: '"A warm hearth. A cook can''t abide a cold house."'
-    thanks: '"A warm hearth. Come by later: the first loaf from it is yours."'
-  - resident: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
-    likes: Lit lane
-    line: '"A light on the path. I come home late."'
-    thanks: '"Light on my path. I came home late and saw every step of it."'
-  - resident: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
-    likes: A place to sit
-    line: '"Somewhere to sit and read the stones."'
-    thanks: '"Somewhere to sit. The stones read better when my feet are still."'
-  - resident: {fileID: 11400000, guid: f8b63bb3e2db2fb44947d33b612f80f3, type: 2}
-    likes: Near work
-    line: '"Close to the stone. Every walk is a block not cut."'
-    thanks: '"The stone''s close. That''s a block a day I''d have spent walking."'
-  - resident: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
-    likes: Lit lane
-    line: '"Light on the lanes. People should see their way home."'
-    thanks: '"Light on the lanes. People find their way home now. So do I."'
+  likings: []
   contentWorkSpeed: 0.05
   moveHomeFor: 15
   pathsOnlyAtHome: 1

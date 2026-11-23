@@ -143,7 +143,36 @@ public sealed class HomeLifeSettings : GameSettings<HomeLifeSettings>
     public int PointsPerTier => pointsPerTier;
     public IReadOnlyList<Comfort> Comforts => comforts;
     public IReadOnlyList<Level> Levels => levels;
-    public IReadOnlyList<Liking> Likings => likings;
+    /// <summary>Every resident's home liking (their own, ResidentDefinition › Home Liking; then any left in the old list), for tools and
+    /// checks: builds a list, so not for per-frame use (that is <see cref="LikingOf"/>).</summary>
+    public IReadOnlyList<Liking> Likings
+    {
+        get
+        {
+            var all = new List<Liking>();
+            ContentDatabase content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+            if (content != null)
+            {
+                foreach (ResidentDefinition resident in content.Residents)
+                {
+                    if (resident != null && resident.HomeLiking != null)
+                    {
+                        all.Add(resident.HomeLiking);
+                    }
+                }
+            }
+
+            foreach (Liking old in likings)
+            {
+                if (old != null && !all.Exists(one => one.resident == old.resident))
+                {
+                    all.Add(old);
+                }
+            }
+
+            return all;
+        }
+    }
     public float ContentWorkSpeed => contentWorkSpeed;
     public float MoveHomeFor => moveHomeFor;
     public bool PathsOnlyAtHome => pathsOnlyAtHome;
@@ -187,7 +216,31 @@ public sealed class HomeLifeSettings : GameSettings<HomeLifeSettings>
 
     public Comfort FindComfort(string id) => comforts.Find(one => one.id == id);
 
-    public Liking LikingOf(ResidentDefinition resident) => likings.Find(one => one.resident == resident);
+    /// <summary>What <paramref name="resident"/> wants of a home: their own (ResidentDefinition › Home Liking), else the old list's.
+    /// Asked every frame by work speeds: no garbage.</summary>
+    public Liking LikingOf(ResidentDefinition resident)
+    {
+        if (resident == null)
+        {
+            return null;
+        }
+
+        Liking own = resident.HomeLiking;
+        if (own != null)
+        {
+            return own;
+        }
+
+        for (int i = 0; i < likings.Count; i++)
+        {
+            if (likings[i].resident == resident)
+            {
+                return likings[i];
+            }
+        }
+
+        return null;
+    }
 
     /// <summary>Sets what is found by name (tests and editor tools).</summary>
     public void Configure(List<Feature> homeFeatures, List<Comfort> houseComforts, List<Liking> residentLikings, List<JobDefinition> builderJobs)

@@ -59,7 +59,7 @@ public sealed class HavenRequestSettings : GameSettings<HavenRequestSettings>
             int index = random.Next(open.Count);
             HavenRequestDefinition pick = open[index];
             open.RemoveAt(index);
-            if (pick.Asker != null && (SameAsker(standing, pick) || SameAsker(chosen, pick)))
+            if (pick.IsPersonal && (SameAsker(standing, pick, settlement) || SameAsker(chosen, pick, settlement)))
             {
                 continue;
             }
@@ -94,16 +94,18 @@ public sealed class HavenRequestSettings : GameSettings<HavenRequestSettings>
         return false;
     }
 
-    private static bool SameAsker(IReadOnlyList<HavenRequestDefinition> list, HavenRequestDefinition request)
+    // One ask per person: by who would ask it here (an ask from a mark or trait is someone's too).
+    private static bool SameAsker(IReadOnlyList<HavenRequestDefinition> list, HavenRequestDefinition request, IHavenView settlement)
     {
         if (list == null)
         {
             return false;
         }
 
+        ResidentDefinition who = request.AskerIn(settlement);
         foreach (HavenRequestDefinition one in list)
         {
-            if (one != null && one.Asker == request.Asker)
+            if (one != null && one.IsPersonal && one.AskerIn(settlement) == who)
             {
                 return true;
             }

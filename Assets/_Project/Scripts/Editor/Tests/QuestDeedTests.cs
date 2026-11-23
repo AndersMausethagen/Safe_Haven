@@ -83,8 +83,21 @@ public sealed class QuestDeedTests
         var alchemist = Create<JobDefinition>("Alchemist");
         var cook = Create<JobDefinition>("Cook");
         QuestObjective hire = QuestObjective.Create(ObjectiveType.AssignJob, 1, alchemist);
-        Assert.AreEqual(1, hire.Progress(new GameEvent(GameEventKind.JobAssigned, alchemist, detail: tor)), "anyone as alchemist");
-        Assert.AreEqual(0, hire.Progress(new GameEvent(GameEventKind.JobAssigned, cook, detail: ingrid)));
+        // Naming nobody, it counts anyone who fills the trade (SettlementState.FillsTrade): the player's own people, and this job is nobody's
+        // written trade.
+        GameSession.StartNewGame();
+        try
+        {
+            GameSession.Home.AddResident(tor);
+            Assert.IsNull(GameSession.Home.Find(ingrid), "the canary: Ingrid isn't home in a new game");
+            Assert.AreEqual(1, hire.Progress(new GameEvent(GameEventKind.JobAssigned, alchemist, detail: tor)), "anyone as alchemist");
+            Assert.AreEqual(0, hire.Progress(new GameEvent(GameEventKind.JobAssigned, alchemist, detail: ingrid)), "not someone who isn't home");
+            Assert.AreEqual(0, hire.Progress(new GameEvent(GameEventKind.JobAssigned, cook, detail: ingrid)));
+        }
+        finally
+        {
+            GameSession.StartNewGame();
+        }
 
         var first = Create<WardBreachDefinition>("First");
         var second = Create<WardBreachDefinition>("Second");

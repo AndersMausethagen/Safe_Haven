@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad044708340368842899cf78f08bfbfb, type: 3}
+  m_Name: Stablehand
+  m_EditorClassIdentifier: SafeHaven::JobDefinition
+  id: stablehand
+  displayName: Stablehand
+  description: 'Feeds, grooms and walks the horses in the stable each morning: their bond grows, and none of it is lost while you are away. Better with Horsemanship.'
+  acceptLine: I'll see to them. Horses like a steady hand and the same voice every morning.
+  teachesBuildings: []
+  teachesRecipes: []
+  workplace: {fileID: 11400000, guid: 08a3177177c32de4fa1bcd278a16ee86, type: 2}
+  workGesture: {fileID: 0}
+  workTool: {fileID: 0}
+  workToolScale: 1
+  workSound: {fileID: 0}
+  workSoundDelay: 0.4
+  workSoundEvery: {x: 1.5, y: 4}
+  workOrders: []
+  teaches: {fileID: 0}
+  skill: {fileID: 11400000, guid: ad510c562ab935f468111dad718b4bcb, type: 2}
+  assignedEvent: {fileID: 0}
+  extraRumours: 0
+  gearRepairDiscount: 0
+  buildingRepairDiscount: 0
+  defendsAs: {fileID: 0}
+  wardHealth: 0
+  raidSeconds: 0
+  carvesPast: 
+  tendsHorses: 3

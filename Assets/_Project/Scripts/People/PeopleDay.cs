@@ -56,6 +56,7 @@ public static class PeopleDay
     private static void Morning(SettlementState home)
     {
         PeopleStandings.Dawn(home);
+        Stablehands.Morning(home);
         int bright = 0, low = 0, steady = 0;
         foreach (ResidentRecord record in home.Residents)
         {

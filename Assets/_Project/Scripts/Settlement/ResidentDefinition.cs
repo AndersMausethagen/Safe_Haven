@@ -55,6 +55,12 @@ public sealed class ResidentDefinition : ScriptableObject, IQuestTarget
     [Tooltip("Two things they love to be given (PeopleGifts): given in talk, a gift lifts their spirits for a few days and grows their bond " +
              "with the player.")]
     [SerializeField] private System.Collections.Generic.List<ItemDefinition> loves = new System.Collections.Generic.List<ItemDefinition>();
+    [Tooltip("Their favourite dish (ResidentMeals): eaten first at breakfast when the chests hold it, and a lift to their spirits that day. " +
+             "Food the residents eat (basic food, Home Life Settings › Most Meal Tier at most).")]
+    [SerializeField] private ItemDefinition favouriteDish;
+    [Tooltip("What they want of a home (HomeLife, HomeWishes): the feature they care for, what they say of it, and their thanks when it comes. " +
+             "Here with the rest of who they are (Docs/PeopleSystemReview_2026-11-23.md §2.6); Home Life Settings › Likings is the old place.")]
+    [SerializeField] private HomeLifeSettings.Liking homeLiking = new HomeLifeSettings.Liking();
 
     [Header("Jobs")]
     [Tooltip("Jobs they can be given at home. The first is suggested.")]
@@ -90,6 +96,27 @@ public sealed class ResidentDefinition : ScriptableObject, IQuestTarget
     public ResidentDefinition Friend => friend;
     public ResidentDefinition Friction => friction;
     public System.Collections.Generic.IReadOnlyList<ItemDefinition> Loves => loves;
+    public ItemDefinition FavouriteDish => favouriteDish;
+    /// <summary>Their home liking, or null when it isn't set here.</summary>
+    public HomeLifeSettings.Liking HomeLiking => homeLiking != null && !string.IsNullOrEmpty(homeLiking.likes) ? homeLiking : null;
+
+    // A liking held on the person names them (a reference to the asset itself isn't kept in its own file): what HomeWishes and the
+    // Likings list read.
+    private void OnEnable()
+    {
+        if (homeLiking != null)
+        {
+            homeLiking.resident = this;
+        }
+    }
+
+    /// <summary>Sets their favourite dish and home liking (content tools and tests).</summary>
+    public void SetTastes(ItemDefinition dish, HomeLifeSettings.Liking liking)
+    {
+        favouriteDish = dish;
+        homeLiking = liking ?? new HomeLifeSettings.Liking();
+        homeLiking.resident = this;
+    }
 
     /// <summary>Sets what they love to be given (content tools and tests).</summary>
     public void SetLoves(System.Collections.Generic.IEnumerable<ItemDefinition> items) => loves = new System.Collections.Generic.List<ItemDefinition>(items);

@@ -129,6 +129,10 @@ public static class PeopleStandings
         if (after == 2 && before < 2)
         {
             PeopleNews.Tell($"{a.Resident.DisplayName} and {b.Resident.DisplayName} are friends now.", MessageKind.Gain);
+            if (PeopleBond.IsOwn(a) && PeopleBond.IsOwn(b))
+            {
+                GameEvents.Raise(new GameEvent(GameEventKind.BecameFriends, a.Resident, 1, detail: b.Resident));
+            }
         }
         else if (after == -2 && before > -2)
         {
@@ -378,6 +382,29 @@ public static class PeopleStandings
         BuildingObject first = HavenHomes.WorkplaceOf(a, Vector3.zero);
         BuildingObject second = HavenHomes.WorkplaceOf(b, Vector3.zero);
         return first != null && second != null && (first.transform.position - second.transform.position).sqrMagnitude <= reach * reach;
+    }
+
+    /// <summary>A Rival of <paramref name="record"/> who lives in or next door to <paramref name="house"/> (the window's Move them), or null.</summary>
+    public static ResidentRecord RivalBy(IHavenView here, ResidentRecord record, BuildingObject house)
+    {
+        if (here == null || record == null || house == null)
+        {
+            return null;
+        }
+
+        float reach = PeopleSettings.Current.NextDoor;
+        IReadOnlyList<ResidentRecord> people = here.Residents;
+        for (int i = 0; i < people.Count; i++)
+        {
+            ResidentRecord other = people[i];
+            BuildingObject theirs = other != record ? HavenHomes.HomeOf(other) : null;
+            if (theirs != null && LevelOf(here, record, other) <= -2 && (theirs == house || (theirs.transform.position - house.transform.position).sqrMagnitude <= reach * reach))
+            {
+                return other;
+            }
+        }
+
+        return null;
     }
 
     private static bool HomesNear(ResidentRecord a, ResidentRecord b, float reach)

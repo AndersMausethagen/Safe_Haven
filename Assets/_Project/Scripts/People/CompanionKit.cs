@@ -81,6 +81,7 @@ public static class CompanionKit
             PeopleBond.Grow(record, PeopleSettings.Current.BondKit, "kit given");
         }
 
+        GameEvents.Raise(new GameEvent(GameEventKind.KitGiven, given.Item, 1, detail: record.Resident));
         return true;
     }
 

@@ -777,6 +777,19 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
         return best;
     }
 
+    /// <summary>A morning's care from a stablehand (Stablehands): its bond grows by <paramref name="amount"/>, and the days since it was
+    /// last cared for don't wear it (it was cared for every one of them).</summary>
+    public void Tended(float amount)
+    {
+        if (!IsTamed || !IsAlive)
+        {
+            return;
+        }
+
+        LastCared = PlantedTrees.Today;
+        Bond = HorseBondRules.Add(Bond, amount);
+    }
+
     /// <summary>A brush down: once each in-game day it raises the bond.</summary>
     public void Groom()
     {

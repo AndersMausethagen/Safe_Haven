@@ -535,6 +535,10 @@ A changed co-op message fails `CoopWireTests` until `MultiplayerSettings.WireFor
 | Stored | `StashStorage.Store`, `StoreMaterials` and `StoreResources`: the stash window and a cart's Send to Storage |
 | Repaired | `Repairs.TryRepair` (at the Workshop) and a repair kit (`ItemInventory`), one per piece |
 | Upgraded | `Construction.Finish` when an upgrade is done (Amount: the tier it stands at now; building it the first time raises Built) |
+| PersonRanked | `ResidentTalents.Practise` when someone's job skill reaches a new worker rank (Subject: their `ResidentDefinition`; Amount: the rank, from 1 = Apprentice). Only the player's own people (`PeopleBond.IsOwn`) |
+| BecameFriends | `PeopleStandings` when two of the player's own people become Friends (Subject: one; Detail: the other) |
+| MarkHealed | `ResidentMarks.Heal` (talk, an ask brought, a Friend's scene; Subject: the `MarkDefinition`; Detail: whose) |
+| KitGiven | `CompanionKit.Give` (Subject: the piece's `ItemDefinition`; Detail: who carries it) |
 | Custom (Story Events) | One-off moments only: `GameEventTrigger`'s Quest Event, `GameEventDefinition.Raise`, a quest's completion event and On Started/On Completed lists, story nodes, `RaidPortal` (repaired), the prologue's chapter events, and the optional Story Event fields on `Talkable`, `HomePortal`, `RescuableTraveler`, `JobDefinition` and `WardBreachDefinition`. Talking to someone, reaching a place, using a thing, rescuing someone, hiring, defending and Haven ranks are deeds above: a Quest Event made per person or place is not needed (and the shared traveller and companion prefabs used to raise one person's event for everyone). The Content Editor's "nothing raises this event" check finds raisers by `[RaisedByGame]` on the field; fields naming who or what an object is for quests carry `[QuestIdentity]` |
 
 ### Base building: clearing, construction, upgrades, renown
@@ -2065,6 +2069,38 @@ Tests: `PeopleTests`.
 - **Traps**: `SaveCoverageTests` can't invent kit stacks, passions or standings pairs: they are in its CheckedElsewhere (PeopleTests).
   The Content Audit wants `MarkDefinition.healedBy` sorted (done). An eval that sets a `GameSettings` asset needs `SetDirty` +
   `SaveAssetIfDirty` (one write was lost without it).
+
+### The review's steps 1-8 (Docs/PeopleSystemReview_2026-11-23.md, built 2026-11-23, unplayed)
+
+- **Measuring**: playtest rows PersonLevel, PersonRank, PersonInspired, PersonMark, Standing, PassionPick, Bond and a morning's Spirits;
+  the F1 menu's People tab (`PeopleCheats`); a People page in the Systems Editor; Traits and Marks in the Content Editor.
+- **Bond** (`PeopleBond`, `ResidentRecord.Bond`, old saves start at their raids along): grows from raids, lessons, asks answered, wishes
+  met, kit first given, gifts, a mark healed in talk, being helped up in a breach, a friend brought home (`PeopleSettings` › Bond). Its
+  ranks owe a passion pick once each. **Gifts** (`PeopleGifts`): two loved things each (`ResidentDefinition` › Loves), one a day, in talk.
+- **News** (`PeopleNews`): paced at home, kept for the homecoming card away.
+- **Any job for anyone** (`SettlementState.JobsOpenTo`, `KnownJobs`, `HasRoom`, `FillsTrade`): a trade known here (its written person
+  lives here or is lost) is open to anyone while it has room (one per standing workplace, one for a job without one); a job's bonus counts
+  once; quests that name no person count only the trade's own person (`FillsTrade`). **Who does what** (`WorkGridWindow`) shows everyone's
+  level in every known trade.
+- **Raid planner and results**: the companion's skill, fighting traits and marks lit when they count, kit, spirits; the results' cards.
+- **Habits** (`TraitHabit` on traits; `PeopleHabits.Now`; spots in `ResidentLife.HabitSpot`): free time or a meal at the edge, the
+  stones, the water, the lanes or a watch post. Friends sit together at the fire, rivals across.
+- **Rivals and mentors**: a rival working near −5% (`PeopleStandings.WorkShare`), rivals on a foray −10% a pair (`ForayBonus`); a Friend
+  Mentor Gap levels better teaches Mentor Share faster (`ResidentTalents.Mentored`).
+- **More marks**: Defended the Ward (`WardBreachDirector.Win`), Lost in the Mire (a marsh foray gone wrong), Night Terrors (downed on a
+  corruption night, `ResidentDefender.Remember`); the Haven window's lost show their marks, kit and who misses them.
+- **Tastes** (step 8): a favourite dish (`ResidentDefinition` › Favourite Dish) is eaten first at breakfast and lifts spirits that day
+  (feeling "dish"); a festival (`Festivals.Now`) lifts everyone's. Home likings live on the person (`ResidentDefinition` › Home Liking;
+  `HomeLifeSettings.LikingOf` asks the person first, the old list is empty; `Likings` builds everyone's for tools). "Move them" says when
+  a rival lives in or next to a house (`PeopleStandings.RivalBy`).
+- **Asks from who they are** (`HavenRequestDefinition` › Who they are): While Marked / While Trait, with no Asker asked of whoever here
+  fits (`AskerIn`); Heals Mark heals it when brought. One ask per person counts by who would ask (`HavenRequestSettings.SameAsker`).
+  Content: old-wound-salve, cook-chanterelles (Proud Cook), bookish-parchment.
+- **Quest kinds** (`ObjectiveType` ResidentRank, BecomeFriends, HealMark, GiveKit; none count in a friend's Haven) and rewards
+  (`QuestDefinition` › Reward Passion, Reward Mark for Reward Work For).
+- **The Stablehand** (`Data/Settlement/Stablehand.asset`, Horsemanship, at the Stable; one of Asa's trades): each people's morning the
+  best stablehand at work tends every tamed horse in a stall (`Stablehands.Morning` → `Horse.Tended`: Tends Horses × their skill speed in
+  bond, and no idle wear for the days missed). The stable's menu says who tends. Riders on forays are not built.
 
 ## The living world: how creatures and people behave
 

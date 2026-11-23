@@ -8,6 +8,9 @@ using UnityEngine;
 /// home (bag or stash; HavenRequestBoard). Ask for what only the raids give, so the asking sends the player out.
 /// <para>A crafting order (Quality Fine or Masterwork) asks instead for a piece the player makes, of at least that make: it is
 /// asked once the player's skill that makes it has reached From Level, and it pays a lesson in that skill and lasting renown.</para>
+/// <para>An ask from who they are (Docs/PeopleSystemReview_2026-11-23.md §2.5): While Marked or While Trait asks only of someone who carries
+/// the mark or has the trait; with no Asker, whoever here does asks (the first of them living here). Heals Mark: brought, the mark is
+/// gone.</para>
 /// </summary>
 [CreateAssetMenu(fileName = "Haven Request", menuName = "Safe Haven/Settlement/Haven Request")]
 public sealed class HavenRequestDefinition : ScriptableObject
@@ -42,6 +45,14 @@ public sealed class HavenRequestDefinition : ScriptableObject
     [Tooltip("Renown the Haven keeps for good work done for its people (HavenRenown › Good work for its people).")]
     [SerializeField, Min(0)] private int renown;
 
+    [Header("Who they are")]
+    [Tooltip("Asked only of someone carrying this mark (ResidentMarks). With no Asker: whoever here carries it asks.")]
+    [SerializeField] private MarkDefinition whileMarked;
+    [Tooltip("Asked only of someone with this trait. With no Asker: whoever here has it asks.")]
+    [SerializeField] private ResidentTraitDefinition whileTrait;
+    [Tooltip("Brought, While Marked's mark is gone (when it can be healed now).")]
+    [SerializeField] private bool healsMark;
+
     public string Id => string.IsNullOrEmpty(id) ? name : id;
     public ResidentDefinition Asker => asker;
     public string Ask => ask;
@@ -57,6 +68,61 @@ public sealed class HavenRequestDefinition : ScriptableObject
     public int FromLevel => fromLevel;
     public int Lesson => lesson;
     public int Renown => renown;
+    public MarkDefinition WhileMarked => whileMarked;
+    public ResidentTraitDefinition WhileTrait => whileTrait;
+    public bool HealsMark => healsMark && whileMarked != null;
+
+    /// <summary>Someone asks (a written Asker, or whoever carries its mark or trait), not the Haven as a whole.</summary>
+    public bool IsPersonal => asker != null || whileMarked != null || whileTrait != null;
+
+    /// <summary>Whether <paramref name="record"/> is someone it may be asked of: its mark carried, its trait theirs.</summary>
+    public bool Fits(ResidentRecord record)
+    {
+        if (record?.Resident == null || (asker != null && record.Resident != asker))
+        {
+            return false;
+        }
+
+        if (whileMarked != null && !record.HasMark(whileMarked.Id))
+        {
+            return false;
+        }
+
+        if (whileTrait != null)
+        {
+            bool has = false;
+            IReadOnlyList<ResidentTraitDefinition> traits = record.Resident.Traits;
+            for (int i = 0; i < traits.Count && !has; i++)
+            {
+                has = traits[i] == whileTrait;
+            }
+
+            return has;
+        }
+
+        return true;
+    }
+
+    /// <summary>Who asks it in <paramref name="here"/>: the written Asker while they fit, else the first living there who fits; null for
+    /// the Haven's own asks and when nobody fits.</summary>
+    public ResidentDefinition AskerIn(IHavenView here)
+    {
+        if (!IsPersonal || here == null)
+        {
+            return null;
+        }
+
+        IReadOnlyList<ResidentRecord> people = here.Residents;
+        for (int i = 0; i < people.Count; i++)
+        {
+            if (Fits(people[i]))
+            {
+                return people[i].Resident;
+            }
+        }
+
+        return null;
+    }
 
     /// <summary>A crafting order: wants a piece of at least Fine make.</summary>
     public bool IsOrder => quality != ItemQuality.Plain;
@@ -67,12 +133,19 @@ public sealed class HavenRequestDefinition : ScriptableObject
     /// <summary>The skill that makes what an order wants, which its lesson teaches; null when no skill makes it.</summary>
     public ProficiencyDefinition Craft => wanted != null ? LevelingSettings.Current.SkillCrafting(CraftedWork.Of(wanted)) : null;
 
-    public string AskerName => asker != null ? asker.DisplayName : "The Haven";
+    public string AskerName => NameIn(GameSession.Here);
+
+    /// <summary>Who asks, by name, in <paramref name="here"/>.</summary>
+    public string NameIn(IHavenView here)
+    {
+        ResidentDefinition who = AskerIn(here);
+        return who != null ? who.DisplayName : asker != null ? asker.DisplayName : IsPersonal ? "Someone" : "The Haven";
+    }
 
     /// <summary>Whether it may be asked now: its asker lives at the Haven (and hasn't fallen), and it is its season.</summary>
     public bool CanAsk(SettlementState settlement, string season)
     {
-        if (wanted == null || (asker != null && (settlement.Find(asker) == null)))
+        if (wanted == null || (asker != null && (settlement.Find(asker) == null)) || (IsPersonal && AskerIn(settlement) == null))
         {
             return false;
         }
@@ -118,6 +191,15 @@ public sealed class HavenRequestDefinition : ScriptableObject
         fromLevel = 0;
         lesson = 0;
         renown = 0;
+    }
+
+    /// <summary>Makes it an ask from who they are (after Configure): of someone carrying <paramref name="mark"/> or with
+    /// <paramref name="trait"/>; <paramref name="heals"/>: brought, the mark is gone.</summary>
+    public void ConfigureWho(MarkDefinition mark, ResidentTraitDefinition trait, bool heals)
+    {
+        whileMarked = mark;
+        whileTrait = trait;
+        healsMark = heals;
     }
 
     /// <summary>Makes it a crafting order (after Configure): a piece of at least <paramref name="make"/>, asked from

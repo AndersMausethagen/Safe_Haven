@@ -51,6 +51,12 @@ MonoBehaviour:
   loves:
   - {fileID: 11400000, guid: 3424566669e19bc489098ff49fc1cd94, type: 2}
   - {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
+  favouriteDish: {fileID: 11400000, guid: 991a6891d6fa5cf45a18629d3d7b1df4, type: 2}
+  homeLiking:
+    resident: {fileID: 0}
+    likes: Warm
+    line: '"A smith''s bones like a warm house. The forge is warm enough by day."'
+    thanks: '"Warm through, for once. My bones thank you before I do."'
   jobs:
   - {fileID: 11400000, guid: be5a576d696f9f6459c1667a3521f7b8, type: 2}
   questLine:

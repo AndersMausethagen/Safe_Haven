@@ -51,6 +51,12 @@ MonoBehaviour:
   loves:
   - {fileID: 11400000, guid: 1dd65120c9bb0304c8a45a8012af934c, type: 2}
   - {fileID: 11400000, guid: 15d1c587fc1b8f34696d9b01c733b94e, type: 2}
+  favouriteDish: {fileID: 11400000, guid: ab1d11a58572d62458740158da5361f4, type: 2}
+  homeLiking:
+    resident: {fileID: 0}
+    likes: Warm
+    line: '"A warm hearth. A cook can''t abide a cold house."'
+    thanks: '"A warm hearth. Come by later: the first loaf from it is yours."'
   jobs:
   - {fileID: 11400000, guid: c25a410fc86afd841890a87ffb27e6ea, type: 2}
   - {fileID: 11400000, guid: e9647a52d2bdeec478f332bf63b64731, type: 2}

@@ -43,6 +43,9 @@ MonoBehaviour:
   - skill: {fileID: 11400000, guid: c02bc5ecd6589b94daa2ae6d5320cfb6, type: 2}
     level: 12
     passion: 0
+  - skill: {fileID: 11400000, guid: ad510c562ab935f468111dad718b4bcb, type: 2}
+    level: 18
+    passion: 1
   traits:
   - {fileID: 11400000, guid: 77a5888eb7f122c4485584355b1e0eef, type: 2}
   - {fileID: 11400000, guid: f78dab636207d0b429fe8a13d2bb7304, type: 2}
@@ -51,9 +54,16 @@ MonoBehaviour:
   loves:
   - {fileID: 11400000, guid: 17b016991a7aa4846a121d6027443bf2, type: 2}
   - {fileID: 11400000, guid: acb3416df6dae1b439a8b3945c3f098e, type: 2}
+  favouriteDish: {fileID: 11400000, guid: 8ae780c7423381b4bae5edf4e4beabc9, type: 2}
+  homeLiking:
+    resident: {fileID: 0}
+    likes: Water close
+    line: '"Water near, for the beds and the flax."'
+    thanks: '"Water by the beds. The barley drinks, and I don''t carry it as far."'
   jobs:
   - {fileID: 11400000, guid: 42d876bf3cb45f84088e94fc709b0672, type: 2}
   - {fileID: 11400000, guid: cdd8fcb3acc60ec45854efd2eb13a408, type: 2}
+  - {fileID: 11400000, guid: d2fe6c057eeb1eb49928e1c363256205, type: 2}
   questLine:
   - quest: {fileID: 11400000, guid: 22c52c196cd7f01478e77e31ccc726a4, type: 2}
     text: You gather what the woods drop. I grow what they won't. Give me the Farmer's work and a plot of turned earth, and it grows while you're away.

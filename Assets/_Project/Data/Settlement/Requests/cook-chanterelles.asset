@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dafc92cc79ad39845bc5e18f47753891, type: 3}
+  m_Name: cook-chanterelles
+  m_EditorClassIdentifier: SafeHaven::HavenRequestDefinition
+  id: cook-chanterelles
+  asker: {fileID: 0}
+  ask: 'Chanterelles from the deep woods: nothing grown here comes near them in a broth. Bring me some and I''ll show you.'
+  thanks: Smell that. Now this is cooking.
+  wanted: {fileID: 11400000, guid: 15d1c587fc1b8f34696d9b01c733b94e, type: 2}
+  count: 8
+  reward: {fileID: 11400000, guid: 8a7fa5a174b89fe4fa13218f49daa4d1, type: 2}
+  rewardCount: 2
+  coins: 0
+  experience: 50
+  easesBlight: 0
+  inSeasons: []
+  quality: 0
+  fromLevel: 0
+  lesson: 0
+  renown: 0
+  whileMarked: {fileID: 0}
+  whileTrait: {fileID: 11400000, guid: ecaa7f4880f7b7549a3cb5099290f157, type: 2}
+  healsMark: 0

@@ -42,9 +42,10 @@ public sealed class HavenRequestBoard : MonoBehaviour
             return null;
         }
 
+        IHavenView here = GameSession.Here;
         foreach (HavenRequestDefinition request in Standing())
         {
-            if (request.Asker == resident)
+            if (request.AskerIn(here) == resident)
             {
                 return request;
             }
@@ -109,11 +110,13 @@ public sealed class HavenRequestBoard : MonoBehaviour
         {
             // Someone's ask whose asker is gone (lost on a raid) comes down: it was answered at once from the bag and the stash, a
             // worked piece too, and it held the board's one place for an order until they were found again (then they may ask anew).
-            if (request.Asker != null && !HandedIn(request))
+            // An ask from who they are comes down the same way once nobody here carries its mark or has its trait (a mark healed).
+            if (request.IsPersonal && !HandedIn(request))
             {
                 GameSession.Home.RemoveRequest(request.Id);
                 told.Remove(request.Id);
-                GameMessages.Post($"{request.AskerName}'s ask comes down from the board: they are not here to take it.", MessageKind.Info);
+                GameMessages.Post(request.Asker != null ? $"{request.Asker.DisplayName}'s ask comes down from the board: they are not here to take it."
+                    : $"The ask for {request.WantedName} comes down from the board: nobody here needs it now.", MessageKind.Info);
                 continue;
             }
 
@@ -146,8 +149,11 @@ public sealed class HavenRequestBoard : MonoBehaviour
     private readonly HashSet<string> told = new HashSet<string>();
 
     // Asked by someone who lives here: handed over by talking to them.
-    private static bool HandedIn(HavenRequestDefinition request) =>
-        request.Asker != null && GameSession.Here.Find(request.Asker) != null;
+    private static bool HandedIn(HavenRequestDefinition request)
+    {
+        ResidentDefinition asker = request.AskerIn(GameSession.Here);
+        return asker != null && GameSession.Here.Find(asker) != null;
+    }
 
     /// <summary>
     /// The asker's line for handing over what they asked for (ResidentNpc.AddTopics): ready once it is home, naming what goes, and
@@ -237,12 +243,21 @@ public sealed class HavenRequestBoard : MonoBehaviour
 
         // Only off a visit (every caller returns in a friend's Haven), where one's own Haven is the one here.
         SettlementState settlement = GameSession.Home;
+        ResidentDefinition askedBy = request.AskerIn(settlement);
+        string askerName = request.NameIn(settlement);
+        ResidentRecord asker = askedBy != null ? settlement.Find(askedBy) : null;
         settlement.RemoveRequest(request.Id);
         settlement.RecordRequestAnswered(request.Renown);
-        PeopleBond.Grow(request.Asker != null ? settlement.Find(request.Asker) : null, PeopleSettings.Current.BondAsk, "ask answered");
+        PeopleBond.Grow(asker, PeopleSettings.Current.BondAsk, "ask answered");
         var given = new List<string>();
         // An asker whose traits make much of a kept word pays more (Hammer-Gruff: ResidentTraits, AskReward).
-        float more = 1f + Mathf.Max(0f, ResidentTraits.Sum(request.Asker != null ? settlement.Find(request.Asker) : null, TraitEffectKind.AskReward));
+        float more = 1f + Mathf.Max(0f, ResidentTraits.Sum(asker, TraitEffectKind.AskReward));
+        // An ask from a hard mark (an Old Wound's salve) heals it when brought.
+        if (request.HealsMark && asker != null && ResidentMarks.Heal(asker, request.WhileMarked))
+        {
+            given.Add($"{askerName}'s {request.WhileMarked.DisplayName} is healed");
+        }
+
         Give(request.Reward, Mathf.RoundToInt(request.RewardCount * more), bag, given);
         Give(TradeSettings.Current.Coin, Mathf.RoundToInt(request.Coins * more), bag, given);
         if (request.Experience > 0)
@@ -272,7 +287,7 @@ public sealed class HavenRequestBoard : MonoBehaviour
 
         string thanks = string.IsNullOrEmpty(request.Thanks) ? "Thank you." : request.Thanks;
         string what = request.Count == 1 ? request.WantedName : $"{request.Count} {request.WantedName}";
-        GameMessages.Post(spoken ? $"{request.AskerName} takes the {what}." : $"{request.AskerName} takes the {what}. \"{thanks}\"", MessageKind.Gain);
+        GameMessages.Post(spoken ? $"{askerName} takes the {what}." : $"{askerName} takes the {what}. \"{thanks}\"", MessageKind.Gain);
         if (given.Count > 0)
         {
             GameMessages.Post("For it: " + string.Join(", ", given) + ".", MessageKind.Gain);

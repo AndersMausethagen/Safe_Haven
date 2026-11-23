@@ -60,6 +60,8 @@ public static class ContentAudit
         "MarkDefinition.healedBy",
         // A gift a resident loves, given in talk and used up (PeopleGifts).
         "ResidentDefinition.loves[]",
+        // Their favourite dish, eaten first at breakfast from the chests (ResidentMeals).
+        "ResidentDefinition.favouriteDish",
         // A comfort bought for a house from a resident's window (HomeLife.Furnish).
         "HomeLifeSettings.comforts[].cost[].item",
         // A boss encounter's gate takes its price (the Hearth Ember into Guardian's Hollow).

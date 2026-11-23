@@ -240,3 +240,21 @@ Residents have Horsemanship, but nothing uses it. A stable hand job (Horsemanshi
 4. **Rivals with costs** (§1.4): rivals slower near each other at work and weaker on a foray together (recommended, shown on the cards),
    or keep rivals to spirits and arguments only?
 5. **Order:** start with measuring (step 1) before the next playtest (recommended), or with jobs for anyone (step 2)?
+
+---
+
+## 5. As built (2026-11-23)
+
+The user: "go ahead with your recommendations". All five answers were taken as recommended, and steps 1-8 are built. Step 9
+(rolled strangers) stays for later. None of it has been played by hand. Tests: `PeopleTests`, plus the other classes the steps touch.
+
+| Step | Built | Not built |
+|---|---|---|
+| 1 Measuring | Playtest rows (PersonLevel, PersonRank, PersonInspired, PersonMark, Standing, PassionPick, Bond, Spirits); the F1 People tab; a People page in the Systems Editor; Traits and Marks in the Content Editor | — |
+| 2 Any job, work grid | Trades known here are open to anyone while they have room. Quests that name nobody count only the trade's own person. Who does what grid | — |
+| 3 Planner and results | The companion's skill, traits, marks, kit and spirits in the planner; cards on the results screen; a line in the report | — |
+| 4 Bond and gifts | Bond grows from lessons, asks, wishes, kit, gifts, a mark healed, being helped up and a friend brought home. Two loved gifts each, one a day | — |
+| 5 Habits | Nine traits keep a place and its hours (the edge, the stones, the water, the lanes, a watch). Friends sit together at the fire, rivals across | — |
+| 6 Digest and voice | News is paced at home and kept for the homecoming card | The voice batch for the new lines |
+| 7 Rivals, mentors, marks | A rival at work costs −5%, rivals on a foray −10% a pair; mentors teach a quarter faster. New marks: Defended the Ward, Lost in the Mire, Night Terrors. The Haven window remembers the lost | — |
+| 8 Stories, homes, horses | Favourite dishes; festivals lift spirits; home likings live on the person; "Move them" warns of a rival next door. Asks from marks and traits (an Old Wound's salve heals it). Quest kinds: a rank reached, friends made, a mark healed, kit given. Rewards: a passion and a mark. The Stablehand (Asa) tends stabled horses each morning | Riders on forays; friends' scenes at festivals cheering the whole gathering |

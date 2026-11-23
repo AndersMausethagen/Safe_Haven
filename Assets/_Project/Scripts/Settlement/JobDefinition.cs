@@ -85,6 +85,9 @@ public sealed class JobDefinition : ScriptableObject
     [Tooltip("Carves enchantments at the altar past the player's own Runecraft, by this many levels at each worker rank (Novice, " +
              "Apprentice, Journeyman, Expert, Master): Liv the Rune Scholar (Docs/EnchantingResearch.md #6). Empty: doesn't carve.")]
     [SerializeField] private int[] carvesPast = new int[0];
+    [Tooltip("Bond each tamed horse in the stable gains every morning from whoever holds this job (times their skill's speed; the best of " +
+             "them tends): the Stablehand (Stablehands). Tended, a horse's bond doesn't wear for days of no care. 0: doesn't tend horses.")]
+    [SerializeField, Min(0f)] private float tendsHorses;
 
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
@@ -101,6 +104,7 @@ public sealed class JobDefinition : ScriptableObject
     public float WardHealth => wardHealth;
     public CompanionDefinition DefendsAs => defendsAs;
     public float RaidSeconds => raidSeconds;
+    public float TendsHorses => tendsHorses;
     /// <summary>True for a job that carves enchantments at the altar (Liv's).</summary>
     public bool Carves => carvesPast != null && carvesPast.Length > 0;
 

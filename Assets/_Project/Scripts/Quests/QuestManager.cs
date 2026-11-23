@@ -662,19 +662,23 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
 
         // In the player's own Haven: while visiting (in the friend's Haven or on their raid) the settlement here is the host's, and the
         // work went nowhere (or to the host's copy of the person).
-        if (quest.RewardWorkFor != null && quest.RewardWork > 0)
+        ResidentRecord rewarded = quest.RewardWorkFor != null ? GameSession.Home.Find(quest.RewardWorkFor) : null;
+        if (rewarded != null && quest.RewardWork > 0)
         {
-            void AddWork(SettlementState settlement)
-            {
-                ResidentRecord worker = settlement.Find(quest.RewardWorkFor);
-                if (worker != null)
-                {
-                    worker.WorkDone += quest.RewardWork;
-                    ResidentTalents.PractiseWork(worker, quest.RewardWork);
-                }
-            }
+            rewarded.WorkDone += quest.RewardWork;
+            ResidentTalents.PractiseWork(rewarded, quest.RewardWork);
+        }
 
-            AddWork(GameSession.Home);
+        // A passion to grow and a mark carried from it (Docs/PeopleSystemReview_2026-11-23.md §2.5): the player's own person too.
+        if (rewarded != null && quest.RewardPassion)
+        {
+            rewarded.Talents.SetPicksOwed(rewarded.Talents.PicksOwed + 1);
+            PeopleNews.Tell($"{rewarded.Resident.DisplayName} has a passion to grow: talk to them.", MessageKind.Gain);
+        }
+
+        if (rewarded != null && quest.RewardMark != null)
+        {
+            ResidentMarks.Give(rewarded, quest.RewardMark);
         }
 
         return quest.DescribeRewards();

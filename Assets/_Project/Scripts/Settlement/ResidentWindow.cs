@@ -738,6 +738,9 @@ public sealed class ResidentWindow : MonoBehaviour
             bool lives = record.Home == id;
             bool room = chosenBy < house.Beds;
             string walk = work != null ? $" · {HavenHomes.Walk(house.Door(out _), work.transform.position):0} m to the {work.Definition.DisplayName}" : "";
+            // A Rival living there or next door costs them spirits (PeopleStandings): said before they move, not after.
+            ResidentRecord rival = lives ? null : PeopleStandings.RivalBy(GameSession.Here, record, house);
+            walk += rival != null ? $" · {rival.Resident.DisplayName}, a rival, next door" : "";
             actions.Add(new MenuAction(HavenHomes.Describe(house), $"{(lives ? "Lives here · " : "")}{HavenHomes.LivingIn(house).Count} of {house.Beds} beds{walk}", !lives && room,
                 () => HavenHomes.Choose(who, id)) { Icon = "House", Status = lives || room ? "" : "Promised" });
         }

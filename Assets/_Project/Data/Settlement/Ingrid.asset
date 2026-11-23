@@ -51,6 +51,12 @@ MonoBehaviour:
   loves:
   - {fileID: 11400000, guid: 7e57bf86766de2341bd9c47b5830cf76, type: 2}
   - {fileID: 11400000, guid: bb670a5310dbb494296de3c93180cebd, type: 2}
+  favouriteDish: {fileID: 11400000, guid: 0130792fbe531934b972f65d86423515, type: 2}
+  homeLiking:
+    resident: {fileID: 0}
+    likes: Water close
+    line: '"Clean water close by, for the work and for washing it off."'
+    thanks: '"Water a few steps off. I can wash the work off before supper now."'
   jobs:
   - {fileID: 11400000, guid: f4c65068c1237a04b8a587a274672012, type: 2}
   questLine:

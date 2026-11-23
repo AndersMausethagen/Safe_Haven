@@ -115,7 +115,11 @@ public sealed class HorseStable : MonoBehaviour, ISaveable, ICargoHold
     private MenuPage Page()
     {
         TakeInLoaded();
-        var page = new MenuPage { Title = "Stable", Body = $"{Occupants} of {Stalls} stalls taken. Horses here are safe, mend and rest; a mare and a stallion both fond of you may foal." };
+        // Who tends them each morning (Stablehands), or that someone could.
+        float tends = 0f;
+        ResidentRecord hand = !HavenVisit.IsVisiting ? Stablehands.BestOf(GameSession.Home, out tends) : null;
+        string tended = hand != null ? $" {hand.Resident.DisplayName} tends them each morning: +{tends:0.#} bond a day, and none lost while you are away." : "";
+        var page = new MenuPage { Title = "Stable", Body = $"{Occupants} of {Stalls} stalls taken. Horses here are safe, mend and rest; a mare and a stallion both fond of you may foal.{tended}" };
         bool visiting = HavenVisit.IsVisiting;
         GameObject user = interactable.Interactor;
         page.Add(new MenuAction($"Feed trough ({Meals()} meals)", "Fed horses mend twice as fast and grow fonder", !visiting && user != null,

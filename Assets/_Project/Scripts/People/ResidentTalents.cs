@@ -247,6 +247,11 @@ public static class ResidentTalents
         {
             PlaytestLogger.Note(PlaytestLog.PersonRank, record.Resident.Id, after, RankName(record));
             PeopleNews.Tell($"{record.Resident.DisplayName} is now a {RankName(record)} {record.Job.DisplayName} ({skill.DisplayName} {after}).", MessageKind.Gain);
+            // For quests (QuestObjective › Resident Rank): only the player's own people, never a copy of a friend's.
+            if (PeopleBond.IsOwn(record))
+            {
+                GameEvents.Raise(new GameEvent(GameEventKind.PersonRanked, record.Resident, RankIndex(record)));
+            }
         }
 
         return after - before;

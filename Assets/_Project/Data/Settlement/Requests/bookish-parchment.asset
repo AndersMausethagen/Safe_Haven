@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dafc92cc79ad39845bc5e18f47753891, type: 3}
+  m_Name: bookish-parchment
+  m_EditorClassIdentifier: SafeHaven::HavenRequestDefinition
+  id: bookish-parchment
+  asker: {fileID: 0}
+  ask: 'I''ve filled every scrap I have. Blank parchment, if you find any out there: there''s so much I haven''t written down.'
+  thanks: Clean pages. You don't know what this means to me.
+  wanted: {fileID: 11400000, guid: 06321fa18cb018b4abc8432713f21aab, type: 2}
+  count: 5
+  reward: {fileID: 0}
+  rewardCount: 0
+  coins: 15
+  experience: 80
+  easesBlight: 0
+  inSeasons: []
+  quality: 0
+  fromLevel: 0
+  lesson: 0
+  renown: 0
+  whileMarked: {fileID: 0}
+  whileTrait: {fileID: 11400000, guid: cb8105e56162a2e448af1591ab132dd2, type: 2}
+  healsMark: 0

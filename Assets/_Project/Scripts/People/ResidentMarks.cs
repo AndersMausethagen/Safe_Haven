@@ -290,6 +290,11 @@ public static class ResidentMarks
         record.RemoveMark(mark.Id);
         record.ForgetDeed(SinceKey(mark));
         PlaytestLogger.Note(PlaytestLog.PersonMark, record.Resident != null ? record.Resident.Id : "", -1, mark.Id);
+        if (PeopleBond.IsOwn(record))
+        {
+            GameEvents.Raise(new GameEvent(GameEventKind.MarkHealed, mark, 1, detail: record.Resident));
+        }
+
         return true;
     }
 

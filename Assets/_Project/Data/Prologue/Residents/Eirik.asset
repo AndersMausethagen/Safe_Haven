@@ -71,6 +71,12 @@ MonoBehaviour:
   loves:
   - {fileID: 11400000, guid: 991a6891d6fa5cf45a18629d3d7b1df4, type: 2}
   - {fileID: 11400000, guid: 5148bc82bfb79f94ca5482ed8e4ea69f, type: 2}
+  favouriteDish: {fileID: 11400000, guid: 8a7fa5a174b89fe4fa13218f49daa4d1, type: 2}
+  homeLiking:
+    resident: {fileID: 0}
+    likes: Lit lane
+    line: '"A lit way home. I''ve seen what waits in the dark."'
+    thanks: '"A lit way home. I walk it slower now, and that''s a good thing."'
   jobs:
   - {fileID: 11400000, guid: f918ba89b7b235448905310320940c70, type: 2}
   questLine:

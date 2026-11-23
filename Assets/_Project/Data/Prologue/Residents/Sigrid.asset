@@ -71,6 +71,12 @@ MonoBehaviour:
   loves:
   - {fileID: 11400000, guid: 8a7fa5a174b89fe4fa13218f49daa4d1, type: 2}
   - {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+  favouriteDish: {fileID: 11400000, guid: 4f0ad2fc96d35f9458f41cc859ab82a9, type: 2}
+  homeLiking:
+    resident: {fileID: 0}
+    likes: Lit lane
+    line: '"Light on the lanes. People should see their way home."'
+    thanks: '"Light on the lanes. People find their way home now. So do I."'
   jobs:
   - {fileID: 11400000, guid: 4c4fcc29299e0dd4b9ba5cfd68e28c5b, type: 2}
   questLine:

@@ -116,9 +116,14 @@ public sealed class QuestDefinition : ScriptableObject
     [SerializeField] private List<RecipeDefinition> rewardRecipes = new List<RecipeDefinition>();
     [Tooltip("Enchantments taught for good (a teacher shows how): Liv's quests (Docs/EnchantingResearch.md #6).")]
     [SerializeField] private List<EnchantmentDefinition> rewardEnchantments = new List<EnchantmentDefinition>();
-    [Tooltip("Someone at home whose worker rank grows with the quest (their Work Done): Liv's rank from her own quests.")]
+    [Tooltip("Someone at home the quest rewards: their job skill grows by Reward Work (Liv's rank from her own quests), and they may be given a " +
+             "passion to grow (Reward Passion) or a mark (Reward Mark).")]
     [SerializeField] private ResidentDefinition rewardWorkFor;
     [SerializeField, Min(0)] private int rewardWork;
+    [Tooltip("Reward Work For may grow a passion: a pick owed, chosen in talk or their window's Talents.")]
+    [SerializeField] private bool rewardPassion;
+    [Tooltip("A mark Reward Work For carries from it (Giant-felled after a story boss).")]
+    [SerializeField] private MarkDefinition rewardMark;
     [Tooltip("Experience for completing it. 0: the Quest Experience from LevelingSettings.")]
     [SerializeField, Min(0)] private int experience;
     [Tooltip("Raised when the quest is completed, for scene reactions (open a gate) through a GameEventListener.")]
@@ -193,6 +198,17 @@ public sealed class QuestDefinition : ScriptableObject
     public IReadOnlyList<EnchantmentDefinition> RewardEnchantments => rewardEnchantments;
     public ResidentDefinition RewardWorkFor => rewardWorkFor;
     public int RewardWork => rewardWork;
+    public bool RewardPassion => rewardPassion;
+    public MarkDefinition RewardMark => rewardMark;
+
+    /// <summary>Sets what the quest gives its person (content tools and tests).</summary>
+    public void SetPersonReward(ResidentDefinition who, int work, bool passion, MarkDefinition givenMark)
+    {
+        rewardWorkFor = who;
+        rewardWork = work;
+        rewardPassion = passion;
+        rewardMark = givenMark;
+    }
     public GameEventDefinition CompletionEvent => completionEvent;
 
     /// <summary>The rewards in words: "3 Iron Ingot, 10 Hardwood, recipe: Iron Axe".</summary>
@@ -213,6 +229,16 @@ public sealed class QuestDefinition : ScriptableObject
             {
                 parts.Add("enchantment: " + enchantment.DisplayName);
             }
+        }
+
+        if (rewardWorkFor != null && rewardPassion)
+        {
+            parts.Add($"a passion for {rewardWorkFor.DisplayName}");
+        }
+
+        if (rewardWorkFor != null && rewardMark != null)
+        {
+            parts.Add($"{rewardWorkFor.DisplayName}: {rewardMark.DisplayName}");
         }
 
         parts.RemoveAll(string.IsNullOrEmpty);

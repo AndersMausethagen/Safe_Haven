@@ -73,6 +73,15 @@ public enum GameEventKind
     PortalRaised = 32,
     /// <summary>The raid portal was improved (RaidPortal: Steadied, the safe pocket). Amount: its level now, from 1.</summary>
     PortalImproved = 33,
+    /// <summary>One of the player's people reached a rank in their job (ResidentTalents). Subject: their ResidentDefinition; Amount: the
+    /// rank, from 1 (Apprentice).</summary>
+    PersonRanked = 34,
+    /// <summary>Two of the player's people became Friends (PeopleStandings). Subject: one's ResidentDefinition; Detail: the other's.</summary>
+    BecameFriends = 35,
+    /// <summary>A hard mark was healed (ResidentMarks.Heal). Subject: the MarkDefinition; Detail: whose (ResidentDefinition).</summary>
+    MarkHealed = 36,
+    /// <summary>The player gave someone a piece of kit (CompanionKit.Give). Subject: the ItemDefinition; Detail: their ResidentDefinition.</summary>
+    KitGiven = 37,
 }
 
 /// <summary>

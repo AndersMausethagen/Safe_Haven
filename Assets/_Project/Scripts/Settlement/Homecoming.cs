@@ -172,7 +172,7 @@ public static class Homecoming
         {
             if (request.Wanted != null && HavenRequestBoard.AtHome(request, bag) >= request.Count)
             {
-                string who = request.Asker != null ? request.Asker.DisplayName : "Someone";
+                string who = request.NameIn(GameSession.Here);
                 lines.Add($"{who} asked for {request.Count} {request.Wanted.DisplayName}: you have them.");
             }
         }

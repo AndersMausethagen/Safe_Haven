@@ -52,4 +52,9 @@ public static class PeopleBond
             }
         }
     }
+
+    /// <summary>True when <paramref name="record"/> is one of the player's own people (in their own Haven's state), not a copy of a friend's:
+    /// what quests count (GameEventKind.PersonRanked and the like).</summary>
+    public static bool IsOwn(ResidentRecord record) =>
+        record?.Resident != null && GameSession.Home != null && GameSession.Home.Find(record.Resident) == record;
 }

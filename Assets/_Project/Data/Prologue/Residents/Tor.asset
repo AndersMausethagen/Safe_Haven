@@ -51,6 +51,12 @@ MonoBehaviour:
   loves:
   - {fileID: 11400000, guid: ec7e90fe19d492f4b974dc8fb9b8d261, type: 2}
   - {fileID: 11400000, guid: 183fddc5567e8b8479fcb1618e73496c, type: 2}
+  favouriteDish: {fileID: 11400000, guid: ab1d11a58572d62458740158da5361f4, type: 2}
+  homeLiking:
+    resident: {fileID: 0}
+    likes: A place to sit
+    line: '"A bench by the door, for the evening and my leg."'
+    thanks: '"A bench by the door. I''ll sit there tonight and admire your work. And mine."'
   jobs:
   - {fileID: 11400000, guid: b33d365bf7bdfe74793c6d3f0f4b33a5, type: 2}
   questLine:

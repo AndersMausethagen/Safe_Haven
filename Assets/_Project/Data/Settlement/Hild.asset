@@ -48,6 +48,12 @@ MonoBehaviour:
   loves:
   - {fileID: 11400000, guid: 4c7e3b0b4de138843be249872ebf3393, type: 2}
   - {fileID: 11400000, guid: 4f0ad2fc96d35f9458f41cc859ab82a9, type: 2}
+  favouriteDish: {fileID: 11400000, guid: ef6fd8d3d8462a14e83aa28b1673181c, type: 2}
+  homeLiking:
+    resident: {fileID: 0}
+    likes: Near work
+    line: '"Close to the stone. Every walk is a block not cut."'
+    thanks: '"The stone''s close. That''s a block a day I''d have spent walking."'
   jobs:
   - {fileID: 11400000, guid: 59a0d6a12e809f84f92d2b2a418d1d26, type: 2}
   questLine:

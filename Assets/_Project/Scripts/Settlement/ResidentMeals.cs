@@ -106,6 +106,22 @@ public static class ResidentMeals
 
             float had = 0f;
             bool raw = false;
+            // Their favourite dish first, when the chests hold it and it is food they may eat (Docs/PeopleSystemReview_2026-11-23.md §2.6).
+            ItemDefinition favourite = record.Resident.FavouriteDish;
+            if (favourite != null && foods.Contains(favourite) && chests.Count(favourite) > 0 && chests.Remove(favourite, 1) > 0)
+            {
+                had += favourite.HungerRestore;
+                raw |= !IsPrepared(favourite);
+                if (!eaten.ContainsKey(favourite))
+                {
+                    order.Add(favourite);
+                }
+
+                eaten.TryGetValue(favourite, out int ate);
+                eaten[favourite] = ate + 1;
+                record.Feel(FavouriteFeeling, settlement.DaysPassed);
+            }
+
             while (had < settings.DailyHunger)
             {
                 ItemDefinition food = TakeFirst(chests, foods);
@@ -163,6 +179,9 @@ public static class ResidentMeals
 
         return said.ToString();
     }
+
+    /// <summary>The feeling their favourite dish at breakfast leaves, for the day (ResidentSpirits).</summary>
+    public const string FavouriteFeeling = "dish";
 
     /// <summary>How much faster (or slower) this resident works for what they ate this morning; 0 before meals are expected.</summary>
     public static float WorkBonus(ResidentRecord record) => WorkBonus(record, GameSession.Here);

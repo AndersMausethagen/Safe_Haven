@@ -57,6 +57,12 @@ MonoBehaviour:
   loves:
   - {fileID: 11400000, guid: d223892dc77348c4e921cc0139490553, type: 2}
   - {fileID: 11400000, guid: f502c59e5645f1c4f98fbca7982042d4, type: 2}
+  favouriteDish: {fileID: 11400000, guid: d223892dc77348c4e921cc0139490553, type: 2}
+  homeLiking:
+    resident: {fileID: 0}
+    likes: Near work
+    line: '"Not far to the lodge. Meat won''t cure itself."'
+    thanks: '"The lodge is close. The meat will thank you, and so do I."'
   jobs:
   - {fileID: 11400000, guid: 9d8e9d72cc07d544c975b891d5c740e6, type: 2}
   - {fileID: 11400000, guid: e9647a52d2bdeec478f332bf63b64731, type: 2}
