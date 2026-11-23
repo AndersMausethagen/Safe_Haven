@@ -39,7 +39,7 @@ Shader "Hidden/Safe Haven/Mist Wake"
         float4 _MistWakeShift;                  // xy: how far the square moved, in uv (applied where a pass reads its own last frame)
         float4 _WakeSim;                    // dt, fill rate, settle rate, velocity damping
         float4 _WakeRect;                   // min x, min z, size, stir strength
-        float4 _WakeCreep;                  // the background flow (world x, z, m/s), how much an obstacle parts the mist, 0
+        float4 _WakeCreep;                  // the background flow (world x, z, m/s), how much an obstacle parts the mist, turbulence
         float _StampCount;                  // a float: Material.SetFloat (an int uniform read a float's bits)
         float4 _Stamps[MAX_STAMPS];         // x, z, radius, strength
         float4 _StampVelocities[MAX_STAMPS];// world x, z velocity
@@ -72,6 +72,13 @@ Shader "Hidden/Safe Haven/Mist Wake"
         }
 
         #define VELOCITY(uv) ReadVelocity(uv)
+
+        // The air's spin at a point (the curl of the velocity, per second): which way, and how hard, it whirls there.
+        float Curl(float2 uv, float2 t, float h)
+        {
+            return (ReadVelocity(uv + float2(t.x, 0.0)).y - ReadVelocity(uv - float2(t.x, 0.0)).y
+                  - ReadVelocity(uv + float2(0.0, t.y)).x + ReadVelocity(uv - float2(0.0, t.y)).x) / (2.0 * h);
+        }
         #define PRESSURE(uv) Read(TEXTURE2D_ARGS(_MistWakePressure, sampler_wake_point_clamp), uv).x
         #define STATE(uv) Read(TEXTURE2D_ARGS(_MistWakeState, sampler_wake_linear_clamp), uv)
         #define SOLID(uv) Read(TEXTURE2D_ARGS(_MistWakeSolid, sampler_wake_point_clamp), uv).x
@@ -109,6 +116,23 @@ Shader "Hidden/Safe Haven/Mist Wake"
                 float2 here = VELOCITY(uv);
                 float2 carried = VELOCITY(uv - here * dt / _WakeRect.z);
                 float2 velocity = _WakeCreep.xy + (carried - _WakeCreep.xy) * exp(-dt * _WakeSim.w);
+                // Turbulence (vorticity confinement): each little whirl is pushed on round its own centre, so the eddies a swing or a run
+                // stirs keep curling instead of smoothing away.
+                if (_WakeCreep.w > 0.0)
+                {
+                    float2 t = _WakeTexel.xy;
+                    float h = _WakeTexel.z;
+                    float centre = Curl(uv, t, h);
+                    float2 rise = float2(abs(Curl(uv + float2(t.x, 0.0), t, h)) - abs(Curl(uv - float2(t.x, 0.0), t, h)),
+                                         abs(Curl(uv + float2(0.0, t.y), t, h)) - abs(Curl(uv - float2(0.0, t.y), t, h)));
+                    float lengthRise = length(rise);
+                    if (lengthRise > 1e-5)
+                    {
+                        float2 toward = rise / lengthRise;
+                        velocity += float2(toward.y, -toward.x) * centre * (_WakeCreep.w * h * dt);
+                    }
+                }
+
                 float2 world = World(input.uv);
                 int count = min((int)_StampCount, MAX_STAMPS);
                 for (int s = 0; s < count; s++)

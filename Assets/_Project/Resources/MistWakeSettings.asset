@@ -16,12 +16,13 @@ MonoBehaviour:
   size: 48
   resolution: 192
   parting: 1
-  swirl: 0.7
+  swirl: 1
   reach: 3
   fillRate: 0.3
   settleRate: 0.45
-  velocityDamping: 0.9
-  stir: 1
+  velocityDamping: 0.6
+  stir: 1.5
+  turbulence: 2
   pressureSteps: 20
   bodyScale: 2.2
   stillPresence: 0.35
@@ -31,8 +32,8 @@ MonoBehaviour:
   treeRadius: 2.4
   treeLandingSpread: 1.6
   mostStamps: 64
-  strikeSpeed: 14
-  strikeSeconds: 0.3
+  strikeSpeed: 20
+  strikeSeconds: 0.4
   strikeStrength: 0.9
   strikeMostReach: 4
   strikeWidth: 0.55

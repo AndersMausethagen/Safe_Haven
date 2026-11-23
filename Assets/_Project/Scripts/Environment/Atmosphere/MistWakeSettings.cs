@@ -31,6 +31,9 @@ public sealed class MistWakeSettings : GameSettings<MistWakeSettings>
     [SerializeField, Range(0.05f, 5f)] private float velocityDamping = 0.9f;
     [Tooltip("How hard a moving body stirs the mist (Stable Fluids: the push it gives the air).")]
     [SerializeField, Range(0f, 4f)] private float stir = 1f;
+    [Tooltip("Turbulence (vorticity confinement): how hard each little whirl the stirring makes is kept spinning, so a swing or a run " +
+             "leaves curling eddies behind instead of a smooth smear (the user, 2026-11-23: \"make the whirl more turbulent\"). 0: none.")]
+    [SerializeField, Range(0f, 8f)] private float turbulence = 2f;
     [Tooltip("Pressure steps a frame: more, and the flow curls round a body more truly (each is one small pass).")]
     [SerializeField, Range(4, 60)] private int pressureSteps = 20;
 
@@ -92,6 +95,7 @@ public sealed class MistWakeSettings : GameSettings<MistWakeSettings>
     public float SettleRate => settleRate;
     public float VelocityDamping => velocityDamping;
     public float Stir => stir;
+    public float Turbulence => turbulence;
     public int PressureSteps => pressureSteps;
     public float BodyScale => bodyScale;
     public float StillPresence => stillPresence;

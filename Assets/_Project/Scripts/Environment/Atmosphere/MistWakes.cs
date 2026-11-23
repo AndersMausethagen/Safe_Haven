@@ -508,7 +508,7 @@ public sealed class MistWakes : MonoBehaviour
         material.SetVectorArray(StampsId, stamps);
         material.SetVectorArray(StampVelocitiesId, stampVelocities);
         Vector2 creep = CreepAt(focus);
-        material.SetVector(CreepId, new Vector4(creep.x, creep.y, settings.ObstacleParting, 0f));
+        material.SetVector(CreepId, new Vector4(creep.x, creep.y, settings.ObstacleParting, settings.Turbulence));
         material.SetFloat(ObstacleCountId, obstacleCount);
         material.SetVectorArray(ObstaclesId, obstacles);
         material.SetVectorArray(ObstacleShapesId, obstacleShapes);
