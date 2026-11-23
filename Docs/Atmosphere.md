@@ -139,7 +139,7 @@ Preview in **Game view**, not Scene view.
 | Wind / Drift Speed | World X/Z direction and base speed, multiplied by Drift Speed (default 3.5) and Weather Wind Influence |
 | Edge Fade | Soft perimeter on the terrain tile, in metres |
 | Clumps | 1 (the default since 2026-11-22): a **blanket** on the ground, a thin veil swelling into soft billows; 0: the older drifting sheet; between, a blend |
-| Clump Size / Clump Height | Metres across a billow (4.5) / how high the tallest rise (1.1 m: knee to waist high) |
+| Clump Size / Clump Height | Metres across a billow (4.5) / how high the tallest rise (1.5 m: about waist high; the veil between lies over the ground plants) |
 | Under Shade | How much darker a billow is at its foot than its top |
 | Creep | How fast the billows creep, as a share of the drift (0.1: slowly along the ground, not sailing like clouds) |
 | Billow Density | A billow's thickness, times Density (12: white and nearly opaque, where the sheet is a veil) |
@@ -152,7 +152,8 @@ that part round a body, swirl behind it and fill back in. **MistWakes** (made by
 (Stam; keijiro/StableFluids as the guide) on a 48 m square that follows the player (**Resources/MistWakeSettings**):
 
 - **Bodies**: the player, friends, creatures, residents, companions and horses part the mist and push it aside, harder
-  the faster they go. A felled tree sweeps it as it falls and blows it out where it lands.
+  the faster they go. The player (and a friend) leaves a wider, stronger wake than anyone else (*Player Radius*,
+  *Player Strength* 2×; the user found it "way too subtle"). A felled tree sweeps it as it falls and blows it out where it lands.
 - **Blows**: every melee blow (`AttackResolver.Execute`: creatures, companions, skills, the shoulder barge) and the
   player's swing throw a short gust the way they go across their arc (a spin throws it round); the player's blade also
   stirs it along its path (`WeaponTrail`). *Blows* in the settings.

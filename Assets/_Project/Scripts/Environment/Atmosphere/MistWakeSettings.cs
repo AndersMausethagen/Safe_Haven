@@ -18,7 +18,7 @@ public sealed class MistWakeSettings : GameSettings<MistWakeSettings>
 
     [Header("How the mist answers")]
     [Tooltip("How fully a body parts the mist where it stands (0-1).")]
-    [SerializeField, Range(0f, 1f)] private float parting = 0.8f;
+    [SerializeField, Range(0f, 1f)] private float parting = 1f;
     [Tooltip("How much of the flow's carrying the mist's pattern shows (1: all of it): it curls round a body rather than just thinning.")]
     [SerializeField, Range(0f, 2f)] private float swirl = 0.7f;
     [Tooltip("The wake reaches this high over the ground; the mist above drifts on untouched.")]
@@ -40,6 +40,11 @@ public sealed class MistWakeSettings : GameSettings<MistWakeSettings>
     [Tooltip("How much a body standing still parts the mist; moving adds up to all of it at Full Speed.")]
     [SerializeField, Range(0f, 1f)] private float stillPresence = 0.35f;
     [SerializeField, Min(0.5f)] private float fullSpeed = 6f;
+    [Tooltip("The player's (and a friend's) radius in the mist, metres: wider than a resident's, so the one you play leaves a wake you see " +
+             "(the user, 2026-11-23: \"we must also tune the effect the player and his attack has on the mist with at least 100%\").")]
+    [SerializeField, Min(0.1f)] private float playerRadius = 0.8f;
+    [Tooltip("How many times harder the player parts and pushes the mist than any other body (parting caps at all of it).")]
+    [SerializeField, Range(1f, 4f)] private float playerStrength = 2f;
     [Tooltip("A felled tree's trunk parts this wide as it sweeps down (metres, for a full-sized tree).")]
     [SerializeField, Min(0.5f)] private float treeRadius = 2.4f;
     [Tooltip("And as it lands: how much wider its burst is.")]
@@ -49,17 +54,19 @@ public sealed class MistWakeSettings : GameSettings<MistWakeSettings>
 
     [Header("Blows")]
     [Tooltip("How fast a blow throws the mist the way it goes (metres a second, at the heart of its gust).")]
-    [SerializeField, Min(0f)] private float strikeSpeed = 7f;
+    [SerializeField, Min(0f)] private float strikeSpeed = 14f;
     [Tooltip("How long a blow's gust goes on, fading (seconds).")]
-    [SerializeField, Range(0.02f, 1f)] private float strikeSeconds = 0.2f;
+    [SerializeField, Range(0.02f, 1f)] private float strikeSeconds = 0.3f;
     [Tooltip("How much a blow's gust parts the mist as it throws it (0-1).")]
-    [SerializeField, Range(0f, 1f)] private float strikeStrength = 0.45f;
+    [SerializeField, Range(0f, 1f)] private float strikeStrength = 0.9f;
     [Tooltip("The farthest a gust reaches from the one striking (a long spear's reach, a troll's sweep), metres.")]
     [SerializeField, Min(0.5f)] private float strikeMostReach = 4f;
+    [Tooltip("How wide each of a blow's gusts is, as a share of its reach.")]
+    [SerializeField, Range(0.2f, 1f)] private float strikeWidth = 0.55f;
     [Tooltip("Metres round a swinging blade's tip that its path stirs the mist.")]
-    [SerializeField, Min(0.1f)] private float bladeRadius = 0.6f;
+    [SerializeField, Min(0.1f)] private float bladeRadius = 1f;
     [Tooltip("How much a blade at full speed parts the mist along its path (0-1).")]
-    [SerializeField, Range(0f, 1f)] private float bladeStrength = 0.4f;
+    [SerializeField, Range(0f, 1f)] private float bladeStrength = 0.8f;
 
     [Header("What stands in its way")]
     [Tooltip("How much a tree, a rock or a wall parts the mist where it stands; the creep carries that gap on into its lee (0-1).")]
@@ -89,6 +96,8 @@ public sealed class MistWakeSettings : GameSettings<MistWakeSettings>
     public float BodyScale => bodyScale;
     public float StillPresence => stillPresence;
     public float FullSpeed => fullSpeed;
+    public float PlayerRadius => playerRadius;
+    public float PlayerStrength => playerStrength;
     public float TreeRadius => treeRadius;
     public float TreeLandingSpread => treeLandingSpread;
     public int MostStamps => mostStamps;
@@ -96,6 +105,7 @@ public sealed class MistWakeSettings : GameSettings<MistWakeSettings>
     public float StrikeSeconds => strikeSeconds;
     public float StrikeStrength => strikeStrength;
     public float StrikeMostReach => strikeMostReach;
+    public float StrikeWidth => strikeWidth;
     public float BladeRadius => bladeRadius;
     public float BladeStrength => bladeStrength;
     public float ObstacleParting => obstacleParting;

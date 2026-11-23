@@ -121,8 +121,8 @@ Shader "Hidden/Safe Haven/Mist Wake"
                 }
 
                 float speed = length(velocity);
-                if (speed > 8.0)
-                    velocity *= 8.0 / speed;
+                if (speed > 16.0)
+                    velocity *= 16.0 / speed;
                 velocity *= 1.0 - SOLID(input.uv);
                 return half4(velocity, 0.0, 0.0);
             }

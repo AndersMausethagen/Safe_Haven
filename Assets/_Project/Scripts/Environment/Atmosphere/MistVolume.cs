@@ -27,8 +27,8 @@ public sealed class MistVolume : MonoBehaviour
     [SerializeField, Range(0f, 1f)] private float clumps = 1f;
     [Tooltip("Metres across a billow.")]
     [SerializeField, Min(0.5f)] private float clumpSize = 4.5f;
-    [Tooltip("How high the tallest billows rise, in metres (about knee to waist high on a person).")]
-    [SerializeField, Min(0.1f)] private float clumpHeight = 1.1f;
+    [Tooltip("How high the tallest billows rise, in metres (about waist high on a person; the veil between them lies over the ground plants: the user, 2026-11-23, \"so most of the ground plants gets mostly covered\").")]
+    [SerializeField, Min(0.1f)] private float clumpHeight = 1.5f;
     [Tooltip("How much darker a billow is at its foot than at its top (its own shade; 0: lit evenly).")]
     [SerializeField, Range(0f, 0.9f)] private float underShade = 0.5f;
     [Tooltip("How fast the billows creep, as a share of the drift (Wind × Drift Speed): slowly along the ground, not sailing like clouds. " +

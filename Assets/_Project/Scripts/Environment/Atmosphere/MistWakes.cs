@@ -202,7 +202,7 @@ public sealed class MistWakes : MonoBehaviour
         direction.y = 0f;
         direction = direction.sqrMagnitude > 1e-4f ? direction.normalized : Vector3.forward;
         float reach = Mathf.Clamp(range, 0.5f, settings.StrikeMostReach);
-        float radius = Mathf.Max(0.5f, reach * 0.4f);
+        float radius = Mathf.Max(0.5f, reach * settings.StrikeWidth);
         if (arc >= 300f)
         {
             for (int i = 0; i < 6; i++)
@@ -817,7 +817,7 @@ public sealed class MistWakes : MonoBehaviour
         seenNow.Clear();
         if (Player.Current != null)
         {
-            Body(Player.Current.transform, 0.4f, settings);
+            Body(Player.Current.transform, settings.PlayerRadius, settings, settings.PlayerStrength);
         }
 
         // Blows and falling trees before the crowd: a frame holds only so many stamps.
@@ -830,7 +830,7 @@ public sealed class MistWakes : MonoBehaviour
             NetworkPlayerAvatar friend = friends[i];
             if (friend != null && !friend.IsOwner && friend.IsVisible && friend.Body != null)
             {
-                Body(friend.Body.transform, 0.4f, settings);
+                Body(friend.Body.transform, settings.PlayerRadius, settings, settings.PlayerStrength);
             }
         }
 
@@ -878,7 +878,8 @@ public sealed class MistWakes : MonoBehaviour
         }
     }
 
-    private void Body(Transform body, float radius, MistWakeSettings settings)
+    // strength: the player's own wake is stronger than anyone else's (Player Strength); parting caps at all of it.
+    private void Body(Transform body, float radius, MistWakeSettings settings, float strength = 1f)
     {
         Vector3 at = body.position;
         seenNow[body] = at;
@@ -891,7 +892,7 @@ public sealed class MistWakes : MonoBehaviour
 
         velocity.y = 0f;
         float speed = velocity.magnitude;
-        Stamp(at, radius * settings.BodyScale * (1f + 0.15f * Mathf.Clamp01(speed / settings.FullSpeed)), velocity, settings.PresenceAt(speed));
+        Stamp(at, radius * settings.BodyScale * (1f + 0.15f * Mathf.Clamp01(speed / settings.FullSpeed)), velocity * strength, settings.PresenceAt(speed) * strength);
     }
 
     // A creature's width, from its agent and size (a troll parts more than a rootling); found once.

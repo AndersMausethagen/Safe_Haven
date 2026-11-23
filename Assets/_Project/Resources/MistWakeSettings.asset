@@ -15,7 +15,7 @@ MonoBehaviour:
   simulation: {fileID: 4800000, guid: 039ceae75ceb9ce48b2df1582434ea40, type: 3}
   size: 48
   resolution: 192
-  parting: 0.8
+  parting: 1
   swirl: 0.7
   reach: 3
   fillRate: 0.3
@@ -26,15 +26,18 @@ MonoBehaviour:
   bodyScale: 2.2
   stillPresence: 0.35
   fullSpeed: 6
+  playerRadius: 0.8
+  playerStrength: 2
   treeRadius: 2.4
   treeLandingSpread: 1.6
   mostStamps: 64
-  strikeSpeed: 7
-  strikeSeconds: 0.2
-  strikeStrength: 0.45
+  strikeSpeed: 14
+  strikeSeconds: 0.3
+  strikeStrength: 0.9
   strikeMostReach: 4
-  bladeRadius: 0.6
-  bladeStrength: 0.4
+  strikeWidth: 0.55
+  bladeRadius: 1
+  bladeStrength: 0.8
   obstacleParting: 0.7
   lowestObstacle: 0.3
   smallestObstacle: 0.3

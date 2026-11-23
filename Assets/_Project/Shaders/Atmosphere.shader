@@ -278,7 +278,7 @@ Shader "Hidden/Safe Haven/Atmosphere"
                 // joined by it rather than standing apart. The veil is thinner than a heap (Billows.z of its thickness).
                 float wisps = FogNoise(float3(q * float2(0.9, 1.7) + 21.7, windTime * 0.05));
                 float heap = smoothstep(0.2, 0.85, puff);
-                float veilTop = tallest * (0.3 + 0.3 * wisps);
+                float veilTop = tallest * (0.45 + 0.25 * wisps);
                 float heapTop = tallest * (0.45 + 0.55 * puff);
                 float top = lerp(veilTop, heapTop, heap) * smoothstep(0.0, 0.35, cover + 0.15);
                 float surface = top + fray * (0.3 + rise01);

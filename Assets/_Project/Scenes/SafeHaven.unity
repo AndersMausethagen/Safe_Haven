@@ -254085,7 +254085,7 @@ MonoBehaviour:
   edgeFade: 5
   clumps: 1
   clumpSize: 4.5
-  clumpHeight: 1.1
+  clumpHeight: 1.5
   underShade: 0.5
   creep: 0.1
   billowDensity: 12
