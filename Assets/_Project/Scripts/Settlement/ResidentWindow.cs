@@ -700,7 +700,7 @@ public sealed class ResidentWindow : MonoBehaviour
 
             JobDefinition offered = job;
             bool holds = record.Job == job;
-            ProficiencyDefinition skill = job.Skill ?? ResidentTalents.JobSkill(record);
+            ProficiencyDefinition skill = job.Skill;
             string where = job.Workplace != null ? $"At the {job.Workplace.DisplayName}" : "About the Haven";
             string level = skill != null ? $"{skill.DisplayName} {ResidentTalents.LevelOf(record, skill)} {ResidentTalents.Flames(ResidentTalents.PassionOf(record, skill))} · " : "";
             actions.Add(new MenuAction(holds ? $"Working as {job.DisplayName}" : $"Work as {job.DisplayName}", level + where, !holds,

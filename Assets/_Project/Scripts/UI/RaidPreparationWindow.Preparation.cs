@@ -50,7 +50,9 @@ public sealed partial class RaidPreparationWindow
             ResidentRecord along = GameSession.Here.Find(plan.Companion);
             int raids = along?.RaidsAlong ?? 0;
             string rank = PeopleBond.Rank(along)?.name;
-            companionBond.text = raids == 0 ? "No raids together yet" : $"{(string.IsNullOrEmpty(rank) ? "" : rank + ", ")}{raids} raid{(raids == 1 ? "" : "s")} together";
+            // A bond rank reached without raids (gifts, lessons: PeopleBond) shows too.
+            companionBond.text = raids == 0 ? (string.IsNullOrEmpty(rank) ? "No raids together yet" : $"{rank}, no raids together yet")
+                : $"{(string.IsNullOrEmpty(rank) ? "" : rank + ", ")}{raids} raid{(raids == 1 ? "" : "s")} together";
         }
 
         if (plan.Companion != null)
@@ -84,17 +86,35 @@ public sealed partial class RaidPreparationWindow
         {
             if (trait != null && IsFighting(trait))
             {
-                line.Add(trait.DisplayName);
+                if (line.Count < 2)
+                {
+                    line.Add(trait.DisplayName);
+                }
+
                 detail.Add($"{trait.DisplayName}: {trait.Description}");
             }
         }
 
-        string good = ColorUtility.ToHtmlStringRGB(style.Good);
+        // Marks that count against this raid's creatures in the line, lit good or warning; every mark on hover (11: the line stays short).
+        int others = 0;
         foreach (MarkDefinition mark in ResidentMarks.Of(record))
         {
             bool here = raid != null && !string.IsNullOrEmpty(mark.Creature) && Meets(raid, mark.Creature);
-            line.Add(here ? $"<color=#{good}>{mark.DisplayName}</color>" : mark.DisplayName);
+            if (here)
+            {
+                line.Add($"<color=#{ColorUtility.ToHtmlStringRGB(mark.Good ? style.Good : style.Warning)}>{mark.DisplayName}</color>");
+            }
+            else
+            {
+                others++;
+            }
+
             detail.Add($"{mark.DisplayName}{(here ? " (it counts here)" : "")}: {mark.Description}");
+        }
+
+        if (others > 0)
+        {
+            line.Add($"{others} mark{(others == 1 ? "" : "s")}");
         }
 
         if (!record.KitWeapon.IsEmpty)

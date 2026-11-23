@@ -64,6 +64,10 @@ MonoBehaviour:
   missedDays: 5
   friendNearWork: 0.05
   mostNearFriends: 2
+  rivalNearWork: 0.05
+  forayRivals: 0.1
+  mentorShare: 0.25
+  mentorGap: 5
   forayFriends: 0.1
   mostForayFriends: 3
   marks:
@@ -76,8 +80,21 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a6331526b041ef44884333df9107e047, type: 2}
   - {fileID: 11400000, guid: 425f2558e10d85e46a3cfc157717682f, type: 2}
   - {fileID: 11400000, guid: fb7f4ab98695d434b89bdcc5d497e191, type: 2}
+  - {fileID: 11400000, guid: 7105e90073f464542ac9a5b06c114787, type: 2}
+  - {fileID: 11400000, guid: 1ea7639cbf5d6614a8aa797ce076bf98, type: 2}
+  - {fileID: 11400000, guid: a02df42eacd40fc4ab8cb7a8b2127f65, type: 2}
   mostMarks: 3
   forestMark: {fileID: 11400000, guid: fb7f4ab98695d434b89bdcc5d497e191, type: 2}
+  bondRaid: 1
+  bondLesson: 0.25
+  bondAsk: 0.5
+  bondWish: 0.5
+  bondKit: 0.25
+  bondGift: 0.35
+  bondMarkHealed: 0.5
+  bondHelpedUp: 0.5
+  bondFriendHome: 1
+  giftDays: 3
   kitNamedAfter: 8
   kitWearPerRaid: 0.06
   kitWearFailed: 0.2

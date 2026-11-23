@@ -36,6 +36,16 @@ public static class PeopleNews
 
         if (!Place.InOwnHaven)
         {
+            // What was still waiting its turn at home goes with it, for the homecoming.
+            foreach ((string text, MessageKind kind) left in waiting)
+            {
+                if (!away.Contains(left.text))
+                {
+                    away.Add(left.text);
+                }
+            }
+
+            waiting.Clear();
             if (!away.Contains(text))
             {
                 away.Add(text);

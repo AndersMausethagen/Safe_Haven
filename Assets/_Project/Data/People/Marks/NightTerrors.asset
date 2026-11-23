@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76e0c92852a3914498e494feab24c1f5, type: 3}
+  m_Name: NightTerrors
+  m_EditorClassIdentifier: SafeHaven::MarkDefinition
+  id: night_terrors
+  displayName: Night Terrors
+  icon: Drop
+  description: 'Went down in the dark when the corruption came: steps aside from blows less, and sleeps badly.'
+  good: 0
+  effects:
+  - kind: 10
+    amount: -0.05
+    skill: {fileID: 0}
+    partySize: 0
+    creature: 
+  cause: 9
+  chance: 0.4
+  creature: 
+  count: 0
+  healedBy: {fileID: 11400000, guid: bc84181ce4315c74a9432364fb1f38e1, type: 2}
+  friendsHeal: 1
+  turnsInto: {fileID: 0}
+  heldByTheForest: 0
+  line: Don't let the fire go out tonight.

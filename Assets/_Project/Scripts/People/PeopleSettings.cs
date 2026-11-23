@@ -108,6 +108,14 @@ public sealed class PeopleSettings : GameSettings<PeopleSettings>
     [Tooltip("A friend (Friendly or better) working near: the share quicker at work for each, up to Most Near Friends.")]
     [SerializeField, Range(0f, 0.3f)] private float friendNearWork = 0.05f;
     [SerializeField, Min(0)] private int mostNearFriends = 2;
+    [Tooltip("A rival (Cool or worse) working near: the share slower at work for each, up to Most Near Friends (the user's go-ahead: rivals " +
+             "cost something, shown on the cards).")]
+    [SerializeField, Range(0f, 0.3f)] private float rivalNearWork = 0.05f;
+    [Tooltip("Rivals on one foray: the share of the party's power lost for each pair, up to Most Foray Friends.")]
+    [SerializeField, Range(0f, 0.5f)] private float forayRivals = 0.1f;
+    [Tooltip("A Friend at least Mentor Gap levels better in a skill makes their friend learn it this share faster (masters teach apprentices).")]
+    [SerializeField, Range(0f, 1f)] private float mentorShare = 0.25f;
+    [SerializeField, Min(1)] private int mentorGap = 5;
     [Tooltip("Friends going on a foray together: the share of the party's power for each pair, up to Most Foray Friends.")]
     [SerializeField, Range(0f, 0.5f)] private float forayFriends = 0.1f;
     [SerializeField, Min(0)] private int mostForayFriends = 3;
@@ -170,6 +178,10 @@ public sealed class PeopleSettings : GameSettings<PeopleSettings>
     public float FriendNearWork => friendNearWork;
     public int MostNearFriends => mostNearFriends;
     public float ForayFriends => forayFriends;
+    public float RivalNearWork => rivalNearWork;
+    public float ForayRivals => forayRivals;
+    public float MentorShare => mentorShare;
+    public int MentorGap => mentorGap;
     public int MostForayFriends => mostForayFriends;
     public System.Collections.Generic.IReadOnlyList<MarkDefinition> Marks => marks;
     public int MostMarks => mostMarks;

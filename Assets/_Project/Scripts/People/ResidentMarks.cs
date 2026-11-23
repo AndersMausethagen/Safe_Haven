@@ -210,6 +210,36 @@ public static class ResidentMarks
         }
     }
 
+    /// <summary>
+    /// Something at home or on a foray happened to them (<paramref name="cause"/>: a breach won, a foray gone wrong, downed on a corruption
+    /// night; <paramref name="where"/> the land's id for a foray): each mark of that cause (and Creature, as a word in it, if it says) may
+    /// come at its chance. Returns what came.
+    /// </summary>
+    public static List<MarkDefinition> AfterEvent(ResidentRecord record, MarkCause cause, string where, System.Func<float> roll)
+    {
+        var came = new List<MarkDefinition>();
+        if (record == null)
+        {
+            return came;
+        }
+
+        foreach (MarkDefinition mark in PeopleSettings.Current.Marks)
+        {
+            if (mark == null || mark.Cause != cause || record.HasMark(mark.Id) || (mark.TurnsInto != null && record.HasMark(mark.TurnsInto.Id))
+                || (!string.IsNullOrEmpty(mark.Creature) && !Matches(mark.Creature, where)))
+            {
+                continue;
+            }
+
+            if (roll() < mark.Chance && Give(record, mark))
+            {
+                came.Add(mark);
+            }
+        }
+
+        return came;
+    }
+
     /// <summary>Foes of a kind (a word in their id) felled along, over every raid.</summary>
     public static int KillsOf(ResidentRecord record, string creature)
     {
@@ -260,7 +290,6 @@ public static class ResidentMarks
         record.RemoveMark(mark.Id);
         record.ForgetDeed(SinceKey(mark));
         PlaytestLogger.Note(PlaytestLog.PersonMark, record.Resident != null ? record.Resident.Id : "", -1, mark.Id);
-        PeopleBond.Grow(record, PeopleSettings.Current.BondMarkHealed, "mark healed");
         return true;
     }
 

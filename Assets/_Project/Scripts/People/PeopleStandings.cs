@@ -245,18 +245,26 @@ public static class PeopleStandings
     /// <summary>Friends (Friendly or better) going on a foray together: a share of the party's power for each pair, up to Most Foray Friends.</summary>
     public static float ForayBonus(IReadOnlyList<ResidentRecord> party, IHavenView here = null)
     {
-        here ??= GameSession.Here;
         PeopleSettings settings = PeopleSettings.Current;
-        int pairs = 0;
+        CountPairs(party, here, out int friends, out int rivals);
+        return Mathf.Min(friends, settings.MostForayFriends) * settings.ForayFriends - Mathf.Min(rivals, settings.MostForayFriends) * settings.ForayRivals;
+    }
+
+    /// <summary>Pairs in a party who are friends (Friendly or better) and who are rivals (Cool or worse): for the foray card.</summary>
+    public static void CountPairs(IReadOnlyList<ResidentRecord> party, IHavenView here, out int friends, out int rivals)
+    {
+        here ??= GameSession.Here;
+        friends = 0;
+        rivals = 0;
         for (int i = 0; i < party.Count; i++)
         {
             for (int j = i + 1; j < party.Count; j++)
             {
-                pairs += LevelOf(here, party[i], party[j]) >= 1 ? 1 : 0;
+                int level = LevelOf(here, party[i], party[j]);
+                friends += level >= 1 ? 1 : 0;
+                rivals += level <= -1 ? 1 : 0;
             }
         }
-
-        return Mathf.Min(pairs, settings.MostForayFriends) * settings.ForayFriends;
     }
 
     /// <summary>Others at home with Kind Words who don't stand badly with them (their spirits).</summary>
@@ -285,7 +293,8 @@ public static class PeopleStandings
 
     private const float RecheckSeconds = 10f;
     // By who, not by record: a guest's copy of a friend's Haven is rebuilt with new records many times a visit.
-    private static readonly Dictionary<ResidentDefinition, (float until, int friends, bool rival)> near = new Dictionary<ResidentDefinition, (float, int, bool)>();
+    private static readonly Dictionary<ResidentDefinition, (float until, int friends, bool rival, int rivalsAtWork)> near =
+        new Dictionary<ResidentDefinition, (float, int, bool, int)>();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => near.Clear();
@@ -301,10 +310,18 @@ public static class PeopleStandings
     /// <summary>A Rival lives within Next Door of their home.</summary>
     public static bool RivalNextDoor(ResidentRecord record) => Near(record).rival;
 
-    /// <summary>Their work speed share from friends working near them.</summary>
-    public static float WorkShare(ResidentRecord record) => FriendsNearWork(record) * PeopleSettings.Current.FriendNearWork;
+    /// <summary>Their work speed share from friends working near them, less what rivals working near them cost.</summary>
+    public static float WorkShare(ResidentRecord record)
+    {
+        (float _, int friends, bool _, int rivals) = Near(record);
+        PeopleSettings settings = PeopleSettings.Current;
+        return friends * settings.FriendNearWork - rivals * settings.RivalNearWork;
+    }
 
-    private static (float until, int friends, bool rival) Near(ResidentRecord record)
+    /// <summary>Rivals (Cool or worse) whose work is within Near Reach of theirs, up to Most Near Friends.</summary>
+    public static int RivalsNearWork(ResidentRecord record) => Near(record).rivalsAtWork;
+
+    private static (float until, int friends, bool rival, int rivalsAtWork) Near(ResidentRecord record)
     {
         if (record?.Resident == null)
         {
@@ -312,7 +329,7 @@ public static class PeopleStandings
         }
 
         float now = Time.unscaledTime;
-        if (near.TryGetValue(record.Resident, out (float until, int friends, bool rival) known) && now < known.until)
+        if (near.TryGetValue(record.Resident, out (float until, int friends, bool rival, int rivalsAtWork) known) && now < known.until)
         {
             return known;
         }
@@ -320,6 +337,7 @@ public static class PeopleStandings
         IHavenView here = GameSession.Here;
         PeopleSettings settings = PeopleSettings.Current;
         int friends = 0;
+        int rivalsAtWork = 0;
         bool rival = false;
         if (here != null && !record.IsAway)
         {
@@ -333,18 +351,24 @@ public static class PeopleStandings
                 }
 
                 int level = LevelOf(here, record, other);
-                if (level >= 1 && record.Job != null && other.Job != null && WorkNear(record, other, settings.NearReach))
+                bool working = record.Job != null && other.Job != null && level != 0 && WorkNear(record, other, settings.NearReach);
+                if (level >= 1 && working)
                 {
                     friends++;
                 }
-                else if (level <= -2 && HomesNear(record, other, settings.NextDoor))
+                else if (level <= -1 && working)
+                {
+                    rivalsAtWork++;
+                }
+
+                if (level <= -2 && HomesNear(record, other, settings.NextDoor))
                 {
                     rival = true;
                 }
             }
         }
 
-        var found = (now + RecheckSeconds, Mathf.Min(friends, settings.MostNearFriends), rival);
+        var found = (now + RecheckSeconds, Mathf.Min(friends, settings.MostNearFriends), rival, Mathf.Min(rivalsAtWork, settings.MostNearFriends));
         near[record.Resident] = found;
         return found;
     }

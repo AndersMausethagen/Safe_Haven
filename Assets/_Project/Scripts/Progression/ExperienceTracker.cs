@@ -214,8 +214,12 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
             return 1;
         }
 
-        int rank = Rules.TierBand(ResidentTalents.LevelOf(teacher, teacher.Job.Teaches ?? teacher.Job.Skill));
-        int workplace = teacher.Job.Workplace != null ? GameSession.Here.BuiltTier(teacher.Job.Workplace) : 0;
+        ProficiencyDefinition taught = teacher.Job.Teaches != null ? teacher.Job.Teaches : teacher.Job.Skill;
+        int rank = Rules.TierBand(ResidentTalents.LevelOf(teacher, taught));
+        // The workplace's tier lifts a lesson only from one whose own trade it is: any trade is open to anyone now (PeopleSystemReview
+        // §2.1), and handing a job round would have given high-tier lessons from the unskilled.
+        bool ownTrade = teacher.Resident != null && System.Array.IndexOf(teacher.Resident.Jobs, teacher.Job) >= 0;
+        int workplace = ownTrade && teacher.Job.Workplace != null ? GameSession.Here.BuiltTier(teacher.Job.Workplace) : 0;
         return Mathf.Clamp(Mathf.Max(rank, workplace), 1, Tiers.Max);
     }
 

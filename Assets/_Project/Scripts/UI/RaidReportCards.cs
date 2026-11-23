@@ -35,11 +35,20 @@ public static class RaidReportCards
         // The companion's cards (what the raid made of them) follow the player's lessons in the same row.
         List<KitCardFace> along = CompanionFaces(report);
         int count = report.Lessons.Count + along.Count;
+        // The companion's cards give way first: the player's own lessons stay pictures where they fit alone.
+        if (count > 0 && along.Count > 0 && (!lessons.Fits(count) || haul + Gap + lessons.HeightFor(count) > room))
+        {
+            along.Clear();
+            count = report.Lessons.Count;
+        }
+
         if (count == 0 || !lessons.Fits(count) || haul + Gap + lessons.HeightFor(count) > room)
         {
             lessons.Hide();
             return haul;
         }
+
+        report.CompanionShownAsCards = along.Count > 0;
 
         var faces = new List<KitCardFace>();
         UIStyle style = UIStyle.Current;

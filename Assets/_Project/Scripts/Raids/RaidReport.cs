@@ -129,6 +129,8 @@ public sealed class RaidReport
     public List<MarkDefinition> CompanionMarks { get; } = new List<MarkDefinition>();
     /// <summary>Their kit's weapon as it came home (empty with none).</summary>
     public ItemStack CompanionWeapon { get; set; }
+    /// <summary>The results screen showed what the raid made of them as cards (so the words leave it out).</summary>
+    public bool CompanionShownAsCards { get; set; }
     /// <summary>Someone lost before, brought home by this raid. They don't know the player.</summary>
     public ResidentDefinition FoundAgain { get; set; }
     /// <summary>Someone lost before, found on this raid and left out there again.</summary>

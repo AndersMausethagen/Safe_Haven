@@ -232,7 +232,7 @@ public static class ResidentTalents
         int before = LevelOf(record, skill);
         int rankBefore = RankIndex(record);
         float amount = baseAmount * rules.Multiplier(Mathf.Max(1, tier), before, false) * settings.WorkShare
-                       * settings.LearningFor(PassionOf(record, skill)) * ResidentTraits.LearningOf(record, skill)
+                       * settings.LearningFor(PassionOf(record, skill)) * ResidentTraits.LearningOf(record, skill) * Mentored(record, skill, before)
                        / Mathf.Max(0.01f, rules.PracticeTimeScale);
         int day = GameSession.Home != null ? GameSession.Home.DaysPassed : 0;
         amount = Capped(record.Talents, skill.Id, day, amount, settings);
@@ -250,6 +250,31 @@ public static class ResidentTalents
         }
 
         return after - before;
+    }
+
+    /// <summary>A Friend at home at least Mentor Gap levels better in <paramref name="skill"/>: they learn it Mentor Share faster
+    /// (masters teach apprentices: Docs/PeopleSystemReview_2026-11-23.md §1.4). 1 without one.</summary>
+    public static float Mentored(ResidentRecord record, ProficiencyDefinition skill, int level, IHavenView home = null)
+    {
+        home ??= GameSession.Home;
+        if (home == null || record?.Resident == null || skill == null)
+        {
+            return 1f;
+        }
+
+        PeopleSettings settings = PeopleSettings.Current;
+        IReadOnlyList<ResidentRecord> people = home.Residents;
+        for (int i = 0; i < people.Count; i++)
+        {
+            ResidentRecord other = people[i];
+            if (other != record && !other.IsAway && PeopleStandings.LevelOf(home, record, other) >= 2
+                && LevelOf(other, skill) >= level + settings.MentorGap)
+            {
+                return 1f + settings.MentorShare;
+            }
+        }
+
+        return 1f;
     }
 
     // The daily cap: what is past the day's practice counts only Beyond The Day's share.

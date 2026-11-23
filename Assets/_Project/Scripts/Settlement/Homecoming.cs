@@ -87,9 +87,10 @@ public static class Homecoming
 
         List<string> lines = Compose(Player.Current, GameSession.Home);
         // What happened among the people while away (PeopleNews: ranks, inspired mornings, marks, friends made), two lines at most.
+        int at = System.Math.Min(lines.Count, 1);
         foreach (string news in PeopleNews.TakeAway(2))
         {
-            lines.Insert(System.Math.Min(lines.Count, 1), news);
+            lines.Insert(System.Math.Min(lines.Count, at++), news);
         }
 
         if (lines.Count > MostLines)

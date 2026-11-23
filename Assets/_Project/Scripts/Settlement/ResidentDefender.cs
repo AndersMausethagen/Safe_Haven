@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -57,6 +58,8 @@ public sealed class ResidentDefender
             return;
         }
 
+        Remember(guard);
+
         Vector3 there = guard.transform.position;
         Object.Destroy(guard.gameObject);
         guard = null;
@@ -64,6 +67,37 @@ public sealed class ResidentDefender
         if (agent != null && agent.isOnNavMesh)
         {
             agent.Warp(there);
+        }
+    }
+
+    // What defending the Haven did to them (Docs/PeopleSystemReview_2026-11-23.md §2.7): helped up by the player grows their bond; downed in
+    // a breach may leave a raid's marks (an old wound, a fear of what downed them), downed on a corruption night its own; foes felled count
+    // toward marks as on raids. Only in the game that keeps the Haven.
+    private static void Remember(Companion fought)
+    {
+        if (HavenVisit.IsVisiting || fought.Resident == null)
+        {
+            return;
+        }
+
+        ResidentRecord record = GameSession.Home.Find(fought.Resident);
+        if (record == null)
+        {
+            return;
+        }
+
+        if (fought.TimesHelpedUp > 0)
+        {
+            PeopleBond.Grow(record, PeopleSettings.Current.BondHelpedUp, "helped up defending");
+        }
+
+        bool breach = WardBreachDirector.Current != null && WardBreachDirector.Current.IsActive;
+        var facts = new RaidFacts { Extracted = true, TimesDowned = Mathf.Max(fought.TimesHelpedUp, fought.DownedBy.Count), KillsBy = fought.KillsBy, DownedBy = fought.DownedBy };
+        List<MarkDefinition> came = breach ? ResidentMarks.AfterRaid(record, facts, () => Random.value)
+            : facts.TimesDowned > 0 ? ResidentMarks.AfterEvent(record, MarkCause.NightDowned, "", () => Random.value) : new List<MarkDefinition>();
+        foreach (MarkDefinition mark in came)
+        {
+            PeopleNews.Tell($"{record.Resident.DisplayName} came out of the fight {(mark.Good ? "with" : "carrying")} {mark.DisplayName}.", mark.Good ? MessageKind.Gain : MessageKind.Info);
         }
     }
 

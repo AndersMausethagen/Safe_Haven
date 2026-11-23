@@ -1136,16 +1136,24 @@ public sealed class SettlementState : IHavenView
             return null;
         }
 
+        // The best of them at the trade when two hold it at one station (any trade is open now: PeopleSystemReview §2.1).
+        ResidentRecord best = null;
+        int bestLevel = -1;
         foreach (ResidentRecord record in residents)
         {
             if (!record.IsAway && record.Job != null && record.Job.Workplace != null && record.Job.Workplace.Station == station
                 && (stationId == null || string.IsNullOrEmpty(record.WorkQueue) || record.WorkQueue == stationId))
             {
-                return record;
+                int level = ResidentTalents.JobLevel(record);
+                if (level > bestLevel)
+                {
+                    best = record;
+                    bestLevel = level;
+                }
             }
         }
 
-        return null;
+        return best;
     }
 
     /// <summary>How much faster a station works for the rank of the resident who works there (1 with nobody).</summary>
@@ -1317,13 +1325,41 @@ public sealed class SettlementState : IHavenView
         // is has come home (or is lost), so its rescue is still what brings it; open to anyone while it has room (OpenTo).
         foreach (JobDefinition job in KnownJobs())
         {
-            if (!jobs.Contains(job) && WorkplaceMayBeLearned(job, resident) && HasRoom(job, resident))
+            if (!jobs.Contains(job) && WorkplaceMayBeLearned(job, resident) && (HasRoom(job, resident) || (resident != null && Find(resident)?.Job == job)))
             {
                 jobs.Add(job);
             }
         }
 
         return jobs;
+    }
+
+    /// <summary>
+    /// True when <paramref name="record"/> holding <paramref name="job"/> fills it for a story that names nobody: it is their own trade, or
+    /// nobody living here has it as theirs (its own are lost: GDD §15.3, no single person locks the game). Opened trades (§2.1) let anyone
+    /// hold any job, and "give Bjarne the Smith's work" mustn't be done by Tor holding it.
+    /// </summary>
+    public bool FillsTrade(ResidentRecord record, JobDefinition job)
+    {
+        if (record?.Resident == null || job == null)
+        {
+            return false;
+        }
+
+        if (Array.IndexOf(record.Resident.Jobs, job) >= 0)
+        {
+            return true;
+        }
+
+        foreach (ResidentRecord other in residents)
+        {
+            if (other.Resident != null && Array.IndexOf(other.Resident.Jobs, job) >= 0)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /// <summary>The trades known in the Haven: every written job of someone who lives here or is lost.</summary>
@@ -1361,7 +1397,7 @@ public sealed class SettlementState : IHavenView
 
     /// <summary>
     /// True when <paramref name="job"/> has room for <paramref name="resident"/> (not their written trade): as many as there are of its
-    /// workplace standing (one before any stands), one for a job without a workplace (the Leader, the Tracker: their bonus counts once).
+    /// workplace standing (one before any stands), one for a job without a workplace (the Tracker: its bonus counts once).
     /// </summary>
     public bool HasRoom(JobDefinition job, ResidentDefinition resident)
     {
@@ -1550,8 +1586,11 @@ public sealed class SettlementState : IHavenView
             JobDefinition before = record.Job;
             record.Job = job;
             vacantJobs.Remove(job);
-            // A vacant job they took and now leave goes back to waiting for someone: it is in nobody's own list, and was lost.
-            if (before != null && System.Array.IndexOf(resident.Jobs, before) < 0 && !IsHeld(before) && !vacantJobs.Contains(before))
+            // A vacant job they took and now leave goes back to waiting for someone: a lost person's trade that nobody living here has as theirs
+            // (any known trade is open to anyone now, so a job not in their list needn't have been vacant).
+            if (before != null && System.Array.IndexOf(resident.Jobs, before) < 0 && !IsHeld(before) && !vacantJobs.Contains(before)
+                && fallen.Exists(lost => lost.Resident != null && System.Array.IndexOf(lost.Resident.Jobs, before) >= 0)
+                && !residents.Exists(other => other.Resident != null && System.Array.IndexOf(other.Resident.Jobs, before) >= 0))
             {
                 vacantJobs.Add(before);
             }

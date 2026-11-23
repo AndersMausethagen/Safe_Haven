@@ -380,7 +380,8 @@ public sealed class QuestObjective
                 // An empty person counts anyone found (or brought home).
                 return gameEvent.Kind == DeedKind && Is(person, gameEvent.Subject, false) ? gameEvent.Amount : 0;
             case ObjectiveType.AssignJob:
-                return gameEvent.Kind == GameEventKind.JobAssigned && Is(job, gameEvent.Subject, false) && Is(person, gameEvent.Detail, false) ? 1 : 0;
+                return gameEvent.Kind == GameEventKind.JobAssigned && Is(job, gameEvent.Subject, false) && Is(person, gameEvent.Detail, false)
+                       && (person != null || job == null || FillsTrade(gameEvent.Detail as ResidentDefinition)) ? 1 : 0;
             case ObjectiveType.DefendBreach:
                 return gameEvent.Kind == GameEventKind.BreachRepelled && Is(breach, gameEvent.Subject, false) ? 1 : 0;
             case ObjectiveType.ReachHavenRank:
@@ -654,7 +655,23 @@ public sealed class QuestObjective
             return record != null && (job == null ? record.Job != null : record.Job == job);
         }
 
-        return job != null && settlement.HasWorker(job);
+        // Naming nobody: its own trade's person holds it, or anyone while they are lost (SettlementState.FillsTrade).
+        foreach (ResidentRecord record in settlement.Residents)
+        {
+            if (job != null && record.Job == job && settlement.FillsTrade(record, job))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool FillsTrade(ResidentDefinition who)
+    {
+        SettlementState settlement = GameSession.Home;
+        ResidentRecord record = who != null ? settlement.Find(who) : null;
+        return record != null && settlement.FillsTrade(record, job);
     }
 
     private static string HavenRankName(int index)

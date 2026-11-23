@@ -36,6 +36,8 @@ public sealed class WorkGridWindow : MonoBehaviour
     private readonly List<ResidentRecord> people = new List<ResidentRecord>();
     private readonly List<JobDefinition> jobs = new List<JobDefinition>();
     private float nextRefresh;
+    private int hoverRow = -1;
+    private int hoverColumn = -1;
 
     private sealed class Cell
     {
@@ -93,8 +95,11 @@ public sealed class WorkGridWindow : MonoBehaviour
         hint.richText = true;
         for (int column = 0; column < MostColumns; column++)
         {
-            TMP_Text name = CodeUI.Label("Job " + column, panel, Margin + NameWidth + column * (CellWidth + 4f), Top - 30f, CellWidth, 26f, 15f, style.Accent,
-                TextAlignmentOptions.Center);
+            // Two lines for a long trade's name ("Rune Scholar"), never cut short.
+            TMP_Text name = CodeUI.Label("Job " + column, panel, Margin + NameWidth + column * (CellWidth + 4f), Top - 44f, CellWidth, 40f, 15f, style.Accent,
+                TextAlignmentOptions.Bottom);
+            name.textWrappingMode = TextWrappingModes.Normal;
+            name.overflowMode = TextOverflowModes.Overflow;
             columnNames.Add(name);
         }
 
@@ -126,8 +131,17 @@ public sealed class WorkGridWindow : MonoBehaviour
         cell.Label = CodeUI.Label("Level", rect, 2f, 0f, CellWidth - 4f, CellHeight, 17f, style.Text, TextAlignmentOptions.Center);
         cell.Label.richText = true;
         var hover = rect.gameObject.AddComponent<UIHover>();
-        hover.Entered = () => Hint(row, column);
-        hover.Exited = () => Hint(-1, -1);
+        hover.Entered = () =>
+        {
+            hoverRow = row;
+            hoverColumn = column;
+            Hint(row, column);
+        };
+        hover.Exited = () =>
+        {
+            hoverRow = hoverColumn = -1;
+            Hint(-1, -1);
+        };
         return cell;
     }
 
@@ -164,7 +178,7 @@ public sealed class WorkGridWindow : MonoBehaviour
 
         for (int column = 0; column < MostColumns; column++)
         {
-            columnNames[column].text = column < jobs.Count ? jobs[column].DisplayName : "";
+            SetText(columnNames[column], column < jobs.Count ? jobs[column].DisplayName : "");
         }
 
         // As big as its people and trades (at least four across, three down), fitted to the screen.
@@ -180,7 +194,7 @@ public sealed class WorkGridWindow : MonoBehaviour
         for (int row = 0; row < MostRows; row++)
         {
             ResidentRecord record = row < people.Count ? people[row] : null;
-            rowNames[row].text = record != null ? record.Resident.DisplayName + (record.IsAway ? " (away)" : "") : "";
+            SetText(rowNames[row], record != null ? record.Resident.DisplayName + (record.IsAway ? " (away)" : "") : "");
             List<JobDefinition> open = record != null ? here.JobsOpenTo(record.Resident) : null;
             for (int column = 0; column < MostColumns; column++)
             {
@@ -198,7 +212,7 @@ public sealed class WorkGridWindow : MonoBehaviour
                 bool mayTake = holds || open.Contains(job);
                 bool theirTrade = System.Array.IndexOf(record.Resident.Jobs, job) >= 0;
                 // A trade with no skill of its own (the Leader) shows no level: anyone may lead.
-                cell.Label.text = skill != null ? $"{ResidentTalents.Flames(ResidentTalents.PassionOf(record, skill))}{level}" : "-";
+                SetText(cell.Label, skill != null ? $"{ResidentTalents.Flames(ResidentTalents.PassionOf(record, skill))}{level}" : "-");
                 cell.Label.color = holds ? style.AccentBright : mayTake ? style.Text : style.Muted;
                 cell.Fill.color = holds ? style.ControlOn : mayTake ? style.Control : style.Disabled;
                 cell.Rim.color = holds ? style.Accent : theirTrade ? HearthKit.Faded(style.Accent, 0.6f) : HearthKit.Faded(style.Muted, 0.35f);
@@ -211,7 +225,16 @@ public sealed class WorkGridWindow : MonoBehaviour
             }
         }
 
-        Hint(-1, -1);
+        // The hovered cell keeps its words through the refresh.
+        Hint(hoverRow, hoverColumn);
+    }
+
+    private static void SetText(TMP_Text label, string text)
+    {
+        if (label.text != text)
+        {
+            label.text = text;
+        }
     }
 
     private void Hint(int row, int column)

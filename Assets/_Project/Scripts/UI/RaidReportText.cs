@@ -396,12 +396,14 @@ public static class RaidReportText
         return text.ToString();
     }
 
-    /// <summary>
-    /// The heading over what was learned when it is shown as cards (RaidReportCards): the raid bonus beside it, brought home or lost.
-    /// </summary>
-    // What the raid made of the one along, in a line (their skill, marks, weapon), or "" with nothing to say.
+    // What the raid made of the one along, in a line (their skill, marks, weapon), or "" with nothing to say or when cards showed it.
     private static string CompanionLine(RaidReport report)
     {
+        if (report.CompanionShownAsCards)
+        {
+            return "";
+        }
+
         var parts = new List<string>();
         if (report.CompanionSkill != null && report.CompanionLevelAfter > report.CompanionLevelBefore)
         {
@@ -421,6 +423,9 @@ public static class RaidReportText
         return parts.Count > 0 ? "\n" + string.Join("; ", parts) + "." : "";
     }
 
+    /// <summary>
+    /// The heading over what was learned when it is shown as cards (RaidReportCards): the raid bonus beside it, brought home or lost.
+    /// </summary>
     public static string LessonsHeading(RaidReport report)
     {
         int bonus = 0;

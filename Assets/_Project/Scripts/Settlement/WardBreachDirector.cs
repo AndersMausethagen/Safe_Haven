@@ -504,6 +504,18 @@ public sealed class WardBreachDirector : MonoBehaviour
         }
 
         GameMessages.Post(breach.WonText + rewards, MessageKind.Gain);
+        // Everyone at home fought (DefenceSettings › Everyone Fights): a breach won may leave its mark (Defended the Ward).
+        foreach (ResidentRecord defender in GameSession.Home.Residents)
+        {
+            if (!defender.IsAway)
+            {
+                foreach (MarkDefinition mark in ResidentMarks.AfterEvent(defender, MarkCause.BreachWon, breach.name, () => Random.value))
+                {
+                    PeopleNews.Tell($"{defender.Resident.DisplayName} held the ward: {mark.DisplayName}.", MessageKind.Gain);
+                }
+            }
+        }
+
         AudioManager.Play(AudioManager.Sounds?.BreachWon, transform.position);
         QuestDeeds.Raise(GameEventKind.BreachRepelled, breach, player);
         if (breach.WonEvent != null)

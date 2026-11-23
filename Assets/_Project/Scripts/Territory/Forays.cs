@@ -268,6 +268,15 @@ public static class Forays
         foreach (ResidentRecord record in party)
         {
             record.Bruised = !won;
+            // A foray gone wrong may leave its mark (Lost in the Mire, for the marsh).
+            if (!won)
+            {
+                foreach (MarkDefinition mark in ResidentMarks.AfterEvent(record, MarkCause.ForayFailed, place != null ? place.id : "", roll))
+                {
+                    PeopleNews.Tell($"{record.Resident.DisplayName} came home from the foray carrying something: {mark.DisplayName}.", MessageKind.Info);
+                }
+            }
+
             // What they did out there, they got better at (the land's work: ResidentTalents).
             ProficiencyDefinition skill = place != null && place.skill != null ? place.skill : ResidentTalents.JobSkill(record);
             int tier = place != null ? place.tier : 1;

@@ -18,6 +18,12 @@ public enum MarkCause
     Kills = 5,
     /// <summary>Beat a boss beside the player.</summary>
     Boss = 6,
+    /// <summary>At home for a ward breach won (everyone fights).</summary>
+    BreachWon = 7,
+    /// <summary>On a foray gone wrong (Creature: a word in the land's id, e.g. marsh; empty: any).</summary>
+    ForayFailed = 8,
+    /// <summary>Knocked down defending the Haven on a corruption night.</summary>
+    NightDowned = 9,
 }
 
 /// <summary>

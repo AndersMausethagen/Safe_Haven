@@ -80,14 +80,17 @@ public static class HavenPeople
             : "By the fire. They manage, but a Hut or Cottage would help."));
         // Their own page: the house they live in (and moving them), their work and their story.
         entry.Actions.Add(new HavenAction("Their page", () => ResidentWindow.Show(person, "Home"), primary: false));
-        entry.Actions.Add(new HavenAction("Who does what", WorkGridWindow.Show, closesWindow: false, primary: false));
+        if (!HavenVisit.InHostsHaven)
+        {
+            entry.Actions.Add(new HavenAction("Who does what", WorkGridWindow.Show, closesWindow: false, primary: false));
+        }
         AddWork(entry, record, settlement);
         // Their own trades first, then the best of the rest by their level (any known trade with room: §2.1), a few at most here; the
         // whole picture is Who does what.
         ResidentRecord them = GameSession.Here.Find(person);
         List<JobDefinition> others = GameSession.Here.JobsOpenTo(person).Where(one => one != null && one != job)
             .OrderBy(one => System.Array.IndexOf(person.Jobs, one) >= 0 ? 0 : 1)
-            .ThenByDescending(one => ResidentTalents.LevelOf(them, one.Skill ?? ResidentTalents.JobSkill(them))).Take(3).ToList();
+            .ThenByDescending(one => ResidentTalents.LevelOf(them, one.Skill != null ? one.Skill : ResidentTalents.JobSkill(them))).Take(3).ToList();
         if (others.Count > 0)
         {
             entry.Details.Add(new HavenDetail(job != null ? "Could also work as" : "Could work as",
@@ -198,7 +201,47 @@ public static class HavenPeople
             Icon = person.Portrait,
         };
 
-        List<JobDefinition> jobs = GameSession.Here.JobsOpenTo(person).Where(one => one != null).ToList();
+        // Who they were, kept while the forest has them (Docs/PeopleSystemReview_2026-11-23.md §1.5): the marks they carried, the kit that waits
+        // in their house, and who misses them.
+        FallenRecord lost = null;
+        foreach (FallenRecord one in GameSession.Here.Fallen)
+        {
+            lost = one.Resident == person ? one : lost;
+        }
+
+        if (lost != null)
+        {
+            var carried = new List<string>();
+            foreach (string id in lost.Marks)
+            {
+                MarkDefinition mark = ResidentMarks.Find(id);
+                if (mark != null)
+                {
+                    carried.Add(mark.DisplayName);
+                }
+            }
+
+            if (carried.Count > 0)
+            {
+                entry.Details.Add(new HavenDetail("They carried", string.Join(", ", carried)));
+            }
+
+            string kit = string.Join(", ", new[] { lost.KitWeapon, lost.KitBody }.Where(piece => !piece.IsEmpty).Select(piece => piece.DisplayName));
+            if (kit.Length > 0)
+            {
+                entry.Details.Add(new HavenDetail("Waiting in their house", kit));
+            }
+
+            List<string> missing = GameSession.Here.Residents.Where(other => other.Resident != null && other.FeelingUntil(ResidentSpirits.LostFeeling + person.Id) >= GameSession.Here.DaysPassed)
+                .Select(other => other.Resident.DisplayName).ToList();
+            if (missing.Count > 0)
+            {
+                entry.Details.Add(new HavenDetail("Missed by", string.Join(", ", missing)));
+            }
+        }
+
+        // Their own trades (whose building may be learned): any known trade is open to anyone now, so JobsOpenTo would list others'.
+        List<JobDefinition> jobs = person.Jobs.Where(one => one != null && (one.Workplace == null || BuildingGate.MayLearn(one.Workplace))).ToList();
         if (jobs.Count > 0)
         {
             entry.Details.Add(new HavenDetail("What they would bring",

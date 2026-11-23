@@ -97,6 +97,20 @@ public static class HavenLands
                 entry.Details.Add(new HavenDetail("May bring", Forays.Finds(place)));
                 entry.Details.Add(new HavenDetail(chosen.Count == 1 ? "Who goes" : $"Who go ({chosen.Count})",
                     chosen.Count > 0 ? $"{Forays.Names(chosen)}: {power:0} power; each takes food for the road" : "Nobody is free"));
+                // Friends and rivals in the party, and who is best at the land's work (PeopleStandings, ResidentTalents).
+                PeopleStandings.CountPairs(chosen, home, out int friends, out int rivals);
+                if (friends + rivals > 0)
+                {
+                    PeopleSettings people = PeopleSettings.Current;
+                    entry.Details.Add(new HavenDetail("Together", (friends > 0 ? $"{friends} pair{(friends == 1 ? "" : "s")} of friends: +{System.Math.Min(friends, people.MostForayFriends) * people.ForayFriends * 100f:0}%" : "")
+                        + (friends > 0 && rivals > 0 ? "; " : "") + (rivals > 0 ? $"{rivals} pair{(rivals == 1 ? "" : "s")} of rivals: -{System.Math.Min(rivals, people.MostForayFriends) * people.ForayRivals * 100f:0}%" : "")));
+                }
+
+                if (place.skill != null && chosen.Count > 0)
+                {
+                    entry.Details.Add(new HavenDetail("The work", $"{place.skill.DisplayName}: " + string.Join(", ",
+                        chosen.Select(one => $"{one.Resident.DisplayName} {ResidentTalents.LevelOf(one, place.skill)}"))));
+                }
                 entry.Actions.Add(new HavenAction($"Send {(chosen.Count == 1 ? "them" : $"the {chosen.Count}")}", () => Send(place, count), why == null,
                     closesWindow: false, primary: false));
                 if (count < Mathf.Min(settings.MostMembers, free.Count))

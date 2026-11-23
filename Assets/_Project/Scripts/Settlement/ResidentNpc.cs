@@ -390,6 +390,11 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
                 page.Add(new MenuAction($"Give them your {stack.Item.DisplayName}", $"For their {healed.DisplayName.ToLowerInvariant()}", true, () =>
                 {
                     bool used = bag.Remove(stack.Item, 1) > 0 && ResidentMarks.Heal(record, healed);
+                    if (used)
+                    {
+                        // The player tended them: the bond grows (a friend's evening easing a mark doesn't).
+                        PeopleBond.Grow(record, PeopleSettings.Current.BondMarkHealed, "mark healed");
+                    }
                     DialogueBox.Current.Say(speaker, used ? $"That's better. That's... better. Thank you." : "Not now.", afterAnswer);
                 }));
             }
@@ -551,7 +556,8 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
             }
 
             bool isCurrent = job == current;
-            page.Add(new MenuAction(isCurrent ? $"Working as {job.DisplayName}" : $"Work as {job.DisplayName}", null, !isCurrent, () =>
+            string level = job.Skill != null && them != null ? $"{job.Skill.DisplayName} {ResidentTalents.LevelOf(them, job.Skill)} {ResidentTalents.Flames(ResidentTalents.PassionOf(them, job.Skill))}" : null;
+            page.Add(new MenuAction(isCurrent ? $"Working as {job.DisplayName}" : $"Work as {job.DisplayName}", level, !isCurrent, () =>
             {
                 Assign(job, Player.Current != null ? Player.Current.gameObject : null);
                 DialogueBox.Current.Say(speaker, string.IsNullOrWhiteSpace(job.AcceptLine) ? DefaultAcceptLine : job.AcceptLine, afterAnswer);

@@ -682,7 +682,8 @@ public sealed class PeopleTests
         Assert.IsTrue(home.JobsOpenTo(bjarne).Contains(smith), "his own trade is always his");
 
         home.AssignJob(sigrid, leader);
-        Assert.IsFalse(home.JobsOpenTo(tor).Contains(leader), "a job without a workplace: one holder, its bonus once");
+        Assert.IsFalse(home.JobsOpenTo(tor).Contains(leader), "one holder while one of its workplace stands (or none yet)");
+        Assert.IsTrue(home.JobsOpenTo(sigrid).Contains(leader), "a job held stays in the holder's own list");
     }
 
     [Test]
@@ -742,5 +743,61 @@ public sealed class PeopleTests
         }
 
         Assert.Greater(habits, 5, "the traits have habits");
+    }
+
+    // ----- Step 7 and the review of steps 1-4 -----
+
+    [Test]
+    public void AStoryNamingNobody_IsFilledByTheTradesOwn_OrAnyoneWhileTheyAreLost()
+    {
+        SettlementState home = Home("Bjarne", "Tor");
+        ResidentDefinition bjarne = Person("Bjarne"), tor = Person("Tor");
+        JobDefinition smith = bjarne.Jobs[0];
+        Assert.IsTrue(home.FillsTrade(home.Find(bjarne), smith), "his own trade");
+        Assert.IsFalse(home.FillsTrade(home.Find(tor), smith), "Tor holding it while Bjarne lives here doesn't do Bjarne's step");
+        home.LoseResident(bjarne, "probe");
+        Assert.IsTrue(home.FillsTrade(home.Find(tor), smith), "anyone while its own are lost: nobody locks the game");
+    }
+
+    [Test]
+    public void TheStationsWorker_IsTheBestWhoHoldsIt_AndALessonsTier_IsTheirOwn()
+    {
+        SettlementState home = Home("Bjarne", "Tor");
+        ResidentDefinition bjarne = Person("Bjarne"), tor = Person("Tor");
+        JobDefinition smith = bjarne.Jobs[0];
+        home.AssignJob(tor, smith);
+        home.AssignJob(bjarne, smith);
+        Assert.AreEqual(bjarne, home.WorkerAt(smith.Workplace.Station).Resident, "the better smith works the smithy");
+        ResidentRecord torAsSmith = home.Find(tor);
+        Assert.AreEqual(LevelingSettings.Current.TierBand(ResidentTalents.LevelOf(torAsSmith, smith.Teaches)), ExperienceTracker.LessonTier(torAsSmith),
+            "not his trade: his own level, not the smithy's tier");
+    }
+
+    [Test]
+    public void RivalsOnAForay_CostWhatFriendsGive_AndAFriendMentors()
+    {
+        SettlementState home = Home("Sigrid", "Gunnar", "Tor", "Bjarne");
+        ResidentRecord sigrid = home.Find(Person("Sigrid")), gunnar = home.Find(Person("Gunnar"));
+        Assert.AreEqual(-1, PeopleStandings.LevelOf(home, sigrid, gunnar));
+        Assert.AreEqual(-People.ForayRivals, PeopleStandings.ForayBonus(new[] { sigrid, gunnar }, home), 0.0001f);
+
+        ResidentRecord tor = home.Find(Person("Tor")), bjarne = home.Find(Person("Bjarne"));
+        ProficiencyDefinition weapons = Skill("Weaponcrafting");
+        int level = ResidentTalents.LevelOf(tor, weapons);
+        Assert.GreaterOrEqual(ResidentTalents.LevelOf(bjarne, weapons), level + People.MentorGap, "the smith knows far more");
+        Assert.AreEqual(1f, ResidentTalents.Mentored(tor, weapons, level, home), 0.0001f, "Friendly isn't enough");
+        home.SetStanding(tor.Resident.Id, bjarne.Resident.Id, 2f);
+        Assert.AreEqual(1f + People.MentorShare, ResidentTalents.Mentored(tor, weapons, level, home), 0.0001f, "a Friend who knows far more teaches");
+        Assert.AreEqual(1f, ResidentTalents.Mentored(bjarne, weapons, ResidentTalents.LevelOf(bjarne, weapons), home), 0.0001f, "not the other way");
+    }
+
+    [Test]
+    public void AForayGoneWrong_InTheMarsh_MayLeaveItsMark()
+    {
+        ResidentRecord asa = Home("Asa").Find(Person("Asa"));
+        Assert.AreEqual(0, ResidentMarks.AfterEvent(asa, MarkCause.ForayFailed, "troll-valley-2", () => 0f).Count, "not the marsh");
+        List<MarkDefinition> came = ResidentMarks.AfterEvent(asa, MarkCause.ForayFailed, "moss-marsh-3", () => 0f);
+        Assert.IsTrue(came.Any(mark => mark.Id == "lost_in_the_mire"));
+        Assert.IsTrue(ResidentMarks.AfterEvent(asa, MarkCause.BreachWon, "", () => 0f).Any(mark => mark.Good), "a breach won");
     }
 }

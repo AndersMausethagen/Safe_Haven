@@ -9,7 +9,7 @@ public static class PeopleCheats
 {
     private const string NotHome = "Only in your own Haven.";
 
-    private static SettlementState Home => Place.AtHome ? GameSession.Home : null;
+    private static SettlementState Home => Place.InOwnHaven ? GameSession.Home : null;
 
     public static string InspireEveryone()
     {
