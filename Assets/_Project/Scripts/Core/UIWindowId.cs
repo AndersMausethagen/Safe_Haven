@@ -54,4 +54,6 @@ public enum UIWindowId
     BuildingUpgrade = 23,
     /// <summary>A playtester's report: Bug, Idea, Confusing or Liked, with a screenshot (F8, or Escape › Report; PlaytestReportWindow).</summary>
     PlaytestReport = 24,
+    /// <summary>Who does what: everyone's level in every known trade (WorkGridWindow).</summary>
+    WorkGrid = 25,
 }

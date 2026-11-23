@@ -662,4 +662,58 @@ public sealed class PeopleTests
             PeopleNews.ForgetGame();
         }
     }
+
+    // ----- Any job for anyone, the companion's homecoming (Docs/PeopleSystemReview_2026-11-23.md §2.1-2.3) -----
+
+    [Test]
+    public void AKnownTrade_IsOpenToAnyone_WhileItHasRoom_AndAnUnknownOneToNobody()
+    {
+        SettlementState home = Home("Bjarne", "Tor", "Sigrid");
+        ResidentDefinition bjarne = Person("Bjarne"), tor = Person("Tor"), sigrid = Person("Sigrid");
+        JobDefinition smith = bjarne.Jobs[0], leader = sigrid.Jobs[0];
+        Assert.Contains(smith, home.KnownJobs());
+        JobDefinition unknown = All<JobDefinition>().First(job => !home.KnownJobs().Contains(job));
+
+        bool learnable = smith.Workplace == null || BuildingGate.MayLearn(smith.Workplace);
+        Assert.AreEqual(learnable, home.JobsOpenTo(tor).Contains(smith), "the smith's trade is Bjarne's, known here, with room");
+        Assert.IsFalse(home.JobsOpenTo(tor).Contains(unknown), "nobody here has that trade: its rescue still brings it");
+        home.AssignJob(bjarne, smith);
+        Assert.IsFalse(home.JobsOpenTo(tor).Contains(smith), "one smithy (or none yet): room for one smith");
+        Assert.IsTrue(home.JobsOpenTo(bjarne).Contains(smith), "his own trade is always his");
+
+        home.AssignJob(sigrid, leader);
+        Assert.IsFalse(home.JobsOpenTo(tor).Contains(leader), "a job without a workplace: one holder, its bonus once");
+    }
+
+    [Test]
+    public void TwoHoldingOneJob_CountItsBonusOnce()
+    {
+        SettlementState home = Home("Gunnar", "Yrsa");
+        JobDefinition fisher = Person("Gunnar").Jobs.First(job => job.name == "Fisher");
+        home.AssignJob(Person("Gunnar"), fisher);
+        home.AssignJob(Person("Yrsa"), fisher);
+        Assert.AreEqual(2, home.Residents.Count(record => record.Job == fisher));
+        Assert.AreEqual(1, home.JobBonus(job => job == fisher ? 1 : 0), "counted once");
+    }
+
+    [Test]
+    public void TheHomecoming_ShowsWhatTheRaidMadeOfThem()
+    {
+        RaidDefinition raid = All<RaidDefinition>().First();
+        var none = new RaidModifierDefinition[0];
+        var session = new RaidSession(raid, none, RaidParameters.Calculate(raid, none), null, "SafeHaven");
+        session.End(RaidOutcome.Extracted);
+        RaidReport report = RaidReport.Create(session, null, null);
+        report.Companion = Person("Gunnar");
+        report.CompanionSkill = Skill("Melee");
+        report.CompanionLevelBefore = 14;
+        report.CompanionLevelAfter = 15;
+        report.CompanionNewRank = "Trusted";
+        report.CompanionMarks.Add(Mark("troll_wary"));
+        List<KitCardFace> faces = RaidReportCards.CompanionFaces(report);
+        Assert.AreEqual(3, faces.Count, "their skill, the mark, a passion to grow");
+        StringAssert.Contains("14 → 15", faces[0].Name);
+        report.CompanionLost = true;
+        Assert.AreEqual(0, RaidReportCards.CompanionFaces(report).Count, "nothing to show of one the forest has");
+    }
 }

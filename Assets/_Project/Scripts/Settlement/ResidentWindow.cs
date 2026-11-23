@@ -215,7 +215,7 @@ public sealed class ResidentWindow : MonoBehaviour
         float rightWidth = Width - Margin * 2f - rx;
         RectTransform right = HearthKit.Card(page, "Work Card", rx, 0f, rightWidth, BodyHeight);
         HearthKit.Section(right, "Their work", "Hammer", 22f, 18f);
-        jobList = new KitActionList(right, 22f, 58f, rightWidth - 44f, Choose, columns: 1, rowHeight: 62f, nothing: "There is no work here they can do.");
+        jobList = new KitActionList(right, 22f, 58f, rightWidth - 44f, Choose, columns: 2, rowHeight: 62f, nothing: "There is no work here they can do.");
 
         // The kit they fight with beside the player (CompanionKit): its pictures, what it is on hover, and giving or taking it back here
         // as in talk (the UX pass of 2026-11-23: the card stood half empty and kit could only be handled by talking).
@@ -681,21 +681,33 @@ public sealed class ResidentWindow : MonoBehaviour
 
     private List<MenuAction> JobActions(ResidentRecord record)
     {
+        // Their work now and their own trades first, then the rest best first by their level in each one's skill (any known trade with
+        // room is theirs to take: Docs/PeopleSystemReview_2026-11-23.md §2.1); the whole picture is Who does what (WorkGridWindow).
         var actions = new List<MenuAction>();
-        foreach (JobDefinition job in GameSession.Here.JobsOpenTo(who))
+        List<JobDefinition> jobs = GameSession.Here.JobsOpenTo(who);
+        jobs.Sort((a, b) =>
         {
-            if (job == null)
+            int first = Rank(a).CompareTo(Rank(b));
+            return first != 0 ? first : ResidentTalents.LevelOf(record, b.Skill).CompareTo(ResidentTalents.LevelOf(record, a.Skill));
+        });
+        int Rank(JobDefinition job) => record.Job == job ? 0 : System.Array.IndexOf(who.Jobs, job) >= 0 ? 1 : 2;
+        foreach (JobDefinition job in jobs)
+        {
+            if (job == null || actions.Count >= 3)
             {
                 continue;
             }
 
             JobDefinition offered = job;
             bool holds = record.Job == job;
+            ProficiencyDefinition skill = job.Skill ?? ResidentTalents.JobSkill(record);
             string where = job.Workplace != null ? $"At the {job.Workplace.DisplayName}" : "About the Haven";
-            actions.Add(new MenuAction(holds ? $"Working as {job.DisplayName}" : $"Work as {job.DisplayName}", where, !holds,
+            string level = skill != null ? $"{skill.DisplayName} {ResidentTalents.LevelOf(record, skill)} {ResidentTalents.Flames(ResidentTalents.PassionOf(record, skill))} · " : "";
+            actions.Add(new MenuAction(holds ? $"Working as {job.DisplayName}" : $"Work as {job.DisplayName}", level + where, !holds,
                 () => ResidentNpc.GiveJob(who, offered, Player.Current != null ? Player.Current.gameObject : null)) { Icon = "Hammer", Status = holds ? "Now" : "" });
         }
 
+        actions.Add(new MenuAction("Who does what", "Everyone's level in every trade", true, WorkGridWindow.Show) { Icon = "Stats" });
         return actions;
     }
 

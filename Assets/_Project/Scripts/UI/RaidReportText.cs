@@ -53,7 +53,7 @@ public static class RaidReportText
         {
             builder.Append(report.CompanionLost
                 ? $"<b><color={Loss}>{report.Companion.DisplayName} did not come home.</color></b>\n<i>\"{report.Companion.FallenLine}\"</i>\n{SettlementSettings.Current.LostReportLine}\n\n"
-                : $"<b><color={Gain}>{report.Companion.DisplayName} made it home{(report.CompanionNewRank != null ? $", and is {report.CompanionNewRank} now" : "")}.</color></b>\n\n");
+                : $"<b><color={Gain}>{report.Companion.DisplayName} made it home{(report.CompanionNewRank != null ? $", and is {report.CompanionNewRank} now" : "")}.</color></b>{CompanionLine(report)}\n\n");
         }
 
         if (report.FoundAgain != null)
@@ -399,6 +399,28 @@ public static class RaidReportText
     /// <summary>
     /// The heading over what was learned when it is shown as cards (RaidReportCards): the raid bonus beside it, brought home or lost.
     /// </summary>
+    // What the raid made of the one along, in a line (their skill, marks, weapon), or "" with nothing to say.
+    private static string CompanionLine(RaidReport report)
+    {
+        var parts = new List<string>();
+        if (report.CompanionSkill != null && report.CompanionLevelAfter > report.CompanionLevelBefore)
+        {
+            parts.Add($"{report.CompanionSkill.DisplayName} {report.CompanionLevelBefore} → {report.CompanionLevelAfter}");
+        }
+
+        foreach (MarkDefinition mark in report.CompanionMarks)
+        {
+            parts.Add(mark.Good ? $"came home {mark.DisplayName}" : $"carries {mark.DisplayName.ToLowerInvariant()}");
+        }
+
+        if (!report.CompanionWeapon.IsEmpty && report.CompanionWeapon.Durability < 0.25f)
+        {
+            parts.Add($"their {report.CompanionWeapon.Item.DisplayName} wants mending");
+        }
+
+        return parts.Count > 0 ? "\n" + string.Join("; ", parts) + "." : "";
+    }
+
     public static string LessonsHeading(RaidReport report)
     {
         int bonus = 0;

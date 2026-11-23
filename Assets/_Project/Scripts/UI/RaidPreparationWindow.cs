@@ -209,6 +209,9 @@ public sealed partial class RaidPreparationWindow : MonoBehaviour
     private RectTransform companionRowRect;
     private TMP_Text companionName;
     private TMP_Text companionRisk;
+    // Who they are as a fighter (Docs/PeopleSystemReview_2026-11-23.md §2.2): one line, all of it on hover.
+    private TMP_Text companionSelf;
+    private string companionSelfDetail;
     private TMP_Text companionBond;
     private TMP_Text modifiersHeading;
     private TMP_Text modifiersNote;

@@ -291,6 +291,8 @@ public sealed class SettlementState : IHavenView
 {
     [NotSaved("what stands at home, noted again from the buildings on every load there (NoteBuildings, NoteBuilt)")]
     private readonly Dictionary<BuildingDefinition, int> builtTiers = new Dictionary<BuildingDefinition, int>();
+    [NotSaved("seen: counted again from the buildings on every load at home (NoteBuildings)")]
+    private readonly Dictionary<BuildingDefinition, int> builtCounts = new Dictionary<BuildingDefinition, int>();
     [NotSaved("the modules counting at home, noted again from the buildings on every load there (NoteBuildings)")]
     private readonly List<BuildingModuleDefinition> notedModules = new List<BuildingModuleDefinition>();
     private readonly List<ResidentRecord> residents = new List<ResidentRecord>();
@@ -674,6 +676,9 @@ public sealed class SettlementState : IHavenView
     /// <summary>The best tier standing of a kind of building, as last seen at home.</summary>
     public int BuiltTier(BuildingDefinition building) => building != null && builtTiers.TryGetValue(building, out int tier) ? tier : 0;
 
+    /// <summary>How many of <paramref name="building"/> stand at home (as last seen there).</summary>
+    public int BuiltCount(BuildingDefinition building) => building != null && builtCounts.TryGetValue(building, out int count) ? count : 0;
+
     public int BuiltTier(CraftingStationType station)
     {
         int best = 0;
@@ -868,6 +873,7 @@ public sealed class SettlementState : IHavenView
         // Seen, not decided: in a friend's Haven (co-op) the copy notes the friend's buildings too, kept through the host's word
         // (TakeOn leaves what is seen alone).
         builtTiers.Clear();
+        builtCounts.Clear();
         notedModules.Clear();
         // The modules of the best building of each kind (its highest tier, then the most fitted), as the tiers count the best one only.
         var best = new Dictionary<BuildingDefinition, Construction>();
@@ -881,6 +887,7 @@ public sealed class SettlementState : IHavenView
 
             bool upgrades = building.TryGetComponent(out Construction construction);
             NoteBuilt(building.Definition, upgrades ? construction.Level : 1);
+            builtCounts[building.Definition] = BuiltCount(building.Definition) + 1;
             beds += building.Definition.Beds + (upgrades ? Mathf.RoundToInt(construction.Sum(level => level.beds)) : 0);
             if (upgrades && construction.Fitted.Count > 0 && (!best.TryGetValue(building.Definition, out Construction other)
                 || construction.Level > other.Level || (construction.Level == other.Level && construction.Fitted.Count > other.Fitted.Count)))
@@ -975,7 +982,7 @@ public sealed class SettlementState : IHavenView
     // and rumours all read 0).
     private static readonly string[] SeenHere =
     {
-        nameof(builtTiers), "<Beds>k__BackingField", "<ScaffoldsWaiting>k__BackingField",
+        nameof(builtTiers), nameof(builtCounts), "<Beds>k__BackingField", "<ScaffoldsWaiting>k__BackingField",
     };
 
     public void TakeOn(SettlementState other)
@@ -1306,7 +1313,69 @@ public sealed class SettlementState : IHavenView
             }
         }
 
+        // Any trade known in the Haven (Docs/PeopleSystemReview_2026-11-23.md §2.1, the user's go-ahead): someone whose written trade it
+        // is has come home (or is lost), so its rescue is still what brings it; open to anyone while it has room (OpenTo).
+        foreach (JobDefinition job in KnownJobs())
+        {
+            if (!jobs.Contains(job) && WorkplaceMayBeLearned(job, resident) && HasRoom(job, resident))
+            {
+                jobs.Add(job);
+            }
+        }
+
         return jobs;
+    }
+
+    /// <summary>The trades known in the Haven: every written job of someone who lives here or is lost.</summary>
+    public List<JobDefinition> KnownJobs()
+    {
+        var known = new List<JobDefinition>();
+        void Add(ResidentDefinition who)
+        {
+            if (who == null)
+            {
+                return;
+            }
+
+            foreach (JobDefinition job in who.Jobs)
+            {
+                if (job != null && !known.Contains(job))
+                {
+                    known.Add(job);
+                }
+            }
+        }
+
+        foreach (ResidentRecord record in residents)
+        {
+            Add(record.Resident);
+        }
+
+        foreach (FallenRecord lost in fallen)
+        {
+            Add(lost.Resident);
+        }
+
+        return known;
+    }
+
+    /// <summary>
+    /// True when <paramref name="job"/> has room for <paramref name="resident"/> (not their written trade): as many as there are of its
+    /// workplace standing (one before any stands), one for a job without a workplace (the Leader, the Tracker: their bonus counts once).
+    /// </summary>
+    public bool HasRoom(JobDefinition job, ResidentDefinition resident)
+    {
+        int holders = 0;
+        foreach (ResidentRecord record in residents)
+        {
+            if (record.Job == job && record.Resident != resident)
+            {
+                holders++;
+            }
+        }
+
+        int room = job.Workplace != null ? Math.Max(1, BuiltCount(job.Workplace)) : 1;
+        return holders < room;
     }
 
     private bool WorkplaceMayBeLearned(JobDefinition job, ResidentDefinition resident) =>
@@ -1494,22 +1563,39 @@ public sealed class SettlementState : IHavenView
     /// <summary>What everyone's jobs add up to for one bonus (JobDefinition): the Tracker's rumours, say.</summary>
     public int JobBonus(Func<JobDefinition, int> bonus)
     {
+        // Each job once, however many hold it (two smiths at two smithies don't halve repairs twice).
         int total = 0;
-        foreach (ResidentRecord record in residents)
+        for (int i = 0; i < residents.Count; i++)
         {
-            total += record.Job != null ? bonus(record.Job) : 0;
+            JobDefinition job = residents[i].Job;
+            total += job != null && FirstHolder(i, job) ? bonus(job) : 0;
         }
 
         return total;
     }
 
+    private bool FirstHolder(int index, JobDefinition job)
+    {
+        for (int i = 0; i < index; i++)
+        {
+            if (residents[i].Job == job)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /// <summary>What everyone's jobs add up to for one bonus, as a share or an amount.</summary>
     public float JobBonus(Func<JobDefinition, float> bonus)
     {
+        // Each job once, however many hold it.
         float total = 0f;
-        foreach (ResidentRecord record in residents)
+        for (int i = 0; i < residents.Count; i++)
         {
-            total += record.Job != null ? bonus(record.Job) : 0f;
+            JobDefinition job = residents[i].Job;
+            total += job != null && FirstHolder(i, job) ? bonus(job) : 0f;
         }
 
         return total;

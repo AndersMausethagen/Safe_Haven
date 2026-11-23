@@ -35,6 +35,7 @@ public sealed partial class RaidPreparationWindow
         companionHeading.gameObject.SetActive(any);
         companionRow.SetActive(any);
         companionRisk.gameObject.SetActive(any);
+        companionSelf.gameObject.SetActive(any && plan.Companion != null);
         if (!any)
         {
             return y;
@@ -52,11 +53,96 @@ public sealed partial class RaidPreparationWindow
             companionBond.text = raids == 0 ? "No raids together yet" : $"{(string.IsNullOrEmpty(rank) ? "" : rank + ", ")}{raids} raid{(raids == 1 ? "" : "s")} together";
         }
 
+        if (plan.Companion != null)
+        {
+            ResidentRecord along = GameSession.Here.Find(plan.Companion);
+            (companionSelf.text, companionSelfDetail) = CompanionSelf(along, plan.Destination);
+            y = Stack(companionSelf, y, 24f);
+        }
+
         float bleed = plan.Companion != null ? plan.Companion.RaidCompanion.BleedOutSeconds : 0f;
         companionRisk.text = plan.Companion == null ? "One person can go with you." : $"If they fall, help them up within {bleed:0} seconds.";
         companionRiskDetail = plan.Companion == null ? null
             : $"Help them up within {bleed:0} seconds if they fall, or the forest has {plan.Companion.DisplayName}, and they will forget you.";
         return Stack(companionRisk, y, 24f, SectionGap);
+    }
+
+    // Who the one going along is as a fighter: their skill, fighting traits, marks (those against this raid's creatures lit), kit,
+    // spirits and a fighting heart; a short line and the whole on hover.
+    private static (string line, string detail) CompanionSelf(ResidentRecord record, RaidDefinition raid)
+    {
+        if (record == null)
+        {
+            return ("", null);
+        }
+
+        UIStyle style = UIStyle.Current;
+        ProficiencyDefinition skill = ResidentTalents.FightSkill(record);
+        var line = new List<string> { $"{skill?.DisplayName} {ResidentTalents.LevelOf(record, skill)}" };
+        var detail = new List<string> { $"{skill?.DisplayName} {ResidentTalents.LevelOf(record, skill)}: +{ResidentTalents.CompanionDamage(record) * 100f:0}% damage." };
+        foreach (ResidentTraitDefinition trait in ResidentTraits.Of(record))
+        {
+            if (trait != null && IsFighting(trait))
+            {
+                line.Add(trait.DisplayName);
+                detail.Add($"{trait.DisplayName}: {trait.Description}");
+            }
+        }
+
+        string good = ColorUtility.ToHtmlStringRGB(style.Good);
+        foreach (MarkDefinition mark in ResidentMarks.Of(record))
+        {
+            bool here = raid != null && !string.IsNullOrEmpty(mark.Creature) && Meets(raid, mark.Creature);
+            line.Add(here ? $"<color=#{good}>{mark.DisplayName}</color>" : mark.DisplayName);
+            detail.Add($"{mark.DisplayName}{(here ? " (it counts here)" : "")}: {mark.Description}");
+        }
+
+        if (!record.KitWeapon.IsEmpty)
+        {
+            detail.Add($"{CompanionKit.NameOf(record, true)}, {Mathf.RoundToInt(record.KitWeapon.Durability * 100f)}% sound.");
+        }
+
+        Spirits spirits = ResidentSpirits.Of(record);
+        if (spirits != Spirits.Steady)
+        {
+            line.Add(ResidentSpirits.NameOf(spirits));
+        }
+
+        if (record.Inspiration == Inspiration.FightingHeart)
+        {
+            line.Add("spoiling for a fight");
+            detail.Add($"Spoiling for a fight: +{PeopleSettings.Current.FightingHeart * 100f:0}% damage this raid.");
+        }
+
+        return (string.Join(" · ", line), string.Join("\n", detail));
+    }
+
+    private static bool IsFighting(ResidentTraitDefinition trait)
+    {
+        foreach (TraitEffect effect in trait.Effects)
+        {
+            if (effect.kind == TraitEffectKind.FightDamage || effect.kind == TraitEffectKind.FightDodge || effect.kind == TraitEffectKind.FightHealth
+                || effect.kind == TraitEffectKind.NightSight || effect.kind == TraitEffectKind.DamageAgainst)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Whether the raid's creatures include one whose id holds the word (Troll-wary on a raid with trolls).
+    private static bool Meets(RaidDefinition raid, string word)
+    {
+        foreach (MonsterDefinition monster in raid.KnownEnemies)
+        {
+            if (monster != null && monster.Id.IndexOf(word, System.StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     // The right column, stacked the same way: what can't be chosen here takes no room.

@@ -121,7 +121,7 @@ public sealed class RaidCompanions
                 // Read back from where it was written (Home): from the Haven here, a guest's would be the host's record, or none.
                 ResidentRecord record = GameSession.Home.Find(session.Companion);
                 report.CompanionNewRank = rose && record != null ? PeopleBond.Rank(record)?.name : null;
-                SettlePerson(record, session, extracted, rose);
+                SettlePerson(record, session, extracted, rose, report);
             }
         }
 
@@ -130,14 +130,17 @@ public sealed class RaidCompanions
 
     // What the raid made of the person (Docs/PeopleResearch_2026-11-23.md): their fighting skill grew, it may have left a mark (said in
     // the homecoming's words), their kit wore, a fighting heart was spent, and a new bond rank lets the player grow a passion.
-    private void SettlePerson(ResidentRecord record, RaidSession session, bool extracted, bool rose)
+    private void SettlePerson(ResidentRecord record, RaidSession session, bool extracted, bool rose, RaidReport report)
     {
         if (record == null || Companion == null)
         {
             return;
         }
 
+        report.CompanionSkill = ResidentTalents.FightSkill(record);
+        report.CompanionLevelBefore = ResidentTalents.LevelOf(record, report.CompanionSkill);
         ResidentTalents.PractiseRaid(record, session.Tier, Companion.Kills);
+        report.CompanionLevelAfter = ResidentTalents.LevelOf(record, report.CompanionSkill);
         var facts = new RaidFacts
         {
             Extracted = extracted, TimesDowned = Mathf.Max(Companion.TimesHelpedUp, Companion.DownedBy.Count), BossesBeaten = session.BossesBeaten,
@@ -145,11 +148,13 @@ public sealed class RaidCompanions
         };
         foreach (MarkDefinition mark in ResidentMarks.AfterRaid(record, facts, () => UnityEngine.Random.value))
         {
+            report.CompanionMarks.Add(mark);
             PeopleNews.Tell($"{record.Resident.DisplayName} came home {(mark.Good ? "with" : "carrying")} something new: {mark.DisplayName}.",
                 mark.Good ? MessageKind.Gain : MessageKind.Info);
         }
 
         CompanionKit.AfterRaid(record, extracted);
+        report.CompanionWeapon = record.KitWeapon;
         if (heartAlong)
         {
             Inspirations.Use(record, Inspiration.FightingHeart);

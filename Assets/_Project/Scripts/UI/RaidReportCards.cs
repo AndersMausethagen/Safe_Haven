@@ -32,7 +32,10 @@ public static class RaidReportCards
         }
 
         // Every lesson a card, or none: what a "more" card hid would show nowhere (the words leave the lessons out when they are cards).
-        if (report.Lessons.Count == 0 || !lessons.Fits(report.Lessons.Count) || haul + Gap + lessons.HeightFor(report.Lessons.Count) > room)
+        // The companion's cards (what the raid made of them) follow the player's lessons in the same row.
+        List<KitCardFace> along = CompanionFaces(report);
+        int count = report.Lessons.Count + along.Count;
+        if (count == 0 || !lessons.Fits(count) || haul + Gap + lessons.HeightFor(count) > room)
         {
             lessons.Hide();
             return haul;
@@ -56,11 +59,55 @@ public static class RaidReportCards
             });
         }
 
+        faces.AddRange(along);
         float gap = haul > 0f && faces.Count > 0 ? Gap : 0f;
         lessons.Top = top + haul + gap;
-        float learned = lessons.Show(RaidReportText.LessonsHeading(report), "Star", style.Accent, faces);
+        string heading = report.Lessons.Count > 0 ? RaidReportText.LessonsHeading(report) : $"{report.Companion.DisplayName}, beside you";
+        float learned = lessons.Show(heading, "Star", style.Accent, faces);
         lessonsShown = learned > 0f;
         return haul + (learned > 0f ? gap + learned : 0f);
+    }
+
+    /// <summary>What the raid made of the one who went along, as cards: their fighting skill, each mark, their weapon's wear, a passion
+    /// owed (Docs/PeopleSystemReview_2026-11-23.md §2.3). None when nobody came home with the player.</summary>
+    public static List<KitCardFace> CompanionFaces(RaidReport report)
+    {
+        var faces = new List<KitCardFace>();
+        if (report?.Companion == null || report.CompanionLost || report.CompanionSkill == null)
+        {
+            return faces;
+        }
+
+        UIStyle style = UIStyle.Current;
+        string who = report.Companion.DisplayName;
+        bool rose = report.CompanionLevelAfter > report.CompanionLevelBefore;
+        faces.Add(new KitCardFace
+        {
+            Name = rose ? $"{who}: {report.CompanionSkill.DisplayName} {report.CompanionLevelBefore} → {report.CompanionLevelAfter}"
+                : $"{who}: {report.CompanionSkill.DisplayName} {report.CompanionLevelAfter}",
+            Picture = report.CompanionSkill.Icon, Icon = "Sword", Rim = rose ? style.Good : (Color?)null,
+        });
+        foreach (MarkDefinition mark in report.CompanionMarks)
+        {
+            faces.Add(new KitCardFace { Name = $"{who}: {mark.DisplayName}", Icon = mark.Icon, Rim = mark.Good ? style.Good : style.Warning });
+        }
+
+        if (!report.CompanionWeapon.IsEmpty)
+        {
+            faces.Add(new KitCardFace
+            {
+                Name = report.CompanionWeapon.DisplayName, Picture = report.CompanionWeapon.Item.Icon, Icon = "Sword",
+                Badge = $"{Mathf.RoundToInt(report.CompanionWeapon.Durability * 100f)}%",
+                Rim = report.CompanionWeapon.Durability < 0.25f ? style.Warning : (Color?)null,
+            });
+        }
+
+        if (report.CompanionNewRank != null)
+        {
+            faces.Add(new KitCardFace { Name = $"{who} is {report.CompanionNewRank}: a passion to grow", Icon = ResidentTalents.PassionIcon, Rim = style.Good });
+        }
+
+        return faces;
     }
 
     private static float ShowHaul(RaidReport report, KitHaul first, KitHaul second, float top, int rows)

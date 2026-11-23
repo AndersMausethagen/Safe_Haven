@@ -70,6 +70,11 @@ public interface IHavenView
     float WorkerSpeed(string stationId, CraftingStationType station);
     bool HasWorker(JobDefinition job);
     List<JobDefinition> JobsOpenTo(ResidentDefinition resident);
+    /// <summary>The trades known in the Haven (someone whose written trade it is lives here or is lost).</summary>
+    List<JobDefinition> KnownJobs();
+    /// <summary>True when the job has room for one more who isn't its written holder (SettlementState.HasRoom).</summary>
+    bool HasRoom(JobDefinition job, ResidentDefinition resident);
+    int BuiltCount(BuildingDefinition building);
     IReadOnlyList<JobDefinition> VacantJobs { get; }
     int JobBonus(Func<JobDefinition, int> bonus);
     float JobBonus(Func<JobDefinition, float> bonus);

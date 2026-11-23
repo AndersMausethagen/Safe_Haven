@@ -195,6 +195,17 @@ public sealed partial class RaidPreparationWindow
             }
         });
 
+        companionSelf = Label("Self", part, RightColumn, 0f, ColumnWidth, 24f, 15f, style.Accent);
+        companionSelf.richText = true;
+        companionSelf.raycastTarget = true;
+        Hover(companionSelf.gameObject, () =>
+        {
+            if (companionSelfDetail != null)
+            {
+                tooltip.Show(plan.Companion != null ? plan.Companion.DisplayName : "", style.Accent, companionSelfDetail);
+            }
+        });
+
         modifiersHeading = Heading("Raid modifiers", part, RightColumn, 0f, ColumnWidth, style);
         modifiersNote = Label("Note", part, RightColumn, 0f, ColumnWidth, 26f, 16f, style.Muted, TextAlignmentOptions.MidlineRight);
         modifiersNote.text = "One of each is used up on entry";

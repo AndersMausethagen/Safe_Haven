@@ -80,8 +80,14 @@ public static class HavenPeople
             : "By the fire. They manage, but a Hut or Cottage would help."));
         // Their own page: the house they live in (and moving them), their work and their story.
         entry.Actions.Add(new HavenAction("Their page", () => ResidentWindow.Show(person, "Home"), primary: false));
+        entry.Actions.Add(new HavenAction("Who does what", WorkGridWindow.Show, closesWindow: false, primary: false));
         AddWork(entry, record, settlement);
-        List<JobDefinition> others = GameSession.Here.JobsOpenTo(person).Where(one => one != null && one != job).ToList();
+        // Their own trades first, then the best of the rest by their level (any known trade with room: §2.1), a few at most here; the
+        // whole picture is Who does what.
+        ResidentRecord them = GameSession.Here.Find(person);
+        List<JobDefinition> others = GameSession.Here.JobsOpenTo(person).Where(one => one != null && one != job)
+            .OrderBy(one => System.Array.IndexOf(person.Jobs, one) >= 0 ? 0 : 1)
+            .ThenByDescending(one => ResidentTalents.LevelOf(them, one.Skill ?? ResidentTalents.JobSkill(them))).Take(3).ToList();
         if (others.Count > 0)
         {
             entry.Details.Add(new HavenDetail(job != null ? "Could also work as" : "Could work as",

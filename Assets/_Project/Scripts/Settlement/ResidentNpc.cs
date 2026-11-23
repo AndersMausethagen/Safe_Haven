@@ -519,7 +519,31 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
             EnchanterTalk.AddTopics(page, speaker, record, afterAnswer);
         }
 
-        foreach (JobDefinition job in GameSession.Here.JobsOpenTo(resident))
+        // Their work now and their own trades, and the two others they are best at (any known trade with room is open: Who does what
+        // shows them all).
+        ResidentRecord them = GameSession.Here.Find(resident);
+        List<JobDefinition> open = GameSession.Here.JobsOpenTo(resident);
+        var offered = new List<JobDefinition>();
+        foreach (JobDefinition job in open)
+        {
+            if (job != null && (job == current || System.Array.IndexOf(resident.Jobs, job) >= 0))
+            {
+                offered.Add(job);
+            }
+        }
+
+        open.Sort((a, b) => ResidentTalents.LevelOf(them, b.Skill).CompareTo(ResidentTalents.LevelOf(them, a.Skill)));
+        int others = 0;
+        foreach (JobDefinition job in open)
+        {
+            if (job != null && !offered.Contains(job) && others < 2)
+            {
+                offered.Add(job);
+                others++;
+            }
+        }
+
+        foreach (JobDefinition job in offered)
         {
             if (job == null)
             {

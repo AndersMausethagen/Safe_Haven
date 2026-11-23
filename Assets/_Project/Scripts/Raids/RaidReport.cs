@@ -121,6 +121,14 @@ public sealed class RaidReport
     public bool CompanionLost { get; set; }
     /// <summary>The bond they reached on this raid, or null when it didn't change.</summary>
     public string CompanionNewRank { get; set; }
+    /// <summary>What the raid made of them (Docs/PeopleSystemReview_2026-11-23.md §2.3): their fighting skill before and after.</summary>
+    public ProficiencyDefinition CompanionSkill { get; set; }
+    public int CompanionLevelBefore { get; set; }
+    public int CompanionLevelAfter { get; set; }
+    /// <summary>Marks the raid left on them (or turned into).</summary>
+    public List<MarkDefinition> CompanionMarks { get; } = new List<MarkDefinition>();
+    /// <summary>Their kit's weapon as it came home (empty with none).</summary>
+    public ItemStack CompanionWeapon { get; set; }
     /// <summary>Someone lost before, brought home by this raid. They don't know the player.</summary>
     public ResidentDefinition FoundAgain { get; set; }
     /// <summary>Someone lost before, found on this raid and left out there again.</summary>
