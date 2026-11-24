@@ -3263,8 +3263,8 @@ Bodies; Loot From Bodies off restores the old straight-to-bag behaviour).
 - Co-op: personal as before (`OnAFriendsCopy` Same): each game rolls and leaves its own; a kill by a friend leaves a body to loot too.
 - **Review fixes (2026-11-24):** a kill by someone else on the player's side further than Hand Over Beyond (20 m) goes straight to the
   bag as before (`LootOnDeath.StruckNearPlayer`: a wall defended while away, the Keeper's view). An elite's own roll, relic and inscription
-  join its body (`LootableRemains.Leave` again for the same creature merges; `Rename` to its title). At most Most Loot Bodies (24) wait;
-  the oldest fades first. A fading body raises `LeftBehind` (the raid report's count) and writes `LootLeft`. The corpse is held at once
+  join its body (`LootableRemains.Leave` again for the same creature merges; `Rename` to its title). Most Loot Bodies and Lootable Seconds
+  can cap them, but both are 0 (the user: "make sure bodies dont dissapear until after we loot them"): a body waits until looted. A fading body raises `LeftBehind` (the raid report's count) and writes `LootLeft`. The corpse is held at once
   in `Leave` (it is made before Died), and the limit's choice is `DeathRagdoll.ToClear` (tested). The loot point stops following once
   the corpse has settled. `LootableRemains.Version` drives the window's redraws. `[InAFriendsHaven(Anyone)]` on the remains.
   Not done: loot left on bodies at home when the game is saved and quit is lost, as it is on a raid.

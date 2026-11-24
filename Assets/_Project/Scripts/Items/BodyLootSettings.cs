@@ -12,12 +12,14 @@ public sealed class BodyLootSettings : GameSettings<BodyLootSettings>
 {
     [Tooltip("On: a creature's loot waits on its body. Off: straight into the killer's bag, as before 2026-11-24.")]
     [SerializeField] private bool lootFromBodies = true;
-    [Tooltip("How long a body keeps its loot, in seconds. Then it fades with what it held; a looted body sinks as any corpse.")]
-    [SerializeField, Min(10f)] private float lootableSeconds = 600f;
+    [Tooltip("How long a body keeps its loot, in seconds, before it fades with what it held. 0: until it is looted (the user, 2026-11-24: " +
+             "\"make sure bodies dont dissapear until after we loot them\"). A looted body sinks as any corpse.")]
+    [SerializeField, Min(0f)] private float lootableSeconds;
     [Tooltip("How close the player must be to loot it, in metres, measured to its loot point.")]
     [SerializeField, Min(0.5f)] private float reach = 2.2f;
-    [Tooltip("At most this many bodies wait with loot at once; past it the oldest fades first (each is a ragdoll, an outline and glitter).")]
-    [SerializeField, Min(1)] private int mostLootBodies = 24;
+    [Tooltip("At most this many bodies wait with loot at once; past it the oldest fades first (each is a ragdoll, an outline and glitter). " +
+             "0: no limit, every body waits to be looted.")]
+    [SerializeField, Min(0)] private int mostLootBodies;
     [Tooltip("A kill by someone else on the player's side (a companion, a trap, a watch post's archer) further than this from the player " +
              "goes straight to the bag, as before: nobody is there to loot it (a wall defended while away, the Keeper's view).")]
     [SerializeField, Min(0f)] private float handOverBeyond = 20f;

@@ -263,8 +263,8 @@ public sealed class BodyLootPage : SystemsPage
     public override string Group => "World";
     public override string Help => "A slain creature's loot waits on its body: it glows faintly and glitters until the player loots it (Interact) " +
                                    "in the loot window, a stack at a time or all at once. A relic or inscription it holds is found on opening. " +
-                                   "Gathering, crates and caches still hand things over at once. A body keeps its loot for Lootable Seconds, " +
-                                   "then fades with it; looted, it sinks as any corpse.";
+                                   "Gathering, crates and caches still hand things over at once. A body keeps its loot until it is looted (or for " +
+                                   "Lootable Seconds, when set); looted, it sinks as any corpse.";
 
     public override void Draw()
     {
@@ -276,7 +276,8 @@ public sealed class BodyLootPage : SystemsPage
 
         SettingsPanel(settings, "Loot on Bodies", "Resources/BodyLootSettings");
         BeginDerived();
-        Derived("A body keeps its loot", $"{settings.LootableSeconds / 60f:0.#} minutes");
+        Derived("A body keeps its loot", settings.LootableSeconds > 0f ? $"{settings.LootableSeconds / 60f:0.#} minutes" : "until it is looted");
+        Derived("Bodies with loot at once", settings.MostLootBodies > 0 ? $"{settings.MostLootBodies}, then the oldest fades" : "no limit");
         EndDerived();
     }
 }

@@ -116,7 +116,7 @@ public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteract
         {
             // Too many waiting (a long fight, a swarm): the oldest fades first, each body being a ragdoll, an outline and its glitter.
             int most = BodyLootSettings.Current.MostLootBodies;
-            while (all.Count >= most && all.Count > 0)
+            while (most > 0 && all.Count >= most && all.Count > 0)
             {
                 LootableRemains oldest = all[0];
                 all.RemoveAt(0);
@@ -256,7 +256,7 @@ public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteract
     private void Build()
     {
         BodyLootSettings settings = BodyLootSettings.Current;
-        expiresAt = Time.time + settings.LootableSeconds;
+        expiresAt = settings.LootableSeconds > 0f ? Time.time + settings.LootableSeconds : 0f;
         point = gameObject.AddComponent<SphereCollider>();
         point.isTrigger = true;
         point.radius = 0.5f;
@@ -453,7 +453,8 @@ public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteract
 
     private void Update()
     {
-        if (Time.time >= expiresAt)
+        // 0 seconds: it waits until it is looted.
+        if (expiresAt > 0f && Time.time >= expiresAt)
         {
             Fade("faded");
             return;

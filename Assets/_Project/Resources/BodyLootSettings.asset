@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: BodyLootSettings
   m_EditorClassIdentifier: SafeHaven::BodyLootSettings
   lootFromBodies: 1
-  lootableSeconds: 600
+  lootableSeconds: 0
   reach: 2.2
+  mostLootBodies: 0
+  handOverBeyond: 20
   windowReach: 4
   glow: {r: 1, g: 0.84, b: 0.45, a: 0.85}
   glowPixels: 2
