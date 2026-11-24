@@ -394,6 +394,28 @@ public static class GameInput
         return null;
     }
 
+    /// <summary>The action a key token names ("Guard", or a verb such as "Feed"), as the text shows it on what the player is using now;
+    /// null when it names none.</summary>
+    public static InputAction ActionForToken(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            return null;
+        }
+
+        if (string.Equals(name, BackToken, System.StringComparison.OrdinalIgnoreCase))
+        {
+            return Back;
+        }
+
+        if (InputDevices.UsingGamepad && PadVerbs.TryGetValue(name, out string padAction))
+        {
+            return Find(padAction, quiet: true);
+        }
+
+        return ActionNamed(Verbs.TryGetValue(name, out string verb) ? verb : name);
+    }
+
     private static InputAction ActionNamed(string name)
     {
         if (name.IndexOf('/') >= 0)

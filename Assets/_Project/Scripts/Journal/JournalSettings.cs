@@ -29,6 +29,10 @@ public sealed class JournalPage
     public Sprite art;
     [Tooltip("What it is, in a sentence or two, above how it works (the body). Mechanics pages only.")]
     [TextArea(2, 4)] public string summary;
+    [Tooltip("Things to try as the tutorial opens, done in order: a few words each with one key in it (\"[{key:Guard}] Hold to guard\"). " +
+             "The tutorial card ticks a step off when its key is pressed, and the page counts as read when all are done (TutorialLesson). " +
+             "Mechanics pages only; empty: the card just names the page.")]
+    public List<string> steps = new List<string>();
 }
 
 /// <summary>A cinematic the journal (Backstory tab) and the main menu (Cinematics) offer to watch again.</summary>

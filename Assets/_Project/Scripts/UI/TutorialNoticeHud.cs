@@ -4,16 +4,26 @@ using UnityEngine.UI;
 using static CodeUI;
 
 /// <summary>
-/// The notice that a tutorial is waiting. When one opens, a card at the right edge fades in quickly with the newest one's painting and
-/// name and the key to read it (T); left unread it fades slowly away after a few seconds (not while the pointer is on it), leaving only a
-/// small line at the edge that says how many wait ("2 unread tutorials · T"), which stays until they are read. Clicking either, or the
-/// key, opens TutorialWindow. Both step aside while a window covers the screen. It only reads Tutorials. Built in code for every scene with
-/// a player (ExperienceTracker).
+/// The notice that a tutorial is waiting. When one opens, a card at the right edge fades in quickly with the newest one's painting,
+/// name, what it is in a line, and the key to read it all (T). A page with steps teaches on the card while the game goes on
+/// (Docs/QualityLevers_2026-11-24.md §1: a new tutorial cost a trip into a window, 56 s of the first 13 at home): "TRY IT" and its steps,
+/// each with its key, ticked off in order as that key is pressed (TutorialLesson); all done, "LEARNED" and the page counts as read. The
+/// card stays while a lesson is under way (up to LessonSeconds), else fades slowly after a few seconds (not while the pointer is on it),
+/// leaving a small line at the edge that says how many wait ("2 unread tutorials · T"). Clicking either, or the key, opens
+/// TutorialWindow. Both step aside while a window covers the screen. Built in code for every scene with a player (ExperienceTracker).
 /// </summary>
 public sealed class TutorialNoticeHud : MonoBehaviour
 {
-    private const float CardWidth = 340f;
+    private const float CardWidth = 380f;
+    // The card's head (painting, name, hint); what it is and the steps go under it.
     private const float CardHeight = 92f;
+    private const float SummaryGap = 6f;
+    private const float StepHeight = 26f;
+    private const int MostSteps = 4;
+    // A lesson keeps the card up this long at most; done, "LEARNED" shows this long.
+    private const float LessonSeconds = 45f;
+    private const float LearnedSeconds = 2.5f;
+    private const string StepIndent = "<space=1.5em>";
     private const float ThumbWidth = 128f;
     private const float ThumbHeight = ThumbWidth * 9f / 16f;
     // Up from the middle of the right edge, clear of the quest tracker above and the minimap below.
@@ -34,6 +44,13 @@ public sealed class TutorialNoticeHud : MonoBehaviour
     private TMP_Text title;
     private TMP_Text hint;
     private int shownCount;
+    private TMP_Text summary;
+    private readonly TMP_Text[] stepRows = new TMP_Text[MostSteps];
+    private TutorialLesson lesson;
+    private float lessonUntil;
+    private float learnedUntil = -1f;
+    // The frame the lesson began: the press that opened its page (the first swing at a tree) doesn't also do its first step.
+    private int lessonFrame;
     private CanvasGroup cardFade;
     private RectTransform line;
     private CanvasGroup lineFade;
@@ -103,6 +120,40 @@ public sealed class TutorialNoticeHud : MonoBehaviour
     /// <summary>Whether the small "unread" line is up instead.</summary>
     public bool ShowingLine => line != null && line.gameObject.activeSelf;
 
+    /// <summary>The page being learned on the card, with its steps done so far; null when the card has none.</summary>
+    public TutorialLesson Lesson => lesson;
+
+    /// <summary>The key named <paramref name="token"/> was pressed (Update, from the input; tests call it): the lesson's step now is done
+    /// when it is that key's, and the page is learned when it was the last.</summary>
+    public void Pressed(string token)
+    {
+        if (lesson == null || !lesson.Press(token))
+        {
+            return;
+        }
+
+        if (Application.isPlaying)
+        {
+            UIMotion.Sound(AudioManager.Sounds != null ? AudioManager.Sounds.QuestStarted : null);
+        }
+
+        if (!lesson.Finished)
+        {
+            Draw(lesson.Page, Tutorials.Pending.Count);
+            return;
+        }
+
+        // Learned: the card says so a moment, then the next waiting page (if any) takes it. Read, it no longer waits.
+        learnedUntil = Time.unscaledTime + LearnedSeconds;
+        shownUntil = Mathf.Max(shownUntil, learnedUntil);
+        Tutorials.MarkSeen(lesson.Page);
+        Draw(lesson.Page, Tutorials.Pending.Count);
+        if (Application.isPlaying && card.gameObject.activeSelf)
+        {
+            UIMotion.Punch(card);
+        }
+    }
+
     private void Awake()
     {
         Current = this;
@@ -131,7 +182,9 @@ public sealed class TutorialNoticeHud : MonoBehaviour
     private void Build(Transform root)
     {
         UIStyle style = UIStyle.Current;
-        card = Box("Card", root, new Vector2(1f, 0.5f), new Vector2(CardWidth, CardHeight), new Vector2(-EdgeGap - CardWidth * 0.5f, RaisedBy));
+        // Hung from its top, so what it is and the steps grow it downwards.
+        card = Box("Card", root, new Vector2(1f, 0.5f), new Vector2(CardWidth, CardHeight), new Vector2(-EdgeGap - CardWidth * 0.5f, RaisedBy + CardHeight * 0.5f));
+        card.pivot = new Vector2(0.5f, 1f);
         // Hearthline 3: a rounded card in the kit's look, its gold rim breathing while it waits.
         Image background = HearthKit.Sliced(card.gameObject.AddComponent<Image>(), style.Card, 1.2f);
         background.color = style.Panel;
@@ -161,6 +214,15 @@ public sealed class TutorialNoticeHud : MonoBehaviour
         title.fontSizeMax = 20f;
         hint = Label("Hint", card, textX, 60f, textWidth, 22f, 15f, style.Muted);
         hint.richText = true;
+        summary = Paragraph("What It Is", card, 12f, CardHeight + SummaryGap, CardWidth - 24f, 60f, 15f, style.Text);
+        summary.richText = true;
+        for (int i = 0; i < MostSteps; i++)
+        {
+            stepRows[i] = Label("Step " + (i + 1), card, 14f, CardHeight, CardWidth - 28f, StepHeight, 16f, style.Text);
+            stepRows[i].richText = true;
+            stepRows[i].gameObject.SetActive(false);
+        }
+
         foreach (TMP_Text text in card.GetComponentsInChildren<TMP_Text>())
         {
             text.raycastTarget = false;
@@ -203,13 +265,36 @@ public sealed class TutorialNoticeHud : MonoBehaviour
 
         // Out of the way while a window is up (the tutorial itself, the bag, a station...), back when it closes. The card only for a
         // while after a tutorial opens (longer while the pointer rests on it); then the small line.
-        bool waiting = Tutorials.Pending.Count > 0 && (UIStateManager.Current == null || !UIStateManager.Current.IsAnyWindowOpen);
+        // The step's key, pressed in play (a window's own keys don't count: the gameplay keys are off under it).
+        string token = lesson != null ? lesson.CurrentToken : null;
+        if (token != null && Time.frameCount > lessonFrame)
+        {
+            UnityEngine.InputSystem.InputAction action = GameInput.ActionForToken(token);
+            if (action != null && action.enabled && action.WasPressedThisFrame())
+            {
+                Pressed(token);
+            }
+        }
+
+        // "LEARNED" has had its moment: the next waiting page, if any.
+        if (learnedUntil > 0f && Time.unscaledTime >= learnedUntil)
+        {
+            learnedUntil = -1f;
+            lesson = null;
+            shownCount = 0;
+            Refresh();
+        }
+
+        bool noWindow = UIStateManager.Current == null || !UIStateManager.Current.IsAnyWindowOpen;
+        bool pending = Tutorials.Pending.Count > 0 && noWindow;
+        bool waiting = (Tutorials.Pending.Count > 0 || learnedUntil > 0f) && noWindow;
+        bool teaching = lesson != null && !lesson.Finished && Time.unscaledTime < lessonUntil;
         if (card.gameObject.activeSelf && Hovered(card))
         {
             shownUntil = Mathf.Max(shownUntil, Time.unscaledTime + 1f);
         }
 
-        bool wanted = waiting && Time.unscaledTime < shownUntil;
+        bool wanted = waiting && (Time.unscaledTime < shownUntil || teaching);
         float dt = Time.unscaledDeltaTime;
         cardFade.alpha = Mathf.MoveTowards(cardFade.alpha, wanted ? 1f : 0f, dt / (wanted ? FadeIn : FadeOut));
         bool cardUp = cardFade.alpha > 0.001f;
@@ -218,7 +303,7 @@ public sealed class TutorialNoticeHud : MonoBehaviour
             card.gameObject.SetActive(cardUp);
         }
 
-        bool lineWanted = waiting && !wanted && cardFade.alpha < 0.3f;
+        bool lineWanted = pending && !wanted && cardFade.alpha < 0.3f;
         lineFade.alpha = Mathf.MoveTowards(lineFade.alpha, lineWanted ? 1f : 0f, dt / 0.4f);
         bool lineUp = lineFade.alpha > 0.001f;
         if (lineUp != line.gameObject.activeSelf)
@@ -232,7 +317,8 @@ public sealed class TutorialNoticeHud : MonoBehaviour
         }
     }
 
-    private void Refresh()
+    /// <summary>Shows what waits now (heard from Tutorials.Changed; an edit-mode test, where OnEnable doesn't run, calls it).</summary>
+    public void Refresh()
     {
         if (card == null)
         {
@@ -240,19 +326,47 @@ public sealed class TutorialNoticeHud : MonoBehaviour
         }
 
         int count = Tutorials.Pending.Count;
-        if (count == 0)
+        // "LEARNED" holds the card until its moment is over (Update refreshes then).
+        if (learnedUntil > 0f)
         {
-            shownCount = 0;
+            if (count > 0)
+            {
+                StyleLine(count);
+            }
+
+            if (lesson != null)
+            {
+                Draw(lesson.Page, count);
+            }
+
             return;
         }
 
-        JournalPage newest = Tutorials.Pending[count - 1];
-        heading.text = count > 1 ? $"{count} NEW TUTORIALS" : "NEW TUTORIAL";
-        title.text = newest.title;
-        thumb.sprite = newest.art;
-        thumb.enabled = newest.art != null;
-        thumbGlyph.text = newest.art == null && !string.IsNullOrEmpty(newest.title) ? newest.title.Substring(0, 1) : "";
-        hint.text = GameInput.WithRebinds("Press ({key:Tutorial}) or click to read");
+        if (count == 0)
+        {
+            shownCount = 0;
+            lesson = null;
+            return;
+        }
+
+        // The lesson: the newest waiting page with steps; one read in the window meanwhile is no longer taught.
+        if (lesson != null && !Contains(Tutorials.Pending, lesson.Page))
+        {
+            lesson = null;
+        }
+
+        for (int i = count - 1; i >= 0 && lesson == null; i--)
+        {
+            if (TutorialLesson.HasSteps(Tutorials.Pending[i]))
+            {
+                lesson = new TutorialLesson(Tutorials.Pending[i]);
+                lessonUntil = Time.unscaledTime + LessonSeconds;
+                lessonFrame = Time.frameCount;
+            }
+        }
+
+        JournalPage newest = lesson != null ? lesson.Page : Tutorials.Pending[count - 1];
+        Draw(newest, count);
         StyleLine(count);
         // A new one brings the card back, quickly, for a while.
         if (count > shownCount)
@@ -272,6 +386,67 @@ public sealed class TutorialNoticeHud : MonoBehaviour
         }
 
         shownCount = count;
+    }
+
+    private static bool Contains(System.Collections.Generic.IReadOnlyList<JournalPage> pages, JournalPage page)
+    {
+        for (int i = 0; i < pages.Count; i++)
+        {
+            if (pages[i] == page)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // The card for <page>: its head, what it is, and its steps when it is the lesson.
+    private void Draw(JournalPage page, int count)
+    {
+        bool teaching = lesson != null && lesson.Page == page;
+        heading.text = teaching ? (lesson.Finished ? "LEARNED" : "TRY IT") : count > 1 ? $"{count} NEW TUTORIALS" : "NEW TUTORIAL";
+        title.text = page.title;
+        thumb.sprite = page.art;
+        thumb.enabled = page.art != null;
+        thumbGlyph.text = page.art == null && !string.IsNullOrEmpty(page.title) ? page.title.Substring(0, 1) : "";
+        hint.text = GameInput.WithRebinds(teaching && lesson.Finished ? "In the journal ({key:Journal})" : "({key:Tutorial}) or click to read more");
+
+        summary.text = GameInput.WithRebinds(string.IsNullOrWhiteSpace(page.summary) ? page.line : page.summary) ?? "";
+        float summaryHeight = summary.text.Length == 0 ? 0f : Mathf.Ceil(summary.GetPreferredValues(summary.text, CardWidth - 24f, 0f).y);
+        RectTransform summaryRect = summary.rectTransform;
+        summaryRect.sizeDelta = new Vector2(summaryRect.sizeDelta.x, summaryHeight);
+
+        UIStyle style = UIStyle.Current;
+        float y = CardHeight + (summaryHeight > 0f ? SummaryGap + summaryHeight + 6f : 0f);
+        int shown = teaching ? Mathf.Min(MostSteps, lesson.Count) : 0;
+        for (int i = 0; i < MostSteps; i++)
+        {
+            TMP_Text row = stepRows[i];
+            row.gameObject.SetActive(i < shown);
+            if (i >= shown)
+            {
+                continue;
+            }
+
+            string step = GameInput.WithRebinds(page.steps[i]);
+            if (i < lesson.Done)
+            {
+                row.text = HearthKit.InlineIcon("Star") + "  <s>" + step + "</s>";
+                row.color = style.Muted;
+            }
+            else
+            {
+                // Indented as far as a done row's star, so the keys line up.
+                row.text = StepIndent + (i == lesson.Done ? "<b>" + step + "</b>" : step);
+                row.color = i == lesson.Done ? style.Text : style.Faint;
+            }
+
+            row.rectTransform.anchoredPosition = new Vector2(14f, -y);
+            y += StepHeight;
+        }
+
+        card.sizeDelta = new Vector2(CardWidth, y + 10f);
     }
 
     private static bool Hovered(RectTransform rect)

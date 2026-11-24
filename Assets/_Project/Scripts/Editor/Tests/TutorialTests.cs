@@ -122,6 +122,76 @@ public sealed class TutorialTests
     }
 
     [Test]
+    public void EveryStep_NamesOneKeyThatExists_AndNoPageWritesAKeyOut()
+    {
+        // A key written out ("Hold Left Ctrl") never followed a rebinding or a controller; a step's key is what the card listens for.
+        var writtenOut = new System.Text.RegularExpressions.Regex(@"\b(Left|Right) (Ctrl|Shift|Alt)\b|\b(left|right|middle) mouse button\b|^Space\b",
+            System.Text.RegularExpressions.RegexOptions.Multiline);
+        int checkedSteps = 0;
+        foreach (JournalPage page in Settings.Mechanics)
+        {
+            Assert.IsFalse(writtenOut.IsMatch(page.body), $"{page.title} writes a key out: use {{key:Action}}");
+            foreach (string step in page.steps)
+            {
+                string token = TutorialLesson.TokenOf(step);
+                Assert.IsNotNull(token, $"{page.title}: \"{step}\" has no key");
+                Assert.IsNotNull(GameInput.ActionForToken(token), $"{page.title}: {{key:{token}}} names no action");
+                Assert.IsNull(GameInput.UnknownKey(step), page.title);
+                checkedSteps++;
+            }
+        }
+
+        Assert.Greater(checkedSteps, 30);
+    }
+
+    [Test]
+    public void ALesson_IsDoneInOrder_ByItsKeys()
+    {
+        var page = new JournalPage { title = "A test's page" };
+        page.steps.Add("[{key:Guard}] Hold to guard");
+        page.steps.Add("[{key:Attack}] Then strike");
+        var lesson = new TutorialLesson(page);
+        Assert.IsFalse(lesson.Press("Attack"), "the second step's key does nothing yet");
+        Assert.IsTrue(lesson.Press("guard"), "a token is matched whatever its case");
+        Assert.IsFalse(lesson.Finished);
+        Assert.IsTrue(lesson.Press("Attack"));
+        Assert.IsTrue(lesson.Finished);
+        Assert.IsNull(lesson.CurrentToken);
+        Assert.IsFalse(lesson.Press("Attack"), "done is done");
+    }
+
+    [Test]
+    public void ATutorialWithSteps_IsLearnedOnTheCard_AndThenIsRead()
+    {
+        TutorialNoticeHud notice = TutorialNoticeHud.Create();
+        try
+        {
+            JournalNotices.Tried(LevelingSettings.Current.FindSkill("woodcutting"));
+            Assert.IsNotEmpty(Tutorials.Pending);
+            JournalPage page = Tutorials.Pending[Tutorials.Pending.Count - 1];
+            Assert.IsTrue(TutorialLesson.HasSteps(page), "woodcutting's page teaches on the card");
+            notice.Refresh(); // in Play it hears Tutorials.Changed; an edit-mode test doesn't run OnEnable
+            Assert.IsNotNull(notice.Lesson, "the card teaches the page that opened");
+            Assert.AreEqual(page, notice.Lesson.Page);
+
+            notice.Pressed("Journal"); // a key the lesson doesn't ask for
+            Assert.AreEqual(0, notice.Lesson.Done);
+            for (int i = 0; i < page.steps.Count; i++)
+            {
+                notice.Pressed(TutorialLesson.TokenOf(page.steps[i]));
+            }
+
+            Assert.IsTrue(notice.Lesson.Finished);
+            Assert.IsTrue(GameSession.Progress.Journal.HasRead(Tutorials.ReadKeyOf(page)), "learned is read");
+            CollectionAssert.DoesNotContain(Tutorials.Pending, page);
+        }
+        finally
+        {
+            Object.DestroyImmediate(notice.gameObject);
+        }
+    }
+
+    [Test]
     public void TheWindowAndNotice_ShowWhatWaits()
     {
         TutorialWindow window = TutorialWindow.Create();
