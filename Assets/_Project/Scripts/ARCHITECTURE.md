@@ -3267,7 +3267,8 @@ Bodies; Loot From Bodies off restores the old straight-to-bag behaviour).
   can cap them, but both are 0 (the user: "make sure bodies dont dissapear until after we loot them"): a body waits until looted. A fading body raises `LeftBehind` (the raid report's count) and writes `LootLeft`. The corpse is held at once
   in `Leave` (it is made before Died), and the limit's choice is `DeathRagdoll.ToClear` (tested). The loot point stops following once
   the corpse has settled. `LootableRemains.Version` drives the window's redraws. `[InAFriendsHaven(Anyone)]` on the remains.
-  Not done: loot left on bodies at home when the game is saved and quit is lost, as it is on a raid.
+  Loot left on a body when the raid ends or the game is left (saved and quit, at home too) disappears: the user's decision
+  (2026-11-24, "leftover loot dissapears"); bodies aren't saved.
 
 ## Storage: a chest each, quick stack, water as a cost (2026-11-15)
 
