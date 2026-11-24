@@ -22,6 +22,9 @@ MonoBehaviour:
   castTime: 0.45
   lungeDistance: 0
   lungeDuration: 0.22
+  foesStatus: {fileID: 0}
+  foesRadius: 7
+  foesDelay: 0.5
   leaves: {fileID: 8259815620890901134, guid: b7e51a4d7a62cfa40a36b487ec2459ae, type: 3}
   leavesCount: 3
   attack: {fileID: 11400000, guid: d00127f28eb6938489ecee69ff6d6719, type: 2}

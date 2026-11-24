@@ -136,6 +136,24 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
 
     public bool Has(StatusEffectDefinition effect) => Find(effect) != null;
 
+    /// <summary>How much of its bearer's damage its blows deal while these last (Status Effect › Damage Dealt; Cowed): 1 when none asks.</summary>
+    public float DamageDealtScale
+    {
+        get
+        {
+            float scale = 1f;
+            foreach (Active entry in active)
+            {
+                if (entry.Definition != null && Time.time < entry.EndsAt)
+                {
+                    scale *= entry.Definition.DamageDealt;
+                }
+            }
+
+            return scale;
+        }
+    }
+
     /// <summary>The slowest of what is at work (Status Effect › Move Speed): 1 unhindered, 0 held fast. The player's speed is set from it
     /// here; a creature's movement asks for it (MonsterAI).</summary>
     public float MoveScale

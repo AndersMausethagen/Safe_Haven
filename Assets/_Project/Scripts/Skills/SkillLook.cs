@@ -61,6 +61,12 @@ public sealed class SkillLook
     [Min(0f)] public float lightSeconds = 0.35f;
     [Tooltip("Camera shake at the release (0 none, 1 a heavy blow's).")]
     [Range(0f, 2f)] public float shake;
+    [Tooltip("Heard as it is cast, from the caster (ice gathering, embers catching). Empty: nothing.")]
+    public SoundDefinition castSound;
+    [Tooltip("Heard as it lands, where it lands (the lance breaking out of the ground, the slam). Empty: nothing.")]
+    public SoundDefinition releaseSound;
+    [Tooltip("Seconds after the release that its sound is heard (a war cry's roar comes into its loudest a moment in).")]
+    [Min(0f)] public float releaseSoundDelay;
 
-    public bool IsEmpty => cast.Count == 0 && release.Count == 0 && struck.Count == 0;
+    public bool IsEmpty => cast.Count == 0 && release.Count == 0 && struck.Count == 0 && castSound == null && releaseSound == null;
 }

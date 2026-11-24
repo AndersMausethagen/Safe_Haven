@@ -24,6 +24,7 @@ MonoBehaviour:
   moveSpeed: 0
   damageTaken: 1
   stopsStrikes: 1
+  damageDealt: 1
   consumedBy: 131
   consumeDamage: 0.75
   consumeLook: {fileID: 4019741075779077962, guid: 92dea07e5039e9d4f8eca3c4417c0d12, type: 3}

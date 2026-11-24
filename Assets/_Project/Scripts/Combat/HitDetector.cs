@@ -39,14 +39,27 @@ public static class HitDetector
         List<Hit> results,
         float arcBonus = 0f)
     {
+        Find(origin, direction, attack.Range, attack.Arc + arcBonus, attackerFaction, layerMask, results);
+        if (attack.MaxTargets > 0 && results.Count > attack.MaxTargets)
+        {
+            results.RemoveRange(attack.MaxTargets, results.Count - attack.MaxTargets);
+        }
+    }
+
+    /// <summary>Every foe of <paramref name="attackerFaction"/> within <paramref name="radius"/> all round, not behind a wall (a war cry).</summary>
+    public static void FindAround(Vector3 origin, float radius, Faction attackerFaction, int layerMask, List<Hit> results) =>
+        Find(origin, Vector3.forward, radius, 360f, attackerFaction, layerMask, results);
+
+    private static void Find(Vector3 origin, Vector3 direction, float range, float arc, Faction attackerFaction, int layerMask, List<Hit> results)
+    {
         results.Clear();
 
         direction.y = 0f;
         direction = direction.sqrMagnitude > 0.0001f ? direction.normalized : Vector3.forward;
 
         Vector3 center = origin + Vector3.up * CenterHeight;
-        int count = Physics.OverlapSphereNonAlloc(center, attack.Range, Overlaps, layerMask, QueryTriggerInteraction.Ignore);
-        float halfArc = Mathf.Min(360f, attack.Arc + arcBonus) * 0.5f;
+        int count = Physics.OverlapSphereNonAlloc(center, range, Overlaps, layerMask, QueryTriggerInteraction.Ignore);
+        float halfArc = Mathf.Min(360f, arc) * 0.5f;
 
         for (int i = 0; i < count; i++)
         {
@@ -77,11 +90,6 @@ public static class HitDetector
         }
 
         results.Sort(ByDistance);
-
-        if (attack.MaxTargets > 0 && results.Count > attack.MaxTargets)
-        {
-            results.RemoveRange(attack.MaxTargets, results.Count - attack.MaxTargets);
-        }
     }
 
     // Scenery between the blow and the target (a palisade, a gate, an arena's root wall, a hill) takes it: a blow was a sphere and a

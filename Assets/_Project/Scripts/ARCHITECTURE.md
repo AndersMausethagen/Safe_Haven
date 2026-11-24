@@ -3331,6 +3331,16 @@ sample textures and flames are in `Art/Effects/VFX Graph/Additions` (Unity Compa
   fitted to the weapon's mesh the same way) shows `CombatFeelSettings.ArtBladeGlow` (Art Blade Glow: sparks of light along the blade,
   Radius = the blade's half length) in the art's colour (its look's light, else its slash colour) with a small light, from the art's
   wind-up while `PlayerCombat.ArtBlowPending`, then fades over 0.3 s.
+- **War Cry** (the user: "war cry can be teached by the portal after the first death. create a quest for it"): `WarCry` (Steel; 30 s
+  cooldown; +15% Damage Bonus for 8 s; the Stylized Emote_Roar as state `War Cry` on all three swing layers, x1.5). `SkillDefinition.
+  FoesStatus/FoesRadius/FoesDelay`: `PlayerSkills.RingOut` lays it on every foe within 7 m at 0.5 s (`HitDetector.FindAround`, the same
+  side and wall tests as a blow; a dodge or a stagger before then cuts the cry off). **Cowed** (`StatusEffectDefinition.DamageDealt`
+  0.8 for 8 s): `DamageCalculator.DealtScale`/`BonusScale` multiply the attacker's own statuses in. Quest **Back Through the Door**
+  (after The Door Wakes; starts on the new objective `FallInRaid` = a RaidFinished with outcome Died; Talk To the Portal; teaches War Cry);
+  the portal's whisper for it is on the Haven scene's HomePortal.
+- **Sounds** (Docs/CombatSkillsResearch 6): `SkillLook.castSound/releaseSound/releaseSoundDelay` (SkillFx plays them; the effects builder
+  keeps them when it remakes a look) and `StatusEffectDefinition.consumeSound` (Shatter). Takes for 13 sounds wait on the user's ear:
+  MOSS and Stable Audio 3 (two each) and `Tools/Audio/skills.py` (two each; none for the war cry's voice) on the Skill sound picks page.
 
 ## Loot on bodies (2026-11-24)
 

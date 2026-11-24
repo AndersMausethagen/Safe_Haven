@@ -228,6 +228,30 @@ public sealed class SkillLookTests
     }
 
     [Test]
+    public void TheWarCry_CowsFoes_AndThePortalTeachesItAfterAFall()
+    {
+        var cry = AssetDatabase.LoadAssetAtPath<SkillDefinition>("Assets/_Project/Data/Skills/WarCry.asset");
+        Assert.IsNotNull(cry.FoesStatus, "it lays something on the foes that hear it");
+        Assert.Less(cry.FoesStatus.DamageDealt, 1f, "they strike weaker");
+
+        // A Cowed creature's blows: its own statuses scale what it deals.
+        var foe = new GameObject("A test's cowed creature");
+        made.Add(foe);
+        var combatant = foe.AddComponent<Combatant>();
+        Damageable body = foe.AddComponent<Damageable>();
+        float before = DamageCalculator.DealtScale(combatant, TargetCategory.Creature);
+        StatusEffects.Apply(body, cry.FoesStatus, null);
+        Assert.AreEqual(before * cry.FoesStatus.DamageDealt, DamageCalculator.DealtScale(combatant, TargetCategory.Creature), 1e-4f);
+
+        var quest = AssetDatabase.LoadAssetAtPath<QuestDefinition>("Assets/_Project/Data/Quests/BackThroughTheDoor.asset");
+        CollectionAssert.Contains(quest.RewardSkills, cry, "the portal's quest teaches it");
+        Assert.AreEqual(ObjectiveType.FallInRaid, quest.StartWhen.Type, "it begins with a fall");
+        var fall = quest.StartWhen;
+        Assert.AreEqual(1, fall.Progress(new GameEvent(GameEventKind.RaidFinished, null, 1, null, RaidOutcome.Died, 300f)), "a fall counts");
+        Assert.AreEqual(0, fall.Progress(new GameEvent(GameEventKind.RaidFinished, null, 1, null, RaidOutcome.Extracted, 300f)), "getting out doesn't");
+    }
+
+    [Test]
     public void EveryAbility_PlaysAMoveOfItsOwn_ThatTheBodyHas()
     {
         var controller = AssetDatabase.LoadAssetAtPath<UnityEditor.Animations.AnimatorController>("Assets/_Project/Animation/Controllers/PlayerAnimator.controller");

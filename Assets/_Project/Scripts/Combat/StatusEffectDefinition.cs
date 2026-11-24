@@ -33,6 +33,8 @@ public sealed class StatusEffectDefinition : ScriptableObject, IDisplayName
     [SerializeField, Range(1f, 2f)] private float damageTaken = 1f;
     [Tooltip("A creature under it strikes no blow while it lasts (Frozen): the strike under way is broken off, as a recoil does.")]
     [SerializeField] private bool stopsStrikes;
+    [Tooltip("Share of its bearer's own damage its blows deal while it lasts: 1 is full, 0.8 is a fifth less (Cowed by a war cry).")]
+    [SerializeField, Range(0.3f, 1f)] private float damageDealt = 1f;
 
     [Header("Consumed by a blow (Docs/CombatSkillsResearch_2026-11-24.md 3.2: Shatter)")]
     [Tooltip("Blows of these kinds end it at once and burst it: a heavy, a finisher or a weapon art on a frozen creature shatters it. None: nothing does.")]
@@ -41,6 +43,8 @@ public sealed class StatusEffectDefinition : ScriptableObject, IDisplayName
     [SerializeField, Min(0f)] private float consumeDamage;
     [Tooltip("What shows where it bursts (StatusBearerLook), once.")]
     [SerializeField] private GameObject consumeLook;
+    [Tooltip("Heard where it bursts (ice shattering). Empty: nothing.")]
+    [SerializeField] private SoundDefinition consumeSound;
     [Tooltip("What the player is told when it bursts (\"Shattered!\"). Empty: nothing.")]
     [SerializeField] private string consumeLine;
 
@@ -67,9 +71,11 @@ public sealed class StatusEffectDefinition : ScriptableObject, IDisplayName
     public float MoveSpeed => moveSpeed;
     public float DamageTaken => damageTaken;
     public bool StopsStrikes => stopsStrikes;
+    public float DamageDealt => damageDealt;
     public HitTechnique ConsumedBy => consumedBy;
     public float ConsumeDamage => consumeDamage;
     public GameObject ConsumeLook => consumeLook;
+    public SoundDefinition ConsumeSound => consumeSound;
     public string ConsumeLine => consumeLine;
     public GameObject Look => look;
     public bool Refreshes => refreshes;

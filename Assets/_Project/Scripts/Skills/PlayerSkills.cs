@@ -54,6 +54,10 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     private float lungeEndsAt = float.NegativeInfinity;
     // The creatures a skill's blow struck as it landed (Damageable.AnyDamaged during its hit), for its look's struck effects.
     private readonly List<Vector3> struck = new List<Vector3>();
+    // A war cry ringing out (Skill › Foes Status): which, and when.
+    private SkillDefinition pendingCry;
+    private float pendingCryAt;
+    private readonly List<HitDetector.Hit> heard = new List<HitDetector.Hit>();
     private bool collectingStruck;
 
     /// <summary>True while a skill is being cast or its lunge and hit are under way: a swing pressed now waits for it (PlayerCombat).</summary>
@@ -193,6 +197,16 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         {
             pendingHit = null;
             SkillAreaMark.Hide();
+        }
+
+        if (pendingCry != null && (!health.IsAlive || Time.time >= pendingCryAt))
+        {
+            SkillDefinition cry = pendingCry;
+            pendingCry = null;
+            if (health.IsAlive)
+            {
+                RingOut(cry);
+            }
         }
 
         if (pendingHit != null && Time.time >= pendingHitAt)
@@ -441,6 +455,12 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             SkillFx.Release(skill, transform.position, direction, null);
         }
 
+        if (skill.FoesStatus != null)
+        {
+            pendingCry = skill;
+            pendingCryAt = now + skill.FoesDelay;
+        }
+
         float hitAfter = 0f;
         if (skill.LungeDistance > 0f)
         {
@@ -501,6 +521,21 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         activeBuffs[skill] = now + skill.BuffDuration;
     }
 
+    // A war cry rings out: every foe in earshot (not behind a wall) is laid under its status.
+    private void RingOut(SkillDefinition skill)
+    {
+        HitDetector.FindAround(transform.position, skill.FoesRadius, combatant.Faction, hitLayers, heard);
+        foreach (HitDetector.Hit hit in heard)
+        {
+            if (hit.Target is Damageable foe)
+            {
+                StatusEffects.Apply(foe, skill.FoesStatus, combatant);
+            }
+        }
+
+        heard.Clear();
+    }
+
     // What the skill leaves on the ground where it lands (Skill › Leaves): patches spread out along its reach, nearest first.
     private void LeaveGround(SkillDefinition skill, Vector3 direction)
     {
@@ -537,6 +572,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     // A dodge is the way out of trouble: like a weapon swing, a skill hit that hadn't landed yet is lost.
     private void OnDodged(Vector3 direction)
     {
+        pendingCry = null; // a cry cut short never rings out
         if (pendingHit != null)
         {
             SkillAreaMark.Hide();
@@ -550,6 +586,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
     public void Interrupt(PlayerInterrupt reason)
     {
+        pendingCry = null; // a cry cut short never rings out
         if (pendingHit != null)
         {
             SkillAreaMark.Hide();

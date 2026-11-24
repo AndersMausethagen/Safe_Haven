@@ -67,6 +67,8 @@ public enum ObjectiveType
     GiveKit = 28,
     /// <summary>Send people out on a foray and see them home (the Haven's Lands): X forays.</summary>
     CompleteForay = 29,
+    /// <summary>Fall in a raid X times, optionally in one place: the portal pulls the player home (the war cry's lesson).</summary>
+    FallInRaid = 30,
 }
 
 /// <summary>
@@ -310,6 +312,8 @@ public sealed class QuestObjective
                 return new[] { nameof(person), nameof(mark) };
             case ObjectiveType.GiveKit:
                 return new[] { nameof(person), nameof(item), nameof(countAlreadyOwned) };
+            case ObjectiveType.FallInRaid:
+                return new[] { nameof(raid) };
             default:
                 return Array.Empty<string>();
         }
@@ -461,6 +465,8 @@ public sealed class QuestObjective
                 return gameEvent.Kind == GameEventKind.KitGiven && Is(item, gameEvent.Subject, false) && Is(person, gameEvent.Detail, false) ? 1 : 0;
             case ObjectiveType.CompleteForay:
                 return gameEvent.Kind == GameEventKind.ForayReturned ? 1 : 0;
+            case ObjectiveType.FallInRaid:
+                return gameEvent.Kind == GameEventKind.RaidFinished && gameEvent.Outcome == RaidOutcome.Died && Is(raid, gameEvent.Subject, false) ? 1 : 0;
             default:
                 return 0;
         }
@@ -724,6 +730,8 @@ public sealed class QuestObjective
             case ObjectiveType.HealMark:
                 string healed = mark != null ? mark.DisplayName : "a hard mark";
                 return person != null ? $"Heal {person.DisplayName}'s {healed}" : $"Heal someone's {healed}";
+            case ObjectiveType.FallInRaid:
+                return $"Fall in {(Amount == 1 ? "a raid" : count + " raids")}{(raid != null ? " in " + raid.DisplayName : "")}";
             case ObjectiveType.CompleteForay:
                 return Amount == 1 ? "Send people out on a foray and see them home ({key:Haven}, Lands)" : $"See {count} forays home ({{key:Haven}}, Lands)";
             case ObjectiveType.GiveKit:

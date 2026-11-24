@@ -267,6 +267,33 @@ public static class SkillFxPrefabs
         };
         log.AppendLine(Dress("WhirlingSteel", whirl, sundered, null, arc: -1f));
 
+        // ----- War Cry: a roar that rolls out over the ground; foes in earshot are Cowed (they strike weaker). -----
+        GameObject cowedLook = Make("Status Cowed", new Design("Skill Mist").F("Rate", 8f).F("Radius", 0.5f).V("Color", new Vector3(0.35f, 0.32f, 0.42f))
+            .F("Alpha", 0.35f).F("Lifetime Min", 1f).F("Lifetime Max", 1.6f).F("Size Min", 0.5f).F("Size Max", 0.9f).F("Turbulence", 0.2f)
+            .V("Velocity Min", new Vector3(-0.05f, -0.1f, -0.05f)).V("Velocity Max", new Vector3(0.05f, 0.02f, 0.05f)));
+        StatusEffectDefinition cowed = Status("Cowed", "Shaken by a war cry: its blows land weaker for a while.", new Color(0.62f, 0.56f, 0.78f), 8f, 0f,
+            DamageType.Physical, 1f, refreshes: true, restSeconds: 0f, look: cowedLook);
+        var cowedData = new SerializedObject(cowed);
+        cowedData.FindProperty("damageDealt").floatValue = 0.8f;
+        cowedData.ApplyModifiedPropertiesWithoutUndo();
+        GameObject cryRing = Make("War Cry Ring", new Design("Skill Ring").T("Texture", "Ring").V("Color", new Vector3(1.1f, 1f, 0.9f)).F("Size", 14f)
+            .F("Lifetime", 0.55f));
+        var cry = new SkillLook
+        {
+            showArea = false,
+            cast = { Cue(dust, SkillFxPlace.CasterGround, 1, 0.2f, 0f, 0.8f) },
+            release =
+            {
+                Cue(cryRing, SkillFxPlace.CasterGround, 1, 0.5f, 0f, 0.7f), Cue(windRing, SkillFxPlace.CasterGround, 1, 0.55f, 0f, 0.5f),
+                Cue(dust, SkillFxPlace.Ring, 10, 0.55f, 0.02f, 0.8f),
+            },
+            light = new Color(1f, 0.85f, 0.6f, 1f), lightIntensity = 2.5f, lightRange = 6f, lightSeconds = 0.25f, shake = 0.3f,
+        };
+        log.AppendLine(Dress("WarCry", cry, null, null, arc: -1f));
+        var cryData = new SerializedObject(AssetDatabase.LoadAssetAtPath<SkillDefinition>("Assets/_Project/Data/Skills/WarCry.asset"));
+        cryData.FindProperty("foesStatus").objectReferenceValue = cowed;
+        cryData.ApplyModifiedPropertiesWithoutUndo();
+
         // ----- Huldra's Blessing: the hidden folk's gift, green and gold, rising. -----
         GameObject wyrdCircle = Make("Wyrd Cast Circle", new Design("Skill Ring").T("Texture", "Rune Circle").V("Color", new Vector3(0.9f, 2.4f, 0.6f))
             .F("Size", 2.8f).F("Lifetime", 1.4f).V("Spin", new Vector3(0f, 0f, 20f)));
@@ -504,6 +531,14 @@ public static class SkillFxPrefabs
         if (skill == null)
         {
             return "no skill " + skillName;
+        }
+
+        // The sounds are picked by ear and set apart from this builder (SkillSounds): kept when the look is made again.
+        if (skill.Look != null)
+        {
+            look.castSound = skill.Look.castSound;
+            look.releaseSound = skill.Look.releaseSound;
+            look.releaseSoundDelay = skill.Look.releaseSoundDelay;
         }
 
         typeof(SkillDefinition).GetField("look", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).SetValue(skill, look);

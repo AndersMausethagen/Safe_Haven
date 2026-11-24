@@ -1,0 +1,81 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9139778d2cece034ba4eeb23169bbba8, type: 3}
+  m_Name: WarCry
+  m_EditorClassIdentifier: SafeHaven::SkillDefinition
+  displayName: War Cry
+  description: Roar as the hird did before the shield wall broke. Foes near enough to hear it lose heart and strike weaker; your own blows bite harder for a while.
+  icon: {fileID: 21300000, guid: 0b8fa4d989f90054696000f319f2d4e3, type: 3}
+  school: 0
+  cooldown: 30
+  staminaCost: 25
+  focusCost: 30
+  castTime: 0.9
+  lungeDistance: 0
+  lungeDuration: 0.2
+  foesStatus: {fileID: 11400000, guid: 05e74601a31d1534297fa262575659f3, type: 2}
+  foesRadius: 7
+  foesDelay: 0.5
+  leaves: {fileID: 0}
+  leavesCount: 3
+  attack: {fileID: 0}
+  heal: 0
+  buffs:
+  - stat: 14
+    op: 0
+    value: 0.15
+  buffDuration: 8
+  playAttackAnimation: 1
+  animationState: War Cry
+  animationSpeed: 1.5
+  look:
+    showArea: 0
+    cast:
+    - prefab: {fileID: 4047249316231547844, guid: 470b560476fcda647a51ec6ad778232e, type: 3}
+      place: 1
+      count: 1
+      delay: 0.2
+      stepDelay: 0
+      seconds: 0.8
+      scale: 1
+    release:
+    - prefab: {fileID: 1507627560349560555, guid: 5d12d0212994e4a4ab5ff4cd1d2b9fa6, type: 3}
+      place: 1
+      count: 1
+      delay: 0.5
+      stepDelay: 0
+      seconds: 0.7
+      scale: 1
+    - prefab: {fileID: 8785999770213858728, guid: 14c8f11c88321f04391b1939aad7404a, type: 3}
+      place: 1
+      count: 1
+      delay: 0.55
+      stepDelay: 0
+      seconds: 0.5
+      scale: 1
+    - prefab: {fileID: 4047249316231547844, guid: 470b560476fcda647a51ec6ad778232e, type: 3}
+      place: 4
+      count: 10
+      delay: 0.55
+      stepDelay: 0.02
+      seconds: 0.8
+      scale: 1
+    struck: []
+    light: {r: 1, g: 0.85, b: 0.6, a: 1}
+    lightIntensity: 2.5
+    lightRange: 6
+    lightSeconds: 0.25
+    shake: 0.3
+    castSound: {fileID: 0}
+    releaseSound: {fileID: 0}
+    releaseSoundDelay: 0
+  weaponArt: 0

@@ -282976,6 +282976,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HeartTree
   questWhispers:
+  - quest: {fileID: 11400000, guid: fb9d0f9010e5743408d2ad484bbffb19, type: 2}
+    text: 'You came back to me torn, little one. I caught you, as I catch all of mine. But you met the dark with your mouth shut. The hird that built your hearths never did. Stand here and roar with me: let them be the ones who are afraid.'
+    moment: {fileID: 0}
   - quest: {fileID: 11400000, guid: 74cd46b9fddfdd747857eb1796e3be5d, type: 2}
     text: <i>Bring what my stones ask and lay it in me, then raise me. The deeper woods are waiting, and so are the ones lost in them.</i>
     moment: {fileID: 11400000, guid: ce1ddb6c97c72ca4e9e8fbb84821867b, type: 2}

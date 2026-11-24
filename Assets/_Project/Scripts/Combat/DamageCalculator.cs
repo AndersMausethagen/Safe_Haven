@@ -40,7 +40,11 @@ public static class DamageCalculator
     /// player's Combat Technique › Player Damage, every path a blow takes meets here), but not against structures, which keep their pace.
     /// </summary>
     public static float DealtScale(Combatant attacker, TargetCategory category) =>
-        attacker == null || category == TargetCategory.Structure ? 1f : attacker.DamageDealtScale;
+        attacker == null || category == TargetCategory.Structure ? 1f : attacker.DamageDealtScale * StatusDealt(attacker);
+
+    // What the attacker's own statuses leave of its blows (Cowed by a war cry deals less).
+    private static float StatusDealt(Combatant attacker) =>
+        attacker.TryGetComponent(out StatusEffects effects) ? effects.DamageDealtScale : 1f;
 
     /// <summary>
     /// What <paramref name="source"/>'s Damage Bonus (the raid's tier and stage, an elite's share, a boss's phase, gear) makes of damage
@@ -48,7 +52,7 @@ public static class DamageCalculator
     /// a tier I one's). 1 for no source. Taken when the hazard, status or fire begins, so it keeps its power after its maker dies.
     /// </summary>
     public static float BonusScale(Combatant source) =>
-        source != null ? Mathf.Max(0f, 1f + source.Stats.Get(StatType.DamageBonus)) * source.DamageDealtScale : 1f;
+        source != null ? Mathf.Max(0f, 1f + source.Stats.Get(StatType.DamageBonus)) * source.DamageDealtScale * StatusDealt(source) : 1f;
 
     /// <summary>Damage after the attacker's power and crit, before the target's defenses.</summary>
     public static float CalculateOutgoing(

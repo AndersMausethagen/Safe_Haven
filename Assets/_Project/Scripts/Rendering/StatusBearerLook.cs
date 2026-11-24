@@ -57,7 +57,17 @@ public sealed class StatusBearerLook : MonoBehaviour
     private static void OnConsumed(Damageable target, StatusEffectDefinition effect, Vector3 at)
     {
         // Only in a game being played: an edit-mode test bursting a status leaves nothing in the open scene.
-        if (!Application.isPlaying || effect == null || effect.ConsumeLook == null)
+        if (!Application.isPlaying || effect == null)
+        {
+            return;
+        }
+
+        if (effect.ConsumeSound != null)
+        {
+            AudioManager.Play(effect.ConsumeSound, at);
+        }
+
+        if (effect.ConsumeLook == null)
         {
             return;
         }

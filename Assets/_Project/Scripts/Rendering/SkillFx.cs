@@ -53,6 +53,10 @@ public sealed class SkillFx : MonoBehaviour
         }
 
         Runner.PlayAll(look.cast, caster.position, aim, Reach(skill.Attack), Arc(skill.Attack), null, caster.position);
+        if (look.castSound != null)
+        {
+            AudioManager.Play(look.castSound, caster.position);
+        }
     }
 
     /// <summary>A weapon art begins (its attack's own look, AttackDefinition.Look): its cast cues round the striker.</summary>
@@ -93,6 +97,17 @@ public sealed class SkillFx : MonoBehaviour
     {
         PlayAll(look.release, origin, aim, reach, arc, null, from);
         PlayAll(look.struck, origin, aim, reach, arc, struck, from);
+        if (look.releaseSound != null)
+        {
+            if (look.releaseSoundDelay > 0f)
+            {
+                StartCoroutine(SoundLater(look.releaseSound, origin, look.releaseSoundDelay));
+            }
+            else
+            {
+                AudioManager.Play(look.releaseSound, origin);
+            }
+        }
         if (look.light.a > 0f && look.lightIntensity > 0f)
         {
             Flash(origin + Vector3.up * 1.2f, look.light, look.lightIntensity, look.lightRange, look.lightSeconds);
@@ -200,6 +215,12 @@ public sealed class SkillFx : MonoBehaviour
         }
 
         return point;
+    }
+
+    private static IEnumerator SoundLater(SoundDefinition sound, Vector3 at, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        AudioManager.Play(sound, at);
     }
 
     private IEnumerator PlayLater(SkillFxCue cue, Vector3 at, Vector3 aim, float delay)

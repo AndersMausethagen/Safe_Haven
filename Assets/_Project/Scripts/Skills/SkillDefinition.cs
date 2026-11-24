@@ -40,6 +40,13 @@ public sealed class SkillDefinition : ScriptableObject
     [SerializeField, Min(0f)] private float lungeDistance;
     [SerializeField, Min(0.05f)] private float lungeDuration = 0.2f;
 
+    [Header("Around the caster (a war cry)")]
+    [Tooltip("Laid on every foe within Foes Radius when it rings out (Cowed: they deal less). Empty: none.")]
+    [SerializeField] private StatusEffectDefinition foesStatus;
+    [SerializeField, Min(0f)] private float foesRadius = 7f;
+    [Tooltip("Seconds after the cast that it rings out: the roar's loudest moment in its animation.")]
+    [SerializeField, Min(0f)] private float foesDelay = 0.5f;
+
     [Header("Left behind (Docs/CombatSkillsResearch_2026-11-24.md 6: lingering)")]
     [Tooltip("A patch of ground (a GroundHazard prefab) left along its reach where it lands: smouldering ground, a rime patch. It hurts " +
              "only the caster's foes. Empty: nothing is left.")]
@@ -85,6 +92,9 @@ public sealed class SkillDefinition : ScriptableObject
     public float LungeDistance => lungeDistance;
     public float LungeDuration => lungeDuration;
     public GameObject Leaves => leaves;
+    public StatusEffectDefinition FoesStatus => foesStatus;
+    public float FoesRadius => foesRadius;
+    public float FoesDelay => foesDelay;
     public int LeavesCount => leavesCount;
     public AttackDefinition Attack => attack;
     public float Heal => heal;
