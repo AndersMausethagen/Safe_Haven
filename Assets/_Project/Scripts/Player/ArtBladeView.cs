@@ -18,6 +18,8 @@ public sealed class ArtBladeView : MonoBehaviour
     private const float SparkBrightness = 3f;
 
     private PlayerCombat combat;
+    private PlayerSkills skills;
+    private Color shownColour;
     private HeldItemView held;
     private GameObject glow;
     private VisualEffect visual;
@@ -39,6 +41,7 @@ public sealed class ArtBladeView : MonoBehaviour
     private void Awake()
     {
         combat = GetComponent<PlayerCombat>();
+        skills = GetComponent<PlayerSkills>();
     }
 
     private void LateUpdate()
@@ -48,13 +51,16 @@ public sealed class ArtBladeView : MonoBehaviour
             held = GetComponentInChildren<HeldItemView>();
         }
 
+        // An art under way, or a dodge's readied blow waiting (PlayerSkills.ReadiedStatus): the blade shows it.
+        StatusEffectDefinition readied = skills != null ? skills.ReadiedStatus : null;
         bool arting = combat != null && combat.ArtBlowPending;
-        if (arting)
+        if (arting || readied != null)
         {
             GameObject weapon = WeaponModel();
-            if (weapon != on)
+            Color want = arting ? ArtColour(combat.ActiveAttack) : readied.Color;
+            if (weapon != on || want != shownColour)
             {
-                Attach(weapon, combat.ActiveAttack);
+                Attach(weapon, want);
             }
 
             fadeFrom = -1f;
@@ -136,7 +142,7 @@ public sealed class ArtBladeView : MonoBehaviour
         }
     }
 
-    private void Attach(GameObject weapon, AttackDefinition art)
+    private void Attach(GameObject weapon, Color colour)
     {
         Detach();
         if (weapon == null || (glow == null && !Build()))
@@ -158,7 +164,7 @@ public sealed class ArtBladeView : MonoBehaviour
         glow.transform.localScale = Vector3.one / metres;
         float halfLength = Mathf.Max(bounds.extents.x, Mathf.Max(bounds.extents.y, bounds.extents.z)) * metres;
 
-        Color colour = ArtColour(art);
+        shownColour = colour;
         glow.SetActive(true);
         if (visual != null)
         {

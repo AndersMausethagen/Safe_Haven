@@ -40,6 +40,9 @@ public sealed class PlayerStateMachine : MonoBehaviour
     public event Action DodgeRequested;
     /// <summary>Raised with the skill bar slot (0-4) the player asked to cast.</summary>
     public event Action<int> SkillRequested;
+    /// <summary>A skill's key held with Aim Skills First on: its area shows until the key is let go (SkillReleased).</summary>
+    public event Action<int> SkillAimed;
+    public event Action<int> SkillReleased;
     /// <summary>Raised when the player asks for the next kind of arrow (a bow's quiver).</summary>
     public event Action ArrowCycleRequested;
 
@@ -143,6 +146,18 @@ public sealed class PlayerStateMachine : MonoBehaviour
             SkillRequested?.Invoke(slot);
         }
     }
+
+    /// <summary>Aim Skills First: the key went down; the skill waits for it to come up.</summary>
+    public void AimSkill(int slot)
+    {
+        if (CurrentState != PlayerState.Interacting && !HandsTaken)
+        {
+            SkillAimed?.Invoke(slot);
+        }
+    }
+
+    /// <summary>Aim Skills First: the key came up (PlayerSkills casts what was being aimed).</summary>
+    public void ReleaseSkill(int slot) => SkillReleased?.Invoke(slot);
 
     public void RequestArrowCycle() => ArrowCycleRequested?.Invoke();
 

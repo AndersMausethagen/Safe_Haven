@@ -102,6 +102,17 @@ public static class SkillFxPrefabs
         StatusEffectDefinition sundered = Status("Sundered", "Armour cracked: it takes 15% more from every blow for a while.", new Color(0.8f, 0.8f, 0.84f),
             8f, 0f, DamageType.Physical, 1f, refreshes: true, restSeconds: 0f, damageTaken: 1.15f, look: sunderedLook);
 
+        // Two schools meeting (Docs/SkillsImprovementResearch_2026-11-24.md 9): fire on ice bursts in steam (both end), a bleed on a burn
+        // cauterises (the creature staggers, open to a backstab).
+        GameObject steamBurst = Make("Reaction Steam", new Design("Skill Burst").T("Texture", "Glow").V("Color", new Vector3(1.6f, 1.6f, 1.7f)).F("Count", 45f)
+            .V("Velocity Min", new Vector3(-1.5f, 1.5f, -1.5f)).V("Velocity Max", new Vector3(1.5f, 4f, 1.5f)).V("Gravity", new Vector3(0f, 1f, 0f))
+            .F("Drag", 1.5f).F("Size Min", 0.5f).F("Size Max", 1.1f).F("Lifetime Min", 0.8f).F("Lifetime Max", 1.4f));
+        GameObject cauterise = Make("Reaction Cauterise", new Design("Skill Burst").T("Texture", "Ember").V("Color", new Vector3(4f, 1.5f, 0.35f)).F("Count", 30f)
+            .V("Velocity Min", new Vector3(-2f, 0.5f, -2f)).V("Velocity Max", new Vector3(2f, 3f, 2f)).F("Size Min", 0.04f).F("Size Max", 0.09f)
+            .F("Lifetime Min", 0.3f).F("Lifetime Max", 0.6f));
+        SetReaction(frozen, new StatusReaction { displayName = "Steam", with = burning, damage = 25f, damageType = DamageType.Fire, endsBoth = true, look = steamBurst });
+        SetReaction(burning, new StatusReaction { displayName = "Cauterised", with = rend, staggerSeconds = 1.2f, endsBoth = true, look = cauterise });
+
         // ----- The physical kit (the user, 2026-11-24: "a lot of the skills and vfx be physical skills. not necessary magic"): steel, dust,
         // stone and wind, no runes or glows of power. -----
         GameObject slash = Make("Phys Slash", new Design("Skill Ring").T("Texture", "Slash").V("Color", new Vector3(2.4f, 2.1f, 1.6f)).F("Size", 5f)
@@ -488,6 +499,16 @@ public static class SkillFxPrefabs
         so.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(status);
         return status;
+    }
+
+    // One reaction on a status, made again each run (the builder owns its reactions).
+    private static void SetReaction(StatusEffectDefinition status, StatusReaction reaction)
+    {
+        var list = (List<StatusReaction>)typeof(StatusEffectDefinition).GetField("reactions",
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(status);
+        list.RemoveAll(r => r == null || r.with == reaction.with);
+        list.Add(reaction);
+        EditorUtility.SetDirty(status);
     }
 
     // A patch a skill leaves (GroundHazard), copied from a monster's of the same element and set to these numbers.

@@ -310,6 +310,35 @@ public sealed class SkillLookTests
     }
 
     [Test]
+    public void FireOnIce_BurstsInSteam_AndTakesBoth()
+    {
+        StatusEffectDefinition Load(string n) => AssetDatabase.LoadAssetAtPath<StatusEffectDefinition>($"Assets/_Project/Data/Combat/Status/{n}.asset");
+        var frozen = Load("Frozen");
+        var burning = Load("Burning");
+        Assert.IsTrue(System.Linq.Enumerable.Any(frozen.Reactions, r => r.with == burning), "ice knows what fire does to it");
+
+        var target = new GameObject("A test's frozen creature");
+        made.Add(target);
+        var combatant = target.AddComponent<Combatant>();
+        combatant.SetFaction(Faction.Enemy);
+        combatant.Stats.SetBase(StatType.MaxHealth, 500f);
+        Damageable body = target.AddComponent<Damageable>();
+        var data = new SerializedObject(body);
+        data.FindProperty("destroyOnDeath").boolValue = false;
+        data.ApplyModifiedPropertiesWithoutUndo();
+        typeof(Damageable).GetMethod("Awake", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)?.Invoke(body, null);
+        var effects = typeof(StatusEffects).GetMethod("Awake", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+
+        StatusEffects shown = StatusEffects.Apply(body, frozen, null);
+        effects?.Invoke(shown, null); // its bearer, as in play
+        float before = body.CurrentHealth;
+        StatusEffects.Apply(body, burning, null);
+        Assert.IsFalse(shown.Has(frozen), "the ice is gone");
+        Assert.IsFalse(shown.Has(burning), "and the fire with it");
+        Assert.Less(body.CurrentHealth, before, "in a burst of steam");
+    }
+
+    [Test]
     public void EveryAbility_PlaysAMoveOfItsOwn_ThatTheBodyHas()
     {
         var controller = AssetDatabase.LoadAssetAtPath<UnityEditor.Animations.AnimatorController>("Assets/_Project/Animation/Controllers/PlayerAnimator.controller");

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -48,6 +49,10 @@ public sealed class StatusEffectDefinition : ScriptableObject, IDisplayName
     [Tooltip("What the player is told when it bursts (\"Shattered!\"). Empty: nothing.")]
     [SerializeField] private string consumeLine;
 
+    [Header("Meeting another school's status (Docs/SkillsImprovementResearch_2026-11-24.md 9)")]
+    [Tooltip("What happens when another status is laid on a bearer of this one: fire on ice bursts in steam, a bleed on a burn cauterises.")]
+    [SerializeField] private List<StatusReaction> reactions = new List<StatusReaction>();
+
     [Header("Getting free (Docs/HeartrootPlaytest_2026-11-23.md P5)")]
     [Tooltip("A new hit while it is at work restarts its time. Off: it runs out on its first time, so a volley's later blows (Root " +
              "Eruption's three rings) can't hold the player longer than the first did.")]
@@ -77,9 +82,32 @@ public sealed class StatusEffectDefinition : ScriptableObject, IDisplayName
     public GameObject ConsumeLook => consumeLook;
     public SoundDefinition ConsumeSound => consumeSound;
     public string ConsumeLine => consumeLine;
+    public IReadOnlyList<StatusReaction> Reactions => reactions;
     public GameObject Look => look;
     public bool Refreshes => refreshes;
     public bool EndsOnDodge => endsOnDodge;
     public float RestSeconds => restSeconds;
     public string TakesHoldLine => string.IsNullOrWhiteSpace(takesHoldLine) ? $"{DisplayName}!" : takesHoldLine;
+}
+
+/// <summary>
+/// Two schools meeting on one creature (Hades' duo boons, in small): when <see cref="with"/> is laid on a bearer of the status that holds
+/// this, both may end and something bigger happens: a burst of damage, a stagger, a look and a word for the player.
+/// </summary>
+[System.Serializable]
+public sealed class StatusReaction
+{
+    public string displayName;
+    [Tooltip("The status that, laid on a bearer of this one, sets it off.")]
+    public StatusEffectDefinition with;
+    [Tooltip("Damage at once, of the type below, as strong as its source hits (Damage Bonus).")]
+    [Min(0f)] public float damage;
+    public DamageType damageType = DamageType.Physical;
+    [Tooltip("A creature staggers this long (it opens to a backstab). 0: none.")]
+    [Min(0f)] public float staggerSeconds;
+    [Tooltip("Both statuses end (the steam takes the ice and the fire); off: only this one.")]
+    public bool endsBoth = true;
+    [Tooltip("Shown where it happens, once (StatusBearerLook).")]
+    public GameObject look;
+    public SoundDefinition sound;
 }

@@ -30,6 +30,7 @@ MonoBehaviour:
   consumeLook: {fileID: 0}
   consumeSound: {fileID: 0}
   consumeLine: 
+  reactions: []
   refreshes: 1
   endsOnDodge: 0
   restSeconds: 0

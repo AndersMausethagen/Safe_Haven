@@ -30,6 +30,15 @@ MonoBehaviour:
   consumeLook: {fileID: 4019741075779077962, guid: 92dea07e5039e9d4f8eca3c4417c0d12, type: 3}
   consumeSound: {fileID: 0}
   consumeLine: Shattered!
+  reactions:
+  - displayName: Steam
+    with: {fileID: 11400000, guid: 45fc7b2e7cd424647bfacfdc11dcb936, type: 2}
+    damage: 25
+    damageType: 1
+    staggerSeconds: 0
+    endsBoth: 1
+    look: {fileID: 3365822133416229407, guid: 602f81edcff96d047b5c2cb904262f42, type: 3}
+    sound: {fileID: 0}
   refreshes: 0
   endsOnDodge: 0
   restSeconds: 4

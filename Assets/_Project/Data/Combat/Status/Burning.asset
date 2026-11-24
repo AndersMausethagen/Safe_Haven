@@ -30,6 +30,15 @@ MonoBehaviour:
   consumeLook: {fileID: 0}
   consumeSound: {fileID: 0}
   consumeLine: 
+  reactions:
+  - displayName: Cauterised
+    with: {fileID: 11400000, guid: a7f523403d490f3409dbe93f62cc2341, type: 2}
+    damage: 0
+    damageType: 0
+    staggerSeconds: 1.2
+    endsBoth: 1
+    look: {fileID: 3487987878901678657, guid: 1b9a9e486bd45b64a8600701fbb1f306, type: 3}
+    sound: {fileID: 0}
   refreshes: 1
   endsOnDodge: 0
   restSeconds: 0

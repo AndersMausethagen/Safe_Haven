@@ -30,7 +30,12 @@ public static class GameOptions
     public static readonly GameOption AutoDrink = GameOption.Toggle("AutoDrink", "Auto-Drink",
         "Drink from your waterskin by yourself when thirst falls below 80%.", true);
 
-    public static readonly IReadOnlyList<GameOption> Gameplay = new[] { DamageNumbers, AutoGather, AutoDrink, ToggleSneak, FocusTarget, PoiseBars, Blood, MinimapDistance, Hud };
+    /// <summary>Hold a skill's key to see where it lands, let go to cast (Docs/SkillsImprovementResearch_2026-11-24.md 7: League's
+    /// quick cast with indicator). Off, the way it always was: it casts as the key goes down.</summary>
+    public static readonly GameOption AimSkillsFirst = GameOption.Toggle("AimSkillsFirst", "Aim Skills First",
+        "Hold a skill's key to see where it will land, and let go to cast it. Off: it casts as the key is pressed.", false);
+
+    public static readonly IReadOnlyList<GameOption> Gameplay = new[] { DamageNumbers, AutoGather, AutoDrink, ToggleSneak, FocusTarget, PoiseBars, Blood, MinimapDistance, Hud, AimSkillsFirst };
 
     /// <summary>The minimap's reach in metres for each Minimap Distance (0 for Hidden).</summary>
     public static readonly float[] MinimapReaches = { 0f, 30f, 50f, 75f, 110f };

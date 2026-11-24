@@ -63,6 +63,22 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetGroundLeft() => GroundLeft = null;
 
+    // The dodge's readied blow (Docs/SkillsImprovementResearch_2026-11-24.md 5): the next swing within this long lays the status of the
+    // ability cast last; every creature that one swing strikes takes it (a cleave), then it is spent.
+    private const float ReadiedSeconds = 2.5f;
+    private const float ReadiedSwingSeconds = 0.25f;
+    private SkillDefinition lastCast;
+    private StatusEffectDefinition readiedStatus;
+    private float readiedUntil;
+    private float readiedLanded = -1f;
+
+    /// <summary>The status the next swing will lay, readied by a dodge after an ability; null when none (ArtBladeView glows in its colour).</summary>
+    public StatusEffectDefinition ReadiedStatus => readiedStatus != null && Time.time < readiedUntil ? readiedStatus : null;
+
+    // What an ability lays: its blow's status, or what a war cry lays on those who hear it.
+    private static StatusEffectDefinition SchoolStatusOf(SkillDefinition skill) =>
+        skill.Attack != null && skill.Attack.AppliesStatus != null ? skill.Attack.AppliesStatus : skill.FoesStatus;
+
     // A skill pressed while busy, cast when it can be within this long (Docs/SkillsImprovementResearch_2026-11-24.md 2).
     private const float BufferSeconds = 0.25f;
     private int bufferedSlot = -1;
@@ -122,6 +138,8 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     private void OnEnable()
     {
         stateMachine.SkillRequested += OnSkillRequested;
+        stateMachine.SkillAimed += OnSkillAimed;
+        stateMachine.SkillReleased += OnSkillReleased;
         Damageable.AnyDamaged += OnAnyDamaged;
         if (dodge != null)
         {
@@ -140,6 +158,27 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
     private void OnAnyDamaged(Damageable victim, DamageInfo damage, DamageResult result)
     {
+        // The readied blow: the first swing after a dodge lays the readied status on all it strikes.
+        if (!collectingStruck && readiedStatus != null && victim != null && damage.Source == combatant && result.Damage > 0f && !result.Blocked
+            && (damage.Technique & HitTechnique.Melee) != 0 && Time.time < readiedUntil)
+        {
+            if (readiedLanded < 0f)
+            {
+                readiedLanded = Time.time;
+            }
+
+            if (Time.time - readiedLanded <= ReadiedSwingSeconds)
+            {
+                StatusEffects.Apply(victim, readiedStatus, combatant);
+            }
+        }
+
+        if (readiedLanded >= 0f && Time.time - readiedLanded > ReadiedSwingSeconds)
+        {
+            readiedStatus = null;
+            readiedLanded = -1f;
+        }
+
         if (collectingStruck && victim != null && damage.Source == combatant && struck.Count < 16 && result.Damage > 0f && !result.Blocked && !result.Parried)
         {
             struck.Add(victim.transform.position);
@@ -180,6 +219,8 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     private void OnDisable()
     {
         stateMachine.SkillRequested -= OnSkillRequested;
+        stateMachine.SkillAimed -= OnSkillAimed;
+        stateMachine.SkillReleased -= OnSkillReleased;
         Damageable.AnyDamaged -= OnAnyDamaged;
         if (dodge != null)
         {
@@ -213,6 +254,11 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         {
             pendingHit = null;
             SkillAreaMark.Hide();
+        }
+
+        if (aimingSlot >= 0)
+        {
+            ShowAim();
         }
 
         if (bufferedSlot >= 0)
@@ -530,6 +576,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         }
 
         GameSession.Progress.CountUse(skill);
+        lastCast = skill;
         float optionHeal = SkillChoices.For(skill).Heal;
         if (optionHeal > 0f)
         {
@@ -681,6 +728,15 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     // A dodge is the way out of trouble: like a weapon swing, a skill hit that hadn't landed yet is lost.
     private void OnDodged(Vector3 direction)
     {
+        // A dodge readies the next swing with the status of the ability cast last (V Rising's veils).
+        StatusEffectDefinition school = lastCast != null ? SchoolStatusOf(lastCast) : null;
+        if (school != null)
+        {
+            readiedStatus = school;
+            readiedUntil = Time.time + ReadiedSeconds;
+            readiedLanded = -1f;
+        }
+
         pendingCry = null; // a cry cut short never rings out
         if (pendingHit != null)
         {
@@ -708,6 +764,49 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     private void OnSkillRequested(int slot)
     {
         TryCast(slot);
+    }
+
+    // Aim Skills First (GameOptions.AimSkillsFirst): the held skill's area follows the aim until the key is let go, then it casts.
+    private int aimingSlot = -1;
+
+    private void OnSkillAimed(int slot)
+    {
+        SkillDefinition skill = loadout.Get(slot);
+        if (skill == null || skill.Attack == null || skill.WeaponArt != WeaponArtSlot.None)
+        {
+            TryCast(slot); // nothing to aim (a blessing, a war cry, an item, the weapon's art): as before
+            return;
+        }
+
+        aimingSlot = slot;
+    }
+
+    private void OnSkillReleased(int slot)
+    {
+        if (aimingSlot != slot)
+        {
+            return;
+        }
+
+        aimingSlot = -1;
+        SkillAreaMark.Hide();
+        TryCast(slot);
+    }
+
+    private void ShowAim()
+    {
+        SkillDefinition skill = aimingSlot >= 0 ? loadout.Get(aimingSlot) : null;
+        if (skill == null || skill.Attack == null || !health.IsAlive)
+        {
+            aimingSlot = -1;
+            SkillAreaMark.Hide();
+            return;
+        }
+
+        Vector3 aim = movement.AimDirection;
+        Vector3 flat = new Vector3(aim.x, 0f, aim.z);
+        Vector3 lands = transform.position + (flat.sqrMagnitude > 0.0001f ? flat.normalized : Vector3.zero) * skill.LungeDistance;
+        SkillAreaMark.Show(lands, aim, skill.Attack.Range, skill.Attack.Arc, SkillSchools.ColorOf(skill.School), 10f);
     }
 
     private void EnsureInitialised()

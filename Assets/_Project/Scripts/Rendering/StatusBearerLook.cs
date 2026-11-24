@@ -51,6 +51,42 @@ public sealed class StatusBearerLook : MonoBehaviour
         StatusEffects.Applied += OnApplied;
         StatusEffects.Consumed -= OnConsumed;
         StatusEffects.Consumed += OnConsumed;
+        StatusEffects.Reacted -= OnReacted;
+        StatusEffects.Reacted += OnReacted;
+    }
+
+    // Two schools met on something (steam, a cauterised wound): the reaction's look and sound, once, at its middle.
+    private static void OnReacted(Damageable target, StatusReaction reaction)
+    {
+        if (!Application.isPlaying || target == null || reaction == null)
+        {
+            return;
+        }
+
+        Vector3 at = target.transform.position + Vector3.up;
+        if (reaction.sound != null)
+        {
+            AudioManager.Play(reaction.sound, at);
+        }
+
+        if (reaction.look == null)
+        {
+            return;
+        }
+
+        GameObject burst = Instantiate(reaction.look, at, Quaternion.identity);
+        foreach (VisualEffect visual in burst.GetComponentsInChildren<VisualEffect>())
+        {
+            if (visual.TryGetComponent(out VfxValues values))
+            {
+                values.Apply(visual);
+            }
+
+            visual.Reinit();
+            visual.Play();
+        }
+
+        Destroy(burst, BurstSeconds);
     }
 
     // A status burst by a blow (Shatter): its Consume Look, once, where the blow landed.

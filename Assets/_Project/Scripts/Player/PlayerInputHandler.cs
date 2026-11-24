@@ -24,6 +24,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
     private CommandWheel commandWheel;
     // The skill actions' callbacks, one per slot, kept so they can be unsubscribed.
     private readonly System.Action<InputAction.CallbackContext>[] skillCallbacks = new System.Action<InputAction.CallbackContext>[SkillLoadout.SlotCount];
+    private readonly System.Action<InputAction.CallbackContext>[] skillReleaseCallbacks = new System.Action<InputAction.CallbackContext>[SkillLoadout.SlotCount];
 
     /// <summary>The keyboard key that casts a skill bar slot, for labels in the UI (from the Input Actions asset, so it
     /// follows a rebinding).</summary>
@@ -76,9 +77,17 @@ public sealed class PlayerInputHandler : MonoBehaviour
                 // they put the item on the bar. They cast nothing meanwhile.
                 if (!IsListening && !PadBusy(context) && !DialogueBox.IsAsking && !ItemInventoryWindow.ClaimsKeys)
                 {
-                    stateMachine.RequestSkill(slot);
+                    if (GameOptions.AimSkillsFirst.On)
+                    {
+                        stateMachine.AimSkill(slot);
+                    }
+                    else
+                    {
+                        stateMachine.RequestSkill(slot);
+                    }
                 }
             };
+            skillReleaseCallbacks[i] = context => stateMachine.ReleaseSkill(slot);
         }
     }
 
@@ -294,6 +303,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         for (int i = 0; i < skillCallbacks.Length; i++)
         {
             Hook(GameInput.Skill(i), skillCallbacks[i], on);
+            Hook(GameInput.Skill(i), skillReleaseCallbacks[i], on, performed: false, canceled: true);
         }
     }
 

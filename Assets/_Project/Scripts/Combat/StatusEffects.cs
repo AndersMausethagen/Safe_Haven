@@ -104,6 +104,74 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
         EndedOn?.Invoke(target != null ? target : GetComponent<Damageable>(), effect);
     }
 
+    /// <summary>Two statuses reacted on something (fire on ice: steam): its bearer and the reaction (StatusBearerLook shows it).</summary>
+    public static event System.Action<Damageable, StatusReaction> Reacted;
+
+    // A status arriving on a bearer of another that reacts with it (either way round): the reaction happens. True when the arriving
+    // one was used up in it. Only the host's game reacts; a friend's copy shows what the host tells it.
+    private bool React(StatusEffectDefinition arriving, Combatant source)
+    {
+        if (isCopy || target == null)
+        {
+            return false;
+        }
+
+        for (int i = active.Count - 1; i >= 0; i--)
+        {
+            StatusEffectDefinition there = active[i].Definition;
+            if (there == null || Time.time >= active[i].EndsAt)
+            {
+                continue;
+            }
+
+            StatusReaction reaction = Find(there, arriving) ?? Find(arriving, there);
+            if (reaction == null)
+            {
+                continue;
+            }
+
+            EndNow(there);
+            if (reaction.damage > 0f && target.IsAlive)
+            {
+                var burst = new DamageInfo(source, null, reaction.damage * DamageCalculator.BonusScale(source), reaction.damageType, false,
+                    target.transform.position + Vector3.up, Vector3.up, 0f, HitTechnique.None);
+                DamageResult result = target.ApplyDamage(burst);
+                if (source != null)
+                {
+                    source.ReportDamageDealt(target, burst, result);
+                }
+            }
+
+            if (reaction.staggerSeconds > 0f && target.IsAlive && TryGetComponent(out MonsterAI creature))
+            {
+                creature.Stagger(reaction.staggerSeconds);
+            }
+
+            Reacted?.Invoke(target, reaction);
+            if (!string.IsNullOrWhiteSpace(reaction.displayName) && source != null && source.GetComponent<Player>() != null)
+            {
+                GameMessages.Post(reaction.displayName + "!", MessageKind.Gain);
+            }
+
+            return reaction.endsBoth;
+        }
+
+        return false;
+    }
+
+    private static StatusReaction Find(StatusEffectDefinition holder, StatusEffectDefinition other)
+    {
+        foreach (StatusReaction reaction in holder.Reactions)
+        {
+            if (reaction != null && reaction.with == other)
+            {
+                return reaction;
+            }
+        }
+
+        return null;
+    }
+
     /// <summary>A status burst by a blow (Shatter): its bearer, the status and where (StatusBearerLook shows it).</summary>
     public static event System.Action<Damageable, StatusEffectDefinition, Vector3> Consumed;
 
@@ -123,6 +191,12 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
         if (!target.TryGetComponent(out StatusEffects effects))
         {
             effects = target.gameObject.AddComponent<StatusEffects>();
+        }
+
+        // Two schools meeting: what was there and what arrives react, and the arriving one may not take hold at all.
+        if (effects.React(effect, source))
+        {
+            return effects;
         }
 
         if (!effects.Add(effect, source))
