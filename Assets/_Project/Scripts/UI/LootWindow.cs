@@ -141,7 +141,8 @@ public sealed class LootWindow : MonoBehaviour
     private Grid grid;
     private LootableRemains shown;
     private GameObject looter;
-    private int chipsFor = -1;
+    private int drawnVersion = -1;
+    private float drawnWeight = -1f;
 
     public static LootWindow Current { get; private set; }
 
@@ -200,7 +201,8 @@ public sealed class LootWindow : MonoBehaviour
         looter = user;
         titleLabel.text = remains.Title;
         grid.Show(remains.Items);
-        chipsFor = -1;
+        drawnVersion = -1;
+        drawnWeight = -1f;
         Describe(ItemStack.Empty);
         window.Open();
         Refresh();
@@ -277,22 +279,24 @@ public sealed class LootWindow : MonoBehaviour
             return;
         }
 
-        IReadOnlyList<ResourceAmount> resources = shown.Resources;
-        int signature = resources.Count;
-        foreach (ResourceAmount resource in resources)
-        {
-            signature = signature * 31 + resource.Amount;
-        }
-
-        if (signature != chipsFor)
-        {
-            chipsFor = signature;
-            BuildChips(resources);
-        }
-
+        // Redrawn only when something changed: what the body holds (its Version), or the bag's weight.
         ItemInventory bag = looter != null ? looter.GetComponent<ItemInventory>() : null;
         ItemContainer carried = bag != null ? bag.Container : null;
-        bagLabel.text = carried != null && carried.HasWeightLimit ? HearthKit.ToneNumbers($"Bag {carried.CurrentWeight:0} / {carried.WeightCapacity:0}") : "";
+        float weight = carried != null ? carried.CurrentWeight : 0f;
+        if (weight != drawnWeight)
+        {
+            drawnWeight = weight;
+            bagLabel.text = carried != null && carried.HasWeightLimit ? HearthKit.ToneNumbers($"Bag {carried.CurrentWeight:0} / {carried.WeightCapacity:0}") : "";
+        }
+
+        if (shown.Version == drawnVersion)
+        {
+            return;
+        }
+
+        drawnVersion = shown.Version;
+        IReadOnlyList<ResourceAmount> resources = shown.Resources;
+        BuildChips(resources);
 
         // Wide enough for the stacks or the chips, whichever is wider; tall enough for their rows.
         int stacks = grid.Shown;
@@ -327,6 +331,8 @@ public sealed class LootWindow : MonoBehaviour
 
     private void BuildChips(IReadOnlyList<ResourceAmount> resources)
     {
+        // A chip taken from under the pointer says nothing more.
+        hint.text = "";
         for (int i = chips.childCount - 1; i >= 0; i--)
         {
             Destroy(chips.GetChild(i).gameObject);

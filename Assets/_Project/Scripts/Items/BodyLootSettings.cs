@@ -16,6 +16,11 @@ public sealed class BodyLootSettings : GameSettings<BodyLootSettings>
     [SerializeField, Min(10f)] private float lootableSeconds = 600f;
     [Tooltip("How close the player must be to loot it, in metres, measured to its loot point.")]
     [SerializeField, Min(0.5f)] private float reach = 2.2f;
+    [Tooltip("At most this many bodies wait with loot at once; past it the oldest fades first (each is a ragdoll, an outline and glitter).")]
+    [SerializeField, Min(1)] private int mostLootBodies = 24;
+    [Tooltip("A kill by someone else on the player's side (a companion, a trap, a watch post's archer) further than this from the player " +
+             "goes straight to the bag, as before: nobody is there to loot it (a wall defended while away, the Keeper's view).")]
+    [SerializeField, Min(0f)] private float handOverBeyond = 20f;
     [Tooltip("Walking this far from it closes the loot window.")]
     [SerializeField, Min(1f)] private float windowReach = 4f;
     [Tooltip("The faint outline round a body with loot (the hover outline's shader, in this colour and strength).")]
@@ -39,6 +44,8 @@ public sealed class BodyLootSettings : GameSettings<BodyLootSettings>
     public float LootableSeconds => lootableSeconds;
     public float Reach => reach;
     public float WindowReach => windowReach;
+    public int MostLootBodies => mostLootBodies;
+    public float HandOverBeyond => handOverBeyond;
     public Color Glow => glow;
     public float GlowPixels => glowPixels;
 

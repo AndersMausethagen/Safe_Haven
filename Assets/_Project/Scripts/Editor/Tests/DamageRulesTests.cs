@@ -326,5 +326,7 @@ public sealed class DamageRulesTests
         Assert.IsFalse(LootOnDeath.LeavesOnBody(true, true, null, true), "nor does the forest");
         Assert.IsFalse(LootOnDeath.LeavesOnBody(false, true, player, true), "bodies off: into the bag, as before");
         Assert.IsFalse(LootOnDeath.LeavesOnBody(true, true, player, false), "nobody here to loot it");
+        Assert.IsFalse(LootOnDeath.LeavesOnBody(true, true, companion, true, nearPlayer: false),
+            "a trap or a companion far from the player hands it over, as before: nobody is there to loot it");
     }
 }

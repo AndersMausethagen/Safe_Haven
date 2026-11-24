@@ -38,6 +38,26 @@ public sealed class DeathRagdoll : MonoBehaviour
     /// <summary>Loot waits on it (LootableRemains): it doesn't sink, and the corpse limit clears others first.</summary>
     public bool HoldsLoot { get; set; }
 
+    /// <summary>It has come to rest (its bodies made kinematic).</summary>
+    public bool IsSettled => settled;
+
+    /// <summary>Which corpses the limit clears, oldest first: those over <paramref name="most"/>, never one holding loot and never the
+    /// newest (the last). <paramref name="holdsLoot"/> is every corpse's flag, oldest first.</summary>
+    public static List<int> ToClear(IReadOnlyList<bool> holdsLoot, int most)
+    {
+        var clear = new List<int>();
+        int over = holdsLoot.Count - most;
+        for (int i = 0; i < holdsLoot.Count - 1 && clear.Count < over; i++)
+        {
+            if (!holdsLoot[i])
+            {
+                clear.Add(i);
+            }
+        }
+
+        return clear;
+    }
+
     /// <summary>The corpse <paramref name="victim"/> left, or null.</summary>
     public static DeathRagdoll Of(Damageable victim)
     {
@@ -872,26 +892,18 @@ public sealed class DeathRagdoll : MonoBehaviour
     {
         Corpses.RemoveAll(corpse => corpse == null);
         Corpses.Add(this);
-        int most = CombatFeelSettings.Current.CorpseLimit;
-        // The oldest go first, but not one with loot on it (its loot ends it: LootableRemains).
-        for (int i = 0; i < Corpses.Count && Corpses.Count > most;)
+        // The oldest go first, but not one with loot on it (its loot ends it: LootableRemains, which caps those too).
+        var holding = new List<bool>(Corpses.Count);
+        foreach (DeathRagdoll corpse in Corpses)
         {
-            if (Corpses[i] != null && Corpses[i].HoldsLoot && Corpses[i] != this)
-            {
-                i++;
-                continue;
-            }
+            holding.Add(corpse.HoldsLoot);
+        }
 
-            if (Corpses[i] != null && Corpses[i] != this)
-            {
-                Destroy(Corpses[i].gameObject);
-            }
-            else if (Corpses[i] == this)
-            {
-                break;
-            }
-
-            Corpses.RemoveAt(i);
+        List<int> clear = ToClear(holding, CombatFeelSettings.Current.CorpseLimit);
+        for (int i = clear.Count - 1; i >= 0; i--)
+        {
+            Destroy(Corpses[clear[i]].gameObject);
+            Corpses.RemoveAt(clear[i]);
         }
     }
 

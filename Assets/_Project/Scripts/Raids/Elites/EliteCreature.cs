@@ -270,6 +270,19 @@ public sealed class EliteCreature : MonoBehaviour
         }
 
         GameObject killer = taker.gameObject;
+        // As its creature's own loot does: on the body, with its title, when the kill was made near the player (LootOnDeath.LeavesOnBody).
+        if (LootOnDeath.LeavesOnBody(BodyLootSettings.Current.LootFromBodies, true, taker, true, LootOnDeath.StruckNearPlayer(blow.Source)))
+        {
+            List<ItemAmount> rolled = EliteLoot(difficulty).Roll(difficulty.tier, 1f);
+            rolled.RemoveAll(drop => !difficulty.Allows(drop.Item));
+            bool relic = difficulty.eliteRelicChance > 0f && UnityEngine.Random.value < difficulty.eliteRelicChance;
+            LootableRemains body = LootableRemains.Leave(victim, Title, rolled, EliteLoot(difficulty).RollResources(difficulty.tier, 1f), relic,
+                difficulty.tier, PickInscription(killer, difficulty.tier));
+            body?.Rename(Title);
+            GameMessages.Post($"{Title} slain.", MessageKind.Gain);
+            return;
+        }
+
         var bag = killer.GetComponentInParent<ItemInventory>();
         if (bag != null)
         {
@@ -309,9 +322,19 @@ public sealed class EliteCreature : MonoBehaviour
     // The mark's own enchantment, one not yet known first; when its marks' are all known, another elite one of the tier, else a copy.
     private void GiveInscription(GameObject killer, int tier)
     {
+        EnchantmentDefinition found = PickInscription(killer, tier);
+        if (found != null)
+        {
+            Inscriptions.Grant(killer, found, Title);
+        }
+    }
+
+    // An inscription of its own affixes it may carry, at the tier's chance; null when it carries none.
+    private EnchantmentDefinition PickInscription(GameObject killer, int tier)
+    {
         if (UnityEngine.Random.value >= EssenceSettings.Current.EliteInscriptionChance(tier))
         {
-            return;
+            return null;
         }
 
         var own = new List<EnchantmentDefinition>();
@@ -324,13 +347,9 @@ public sealed class EliteCreature : MonoBehaviour
         }
 
         var random = new System.Random(UnityEngine.Random.Range(0, int.MaxValue));
-        EnchantmentDefinition found = Inscriptions.Pick(own, killer, random, copies: false)
-                                      ?? Inscriptions.Pick(Inscriptions.Pool(EnchantmentSource.Elite, tier), killer, random, copies: false)
-                                      ?? (own.Count > 0 ? own[random.Next(own.Count)] : null);
-        if (found != null)
-        {
-            Inscriptions.Grant(killer, found, Title);
-        }
+        return Inscriptions.Pick(own, killer, random, copies: false)
+               ?? Inscriptions.Pick(Inscriptions.Pool(EnchantmentSource.Elite, tier), killer, random, copies: false)
+               ?? (own.Count > 0 ? own[random.Next(own.Count)] : null);
     }
 
     private void OnDestroy()

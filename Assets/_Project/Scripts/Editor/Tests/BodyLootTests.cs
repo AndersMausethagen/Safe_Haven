@@ -83,6 +83,45 @@ public sealed class BodyLootTests
     }
 
     [Test]
+    public void AnElitesOwnRoll_JoinsItsCreaturesBody_UnderItsTitle()
+    {
+        ResourceDefinition essence = SettlementSettings.Current.CursedEssence;
+        Damageable wolf = Made("A test's wolf").AddComponent<Damageable>();
+        LootableRemains first = LootableRemains.Leave(wolf, "Wolf", new List<ItemAmount> { new ItemAmount(Hide, 2) },
+            new List<ResourceAmount> { new ResourceAmount(essence, 3) }, false, 0, null);
+        LootableRemains again = LootableRemains.Leave(wolf, "Frenzied Wolf", new List<ItemAmount> { new ItemAmount(Hide, 5) },
+            new List<ResourceAmount> { new ResourceAmount(essence, 4) }, false, 0, null);
+        again.Rename("Frenzied Wolf");
+
+        Assert.AreSame(first, again, "one body, one loot");
+        Assert.AreEqual(7, again.Items.Count(Hide));
+        Assert.AreEqual(1, again.Resources.Count, "the same essence in one chip");
+        Assert.AreEqual(7, again.Resources[0].Amount);
+        Assert.AreEqual("Frenzied Wolf", again.Title);
+    }
+
+    [Test]
+    public void ARollPastItsStackSize_KeepsEveryPiece()
+    {
+        Damageable wolf = Made("A test's wolf").AddComponent<Damageable>();
+        int many = Hide.MaximumStack * 7 + 3;
+        LootableRemains remains = LootableRemains.Leave(wolf, "Wolf", new List<ItemAmount> { new ItemAmount(Hide, many) },
+            new List<ResourceAmount>(), false, 0, null);
+        Assert.AreEqual(many, remains.Items.Count(Hide), "eight stacks, none dropped");
+    }
+
+    [Test]
+    public void TheCorpseLimit_ClearsTheOldest_NeverOneWithLoot_NorTheNewest()
+    {
+        // Oldest first; true holds loot.
+        CollectionAssert.AreEqual(new[] { 0, 2 }, DeathRagdoll.ToClear(new[] { false, true, false, false, false }, 3));
+        CollectionAssert.AreEqual(new int[0], DeathRagdoll.ToClear(new[] { false, false }, 3), "under the limit");
+        CollectionAssert.AreEqual(new int[0], DeathRagdoll.ToClear(new[] { true, true, true, false }, 2),
+            "the newest among bodies with loot: none cleared, not even it");
+        CollectionAssert.AreEqual(new[] { 1 }, DeathRagdoll.ToClear(new[] { true, false, true, false }, 3));
+    }
+
+    [Test]
     public void ACreatureWithNothingOnIt_LeavesNothingToLoot()
     {
         Damageable wolf = Made("A test's wolf").AddComponent<Damageable>();

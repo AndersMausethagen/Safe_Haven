@@ -9,8 +9,10 @@ using UnityEngine;
 /// with its own words and sound (RelicSettings.Grant, Inscriptions.Grant). Emptied, the body sinks as any corpse; left alone past
 /// Lootable Seconds it fades with what it held (a LootLeft row in the playtest log). Its loot point follows the corpse until it lies
 /// still (DeathRagdoll keeps a body with loot from sinking or being cleared by the corpse limit). A creature with no corpse (a Marsh
-/// Light, one gone in the cap) leaves the glitter where it fell. Personal: each game in co-op rolls and keeps its own.
+/// Light, one gone in the cap) leaves the glitter where it fell. Personal: each game in co-op rolls and keeps its own. An elite's own
+/// roll joins its body's (Leave again for the same creature). At most Most Loot Bodies wait at once: past that the oldest fades first.
 /// </summary>
+[InAFriendsHaven(HavenUse.Anyone, "personal loot: each game rolls and loots its own")]
 [DisallowMultipleComponent]
 public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteractionName
 {
@@ -32,11 +34,12 @@ public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteract
     private List<OutlineCopies.Entry> glow;
     private float expiresAt;
     private float nextFollow;
-    private bool relic;
+    private int relics;
     private int tier;
-    private EnchantmentDefinition inscription;
+    private readonly List<EnchantmentDefinition> inscriptions = new List<EnchantmentDefinition>();
     private bool opened;
     private bool finished;
+    private bool doneFollowing;
 
     /// <summary>Every body with loot in the scene.</summary>
     public static IReadOnlyList<LootableRemains> All => all;
@@ -50,53 +53,180 @@ public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteract
     /// <summary>The creature's name: the loot window's title and the prompt's.</summary>
     public string Title { get; private set; }
 
+    /// <summary>Goes up whenever what it holds changes (the loot window redraws then).</summary>
+    public int Version { get; private set; }
+
     public string Verb => "Loot";
     public string InteractionName => Title;
 
     /// <summary>True when nothing is left: no items, no resources, nothing still to be found.</summary>
-    public bool IsEmpty => Items.CountItems() == 0 && resources.Count == 0 && !relic && inscription == null;
+    public bool IsEmpty => Items.CountItems() == 0 && resources.Count == 0 && relics == 0 && inscriptions.Count == 0;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession()
     {
         all.Clear();
+        if (glowMaterial != null)
+        {
+            DestroyImmediate(glowMaterial);
+        }
+
         glowMaterial = null;
         glowFrame = -1;
     }
 
+    /// <summary>The loot waiting on <paramref name="body"/>, or null.</summary>
+    public static LootableRemains On(Damageable body)
+    {
+        foreach (LootableRemains remains in all)
+        {
+            if (remains != null && body != null && remains.victim == body)
+            {
+                return remains;
+            }
+        }
+
+        return null;
+    }
+
     /// <summary>Leaves loot on <paramref name="body"/>'s body: what it carried, and on a raid a relic (<paramref name="withRelic"/>, rolled at
-    /// <paramref name="raidTier"/>) and an inscription. Null when there is nothing to leave.</summary>
+    /// <paramref name="raidTier"/>) and an inscription. Loot already on that body takes it in (an elite's own roll joins its creature's).
+    /// Returns the body's loot, or null when there is none.</summary>
     public static LootableRemains Leave(Damageable body, string title, IReadOnlyList<ItemAmount> items, IReadOnlyList<ResourceAmount> rolled,
         bool withRelic, int raidTier, EnchantmentDefinition withInscription)
     {
-        int stacks = 0;
+        LootableRemains remains = On(body);
+        bool anything = withRelic || withInscription != null;
         foreach (ItemAmount item in items)
         {
-            stacks += item.Item != null && item.Amount > 0 ? 1 : 0;
+            anything |= item.Item != null && item.Amount > 0;
         }
 
-        bool anyResource = false;
         foreach (ResourceAmount resource in rolled)
         {
-            anyResource |= resource.Resource != null && resource.Amount > 0;
+            anything |= resource.Resource != null && resource.Amount > 0;
         }
 
-        if (body == null || (stacks == 0 && !anyResource && !withRelic && withInscription == null))
+        if (body == null || !anything)
         {
-            return null;
+            return remains;
         }
 
-        var go = new GameObject($"Loot ({title})");
-        go.transform.position = body.transform.position + Vector3.up * 0.4f;
-        go.layer = LayerMask.NameToLayer("Ignore Raycast");
-        var remains = go.AddComponent<LootableRemains>();
-        remains.victim = body;
-        remains.Title = title;
-        remains.relic = withRelic;
-        remains.tier = raidTier;
-        remains.inscription = withInscription;
-        // Filled into a roomy scratch grid first (an item can need several stacks), then kept in rows just enough for it.
-        var scratch = new ItemContainer(Columns, Mathf.Max(2, stacks * 2 / Columns + 2));
+        if (remains == null)
+        {
+            // Too many waiting (a long fight, a swarm): the oldest fades first, each body being a ragdoll, an outline and its glitter.
+            int most = BodyLootSettings.Current.MostLootBodies;
+            while (all.Count >= most && all.Count > 0)
+            {
+                LootableRemains oldest = all[0];
+                all.RemoveAt(0);
+                if (oldest != null)
+                {
+                    oldest.Fade("crowded");
+                }
+            }
+
+            var go = new GameObject($"Loot ({title})");
+            go.transform.position = body.transform.position + Vector3.up * 0.4f;
+            go.layer = LayerMask.NameToLayer("Ignore Raycast");
+            remains = go.AddComponent<LootableRemains>();
+            if (!all.Contains(remains))
+            {
+                all.Add(remains);
+            }
+
+            remains.victim = body;
+            remains.Title = title;
+            remains.Items = Packed(null, items);
+            // The corpse is usually made already (CombatFeedback makes it as the blow lands, before Died): held at once, so a corpse
+            // limit reached in the same moment can't clear it first.
+            remains.corpse = DeathRagdoll.Of(body);
+            if (remains.corpse != null)
+            {
+                remains.corpse.HoldsLoot = true;
+            }
+
+            remains.Build();
+        }
+        else
+        {
+            remains.Items = Packed(remains.Items, items);
+        }
+
+        foreach (ResourceAmount resource in rolled)
+        {
+            if (resource.Resource != null && resource.Amount > 0)
+            {
+                remains.AddResource(resource);
+            }
+        }
+
+        remains.relics += withRelic ? 1 : 0;
+        remains.tier = Mathf.Max(remains.tier, raidTier);
+        if (withInscription != null)
+        {
+            remains.inscriptions.Add(withInscription);
+        }
+
+        remains.Version++;
+        return remains;
+    }
+
+    /// <summary>Names it anew (an elite's title over its creature's name).</summary>
+    public void Rename(string title)
+    {
+        if (!string.IsNullOrEmpty(title))
+        {
+            Title = title;
+            gameObject.name = $"Loot ({title})";
+            Version++;
+        }
+    }
+
+    private void AddResource(ResourceAmount added)
+    {
+        for (int i = 0; i < resources.Count; i++)
+        {
+            if (resources[i].Resource == added.Resource)
+            {
+                resources[i] = new ResourceAmount(added.Resource, resources[i].Amount + added.Amount);
+                return;
+            }
+        }
+
+        resources.Add(added);
+    }
+
+    // What it holds in rows just enough for it: filled into a scratch grid as roomy as the stacks need (an item past its stack size takes
+    // several), then copied over.
+    private static ItemContainer Packed(ItemContainer held, IReadOnlyList<ItemAmount> items)
+    {
+        int needed = 0;
+        if (held != null)
+        {
+            needed += held.SlotCount;
+        }
+
+        foreach (ItemAmount item in items)
+        {
+            if (item.Item != null && item.Amount > 0)
+            {
+                needed += Mathf.CeilToInt(item.Amount / (float)item.Item.MaximumStack);
+            }
+        }
+
+        var scratch = new ItemContainer(Columns, Mathf.Max(1, Mathf.CeilToInt(needed / (float)Columns)) + 1);
+        if (held != null)
+        {
+            for (int i = 0; i < held.SlotCount; i++)
+            {
+                if (!held.GetSlot(i).IsEmpty)
+                {
+                    scratch.AddStack(held.GetSlot(i));
+                }
+            }
+        }
+
         foreach (ItemAmount item in items)
         {
             if (item.Item != null && item.Amount > 0)
@@ -111,25 +241,16 @@ public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteract
             used += scratch.GetSlot(i).IsEmpty ? 0 : 1;
         }
 
-        remains.Items = new ItemContainer(Columns, Mathf.Max(1, Mathf.CeilToInt(used / (float)Columns)));
+        var packed = new ItemContainer(Columns, Mathf.Max(1, Mathf.CeilToInt(used / (float)Columns)));
         for (int i = 0; i < scratch.SlotCount; i++)
         {
             if (!scratch.GetSlot(i).IsEmpty)
             {
-                remains.Items.AddStack(scratch.GetSlot(i));
+                packed.AddStack(scratch.GetSlot(i));
             }
         }
 
-        foreach (ResourceAmount resource in rolled)
-        {
-            if (resource.Resource != null && resource.Amount > 0)
-            {
-                remains.resources.Add(resource);
-            }
-        }
-
-        remains.Build();
-        return remains;
+        return packed;
     }
 
     private void Build()
@@ -145,7 +266,13 @@ public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteract
         BuildSparkles(settings);
     }
 
-    private void OnEnable() => all.Add(this);
+    private void OnEnable()
+    {
+        if (!all.Contains(this))
+        {
+            all.Add(this);
+        }
+    }
 
     private void OnDisable() => all.Remove(this);
 
@@ -176,17 +303,18 @@ public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteract
         }
 
         opened = true;
-        if (relic)
+        for (; relics > 0; relics--)
         {
-            relic = false;
             RelicSettings.Grant(looter, new System.Random(Random.Range(0, int.MaxValue)), tier);
         }
 
-        if (inscription != null)
+        foreach (EnchantmentDefinition found in inscriptions)
         {
-            global::Inscriptions.Grant(looter, inscription, Title);
-            inscription = null;
+            global::Inscriptions.Grant(looter, found, Title);
         }
+
+        inscriptions.Clear();
+        Version++;
     }
 
     /// <summary>Takes the stack in <paramref name="index"/> into <paramref name="looter"/>'s bag, as much as fits. True when any went.</summary>
@@ -203,6 +331,7 @@ public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteract
         if (given > 0)
         {
             Items.RemoveAt(index, given);
+            Version++;
         }
 
         AfterTaking();
@@ -229,11 +358,12 @@ public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteract
             resources.RemoveAt(index);
         }
 
+        Version++;
         AfterTaking();
         return kept < wanted.Amount;
     }
 
-    /// <summary>Takes everything that fits. Returns how many stacks and resources stayed for want of room.</summary>
+    /// <summary>Takes everything that fits. Returns how many item stacks and resource kinds stayed for want of room.</summary>
     public int TakeAll(GameObject looter)
     {
         FindOnOpening(looter);
@@ -250,7 +380,7 @@ public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteract
             TakeResource(i, looter);
         }
 
-        int stayed = Items.CountItems() + resources.Count;
+        int stayed = StacksLeft() + resources.Count;
         if (stayed > 0)
         {
             GameMessages.Post("No room for the rest: it stays on the body.", MessageKind.Warning);
@@ -285,17 +415,51 @@ public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteract
         }
     }
 
+    private int StacksLeft()
+    {
+        int stacks = 0;
+        for (int i = 0; i < Items.SlotCount; i++)
+        {
+            stacks += Items.GetSlot(i).IsEmpty ? 0 : 1;
+        }
+
+        return stacks;
+    }
+
+    // Gone with what it held: noted for the playtest log, and as left behind (LootGrant.LeftBehind), as loot that didn't fit always was.
+    private void Fade(string why)
+    {
+        if (finished)
+        {
+            return;
+        }
+
+        finished = true;
+        PlaytestLogger.Note(PlaytestLog.LootLeft, Title, StacksLeft() + resources.Count, why);
+        GameObject player = Player.Current != null ? Player.Current.gameObject : null;
+        var items = new List<ItemAmount>();
+        for (int i = 0; i < Items.SlotCount; i++)
+        {
+            if (!Items.GetSlot(i).IsEmpty)
+            {
+                items.Add(new ItemAmount(Items.GetSlot(i).Item, Items.GetSlot(i).Count));
+            }
+        }
+
+        LootGrant.LeftBehind(player, items);
+        LootGrant.LeftBehind(player, resources);
+        Finish();
+    }
+
     private void Update()
     {
         if (Time.time >= expiresAt)
         {
-            PlaytestLogger.Note(PlaytestLog.LootLeft, Title, Items.CountItems() + resources.Count, "faded");
-            finished = true;
-            Finish();
+            Fade("faded");
             return;
         }
 
-        // The corpse is made in the same moment as the loot, in no set order: looked for over the first frames.
+        // Found at once as a rule (Leave); else looked for over the first frames.
         if (corpse == null && corpseLooks < 5 && victim != null)
         {
             corpseLooks++;
@@ -313,10 +477,12 @@ public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteract
             glowMaterial.SetColor(OutlineColorId, BodyLootSettings.Current.GlowAt(Time.time));
         }
 
-        if (Time.time >= nextFollow)
+        // Following the body until it lies still (and the glow is on it); then it stays put.
+        if (!doneFollowing && Time.time >= nextFollow)
         {
             nextFollow = Time.time + FollowEvery;
             Follow();
+            doneFollowing = (corpse != null && corpse.IsSettled && glow != null) || (corpse == null && corpseLooks >= 5);
         }
     }
 
@@ -452,8 +618,10 @@ public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteract
         // Left on the body when the raid or the scene ended: what players walk past is worth knowing.
         if (!finished && Items != null && !IsEmpty)
         {
-            PlaytestLogger.Note(PlaytestLog.LootLeft, Title, Items.CountItems() + resources.Count, "left");
+            PlaytestLogger.Note(PlaytestLog.LootLeft, Title, StacksLeft() + resources.Count, "left");
         }
+
+        all.Remove(this);
 
         if (glow != null)
         {

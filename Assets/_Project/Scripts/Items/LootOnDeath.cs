@@ -86,9 +86,28 @@ public sealed class LootOnDeath : MonoBehaviour
     }
 
     /// <summary>Whether a death leaves its loot on the body (BodyLootSettings): bodies on, a creature (not a crate or a pot), struck down
-    /// by the player's side, and a player here to loot it.</summary>
-    public static bool LeavesOnBody(bool fromBodies, bool creature, Combatant taker, bool playerHere) =>
-        fromBodies && creature && taker != null && taker.Faction.IsPlayerSide() && playerHere;
+    /// by the player's side near the player (<paramref name="nearPlayer"/>: a trap or a companion far off hands it over as before), and a
+    /// player here to loot it.</summary>
+    public static bool LeavesOnBody(bool fromBodies, bool creature, Combatant taker, bool playerHere, bool nearPlayer = true) =>
+        fromBodies && creature && taker != null && taker.Faction.IsPlayerSide() && playerHere && nearPlayer;
+
+    /// <summary>Whether the last blow came from the player or from close by them (BodyLootSettings › Hand Over Beyond).</summary>
+    public static bool StruckNearPlayer(Combatant striker)
+    {
+        Player player = Player.Current;
+        if (striker == null || player == null)
+        {
+            return false;
+        }
+
+        if (striker.gameObject == player.gameObject)
+        {
+            return true;
+        }
+
+        float beyond = BodyLootSettings.Current.HandOverBeyond;
+        return (striker.transform.position - player.transform.position).sqrMagnitude <= beyond * beyond;
+    }
 
     /// <summary><see cref="TakerOf(Combatant, Combatant)"/> for the player in this scene.</summary>
     public static Combatant TakerOf(Combatant killer) => TakerOf(killer, Player.Current != null ? Player.Current.Combatant : null);
@@ -111,7 +130,8 @@ public sealed class LootOnDeath : MonoBehaviour
         int tier = here != null ? here.Session.Tier : 0;
         float multiplier = here != null && here.Session.Difficulty != null ? here.Session.Difficulty.loot : 1f;
         bool atHome = KilledAtHome;
-        if (LeavesOnBody(BodyLootSettings.Current.LootFromBodies, TryGetComponent(out MonsterAI creature), taker, Player.Current != null))
+        if (LeavesOnBody(BodyLootSettings.Current.LootFromBodies, TryGetComponent(out MonsterAI creature), taker, Player.Current != null,
+                StruckNearPlayer(killingBlow.Source)))
         {
             LeaveOnBody(creature, taker, tier, multiplier, atHome);
             LearnRecipes(taker);
