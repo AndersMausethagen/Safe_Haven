@@ -7,7 +7,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(ItemInventory))]
-public sealed class PlayerBurden : MonoBehaviour
+public sealed class PlayerBurden : MonoBehaviour, LeaseWatch.ILastingHold
 {
     private const float CheckSeconds = 0.25f;
 

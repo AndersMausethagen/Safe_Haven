@@ -509,6 +509,11 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
         lastSenseTime = Time.time;
         nextGlanceAt = Time.time + UnityEngine.Random.Range(0f, PerceptionSettings.Current.IdleGlanceSeconds.y);
         RefreshAmbush();
+        // Its blood's tint made before the first blow lands, not on that frame.
+        if (definition != null && definition.Bleeds)
+        {
+            BloodDecals.Prepare(definition.BloodColor);
+        }
     }
 
     private void OnDestroy()

@@ -21,6 +21,13 @@ public sealed class LeaseWatch
         HealthFloor,
     }
 
+    /// <summary>An owner whose hold lasts by design while its reason does: worn gear's pace, a path underfoot, a heavy bag. Only its going
+    /// counts as a leak, never its length (five of the seven Stuck rows of the 2026-11-21 run were HavenPaths and PlayerEquipment
+    /// holding speed for three minutes, as they should).</summary>
+    public interface ILastingHold
+    {
+    }
+
     private static float LongestFor(Kind kind)
     {
         switch (kind)
@@ -111,7 +118,7 @@ public sealed class LeaseWatch
             }
 
             bool ownerGone = owner is Object unityOwner && unityOwner == null;
-            float longest = LongestFor(kind);
+            float longest = owner is ILastingHold ? 0f : LongestFor(kind);
             if ((ownerGone || (longest > 0f && now - from > longest)) && told.Add(key))
             {
                 found.Add($"{kind} on {NameOf(holder)} for {now - from:0} s, held by {(ownerGone ? "something gone (destroyed)" : NameOf(owner))}");

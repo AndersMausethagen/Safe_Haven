@@ -159,6 +159,14 @@ public static class PlaytestLog
     public const string Plundered = "Plundered";
     /// <summary>The death rules changed (the options): subject the new ones.</summary>
     public const string DeathRules = "DeathRules";
+    // How the game ran (Docs/QualityLevers_2026-11-24.md §2):
+    /// <summary>A played minute's frames (fewer at a change of place; paused, unfocused and loading frames left out): subject the place (a
+    /// raid's id, home, or the scene), amount the 95th percentile frame in ms, detail percentiles, worst, hitches over 50 ms, frames and
+    /// the CPU main thread / GPU averages where reported (FrameTally).</summary>
+    public const string Perf = "Perf";
+    /// <summary>What the game runs on, once a session and when the display settings change: subject the GPU, amount its memory in MB,
+    /// detail the screen, quality, vsync, frame cap, graphics API, CPU, RAM and OS.</summary>
+    public const string Machine = "Machine";
 
     public static string Folder => Path.Combine(Application.persistentDataPath, "Playtests");
 

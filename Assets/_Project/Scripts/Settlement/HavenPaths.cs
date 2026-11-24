@@ -6,7 +6,7 @@ using UnityEngine;
 /// times a second against the path pieces' footprints, never per frame. Added to the portal with HavenHomes.
 /// </summary>
 [DisallowMultipleComponent]
-public sealed class HavenPaths : MonoBehaviour
+public sealed class HavenPaths : MonoBehaviour, LeaseWatch.ILastingHold
 {
     private const float LookSeconds = 0.25f;
 

@@ -10,6 +10,36 @@ public static class BloodDecals
 {
     private static readonly int BaseMapId = Shader.PropertyToID("Base_Map");
     private static readonly Dictionary<Color32, Material> Tinted = new Dictionary<Color32, Material>();
+    // Colours asked for ahead of the first blow (Prepare), tinted one a frame by WarmOne.
+    private static readonly Queue<Color32> Waiting = new Queue<Color32>();
+
+    /// <summary>Tints <paramref name="color"/>'s copy soon, one colour a frame, so the first blow on a new kind of creature doesn't pay
+    /// for it: the tint is a pass over the atlas' pixels, 9 ms in the Editor (Docs/QualityLevers_2026-11-24.md §2), landing on the frame
+    /// of the hit. Asked by a bleeding creature as it appears.</summary>
+    public static void Prepare(Color color)
+    {
+        Color32 key = color;
+        if (!Tinted.ContainsKey(key) && !Waiting.Contains(key))
+        {
+            Waiting.Enqueue(key);
+        }
+    }
+
+    /// <summary>Tints the oldest colour waiting, if any (DecalPool, once a frame).</summary>
+    public static void WarmOne()
+    {
+        if (Waiting.Count > 0)
+        {
+            Color32 next = Waiting.Dequeue();
+            if (!Tinted.ContainsKey(next))
+            {
+                MaterialFor(next);
+            }
+        }
+    }
+
+    /// <summary>Whether <paramref name="color"/>'s copy is made already.</summary>
+    public static bool IsTinted(Color color) => Tinted.TryGetValue(color, out Material made) && made != null;
 
     /// <summary>Whether blood can be drawn as decals now.</summary>
     public static bool Available
@@ -89,5 +119,6 @@ public static class BloodDecals
         }
 
         Tinted.Clear();
+        Waiting.Clear();
     }
 }

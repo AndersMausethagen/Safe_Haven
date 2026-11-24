@@ -91,6 +91,7 @@ public sealed class DecalPool : MonoBehaviour
 
     private void Update()
     {
+        BloodDecals.WarmOne();
         float now = Time.time;
         foreach (Mark mark in marks)
         {

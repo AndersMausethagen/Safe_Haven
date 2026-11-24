@@ -2089,6 +2089,19 @@ A Sandbox mode comes only after the Campaign is done (`Docs/TODO.md`). What the 
 - **The playtest logger** leaves out unfocused time, judges walking over 0.25 s, and names the window (`window:<UIWindowId>`, from
   `UIStateManager.Front`).
 
+### How the game runs on a playtester's machine (Docs/QualityLevers_2026-11-24.md §2, 2026-11-24)
+
+- **`Perf` rows**, one a played minute and one at each change of place (a raid's id, `home`, or the scene): `FrameTally` (plain C#,
+  a quarter-millisecond histogram, nothing allocated) gives p50/p95/p99, the worst frame, hitches over 50 ms and the CPU main/GPU
+  split from `FrameTimingManager`. Paused, unfocused and loading frames (and the second after a load) are left out.
+- **`Machine` rows**: GPU and its memory, screen, quality, vsync, frame cap, API, CPU, RAM and OS, once a session and again when the
+  display settings change.
+- **F8's fps** is `PlaytestLogger.RecentFps`, an average of real frames (it read 10000 while paused).
+- **`LeaseWatch.ILastingHold`**: an owner whose hold lasts by design (`HavenPaths`, `PlayerEquipment`, `PlayerBurden`) is a leak only
+  when it is gone, never for its length.
+- **Blood tints ahead of the blow**: a bleeding creature asks `BloodDecals.Prepare` as it starts; `DecalPool` tints one waiting colour
+  a frame (`WarmOne`), so the first hit on a new kind doesn't pay the atlas pass (`BloodTintWarmTests`).
+
 ### The review's steps 1-8 (Docs/PeopleSystemReview_2026-11-23.md, built 2026-11-23, unplayed)
 
 - **Measuring**: playtest rows PersonLevel, PersonRank, PersonInspired, PersonMark, Standing, PassionPick, Bond and a morning's Spirits;

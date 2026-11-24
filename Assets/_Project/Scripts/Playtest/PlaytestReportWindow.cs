@@ -150,7 +150,7 @@ public sealed class PlaytestReportWindow : MonoBehaviour
             ["scene"] = SceneManager.GetActiveScene().name,
             ["run_id"] = GameSession.Playtest != null ? GameSession.Playtest.Id : "",
             ["played_min"] = GameSession.Playtest != null ? (GameSession.Playtest.PlayedSeconds / 60f).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) : "0",
-            ["fps"] = Mathf.RoundToInt(1f / Mathf.Max(0.0001f, Time.smoothDeltaTime)).ToString(),
+            ["fps"] = PlaytestLogger.RecentFps.ToString(),
             ["raid"] = RaidDirector.Current != null && RaidDirector.Current.Session != null && RaidDirector.Current.Session.Definition != null
                 ? RaidDirector.Current.Session.Definition.DisplayName : "",
         };

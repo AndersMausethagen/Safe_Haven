@@ -78,6 +78,35 @@ public sealed class LeaseWatchTests
         }
     }
 
+    [Test]
+    public void ALastingHold_IsNoLeakForItsLength_ButIsWhenItsOwnerGoes()
+    {
+        // Paths underfoot and worn gear hold the pace as long as they are there (2026-11-21: five of seven Stuck rows were these).
+        var watch = new LeaseWatch();
+        var player = new LeaseKey("a test's player");
+        var paths = new GameObject("Haven paths");
+        try
+        {
+            Component lasting = paths.AddComponent<HavenPaths>();
+            var swing = new object();
+            watch.Judge(LeaseWatch.Kind.SpeedChanged, player, new object[] { lasting, swing }, 0f);
+            watch.Judge(LeaseWatch.Kind.SpeedChanged, player, new object[] { lasting, swing }, 600f);
+            Assert.AreEqual(1, watch.Found.Count, string.Join("\n", watch.Found));
+            StringAssert.DoesNotContain("HavenPaths", watch.Found[0], "the path's hold is lasting");
+
+            Object.DestroyImmediate(paths);
+            watch.Judge(LeaseWatch.Kind.SpeedChanged, player, new object[] { lasting }, 601f);
+            Assert.AreEqual(2, watch.Found.Count, "a lasting hold whose owner is gone is still a leak");
+        }
+        finally
+        {
+            if (paths != null)
+            {
+                Object.DestroyImmediate(paths);
+            }
+        }
+    }
+
     // What this test's own holder was found holding (Look also reads the running game, where other tests may have left things).
     private static int Of(LeaseWatch watch, LeaseKey holder) =>
         System.Linq.Enumerable.Count(watch.Found, leak => leak.Contains(" on " + holder + " "));

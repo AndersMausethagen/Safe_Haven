@@ -18,7 +18,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(ItemInventory), typeof(PlayerCombat))]
-public sealed class PlayerEquipment : MonoBehaviour
+public sealed class PlayerEquipment : MonoBehaviour, LeaseWatch.ILastingHold
 {
     [Tooltip("Used when no weapon is equipped.")]
     [SerializeField] private WeaponDefinition unarmed;

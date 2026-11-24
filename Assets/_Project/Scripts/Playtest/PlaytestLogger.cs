@@ -110,6 +110,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
 
         minuteXp.Clear();
         FlushCombat();
+        FlushFrames();
     }
 
     // How the player fought over the minute (CombatTally), one row per technique: the parry/aggression balance is read from these.
@@ -202,9 +203,103 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         }
     }
 
+    // ----- How the game ran (PlaytestLog.Perf, Machine; Docs/QualityLevers_2026-11-24.md §2) -----
+
+    private readonly FrameTally frames = new FrameTally();
+    private readonly FrameTiming[] timings = new FrameTiming[1];
+    // Where the frames being tallied were drawn: a raid's id, "home", or the scene's name (the prologue, a friend's Haven).
+    private string framesAt;
+    // Frames from a scene change until this time aren't counted: the load's own long frames are a loading screen, not play.
+    private float settledAt;
+    private bool wasLoading;
+    // The display settings last written in a Machine row: a change (resolution, quality, frame cap) writes a new one.
+    private string machineWritten;
+    private static float averageFrame = 1f / 60f;
+
+    /// <summary>The frame rate of the last second or so of real frames, in every build: what F8's report says. Time.smoothDeltaTime
+    /// follows the time scale, so a report written while paused said 10000 fps (2026-11-21).</summary>
+    public static int RecentFps => Mathf.RoundToInt(1f / Mathf.Max(0.0001f, averageFrame));
+
+    private static void TrackFrameRate()
+    {
+        float frame = Time.unscaledDeltaTime;
+        if (frame > 0f && frame < 1f)
+        {
+            averageFrame = Mathf.Lerp(averageFrame, frame, 0.05f);
+        }
+    }
+
+    private void TallyFrame()
+    {
+        bool loading = SceneTransition.IsBusy;
+        if (loading || wasLoading)
+        {
+            settledAt = Time.unscaledTime + 1f;
+        }
+
+        wasLoading = loading;
+        if (loading || Time.unscaledTime < settledAt || GamePause.IsPaused || !Application.isFocused)
+        {
+            return;
+        }
+
+        string at = FramesPlace();
+        if (at != framesAt)
+        {
+            FlushFrames();
+            framesAt = at;
+        }
+
+        frames.Add(Time.unscaledDeltaTime * 1000f);
+        FrameTimingManager.CaptureFrameTimings();
+        if (FrameTimingManager.GetLatestTimings(1, timings) > 0)
+        {
+            frames.AddSplit(timings[0].cpuMainThreadFrameTime, timings[0].gpuFrameTime);
+        }
+    }
+
+    private static string FramesPlace()
+    {
+        RaidDirector raid = RaidDirector.Current;
+        if (raid != null && raid.Session != null && raid.Session.Definition != null)
+        {
+            return raid.Session.Definition.Id;
+        }
+
+        return Place.InAHaven && Place.AtHome ? "home" : SceneManager.GetActiveScene().name;
+    }
+
+    // A minute's frames (or fewer, at a change of place) as one Perf row: subject the place, amount the 95th percentile in whole ms.
+    private void FlushFrames()
+    {
+        if (frames.Frames >= 30 && framesAt != null)
+        {
+            WriteMachine();
+            Write(PlaytestLog.Perf, framesAt, Mathf.RoundToInt(frames.Percentile(0.95f)), frames.Detail());
+        }
+
+        frames.Clear();
+    }
+
+    // The machine and its display settings: once a session, and again when the settings change.
+    private void WriteMachine()
+    {
+        string display = $"screen {Screen.width}x{Screen.height} {Screen.fullScreenMode} quality {QualitySettings.names[QualitySettings.GetQualityLevel()]} " +
+                         $"vsync {QualitySettings.vSyncCount} cap {Application.targetFrameRate}";
+        if (display == machineWritten)
+        {
+            return;
+        }
+
+        machineWritten = display;
+        Write(PlaytestLog.Machine, SystemInfo.graphicsDeviceName, SystemInfo.graphicsMemorySize,
+            $"{display} api {SystemInfo.graphicsDeviceType} cpu {SystemInfo.processorType} x{SystemInfo.processorCount} ram {SystemInfo.systemMemorySize} os {SystemInfo.operatingSystem}");
+    }
+
     private void Update()
     {
         LookForLeaks();
+        TrackFrameRate();
         if (!logging)
         {
             return;
@@ -212,6 +307,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
 
         PlaytestRun current = EnsureRun();
         FollowPlayer();
+        TallyFrame();
         // Played time: not paused, and the game in front (time in another window isn't play: Docs/CampaignAudit_2026-11-23.md §4.5).
         if (!GamePause.IsPaused && Application.isFocused)
         {
@@ -520,6 +616,9 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
 
         run.Sessions++;
         WriteRow(PlaytestLog.SessionStart, Application.version, 0, run.Sessions == 1 ? "new run" : "continued");
+        // A new session's file says again what it runs on.
+        machineWritten = null;
+        frames.Clear();
         return current;
     }
 
