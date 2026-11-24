@@ -52,6 +52,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   closedBy: {fileID: 0}
   startDelay: 0
   startsInAFight: 0
@@ -83,6 +85,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   - type: 13
     description: Give Gunnar the Hunter's work
     amount: 1
@@ -107,6 +111,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   - type: 0
     description: 'Bring 4 Rough Hides: the boars at the edge of the light'
     amount: 4
@@ -131,6 +137,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   - type: 7
     description: 'Build a Hunter''s Lodge (build menu: {key:Build})'
     amount: 1
@@ -155,16 +163,24 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   unlocksBuildings:
   - {fileID: 11400000, guid: 27159a7266bda614cbc6774955749e0e, type: 2}
+  unlocksModules: []
   turnInToGiver: 0
   turnInTo: 
   rewardItems: []
   rewardResources: []
   rewardRecipes: []
+  rewardSkills:
+  - {fileID: 11400000, guid: 0e59706e0c7a7504c96c67b8c18daee3, type: 2}
+  teachesAtStart: []
   rewardEnchantments: []
   rewardWorkFor: {fileID: 0}
   rewardWork: 0
+  rewardPassion: 0
+  rewardMark: {fileID: 0}
   experience: 0
   completionEvent: {fileID: 0}
   onCompleted: []

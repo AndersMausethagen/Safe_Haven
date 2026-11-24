@@ -175,6 +175,49 @@ public sealed partial class PlayerCombat
 
     private bool HasGuardCounter => (HasShield && Shield != null && Shield.OwnGuardCounter != null) || (weapon != null && weapon.GuardCounterAttack != null);
 
+    /// <summary>
+    /// The art of the weapon in hand, asked for from the skill bar (SkillDefinition.WeaponArt): its own, or its attuned rune's. The same
+    /// checks and costs as the middle button and the guard's art; true when it started.
+    /// </summary>
+    public bool TryArt(bool fromRune)
+    {
+        artFromRune = fromRune;
+        if (weapon == null || weapon.TakesAttackInput || ArtAttack == null || (fromRune && ArtRune == null)
+            || (stateMachine != null && !stateMachine.CanStartAttack))
+        {
+            artFromRune = false;
+            return false;
+        }
+
+        if (!CanAffordArt)
+        {
+            if (focus != null) focus.TrySpend(ArtFocus); // refused: lets the HUD say so
+            artFromRune = false;
+            return false;
+        }
+
+        if (ArtCoolingDown)
+        {
+            ArtNotReady?.Invoke();
+            artFromRune = false;
+            return false;
+        }
+
+        if (guard != null && guard.IsGuarding)
+        {
+            guard.Lower();
+        }
+
+        Request(SwingKind.Art, ChainPress.Late);
+        return true;
+    }
+
+    /// <summary>Whether the weapon in hand has that art to strike: its own, or a rune attuned to it.</summary>
+    public bool HasArt(bool fromRune) => weapon != null && (fromRune ? ArtRunes.For(weapon) != null && ArtRunes.For(weapon).RuneArt != null : weapon.WeaponArt != null);
+
+    /// <summary>Share of the art's cooldown still to go (the bar's sweep), 1 just used to 0 ready.</summary>
+    public float ArtCooldownFraction => Rules.ArtCooldown > 0f ? Mathf.Clamp01((artReadyAt - Time.time) / Rules.ArtCooldown) : 0f;
+
     // The middle button: the next arrow with a bow (PlayerArchery), the weapon's art with anything else.
     private void OnArtRequested()
     {

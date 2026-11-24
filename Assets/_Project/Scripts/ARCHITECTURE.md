@@ -3263,7 +3263,17 @@ sample textures and flames are in `Art/Effects/VFX Graph/Additions` (Unity Compa
   `AttackDefinition.OnRepeatStatus` freezes what is already chilled: Frozen, 1.5 s rooted, 4 s before again), the Ash Lad's Ember (ember
   circle, hand sparks; a breath of fire down the cone, embers, small fires left on the ground; Burning, 3 a second for 4 s), Trollsbane
   Wrath (gold circle; shockwave ring, dust round its edge, sparks; a heavy shake). `SkillLookTests`.
-- Not yet: weapon skills on the bar, the other abilities' looks, the story's teachers, the paid casting animations (to be imported).
+- **Weapon skills on the 1-5 bar** (slice 2): `SkillDefinition.WeaponArt` (Own, Rune) makes a bar entry strike the weapon in hand's art
+  (`PlayerCombat.TryArt`: the middle button's checks and Focus cost, its cooldown shown by `PlayerSkills.CooldownFraction` through
+  `ArtCooldownFraction`). `Data/Skills/WeaponArt` (Weapon's Art) and `RuneArt` (Rune Art). Entries can be dragged anywhere on the bar as
+  before. A newly learned ability goes into the first free slot of 1-5, so it is seen at once.
+- **Every ability has a teacher** (slice 2): a new game starts with Weapon's Art in slot 1 and Rune Art in the book
+  (`PlayerSkillSettings`); `QuestDefinition.rewardSkills` teaches at a quest's end: The Alchemist (Ingrid) Huldra's Blessing, The Smith
+  (Bjarne) Whirling Steel, The Warden (Eirik) Trollsbane Wrath, The Cook (Yrsa) the Ash Lad's Ember, The Hunter (Gunnar) Wolf's Lunge, The
+  Rune Scholar (Liv) Frost Rune; bosses keep theirs (Brukam: Mountain Leap, the Heartroot: Heartroot's Grasp). Saves keep what they know.
+  `SkillLookTests.EveryAbility_HasATeacher...`.
+- Not yet: the other five abilities' looks, statuses for Beast/Wyrd/Steel, the paid casting animations (the user buys and imports Kevin
+  Iglesias' Human Spellcasting Animations).
 
 ## Loot on bodies (2026-11-24)
 

@@ -214,7 +214,8 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     public float CooldownRemaining(SkillDefinition skill) => cooldowns.Remaining(skill, Time.time);
 
     /// <summary>Share of the skill's cooldown still to go, from 1 (just cast) to 0 (ready).</summary>
-    public float CooldownFraction(SkillDefinition skill) => cooldowns.Fraction(skill, Time.time);
+    public float CooldownFraction(SkillDefinition skill) =>
+        skill != null && skill.WeaponArt != WeaponArtSlot.None ? (combat != null ? combat.ArtCooldownFraction : 0f) : cooldowns.Fraction(skill, Time.time);
 
     /// <summary>Learns a skill. Returns false when it was already known.</summary>
     public bool Learn(SkillDefinition skill, bool announce = true)
@@ -228,6 +229,15 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         if (announce)
         {
             GameMessages.Post("New skill: " + skill.DisplayName, MessageKind.Gain);
+            // Seen at once: into the first free slot of 1-5 (the user, 2026-11-24: "the skills should be visible"); moved anywhere after.
+            for (int slot = 0; slot < 5; slot++)
+            {
+                if (loadout.Get(slot) == null && loadout.GetItem(slot) == null && loadout.IndexOf(skill) < 0)
+                {
+                    loadout.Equip(slot, skill);
+                    break;
+                }
+            }
         }
 
         KnownSkillsChanged?.Invoke();
@@ -281,6 +291,19 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         }
 
         SkillDefinition skill = loadout.Get(slot);
+        // The weapon's art from the bar: what the weapon in hand strikes, at the art's own cost and cooldown.
+        if (skill != null && skill.WeaponArt != WeaponArtSlot.None)
+        {
+            if (combat == null || !combat.HasArt(skill.WeaponArt == WeaponArtSlot.Rune))
+            {
+                GameMessages.Post(skill.WeaponArt == WeaponArtSlot.Rune ? "No rune is attuned to the weapon in hand." : "Nothing in hand has an art.",
+                    MessageKind.Warning);
+                return SkillCastResult.EmptySlot;
+            }
+
+            return combat.TryArt(skill.WeaponArt == WeaponArtSlot.Rune) ? SkillCastResult.Cast : SkillCastResult.CoolingDown;
+        }
+
         SkillCastResult result = CheckCast(skill);
         PlayerFocus focus = GetComponent<PlayerFocus>();
         if (result == SkillCastResult.Cast && skill.FocusCost > 0f && focus != null && !focus.CanSpend(skill.FocusCost))

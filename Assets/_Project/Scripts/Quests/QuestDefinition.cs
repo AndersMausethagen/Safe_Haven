@@ -114,6 +114,9 @@ public sealed class QuestDefinition : ScriptableObject
     [SerializeField] private List<ItemAmount> rewardItems = new List<ItemAmount>();
     [SerializeField] private List<ResourceAmount> rewardResources = new List<ResourceAmount>();
     [SerializeField] private List<RecipeDefinition> rewardRecipes = new List<RecipeDefinition>();
+    [Tooltip("Abilities taught at the end: a person shows what they know (Docs/CombatSkillsResearch_2026-11-24.md §4: every power has a " +
+             "teacher; Ingrid's Huldra's Blessing, Bjarne's Whirling Steel...).")]
+    [SerializeField] private List<SkillDefinition> rewardSkills = new List<SkillDefinition>();
     [Tooltip("Recipes it teaches as it starts, so one of its objectives can ask for the thing made (What the Old Wood Fears teaches " +
              "Ember Pitch, then asks for one). Rewards come at the end; these come at once.")]
     [SerializeField] private List<RecipeDefinition> teachesAtStart = new List<RecipeDefinition>();
@@ -196,6 +199,7 @@ public sealed class QuestDefinition : ScriptableObject
     public int Experience => experience;
     public IReadOnlyList<ResourceAmount> RewardResources => rewardResources;
     public IReadOnlyList<RecipeDefinition> RewardRecipes => rewardRecipes;
+    public IReadOnlyList<SkillDefinition> RewardSkills => rewardSkills;
     public IReadOnlyList<RecipeDefinition> TeachesAtStart => teachesAtStart;
     public IReadOnlyList<BuildingDefinition> UnlocksBuildings => unlocksBuildings;
     public IReadOnlyList<BuildingModuleDefinition> UnlocksModules => unlocksModules;

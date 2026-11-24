@@ -61,6 +61,10 @@ public sealed class SkillDefinition : ScriptableObject
     [Tooltip("How it looks: effects as it is cast, as it is let go (over the attack's reach and arc) and on what it strikes; its area on " +
              "the ground while it winds up; a flash and a shake (Docs/CombatSkillsResearch_2026-11-24.md §6).")]
     [SerializeField] private SkillLook look = new SkillLook();
+    [Tooltip("A bar entry for the weapon in hand's art instead of a skill of its own (the user, 2026-11-24: weapon skills stay on the 1-5 " +
+             "bar and can be placed anywhere): Own strikes the weapon's art (the middle button's), Rune the attuned rune's (attacking out of " +
+             "the guard). Its cost and cooldown are the art's; the fields above are not used.")]
+    [SerializeField] private WeaponArtSlot weaponArt;
 
     /// <summary>Stable identifier, used for saves: the asset's name.</summary>
     public string Id => name;
@@ -82,5 +86,6 @@ public sealed class SkillDefinition : ScriptableObject
     public string AnimationState => animationState;
     public float AnimationSpeed => animationSpeed;
     public SkillLook Look => look;
+    public WeaponArtSlot WeaponArt => weaponArt;
     public bool HasBuffs => buffs.Count > 0 && buffDuration > 0f;
 }

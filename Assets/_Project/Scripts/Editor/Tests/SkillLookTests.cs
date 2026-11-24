@@ -77,6 +77,40 @@ public sealed class SkillLookTests
     }
 
     [Test]
+    public void EveryAbility_HasATeacher_AndANewGameStartsWithTheWeaponsArtOnTheBar()
+    {
+        var settings = AssetDatabase.LoadAssetAtPath<PlayerSkillSettings>("Assets/_Project/Data/Player/PlayerSkillSettings.asset");
+        var taught = new HashSet<SkillDefinition>(settings.StartingSkills);
+        foreach (string guid in AssetDatabase.FindAssets("t:BossDefinition", new[] { "Assets/_Project" }))
+        {
+            taught.Add(AssetDatabase.LoadAssetAtPath<BossDefinition>(AssetDatabase.GUIDToAssetPath(guid)).RewardSkill);
+        }
+
+        foreach (string guid in AssetDatabase.FindAssets("t:QuestDefinition", new[] { "Assets/_Project" }))
+        {
+            foreach (SkillDefinition skill in AssetDatabase.LoadAssetAtPath<QuestDefinition>(AssetDatabase.GUIDToAssetPath(guid)).RewardSkills)
+            {
+                taught.Add(skill);
+            }
+        }
+
+        int checkedSkills = 0;
+        foreach (string guid in AssetDatabase.FindAssets("t:SkillDefinition", new[] { "Assets/_Project/Data/Skills" }))
+        {
+            var skill = AssetDatabase.LoadAssetAtPath<SkillDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            Assert.IsTrue(taught.Contains(skill), $"{skill.name}: no start, boss or quest teaches it");
+            checkedSkills++;
+        }
+
+        Assert.Greater(checkedSkills, 8);
+        Assert.AreEqual(WeaponArtSlot.Own, settings.StartingLoadout[0].WeaponArt, "slot 1 is the weapon's art");
+        for (int i = 1; i < settings.StartingLoadout.Count; i++)
+        {
+            Assert.IsNull(settings.StartingLoadout[i], "the rest of the bar waits for what the story teaches");
+        }
+    }
+
+    [Test]
     public void TheFirstSkills_AreDressedWithEffectsThatExist()
     {
         int cues = 0;

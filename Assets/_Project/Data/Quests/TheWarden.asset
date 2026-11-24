@@ -52,6 +52,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   closedBy: {fileID: 0}
   startDelay: 0
   startsInAFight: 0
@@ -83,6 +85,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   - type: 13
     description: Give Eirik the Warden's work
     amount: 1
@@ -107,6 +111,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   - type: 7
     description: 'Build a Woodcutter''s Lodge (build menu: {key:Build})'
     amount: 1
@@ -131,6 +137,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   - type: 7
     description: 'Build a Watch Post (build menu: {key:Build})'
     amount: 1
@@ -155,6 +163,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   unlocksBuildings:
   - {fileID: 11400000, guid: 3019dc5f891f4c24f90723c22b1cde97, type: 2}
   unlocksModules:
@@ -164,9 +174,14 @@ MonoBehaviour:
   rewardItems: []
   rewardResources: []
   rewardRecipes: []
+  rewardSkills:
+  - {fileID: 11400000, guid: 9218ba12b9f62314ea6a1c8c1469fdd4, type: 2}
+  teachesAtStart: []
   rewardEnchantments: []
   rewardWorkFor: {fileID: 0}
   rewardWork: 0
+  rewardPassion: 0
+  rewardMark: {fileID: 0}
   experience: 0
   completionEvent: {fileID: 0}
   onCompleted: []

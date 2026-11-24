@@ -52,6 +52,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   closedBy: {fileID: 0}
   startDelay: 0
   startsInAFight: 0
@@ -83,6 +85,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   - type: 13
     description: Give Ingrid the Alchemist's work
     amount: 1
@@ -107,6 +111,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   - type: 7
     description: 'Build a Workshop (build menu: {key:Build}): it squares the altar''s stone'
     amount: 1
@@ -131,6 +137,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   - type: 7
     description: 'Build the Purification Altar (build menu: {key:Build})'
     amount: 1
@@ -155,8 +163,11 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   unlocksBuildings:
   - {fileID: 11400000, guid: dd9792482f40fc243a8d7294434f1ee9, type: 2}
+  unlocksModules: []
   turnInToGiver: 1
   turnInTo: Ingrid
   rewardItems: []
@@ -164,9 +175,14 @@ MonoBehaviour:
   - resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
     amount: 4
   rewardRecipes: []
+  rewardSkills:
+  - {fileID: 11400000, guid: c501c71f1498b884a8fbf9cfcac656f0, type: 2}
+  teachesAtStart: []
   rewardEnchantments: []
   rewardWorkFor: {fileID: 0}
   rewardWork: 0
+  rewardPassion: 0
+  rewardMark: {fileID: 0}
   experience: 0
   completionEvent: {fileID: 0}
   onCompleted: []

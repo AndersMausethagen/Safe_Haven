@@ -685,6 +685,18 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
             Inscriptions.Learn(enchantment, player.gameObject, "quest");
         }
 
+        // Abilities a person teaches: into the skill book, announced as any learned skill is.
+        if (player.Skills != null)
+        {
+            foreach (SkillDefinition skill in quest.RewardSkills)
+            {
+                if (skill != null)
+                {
+                    player.Skills.Learn(skill);
+                }
+            }
+        }
+
         // In the player's own Haven: while visiting (in the friend's Haven or on their raid) the settlement here is the host's, and the
         // work went nowhere (or to the host's copy of the person).
         ResidentRecord rewarded = quest.RewardWorkFor != null ? GameSession.Home.Find(quest.RewardWorkFor) : null;

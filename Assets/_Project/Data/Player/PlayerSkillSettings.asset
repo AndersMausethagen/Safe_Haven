@@ -13,15 +13,15 @@ MonoBehaviour:
   m_Name: PlayerSkillSettings
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSkillSettings
   startingSkills:
-  - {fileID: 11400000, guid: d96fe82c89a21d04499ac123e4fd7e76, type: 2}
-  - {fileID: 11400000, guid: 0e59706e0c7a7504c96c67b8c18daee3, type: 2}
-  - {fileID: 11400000, guid: bfd515b7dfa209443b9f7e30787ee61e, type: 2}
-  - {fileID: 11400000, guid: da09e366badb315479c32e7da86ea251, type: 2}
-  - {fileID: 11400000, guid: 9218ba12b9f62314ea6a1c8c1469fdd4, type: 2}
-  - {fileID: 11400000, guid: c501c71f1498b884a8fbf9cfcac656f0, type: 2}
+  - {fileID: 11400000, guid: 8fb575f0789285a4c93fa8cbf4fc7697, type: 2}
+  - {fileID: 11400000, guid: df741c0d1e4c5604ea961c3a33afb8fd, type: 2}
   startingLoadout:
-  - {fileID: 11400000, guid: d96fe82c89a21d04499ac123e4fd7e76, type: 2}
-  - {fileID: 11400000, guid: 0e59706e0c7a7504c96c67b8c18daee3, type: 2}
-  - {fileID: 11400000, guid: bfd515b7dfa209443b9f7e30787ee61e, type: 2}
-  - {fileID: 11400000, guid: da09e366badb315479c32e7da86ea251, type: 2}
-  - {fileID: 11400000, guid: 9218ba12b9f62314ea6a1c8c1469fdd4, type: 2}
+  - {fileID: 11400000, guid: 8fb575f0789285a4c93fa8cbf4fc7697, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}

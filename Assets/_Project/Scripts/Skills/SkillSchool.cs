@@ -18,6 +18,17 @@ public enum SkillSchool
     Wyrd = 4,
 }
 
+/// <summary>Which art a weapon-art bar entry strikes (SkillDefinition.WeaponArt).</summary>
+public enum WeaponArtSlot
+{
+    /// <summary>A skill of its own.</summary>
+    None = 0,
+    /// <summary>The weapon in hand's own art.</summary>
+    Own = 1,
+    /// <summary>The art of the rune attuned to the weapon in hand.</summary>
+    Rune = 2,
+}
+
 /// <summary>How schools are shown everywhere, so the skill window, tooltip and skill bar agree.</summary>
 public static class SkillSchools
 {
