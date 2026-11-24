@@ -46,7 +46,10 @@ public sealed class SkillFx : MonoBehaviour
         SkillLook look = skill.Look;
         if (look.showArea && skill.Attack != null && windUp > 0.05f)
         {
-            SkillAreaMark.Show(caster.position, aim, skill.Attack.Range, skill.Attack.Arc, SkillSchools.ColorOf(skill.School), windUp);
+            // Where it will land: past the lunge for a skill that carries the caster there first (Mountain Leap, Wolf's Lunge).
+            Vector3 flat = new Vector3(aim.x, 0f, aim.z);
+            Vector3 lands = caster.position + (flat.sqrMagnitude > 0.0001f ? flat.normalized : Vector3.zero) * skill.LungeDistance;
+            SkillAreaMark.Show(lands, aim, skill.Attack.Range, skill.Attack.Arc, SkillSchools.ColorOf(skill.School), windUp);
         }
 
         Runner.PlayAll(look.cast, caster.position, aim, skill, null);

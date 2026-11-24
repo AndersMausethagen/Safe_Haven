@@ -139,6 +139,78 @@ public static class SkillFxPrefabs
         };
         log.AppendLine(Dress("TrollsbaneWrath", wrath, null, null, arc: -1f));
 
+        // ----- Wolf's Lunge: a grey bound, dust behind, and the bite. -----
+        GameObject beastDust = Make("Beast Dust", new Design("Skill Mist").F("Rate", 40f).F("Radius", 0.5f).V("Color", new Vector3(0.5f, 0.48f, 0.44f))
+            .F("Alpha", 0.4f).F("Lifetime Min", 0.6f).F("Lifetime Max", 1f).F("Size Min", 0.5f).F("Size Max", 0.9f));
+        GameObject beastBite = Make("Beast Bite", new Design("Skill Burst").T("Texture", "Shard").V("Color", new Vector3(2.6f, 0.5f, 0.35f)).F("Count", 22f)
+            .V("Velocity Min", new Vector3(-3f, 1f, -3f)).V("Velocity Max", new Vector3(3f, 3.5f, 3f)).F("Size Min", 0.12f).F("Size Max", 0.26f)
+            .F("Lifetime Min", 0.25f).F("Lifetime Max", 0.5f));
+        var lunge = new SkillLook
+        {
+            showArea = false,
+            cast = { Cue(beastDust, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.8f) },
+            release = { Cue(beastDust, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.9f) },
+            struck = { Cue(beastBite, SkillFxPlace.Struck, 1, 0f, 0f, 0.8f) },
+            light = new Color(1f, 0.5f, 0.4f, 1f), lightIntensity = 3f, lightRange = 5f, lightSeconds = 0.2f, shake = 0.2f,
+        };
+        log.AppendLine(Dress("WolfsLunge", lunge, null, null, arc: -1f));
+
+        // ----- Whirling Steel: the blade's circle, in gold. -----
+        GameObject steelRing = Make("Steel Ring", new Design("Skill Ring").T("Texture", "Ring").V("Color", new Vector3(3.2f, 2.3f, 1f)).F("Size", 4.5f)
+            .F("Lifetime", 0.5f));
+        GameObject steelSparks = Make("Steel Sparks", new Design("Skill Burst").V("Color", new Vector3(4f, 2.8f, 1.1f)).F("Count", 36f)
+            .V("Velocity Min", new Vector3(-5f, 0.5f, -5f)).V("Velocity Max", new Vector3(5f, 3f, 5f)));
+        var whirl = new SkillLook
+        {
+            release = { Cue(steelRing, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.5f), Cue(steelSparks, SkillFxPlace.Caster, 1, 0f, 0f, 0.9f) },
+            struck = { Cue(steelSparks, SkillFxPlace.Struck, 1, 0f, 0f, 0.8f) },
+            light = new Color(1f, 0.8f, 0.45f, 1f), lightIntensity = 4f, lightRange = 6f, lightSeconds = 0.25f, shake = 0.15f,
+        };
+        log.AppendLine(Dress("WhirlingSteel", whirl, null, null, arc: -1f));
+
+        // ----- Huldra's Blessing: the hidden folk's gift, green and gold, rising. -----
+        GameObject wyrdCircle = Make("Wyrd Cast Circle", new Design("Skill Ring").T("Texture", "Rune Circle").V("Color", new Vector3(0.9f, 2.4f, 0.6f))
+            .F("Size", 2.8f).F("Lifetime", 1.4f).V("Spin", new Vector3(0f, 0f, 20f)));
+        GameObject wyrdMotes = Make("Wyrd Motes", new Design("Skill Burst").T("Texture", "Glow").V("Color", new Vector3(1.6f, 2.6f, 0.8f)).F("Count", 46f)
+            .F("Radius", 0.8f).V("Velocity Min", new Vector3(-0.3f, 0.6f, -0.3f)).V("Velocity Max", new Vector3(0.3f, 1.8f, 0.3f))
+            .V("Gravity", new Vector3(0f, 0.6f, 0f)).F("Drag", 0.6f).F("Size Min", 0.06f).F("Size Max", 0.14f).F("Lifetime Min", 1f).F("Lifetime Max", 1.8f));
+        var blessing = new SkillLook
+        {
+            showArea = false,
+            cast = { Cue(wyrdCircle, SkillFxPlace.CasterGround, 1, 0f, 0f, 1.6f) },
+            release = { Cue(wyrdMotes, SkillFxPlace.CasterGround, 1, 0.05f, 0f, 2f) },
+            light = new Color(0.6f, 1f, 0.45f, 1f), lightIntensity = 3f, lightRange = 6f, lightSeconds = 0.6f,
+        };
+        log.AppendLine(Dress("HuldrasBlessing", blessing, null, null, arc: -1f));
+
+        // ----- Mountain Leap: coming down like a falling stone. -----
+        GameObject earthWave = Make("Earth Shockwave", new Design("Skill Ring").T("Texture", "Ring").V("Color", new Vector3(1.4f, 1f, 0.55f)).F("Size", 7f)
+            .F("Lifetime", 0.5f));
+        GameObject earthDust = Make("Earth Dust", new Design("Skill Mist").F("Rate", 80f).F("Radius", 1f).V("Color", new Vector3(0.5f, 0.45f, 0.38f))
+            .F("Alpha", 0.5f).F("Lifetime Min", 0.8f).F("Lifetime Max", 1.5f).V("Velocity Min", new Vector3(-1f, 0.3f, -1f))
+            .V("Velocity Max", new Vector3(1f, 1.4f, 1f)));
+        var leap = new SkillLook
+        {
+            release = { Cue(earthWave, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.7f), Cue(earthDust, SkillFxPlace.Ring, 6, 0.02f, 0f, 0.8f) },
+            light = new Color(1f, 0.85f, 0.6f, 1f), lightIntensity = 5f, lightRange = 8f, lightSeconds = 0.3f, shake = 0.5f,
+        };
+        log.AppendLine(Dress("MountainLeap", leap, null, null, arc: -1f));
+
+        // ----- Heartroot's Grasp: thorns break out of the ground along the line. -----
+        GameObject thorns = Make("Root Thorns", new Design("Skill Spikes").F("Count", 3f).F("Radius", 0.4f).F("Size", 1.1f).F("Lifetime Min", 1.4f)
+            .F("Lifetime Max", 1.8f).V("Color", new Vector3(0.32f, 0.24f, 0.14f)).F("Smoothness", 0.2f));
+        GameObject rootDust = Make("Root Dust", new Design("Skill Mist").F("Rate", 30f).F("Radius", 0.6f).V("Color", new Vector3(0.42f, 0.4f, 0.3f))
+            .F("Alpha", 0.35f).F("Lifetime Min", 0.8f).F("Lifetime Max", 1.3f));
+        GameObject rootCircle = Make("Root Cast Circle", new Design("Skill Ring").T("Texture", "Rune Circle").V("Color", new Vector3(0.8f, 1.6f, 0.5f))
+            .F("Size", 2.8f).F("Lifetime", 0.9f));
+        var grasp = new SkillLook
+        {
+            cast = { Cue(rootCircle, SkillFxPlace.CasterGround, 1, 0f, 0f, 1f) },
+            release = { Cue(thorns, SkillFxPlace.AlongReach, 6, 0f, 0.06f, 2f), Cue(rootDust, SkillFxPlace.AlongReach, 3, 0.04f, 0.1f, 1.4f) },
+            light = new Color(0.7f, 0.9f, 0.4f, 1f), lightIntensity = 3f, lightRange = 7f, lightSeconds = 0.3f, shake = 0.25f,
+        };
+        log.AppendLine(Dress("HeartrootsGrasp", grasp, null, null, arc: -1f));
+
         AssetDatabase.SaveAssets();
         return log.ToString();
     }

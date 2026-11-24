@@ -81,3 +81,4 @@ MonoBehaviour:
     lightRange: 9
     lightSeconds: 0.4
     shake: 0.2
+  weaponArt: 0

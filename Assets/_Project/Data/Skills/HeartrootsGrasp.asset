@@ -29,3 +29,35 @@ MonoBehaviour:
   playAttackAnimation: 1
   animationState: Cast
   animationSpeed: 1.1
+  look:
+    showArea: 1
+    cast:
+    - prefab: {fileID: 5576360992598670368, guid: 1a1083ce481257b4c9075cd87b2850d0, type: 3}
+      place: 1
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 1
+      scale: 1
+    release:
+    - prefab: {fileID: 5671477447213754943, guid: 67e07367916973e4b80d71d56d437f19, type: 3}
+      place: 2
+      count: 6
+      delay: 0
+      stepDelay: 0.06
+      seconds: 2
+      scale: 1
+    - prefab: {fileID: 3503566043942680596, guid: 7fc0f623b4bbba24f91872389d5cf1d9, type: 3}
+      place: 2
+      count: 3
+      delay: 0.04
+      stepDelay: 0.1
+      seconds: 1.4
+      scale: 1
+    struck: []
+    light: {r: 0.7, g: 0.9, b: 0.4, a: 1}
+    lightIntensity: 3
+    lightRange: 7
+    lightSeconds: 0.3
+    shake: 0.25
+  weaponArt: 0

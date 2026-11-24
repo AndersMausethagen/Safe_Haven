@@ -29,3 +29,35 @@ MonoBehaviour:
   playAttackAnimation: 1
   animationState: 1H Spin
   animationSpeed: 1.1
+  look:
+    showArea: 1
+    cast: []
+    release:
+    - prefab: {fileID: 3154179782875152266, guid: 87495a844a9e250459903f01b131159a, type: 3}
+      place: 1
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 0.5
+      scale: 1
+    - prefab: {fileID: 6158681216303808434, guid: ff15bfba6cf61c646b5fa18097f327a8, type: 3}
+      place: 0
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 0.9
+      scale: 1
+    struck:
+    - prefab: {fileID: 6158681216303808434, guid: ff15bfba6cf61c646b5fa18097f327a8, type: 3}
+      place: 5
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 0.8
+      scale: 1
+    light: {r: 1, g: 0.8, b: 0.45, a: 1}
+    lightIntensity: 4
+    lightRange: 6
+    lightSeconds: 0.25
+    shake: 0.15
+  weaponArt: 0

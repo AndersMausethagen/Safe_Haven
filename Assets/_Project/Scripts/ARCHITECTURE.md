@@ -3272,8 +3272,11 @@ sample textures and flames are in `Art/Effects/VFX Graph/Additions` (Unity Compa
   (Bjarne) Whirling Steel, The Warden (Eirik) Trollsbane Wrath, The Cook (Yrsa) the Ash Lad's Ember, The Hunter (Gunnar) Wolf's Lunge, The
   Rune Scholar (Liv) Frost Rune; bosses keep theirs (Brukam: Mountain Leap, the Heartroot: Heartroot's Grasp). Saves keep what they know.
   `SkillLookTests.EveryAbility_HasATeacher...`.
-- Not yet: the other five abilities' looks, statuses for Beast/Wyrd/Steel, the paid casting animations (the user buys and imports Kevin
-  Iglesias' Human Spellcasting Animations).
+- **All eight abilities dressed** (slice 3): Wolf's Lunge (dust, a red bite on what it strikes), Whirling Steel (a gold ring, sparks),
+  Huldra's Blessing (a green rune circle, golden motes rising), Mountain Leap (an earth shockwave, dust round the landing), Heartroot's
+  Grasp (thorns breaking out along the line, dust). A lunging skill's area shows where it lands.
+- Not yet: statuses for Beast/Wyrd/Steel, the paid casting animations (the user buys and imports Kevin Iglesias' Human Spellcasting
+  Animations), effects for the weapon arts themselves.
 
 ## Loot on bodies (2026-11-24)
 

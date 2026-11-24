@@ -29,3 +29,28 @@ MonoBehaviour:
   playAttackAnimation: 1
   animationState: Sword Counter
   animationSpeed: 1.2
+  look:
+    showArea: 1
+    cast: []
+    release:
+    - prefab: {fileID: 53585801726910448, guid: 5933cc85a61640b44b94bc40a698cd28, type: 3}
+      place: 1
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 0.7
+      scale: 1
+    - prefab: {fileID: 530393091379007461, guid: df231d18fb19ddc478cc3e8e82515538, type: 3}
+      place: 4
+      count: 6
+      delay: 0.02
+      stepDelay: 0
+      seconds: 0.8
+      scale: 1
+    struck: []
+    light: {r: 1, g: 0.85, b: 0.6, a: 1}
+    lightIntensity: 5
+    lightRange: 8
+    lightSeconds: 0.3
+    shake: 0.5
+  weaponArt: 0
