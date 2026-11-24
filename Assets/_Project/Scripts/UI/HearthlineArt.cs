@@ -68,7 +68,7 @@ public static class HearthlineArt
         return frame.gameObject;
     }
 
-    private const string RuleName = "Hearthline Rule";
+    public const string RuleName = "Hearthline Rule";
     private const string GlowName = "Hearthline Glow";
 
     /// <summary>The carved rule under a window's title: a child of the title, below its text, outside any layout.</summary>

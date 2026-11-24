@@ -13,14 +13,21 @@ using static CodeUI;
 /// </summary>
 public sealed class LootWindow : MonoBehaviour
 {
-    private const float Width = 520f;
-    private const float Margin = 36f;
-    private const float Cell = 62f;
+    // As small as what it holds (the user, 2026-11-24: "make it smaller. no need for so much space with nothing in it"): its width
+    // follows the stacks and chips shown, never narrower than the title and the foot need.
+    private const float Margin = 16f;
+    private const float Cell = 56f;
     private const float Gap = 4f;
-    private const float GridTop = 128f;
-    private const float ChipHeight = 44f;
-    private const float ChipWidth = 132f;
-    private const float FootHeight = 74f;
+    private const float GridTop = 66f;
+    private const float ChipHeight = 36f;
+    private const float ChipWidth = 92f;
+    private const float ChipGap = 4f;
+    private const float HintHeight = 20f;
+    private const float FootHeight = 50f;
+    private const float ButtonWidth = 112f;
+    private const float ButtonHeight = 38f;
+    private const float LeastInside = 240f;
+    private const int MostColumns = 5;
     private const float ScreenMargin = 24f;
 
     private sealed class Grid : IItemSlotHandler
@@ -48,7 +55,7 @@ public sealed class LootWindow : MonoBehaviour
             }
 
             views.Clear();
-            Root.GetComponent<GridLayoutGroup>().constraintCount = container.Columns;
+            Root.GetComponent<GridLayoutGroup>().constraintCount = Mathf.Min(MostColumns, container.Columns);
             for (int i = 0; i < container.SlotCount; i++)
             {
                 ItemSlotView view = Instantiate(TransportSettings.Current.SlotPrefab, Root);
@@ -70,7 +77,8 @@ public sealed class LootWindow : MonoBehaviour
             }
         }
 
-        public int Rows
+        /// <summary>How many slots show (those that held something when it opened).</summary>
+        public int Shown
         {
             get
             {
@@ -80,7 +88,7 @@ public sealed class LootWindow : MonoBehaviour
                     shown += view.gameObject.activeSelf ? 1 : 0;
                 }
 
-                return Container == null ? 0 : Mathf.CeilToInt(shown / (float)Mathf.Max(1, Container.Columns));
+                return shown;
             }
         }
 
@@ -125,6 +133,8 @@ public sealed class LootWindow : MonoBehaviour
     private TMP_Text titleLabel;
     private TMP_Text bagLabel;
     private TMP_Text hint;
+    private RectTransform closeButton;
+    private RectTransform hairline;
     private RectTransform chips;
     private Button takeAll;
     private ItemTooltipView tooltip;
@@ -284,14 +294,35 @@ public sealed class LootWindow : MonoBehaviour
         ItemContainer carried = bag != null ? bag.Container : null;
         bagLabel.text = carried != null && carried.HasWeightLimit ? HearthKit.ToneNumbers($"Bag {carried.CurrentWeight:0} / {carried.WeightCapacity:0}") : "";
 
-        float gridBottom = GridTop + Mathf.Max(1, grid.Rows) * (Cell + Gap) - Gap;
-        float chipsTop = gridBottom + (resources.Count > 0 ? 16f : 0f);
+        // Wide enough for the stacks or the chips, whichever is wider; tall enough for their rows.
+        int stacks = grid.Shown;
+        int columns = Mathf.Clamp(stacks, 1, MostColumns);
+        int chipColumns = Mathf.Clamp(resources.Count, 0, 3);
+        float inside = Mathf.Max(LeastInside, columns * (Cell + Gap) - Gap, chipColumns * (ChipWidth + ChipGap) - ChipGap);
+        float width = inside + Margin * 2f;
+        ((RectTransform)grid.Root).GetComponent<GridLayoutGroup>().constraintCount = columns;
+        float gridBottom = stacks > 0 ? GridTop + Mathf.CeilToInt(stacks / (float)columns) * (Cell + Gap) - Gap : GridTop - 6f;
+        float chipsTop = gridBottom + (resources.Count > 0 ? 8f : 0f);
         chips.anchoredPosition = new Vector2(Margin, -chipsTop);
         float chipRows = resources.Count > 0 ? Mathf.Ceil(resources.Count / 3f) : 0f;
-        float height = chipsTop + chipRows * (ChipHeight + 8f) + 18f + FootHeight;
-        panel.sizeDelta = new Vector2(Width, height);
+        float below = chipsTop + chipRows * (ChipHeight + ChipGap) + (resources.Count > 0 ? HintHeight : 0f);
+        float height = below + 10f + FootHeight;
+        hint.rectTransform.anchoredPosition = new Vector2(Margin, -(below - HintHeight + 2f));
+        hint.rectTransform.sizeDelta = new Vector2(inside, HintHeight);
+        panel.sizeDelta = new Vector2(width, height);
+        titleLabel.rectTransform.sizeDelta = new Vector2(inside - 40f, titleLabel.rectTransform.sizeDelta.y);
+        closeButton.anchoredPosition = new Vector2(width - 46f, closeButton.anchoredPosition.y);
+        hairline.sizeDelta = new Vector2(inside, hairline.sizeDelta.y);
+        // The carved title's own rule is at least 240 wide, centred on the letters: past the edge of so small a panel. The hairline
+        // under the header does its work here.
+        Transform rule = titleLabel.transform.Find(HearthlineArt.RuleName);
+        if (rule != null && rule.gameObject.activeSelf)
+        {
+            rule.gameObject.SetActive(false);
+        }
+        ((RectTransform)takeAll.transform).anchoredPosition = new Vector2(width - Margin - ButtonWidth, 10f);
         Rect screen = ((RectTransform)transform).rect;
-        panel.localScale = Vector3.one * Mathf.Min(1f, (screen.width - ScreenMargin) / Width, (screen.height - ScreenMargin) / height);
+        panel.localScale = Vector3.one * Mathf.Min(1f, (screen.width - ScreenMargin) / width, (screen.height - ScreenMargin) / height);
     }
 
     private void BuildChips(IReadOnlyList<ResourceAmount> resources)
@@ -306,8 +337,8 @@ public sealed class LootWindow : MonoBehaviour
         {
             int index = i;
             ResourceAmount resource = resources[i];
-            float x = (i % 3) * (ChipWidth + 8f);
-            float y = (i / 3) * (ChipHeight + 8f);
+            float x = (i % 3) * (ChipWidth + ChipGap);
+            float y = (i / 3) * (ChipHeight + ChipGap);
             RectTransform chip = HearthKit.Card(chips, "Chip " + resource.Resource.DisplayName, x, y, ChipWidth, ChipHeight, 0.35f);
             var button = chip.gameObject.AddComponent<Button>();
             button.transition = Selectable.Transition.ColorTint;
@@ -318,13 +349,13 @@ public sealed class LootWindow : MonoBehaviour
             hover.Exited = () => hint.text = "";
             if (resource.Resource.Icon != null)
             {
-                Image icon = At("Icon", chip, 6f, 6f, ChipHeight - 12f, ChipHeight - 12f).gameObject.AddComponent<Image>();
+                Image icon = At("Icon", chip, 4f, 4f, ChipHeight - 8f, ChipHeight - 8f).gameObject.AddComponent<Image>();
                 icon.sprite = resource.Resource.Icon;
                 icon.preserveAspect = true;
                 icon.raycastTarget = false;
             }
 
-            TMP_Text amount = Label("Amount", chip, ChipHeight, 0f, ChipWidth - ChipHeight - 6f, ChipHeight, 18f, style.Text);
+            TMP_Text amount = Label("Amount", chip, ChipHeight + 2f, 0f, ChipWidth - ChipHeight - 6f, ChipHeight, 16f, style.Text);
             amount.text = HearthKit.ToneNumbers($"{resource.Amount}");
         }
     }
@@ -346,34 +377,39 @@ public sealed class LootWindow : MonoBehaviour
         UIStyle style = UIStyle.Current;
         RectTransform content = Stretch("Content", root);
         content.gameObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.35f);
-        panel = Box("Panel", content, new Vector2(0.5f, 0.5f), new Vector2(Width, 360f), Vector2.zero);
+        panel = Box("Panel", content, new Vector2(0.5f, 0.5f), new Vector2(LeastInside + Margin * 2f, 200f), Vector2.zero);
         panel.gameObject.AddComponent<Image>();
         panel.gameObject.AddComponent<Outline>().effectDistance = new Vector2(1f, -1f);
         panel.gameObject.AddComponent<UIRole>().Set(UIRole.Kind.Window);
 
-        TMP_Text kicker = Label("Kicker", panel, Margin, 26f, 300f, 22f, 16f, style.Accent);
+        TMP_Text kicker = Label("Kicker", panel, Margin, 10f, 200f, 16f, 12f, style.Accent);
         kicker.text = "LOOT";
-        kicker.characterSpacing = 12f;
-        titleLabel = Label("Title", panel, Margin, 46f, Width - Margin * 2f - 50f, 50f, 36f, style.Text);
+        kicker.characterSpacing = 10f;
+        titleLabel = Label("Title", panel, Margin, 24f, LeastInside - 40f, 30f, 24f, style.Text);
         style.Title(titleLabel);
-        HearthKit.CloseButton(panel, Width - 62f, 16f, Close);
-        Hairline(panel, Margin, 108f, Width - Margin * 2f, 1f, style);
+        titleLabel.enableAutoSizing = true;
+        titleLabel.fontSizeMin = 16f;
+        titleLabel.fontSizeMax = 24f;
+        closeButton = (RectTransform)HearthKit.CloseButton(panel, LeastInside + Margin * 2f - 46f, 8f, Close).transform;
+        hairline = (RectTransform)Hairline(panel, Margin, 58f, LeastInside, 1f, style).transform;
 
-        RectTransform slots = At("Loot Grid", panel, Margin, GridTop, Width - Margin * 2f, 340f);
+        RectTransform slots = At("Loot Grid", panel, Margin, GridTop, MostColumns * (Cell + Gap), 340f);
         var layout = slots.gameObject.AddComponent<GridLayoutGroup>();
         layout.cellSize = new Vector2(Cell, Cell);
         layout.spacing = new Vector2(Gap, Gap);
         layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
         grid = new Grid(this, slots);
-        chips = At("Resources", panel, Margin, GridTop, Width - Margin * 2f, ChipHeight);
-        hint = Label("Hint", panel, Margin, 0f, Width - Margin * 2f, 24f, 16f, style.Muted);
-        hint.rectTransform.anchorMin = hint.rectTransform.anchorMax = Vector2.zero;
-        hint.rectTransform.pivot = Vector2.zero;
-        hint.rectTransform.anchoredPosition = new Vector2(Margin, 64f);
-        bagLabel = Label("Bag", panel, Margin, 0f, 220f, 46f, 17f, style.Muted);
+        chips = At("Resources", panel, Margin, GridTop, 3f * (ChipWidth + ChipGap), ChipHeight);
+        hint = Label("Hint", panel, Margin, 0f, LeastInside, HintHeight, 14f, style.Muted);
+        bagLabel = Label("Bag", panel, Margin, 0f, 120f, ButtonHeight, 15f, style.Muted);
         AtFoot(bagLabel.rectTransform);
-        AddButton("Take All", panel, Width - Margin - 190f, 0f, 190f, UIRole.Kind.PrimaryButton, TakeAll, out takeAll).text = "Take all";
-        AtFoot((RectTransform)takeAll.transform);
+        TMP_Text take = AddButton("Take All", panel, LeastInside + Margin - ButtonWidth, 0f, ButtonWidth, UIRole.Kind.PrimaryButton, TakeAll, out takeAll);
+        take.text = "Take all";
+        take.fontSize = 17f;
+        var takeRect = (RectTransform)takeAll.transform;
+        takeRect.sizeDelta = new Vector2(ButtonWidth, ButtonHeight);
+        take.rectTransform.sizeDelta = new Vector2(ButtonWidth, ButtonHeight);
+        AtFoot(takeRect);
         BuildTooltip(content, style);
 
         window = root.gameObject.AddComponent<UIWindow>();
@@ -395,7 +431,7 @@ public sealed class LootWindow : MonoBehaviour
         float x = rect.anchoredPosition.x;
         rect.anchorMin = rect.anchorMax = Vector2.zero;
         rect.pivot = Vector2.zero;
-        rect.anchoredPosition = new Vector2(x, 16f);
+        rect.anchoredPosition = new Vector2(x, 10f);
     }
 
     // The game's item tooltip, over the content so it keeps its size when a small screen shrinks the panel (as the cargo window's).
