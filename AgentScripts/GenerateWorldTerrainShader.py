@@ -659,10 +659,17 @@ def main():
     probe_line = '            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ProbeVolumeVariants.hlsl"\n'
     if probe_line not in shader:
         raise SystemExit("the probe volume keywords line is missing from the forward pass")
+    # Reflection probe blending too (2026-11-24): with the sun's cookie (+2) and screen-space irradiance (+1) the all-layers pass
+    # bound 66 textures (counted in the compiled D3D11 code, TerrainTextureBudgetTests), and the build's D3D11 device warned "uses
+    # 66 texture parameters, more than the 64 supported" for the Haven's own terrain. Rough ground reads the nearest probe alone
+    # (and screen-space reflections) with no visible change; blending's atlas and second cube cost two. URP's guard treats a
+    # declared keyword as defined, so it is set to 0, not only undefined.
     shader = shader.replace(probe_line, probe_line +
                             "            #if defined(_WORLD_ALL_LAYERS)\n"
                             "                #undef PROBE_VOLUMES_L1\n"
                             "                #undef PROBE_VOLUMES_L2\n"
+                            "                #undef _REFLECTION_PROBE_BLENDING\n"
+                            "                #define _REFLECTION_PROBE_BLENDING 0\n"
                             "            #endif\n")
     with open(os.path.join(TARGET, "WorldTerrainLit.shader"), "w", encoding="utf-8", newline="\n") as f:
         f.write(HEADER.format(name="TerrainLit.shader") + shader)

@@ -174,6 +174,8 @@ Shader "Safe Haven/Terrain (World)"
             #if defined(_WORLD_ALL_LAYERS)
                 #undef PROBE_VOLUMES_L1
                 #undef PROBE_VOLUMES_L2
+                #undef _REFLECTION_PROBE_BLENDING
+                #define _REFLECTION_PROBE_BLENDING 0
             #endif
             #pragma multi_compile _ DYNAMICLIGHTMAP_ON
             #pragma multi_compile_fragment _ DEBUG_DISPLAY
@@ -284,6 +286,8 @@ Shader "Safe Haven/Terrain (World)"
             #if defined(_WORLD_ALL_LAYERS)
                 #undef PROBE_VOLUMES_L1
                 #undef PROBE_VOLUMES_L2
+                #undef _REFLECTION_PROBE_BLENDING
+                #define _REFLECTION_PROBE_BLENDING 0
             #endif
             #pragma multi_compile_fragment _ _GBUFFER_NORMALS_OCT
 
