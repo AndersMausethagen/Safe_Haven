@@ -70,8 +70,11 @@ public sealed class SkillChoiceTests
 
         progress.CountUse(rune);
         progress.CountUse(rune);
-        var copy = new CharacterProgress();
-        copy.RestoreSkillChoices(progress.SkillChoices, progress.SkillUses);
+        // Through the save itself (SaveMapper to JSON and back), so a mapping that drops them fails here.
+        SaveData data = SaveMapper.ToSaveData(null, new StashStorage(), "SafeHaven", null, System.DateTime.UtcNow, null, new QuestLog(),
+            new SettlementState(), null, progress);
+        data = JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(data));
+        CharacterProgress copy = SaveMapper.FromSaveData(data, Resources.Load<ContentDatabase>(ContentDatabase.ResourceName)).Progress;
         Assert.AreEqual("frost_keen", copy.ChoiceOf(rune, 1));
         Assert.AreEqual(2, copy.UsesOf(rune));
     }

@@ -56,6 +56,7 @@ public sealed class CreaturePuppets : IRaidCreatureSource
         link.On(CoopCreatures.DiedMessage, OnDied);
         link.On(CoopCreatures.GoneMessage, OnGone);
         link.On(CoopCreatures.StatusShownMessage, OnStatusShown);
+        link.On(CoopCreatures.ReactionShownMessage, OnReactionShown);
         Damageable.AnyDamaged += OnAnyDamaged;
         MonsterAI.RemoteStaggered += OnStaggeredHere;
         MonsterAI.RemotePoiseBlow += OnPoiseBlowHere;
@@ -571,6 +572,32 @@ public sealed class CreaturePuppets : IRaidCreatureSource
 
         StatusEffectDefinition status = StatusCatalog.ById(shown.StatusId.ToString());
         StatusEffects.Mirror(puppet.Health, status, shown.Seconds);
+    }
+
+    // Two statuses the host's game had react on one of its creatures: the reaction's look and sound on this copy.
+    private void OnReactionShown(ulong sender, FastBufferReader reader)
+    {
+        reader.ReadNetworkSerializable(out CreatureReactionShownMessage shown);
+        if (!FromHost || !byId.TryGetValue(shown.Id, out Puppet puppet) || puppet.Health == null)
+        {
+            return;
+        }
+
+        StatusEffectDefinition holder = StatusCatalog.ById(shown.HolderId.ToString());
+        string with = shown.WithId.ToString();
+        if (holder == null)
+        {
+            return;
+        }
+
+        foreach (StatusReaction reaction in holder.Reactions)
+        {
+            if (reaction != null && reaction.with != null && reaction.with.Id == with)
+            {
+                StatusEffects.ShowReaction(puppet.Health, holder, reaction);
+                return;
+            }
+        }
     }
 
 

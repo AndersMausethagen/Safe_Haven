@@ -105,7 +105,11 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
     }
 
     /// <summary>Two statuses reacted on something (fire on ice: steam): its bearer and the reaction (StatusBearerLook shows it).</summary>
-    public static event System.Action<Damageable, StatusReaction> Reacted;
+    /// <summary>Two statuses reacted on a bearer: the bearer, the status whose reaction it is, and the reaction (its look and sound).</summary>
+    public static event System.Action<Damageable, StatusEffectDefinition, StatusReaction> Reacted;
+
+    /// <summary>Co-op: a reaction the host's game had on its creature, shown on a friend's copy (look and sound only; CreaturePuppets).</summary>
+    public static void ShowReaction(Damageable target, StatusEffectDefinition holder, StatusReaction reaction) => Reacted?.Invoke(target, holder, reaction);
 
     // A status arriving on a bearer of another that reacts with it (either way round): the reaction happens. True when the arriving
     // one was used up in it. Only the host's game reacts; a friend's copy shows what the host tells it.
@@ -124,7 +128,14 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
                 continue;
             }
 
-            StatusReaction reaction = Find(there, arriving) ?? Find(arriving, there);
+            StatusEffectDefinition holder = there;
+            StatusReaction reaction = Find(there, arriving);
+            if (reaction == null)
+            {
+                holder = arriving;
+                reaction = Find(arriving, there);
+            }
+
             if (reaction == null)
             {
                 continue;
@@ -147,7 +158,7 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
                 creature.Stagger(reaction.staggerSeconds);
             }
 
-            Reacted?.Invoke(target, reaction);
+            Reacted?.Invoke(target, holder, reaction);
             if (!string.IsNullOrWhiteSpace(reaction.displayName) && source != null && source.GetComponent<Player>() != null)
             {
                 GameMessages.Post(reaction.displayName + "!", MessageKind.Gain);
@@ -367,6 +378,9 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
     }
 
     public void OnCopyChanged(bool copy) => isCopy = copy;
+
+    /// <summary>On a friend's copy of the host's creature: its statuses are the host's to end.</summary>
+    public bool IsCopy => isCopy;
 
     private void OnDisable()
     {

@@ -58,7 +58,15 @@ public sealed class ArtBladeView : MonoBehaviour
         {
             GameObject weapon = WeaponModel();
             Color want = arting ? ArtColour(combat.ActiveAttack) : readied.Color;
-            if (weapon != on || want != shownColour)
+            // Nothing to light (bare hands, a bow): nothing attached, rather than attaching and dropping it again every frame.
+            if (weapon == null)
+            {
+                if (on != null)
+                {
+                    Detach();
+                }
+            }
+            else if (weapon != on || want != shownColour)
             {
                 Attach(weapon, want);
             }

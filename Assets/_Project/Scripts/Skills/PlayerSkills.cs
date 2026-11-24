@@ -67,13 +67,18 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     // ability cast last; every creature that one swing strikes takes it (a cleave), then it is spent.
     private const float ReadiedSeconds = 2.5f;
     private const float ReadiedSwingSeconds = 0.25f;
+    // Only a dodge soon after the ability readies its blow (the review, 2026-11-24: one cast early in a raid made every dodge after it
+    // lay the status, a free passive); once readied, a later dodge needs another cast.
+    private const float ReadiedAfterCastSeconds = 8f;
     private SkillDefinition lastCast;
+    private float lastCastAt = float.NegativeInfinity;
     private StatusEffectDefinition readiedStatus;
     private float readiedUntil;
     private float readiedLanded = -1f;
 
     /// <summary>The status the next swing will lay, readied by a dodge after an ability; null when none (ArtBladeView glows in its colour).</summary>
-    public StatusEffectDefinition ReadiedStatus => readiedStatus != null && Time.time < readiedUntil ? readiedStatus : null;
+    public StatusEffectDefinition ReadiedStatus => readiedStatus != null && Time.time < readiedUntil
+        && (readiedLanded < 0f || Time.time - readiedLanded <= ReadiedSwingSeconds) ? readiedStatus : null;
 
     // What an ability lays: its blow's status, or what a war cry lays on those who hear it.
     private static StatusEffectDefinition SchoolStatusOf(SkillDefinition skill) =>
@@ -94,6 +99,10 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     public event Action ChannelEnded;
 
     public bool IsChanneling => channeling != null;
+
+    // Which skill keys are down (pressed through the input, let go on release): a channel lasts only while its key is held, so one
+    // cast from a buffered press or after an aimed release, with the key already up, ends after its first blow.
+    private readonly bool[] held = new bool[SkillLoadout.SlotCount];
 
     // A war cry ringing out (Skill › Foes Status): which, and when.
     private SkillDefinition pendingCry;
@@ -169,9 +178,11 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
     private void OnAnyDamaged(Damageable victim, DamageInfo damage, DamageResult result)
     {
-        // The readied blow: the first swing after a dodge lays the readied status on all it strikes.
+        // The readied blow: the first swing after a dodge lays the readied status on all it strikes. A swing of the weapon in hand only:
+        // a thrown skill's weapon (Troll's Hurl) strikes as a heavy melee blow but from its flight, after the cast.
         if (!collectingStruck && readiedStatus != null && victim != null && damage.Source == combatant && result.Damage > 0f && !result.Blocked
-            && (damage.Technique & HitTechnique.Melee) != 0 && Time.time < readiedUntil)
+            && (damage.Technique & HitTechnique.Melee) != 0 && Time.time < readiedUntil
+            && combat != null && damage.Attack != null && damage.Attack == combat.ActiveAttack)
         {
             if (readiedLanded < 0f)
             {
@@ -333,6 +344,11 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             {
                 nextChannelTick = Time.time + skill.ChannelTick;
             }
+        }
+
+        if (channeling != null && (channelSlot < 0 || channelSlot >= held.Length || !held[channelSlot]))
+        {
+            EndChannel();
         }
 
         if (channeling != null)
@@ -614,6 +630,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
         GameSession.Progress.CountUse(skill);
         lastCast = skill;
+        lastCastAt = now;
         float optionHeal = SkillChoices.For(skill).Heal;
         if (optionHeal > 0f)
         {
@@ -754,7 +771,8 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         channeling = null;
         channelSlot = -1;
         nextChannelTick = float.MaxValue;
-        busyUntil = Mathf.Min(busyUntil, Time.time);
+        // Let go early: free again at once, but not before its first blow (paid for) has landed.
+        busyUntil = Mathf.Min(busyUntil, pendingHit != null ? Mathf.Max(Time.time, pendingHitAt) : Time.time);
         ChannelEnded?.Invoke();
     }
 
@@ -777,7 +795,8 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
             foreach (SkillOption option in options.Chosen)
             {
-                if (option.consumes != null && foe.TryGetComponent(out StatusEffects effects) && effects.Has(option.consumes))
+                // Not on a friend's copy of the host's creature: the host keeps its statuses, so it would be used up here and tick on there.
+                if (option.consumes != null && foe.TryGetComponent(out StatusEffects effects) && !effects.IsCopy && effects.Has(option.consumes))
                 {
                     effects.End(option.consumes);
                     if (option.consumeHeal > 0f)
@@ -849,12 +868,13 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     {
         EndChannel();
         // A dodge readies the next swing with the status of the ability cast last (V Rising's veils).
-        StatusEffectDefinition school = lastCast != null ? SchoolStatusOf(lastCast) : null;
+        StatusEffectDefinition school = lastCast != null && Time.time - lastCastAt <= ReadiedAfterCastSeconds ? SchoolStatusOf(lastCast) : null;
         if (school != null)
         {
             readiedStatus = school;
             readiedUntil = Time.time + ReadiedSeconds;
             readiedLanded = -1f;
+            lastCastAt = float.NegativeInfinity;
         }
 
         pendingCry = null; // a cry cut short never rings out
@@ -884,7 +904,16 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
     private void OnSkillRequested(int slot)
     {
+        SetHeld(slot, true);
         TryCast(slot);
+    }
+
+    private void SetHeld(int slot, bool down)
+    {
+        if (slot >= 0 && slot < held.Length)
+        {
+            held[slot] = down;
+        }
     }
 
     // Aim Skills First (GameOptions.AimSkillsFirst): the held skill's area follows the aim until the key is let go, then it casts.
@@ -892,10 +921,13 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
     private void OnSkillAimed(int slot)
     {
+        SetHeld(slot, true);
         SkillDefinition skill = loadout.Get(slot);
-        if (skill == null || skill.Attack == null || skill.WeaponArt != WeaponArtSlot.None)
+        // Nothing to aim (a blessing, a war cry, an item, the weapon's art), or a channel (held to keep going, it follows the aim as it
+        // strikes): cast on the press, as before.
+        if (skill == null || skill.Attack == null || skill.WeaponArt != WeaponArtSlot.None || skill.ChannelSeconds > 0f)
         {
-            TryCast(slot); // nothing to aim (a blessing, a war cry, an item, the weapon's art): as before
+            TryCast(slot);
             return;
         }
 
@@ -904,6 +936,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
     private void OnSkillReleased(int slot)
     {
+        SetHeld(slot, false);
         if (channeling != null && channelSlot == slot)
         {
             EndChannel();
@@ -917,7 +950,11 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
         aimingSlot = -1;
         SkillAreaMark.Hide();
-        TryCast(slot);
+        // Aimed, then the hands were taken (a cart's handles, the oars, deep water) or an interaction began: let go without a cast.
+        if (stateMachine == null || stateMachine.CanUseSkills)
+        {
+            TryCast(slot);
+        }
     }
 
     private void ShowAim()

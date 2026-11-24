@@ -476,10 +476,22 @@ public sealed partial class PlayerAnimationController
     }
 
     // A skill plays its own state (a cast, a dash, a spin) where it has one; else the weapon stance's old attack.
-    // A channel let go or run out: the whole body leaves its loop for the ready pose.
+    // A channel let go or run out: the whole body leaves its loop for the ready pose. Only from the loop itself: a channel ended by a
+    // knockdown or a flinch leaves that reaction playing on the same layer.
+    private int channelStateHash;
+
     private void OnChannelEnded()
     {
-        if (fullBodyLayer >= 0)
+        int loop = channelStateHash;
+        channelStateHash = 0;
+        if (fullBodyLayer < 0 || loop == 0)
+        {
+            return;
+        }
+
+        bool inLoop = animator.GetCurrentAnimatorStateInfo(fullBodyLayer).shortNameHash == loop
+            || (animator.IsInTransition(fullBodyLayer) && animator.GetNextAnimatorStateInfo(fullBodyLayer).shortNameHash == loop);
+        if (inLoop)
         {
             animator.CrossFadeInFixedTime(EmptyStateHash, 0.2f, fullBodyLayer);
         }
@@ -494,6 +506,7 @@ public sealed partial class PlayerAnimationController
 
         int state = string.IsNullOrEmpty(skill.AnimationState) ? 0 : Animator.StringToHash(skill.AnimationState);
         int layer = fullBodyLayer >= 0 ? fullBodyLayer : upperBodyLayer;
+        channelStateHash = skill.ChannelSeconds > 0f && layer == fullBodyLayer ? state : 0;
         if (state != 0 && layer >= 0 && animator.HasState(layer, state))
         {
             SetFloat(ActionSpeedHash, skill.AnimationSpeed);

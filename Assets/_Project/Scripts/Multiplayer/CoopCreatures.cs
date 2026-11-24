@@ -42,6 +42,8 @@ public sealed class CoopCreatures : ICoopPart
     /// <summary>Host to friends: a status took hold on a creature (or ended: 0 seconds), for its look on their copy (StatusBearerLook,
     /// the icon over its bar). Without this a friend never saw the host's frost, fire or bleeding on what they fought together.</summary>
     public const string StatusShownMessage = "SafeHaven.CreatureStatusShown";
+    /// <summary>Host to friends: two statuses reacted on a creature (steam, a cauterised wound): its look and sound on their copy.</summary>
+    public const string ReactionShownMessage = "SafeHaven.CreatureReactionShown";
 
     /// <summary>Seconds between updates.</summary>
     public const float Interval = 0.1f;
@@ -394,6 +396,21 @@ public struct CreatureStatusShownMessage : INetworkSerializable
         serializer.SerializeValue(ref Id);
         serializer.SerializeValue(ref StatusId);
         serializer.SerializeValue(ref Seconds);
+    }
+}
+
+/// <summary><c>CreatureReactionShown</c>: which creature, the status whose reaction it was, and the status it reacted with.</summary>
+public struct CreatureReactionShownMessage : INetworkSerializable
+{
+    public int Id;
+    public FixedString64Bytes HolderId;
+    public FixedString64Bytes WithId;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref Id);
+        serializer.SerializeValue(ref HolderId);
+        serializer.SerializeValue(ref WithId);
     }
 }
 

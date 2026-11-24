@@ -17,6 +17,9 @@ public sealed class PlayerStateMachine : MonoBehaviour
     /// <summary>At the oars (PlayerTransport): like swimming, no fighting; interacting means getting out.</summary>
     public bool IsAboard { get; private set; }
     private bool HandsTaken => IsSwimming || IsAboard;
+
+    /// <summary>Whether a skill may be cast now: not mid-interaction, swimming, at the oars or a cart's handles.</summary>
+    public bool CanUseSkills => CurrentState != PlayerState.Interacting && !HandsTaken;
     // In the saddle of a horse of their own the player may still swing a weapon and draw a bow (PlayerRiding); at the oars,
     // the cart's handles or a horse being broken in, not.
     private bool ArmsTaken => IsSwimming || IsAboard && !CanFightAboard;

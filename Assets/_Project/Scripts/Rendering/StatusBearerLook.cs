@@ -56,7 +56,7 @@ public sealed class StatusBearerLook : MonoBehaviour
     }
 
     // Two schools met on something (steam, a cauterised wound): the reaction's look and sound, once, at its middle.
-    private static void OnReacted(Damageable target, StatusReaction reaction)
+    private static void OnReacted(Damageable target, StatusEffectDefinition holder, StatusReaction reaction)
     {
         if (!Application.isPlaying || target == null || reaction == null)
         {

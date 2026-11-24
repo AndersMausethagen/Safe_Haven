@@ -75,10 +75,13 @@ public sealed partial class PlayerCombat
                 // Paid in Focus alone, and no stamina: a circle, or nothing for a follow-up in its window. A buffered art no full
                 // circle can pay for any more doesn't start.
                 artPaid = 0f;
-                if (focus != null && !ArtFollowUpOpen && (artPaid = focus.TrySpendCircle()) <= 0f)
+                artIsFollowUp = ArtFollowUpOpen;
+                if (focus != null && !artIsFollowUp && (artPaid = focus.TrySpendCircle()) <= 0f)
                 {
                     return false;
                 }
+
+                artFollowUpFromRune = artFromRune;
 
                 artFromRune = false;
 
@@ -156,7 +159,7 @@ public sealed partial class PlayerCombat
         // the first one's cooldown and spends one of its follow-ups; the window shuts until this one lands.
         if (kind == SwingKind.Art)
         {
-            if (ArtFollowUpOpen)
+            if (artIsFollowUp)
             {
                 artFollowUpsLeft--;
             }
@@ -164,6 +167,7 @@ public sealed partial class PlayerCombat
             {
                 artReadyAt = Time.time + Rules.ArtCooldown;
                 artFollowUpsLeft = ArtFollowUps;
+                artFollowUpWeapon = weapon;
             }
 
             artFollowUpUntil = -1f;
@@ -761,7 +765,9 @@ public sealed partial class PlayerCombat
             SkillFx.ArtLand(activeAttack, origin, activeDirection, artStruck, activeMotion == ArtMotion.DashThrough ? dashFrom : origin);
             if (artFollowUpsLeft > 0)
             {
-                artFollowUpUntil = Time.time + ArtFollowUpWindow;
+                // From the end of its recovery, when a press queued during it would start.
+                float recoveryLeft = Mathf.Max(0f, RecoverAt(activeAttack, activeSpeed) - ActiveElapsed);
+                artFollowUpUntil = Time.time + recoveryLeft + ArtFollowUpWindow;
             }
         }
 

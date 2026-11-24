@@ -62,16 +62,22 @@ public sealed partial class PlayerCombat
     private bool ArtCoolingDown => (Time.time < artReadyAt && !ArtFollowUpOpen) || WeaponInFlight;
 
     // Follow-ups (Docs/SkillsImprovementResearch_2026-11-24.md 11, Elden Ring's): once an art lands, pressing it again within the window
-    // strikes it again for half its Focus, up to twice; the cooldown still runs from the first.
+    // (which runs on past the art's recovery, so slow arts get one too) strikes it again for no Focus, up to twice; the cooldown still
+    // runs from the first. Only the same art of the same weapon follows up: a swap or the rune's art is a new art.
     private const float ArtFollowUpWindow = 0.8f;
     private const int ArtFollowUps = 2;
     // The Focus the art being struck took: a circle, nothing for a follow-up.
     private float artPaid;
     private float artFollowUpUntil = -1f;
     private int artFollowUpsLeft;
+    private WeaponDefinition artFollowUpWeapon;
+    private bool artFollowUpFromRune;
+    // Whether the art beginning now is a follow-up (decided as it is paid for, before the rune choice is forgotten).
+    private bool artIsFollowUp;
 
-    /// <summary>An art just landed and may be struck again now, for less (a follow-up).</summary>
-    public bool ArtFollowUpOpen => artFollowUpsLeft > 0 && Time.time < artFollowUpUntil;
+    /// <summary>An art just landed and may be struck again now, for nothing (a follow-up).</summary>
+    public bool ArtFollowUpOpen => artFollowUpsLeft > 0 && Time.time < artFollowUpUntil && weapon == artFollowUpWeapon
+        && artFromRune == artFollowUpFromRune;
 
     /// <summary>Raised when the weapon's signature does its thing to a creature (a crush, a stopped charge, a broken guard), for feedback.</summary>
     public event Action<WeaponSignature, MonsterAI> SignatureUsed;

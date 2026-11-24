@@ -46,6 +46,8 @@ public sealed class CoopWireTests
         // 2026-11-24 (skills): the host tells friends what statuses are on its creatures (CreatureStatusShown), and every player's
         // skills show the ground they leave to the others (GroundLeft, CoopGround).
         [33] = "a8f6cfbe8adce864b74cfa2b70072aa1",
+        // 2026-11-24 (skills review): the host shows friends the reactions of statuses on its creatures (CreatureReactionShown: steam).
+        [34] = "162648434da5553ffa1ca8cf4bd7e3a0",
     };
 
     /// <summary>The fingerprint of the messages as they are now.</summary>

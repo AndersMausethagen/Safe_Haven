@@ -123,6 +123,7 @@ public sealed class CreatureHost
         Damageable.AnyDamaged += OnAnyDamaged;
         StatusEffects.Applied += OnStatusTookHold;
         StatusEffects.EndedOn += OnStatusEnded;
+        StatusEffects.Reacted += OnReacted;
     }
 
     public void End()
@@ -131,6 +132,7 @@ public sealed class CreatureHost
         Damageable.AnyDamaged -= OnAnyDamaged;
         StatusEffects.Applied -= OnStatusTookHold;
         StatusEffects.EndedOn -= OnStatusEnded;
+        StatusEffects.Reacted -= OnReacted;
         Forget();
         link = null;
     }
@@ -809,6 +811,15 @@ public sealed class CreatureHost
     // To each friend who has been told of this creature (the others have no copy of it to show it on).
     private void TellStatus(int id, StatusEffectDefinition status, float seconds)
     {
+        if (FriendsWhoKnow(id))
+        {
+            SendStatus(statusTo, id, status, seconds);
+        }
+    }
+
+    // Fills statusTo with the friends who have a copy of this creature; false when none has.
+    private bool FriendsWhoKnow(int id)
+    {
         statusTo.Clear();
         foreach (KeyValuePair<ulong, HashSet<int>> friend in told)
         {
@@ -818,12 +829,25 @@ public sealed class CreatureHost
             }
         }
 
-        if (statusTo.Count == 0)
+        return statusTo.Count > 0;
+    }
+
+    // Two statuses reacted on one of the host's creatures (the review, 2026-11-24: friends never saw the steam): its look on their copies.
+    private void OnReacted(Damageable target, StatusEffectDefinition holder, StatusReaction reaction)
+    {
+        if (holder == null || reaction == null || reaction.with == null || !Hosts(target, out Hosted hosted) || !FriendsWhoKnow(hosted.Id))
         {
             return;
         }
 
-        SendStatus(statusTo, id, status, seconds);
+        using var writer = new FastBufferWriter(160, Allocator.Temp);
+        writer.WriteNetworkSerializable(new CreatureReactionShownMessage
+        {
+            Id = hosted.Id,
+            HolderId = new FixedString64Bytes(holder.Id ?? string.Empty),
+            WithId = new FixedString64Bytes(reaction.with.Id ?? string.Empty),
+        });
+        link.Network.CustomMessagingManager.SendNamedMessage(CoopCreatures.ReactionShownMessage, statusTo, writer, NetworkDelivery.ReliableSequenced);
     }
 
     private void SendStatus(IReadOnlyList<ulong> to, int id, StatusEffectDefinition status, float seconds)

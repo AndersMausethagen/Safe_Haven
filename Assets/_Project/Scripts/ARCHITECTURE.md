@@ -3348,7 +3348,9 @@ sample textures and flames are in `Art/Effects/VFX Graph/Additions` (Unity Compa
 - **Co-op: what friends see** (the user: "then fix the network issues"). Statuses: the host tells friends who know a creature when a
   status takes hold on it (with the seconds it has left; only when new or lasting a second longer, as a patch refreshes it every half
   second) and when it ends (`CreatureStatusShown`, `CreatureHost.OnStatusTookHold/OnStatusEnded`, `StatusEffects.EndedOn`); the friend's
-  copy shows it (`StatusEffects.Mirror`: the copy never ticks it), so its outline, effect and icon appear there too. Ground: a player's
+  copy shows it (`StatusEffects.Mirror`: the copy never ticks it), so its outline, effect and icon appear there too. Reactions (steam)
+  likewise: `CreatureReactionShown` (holder and with ids) -> `StatusEffects.ShowReaction` (wire 34). An altar option never uses up a
+  status on a copy (`StatusEffects.IsCopy`): the host keeps it. Ground: a player's
   skill that leaves ground (`PlayerSkills.GroundLeft`) is shown to everyone in the same place (`CoopGround`, `GroundLeft`, passed on by
   the host as pings are) as a look-only patch (`GroundHazard.SpawnLook`: no touch, burn or meeting fire and frost there; the caster's own
   game does those, and its touches reach the host's creatures as that player's blows). `StatusCatalog` finds statuses by id for both.
