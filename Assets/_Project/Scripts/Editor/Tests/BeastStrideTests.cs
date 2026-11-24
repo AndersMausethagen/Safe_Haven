@@ -23,6 +23,16 @@ public sealed class BeastStrideTests
     }
 
     [Test]
+    public void ABeastTurningOnTheSpot_StepsAsItTurns_NoFasterThanItsWalk()
+    {
+        Assert.AreEqual(0f, MonsterAnimationDriver.TurnStepSpeed(0f, 1.2f), 1e-4f, "standing still");
+        float half = MonsterAnimationDriver.TurnStepSpeed(90f, 1.2f);
+        Assert.Greater(half, 0.3f, "a quarter turn a second steps");
+        Assert.AreEqual(half, MonsterAnimationDriver.TurnStepSpeed(-90f, 1.2f), 1e-4f, "either way round");
+        Assert.AreEqual(1.2f, MonsterAnimationDriver.TurnStepSpeed(720f, 1.2f), 1e-4f, "a whirl walks, never gallops");
+    }
+
+    [Test]
     public void EveryGallopingBeast_IsFittedToItsClips_AndKeepsUpWithItsChase()
     {
         int fitted = 0;

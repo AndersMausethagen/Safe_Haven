@@ -2978,6 +2978,9 @@ Bodies come from CC0 models in `Art/Enemies/Downloaded` (`CREDITS.md` says whose
   speed and faster past it (to 3: a fox chases at 6.2). Run it again after changing a beast's clips or body size; `BeastStrideTests`
   measures the shipped assets. Single-clip bodies keep the old rate (boars: their only stride, a walk at 0.7 m/s, can't keep up with a
   5.6 m/s charge and needs a run clip).
+- **Turning on the spot:** beasts have no turn clips, so a fitted beast (Walk Stride Speed set) feeds its legs the walking speed its turn
+  swings its ends at (0.5 m from its middle, at most its walk: `MonsterAnimationDriver.TurnStepSpeed`): it steps round instead of spinning
+  on planted feet.
 - **Telling one from the next** (`AI/CreatureLook`): Size and Shade Variation give each spawn its own, an elite is tinted with its colour and its eyes take it, and each stage of a boss sets `BossPhase.glow` on its veins (`Tree02 Veins.png`, the treant's crevices) and eyes. These change the body's own copies of its materials, as a hit's flash lays a property block over them and clears it again.
 - **Eyes** are anything whose material is named `Eye ...`, Unlit and HDR so they show in the dark: the model's own where it has them (wolf, goblin), and small spheres on the head bone where it doesn't. Spheres are placed in the standing pose, as the file's own pose can be far from it, and their offsets were found by rendering each head from three sides. A corpse's go dark.
 - **Gear** (`Downloaded/Gear`, modelled in Blender) is rigid and hangs on bones: the Draug's mail and helm, and the Huldra's hollow back, sized from bone positions. `BuildCreatureModels.Refit` re-does only the prefabs, for tuning this without a re-import.

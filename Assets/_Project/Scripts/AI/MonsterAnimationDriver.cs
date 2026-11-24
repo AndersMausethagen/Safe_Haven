@@ -228,6 +228,11 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         // Story movement owns locomotion while the AI is disabled.
         float speed = MovedSpeed();
         UpdateStrikeTail(speed);
+        // Walking and galloping beasts step round as they turn on the spot.
+        if (walkStrideSpeed > 0f)
+        {
+            speed = Mathf.Max(speed, TurnStep());
+        }
         if (ai.enabled && hasSpeed)
         {
             animator.SetFloat(speedHash, speed / bodyScale, speedDampTime, Time.deltaTime);
@@ -354,9 +359,6 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         return Mathf.Max(ai.Speed, measured);
     }
 
-    // Locomotion blends idle, walk (at WalkThreshold) and run (at RunThreshold): the feet cover what the blended clips do, scaled by
-    // this rate, so it is the speed over what they cover. Below the walk, idle and walk share the stride, so the walk clip's own speed
-    // against its threshold is the rate; past the run, the run is played faster.
     /// <summary>The stride's playback rate for a beast moving at <paramref name="speed"/>. One clip (no walk speed): as fast as it keeps up
     /// with the ground, 0.5-2.5. Walk and gallop fitted to their feet (BeastStrides): 1 while the blend keeps up by itself, faster past the
     /// fastest clip, to <see cref="FastestBeastStride"/> (a fox's gallop covers 2.2 m/s and it chases at 6.2).</summary>
@@ -377,6 +379,28 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
 
     public const float FastestBeastStride = 3f;
 
+    // A beast turning on the spot has no turn clips: its legs step as they would walking at the speed the turn swings its shoulders and
+    // haunches (this far from its middle), up to its walk (Docs/QualityLevers_2026-11-24.md §3: it spun on planted feet).
+    private const float TurnStepRadius = 0.5f;
+    private float lastYaw;
+    private bool yawProbed;
+
+    /// <summary>The walking speed whose stride matches turning at <paramref name="degreesPerSecond"/>, at most the walk's.</summary>
+    public static float TurnStepSpeed(float degreesPerSecond, float walkStrideSpeed) =>
+        Mathf.Min(walkStrideSpeed, Mathf.Abs(degreesPerSecond) * Mathf.Deg2Rad * TurnStepRadius);
+
+    private float TurnStep()
+    {
+        float yaw = transform.eulerAngles.y;
+        float turning = yawProbed && Time.deltaTime > 0f ? Mathf.DeltaAngle(lastYaw, yaw) / Time.deltaTime : 0f;
+        lastYaw = yaw;
+        yawProbed = true;
+        return TurnStepSpeed(turning, walkStrideSpeed);
+    }
+
+    // Locomotion blends idle, walk (at WalkThreshold) and run (at RunThreshold): the feet cover what the blended clips do, scaled by
+    // this rate, so it is the speed over what they cover. Below the walk, idle and walk share the stride, so the walk clip's own speed
+    // against its threshold is the rate; past the run, the run is played faster.
     private float LocomotionRate(float speed)
     {
         if (speed <= WalkThreshold)
