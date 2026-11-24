@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Skill Leap Jump
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Skill Leap Jump
+  caption: 
+  clips:
+  - {fileID: 8300000, guid: f8bc8e790378fd343b82bf7aff9a4aaa, type: 3}
+  - {fileID: 8300000, guid: f4141ae0f7aa3c04bbdd719ca5888b3a, type: 3}
+  channel: 2
+  volume: 0.8
+  volumeVariation: 0.1
+  pitchRange: {x: 0.95, y: 1.05}
+  positional: 1
+  fullVolumeDistance: 4
+  audibleDistance: 30
+  maxAtOnce: 4
+  minimumGap: 0.03
+  priority: 1
+  takesTheMix: 0

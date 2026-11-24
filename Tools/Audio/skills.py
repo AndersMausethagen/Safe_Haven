@@ -57,10 +57,12 @@ def frost_release(rng):
 
 
 def ember_cast(rng):
-    s = 1.2
-    whoomp = breath(s, rng, 120, 900, 0.06, 0.18) * 1.4
-    sparks = crackle(s, rng, 45, 900, 5000, early=1.4)
-    return whoomp + sparks * 0.8
+    # A flame catching, not a blast (the user, 2026-11-24: the first sounded "like an explosion"): a soft breath of fire that
+    # swells in over a tenth of a second, under a crackle that carries it.
+    s = 1.3
+    catch = breath(s, rng, 180, 1400, 0.12, 0.3) * 0.55
+    sparks = crackle(s, rng, 70, 900, 5200, early=1.1)
+    return catch + sparks * 1.0
 
 
 def ember_release(rng):

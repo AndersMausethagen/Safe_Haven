@@ -219,7 +219,7 @@ MonoBehaviour:
     shake: 0.2
     hitStop: 0.04
     kick: 0.08
-    castSound: {fileID: 0}
+    castSound: {fileID: 11400000, guid: 3a13086423537444aa766d9db0602564, type: 2}
     releaseSound: {fileID: 0}
     releaseSoundDelay: 0
   weaponArt: 0
