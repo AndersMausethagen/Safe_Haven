@@ -27,8 +27,8 @@ MonoBehaviour:
   buffs: []
   buffDuration: 6
   playAttackAnimation: 1
-  animationState: Sword Counter
-  animationSpeed: 1.2
+  animationState: KI 2H Leap Slam
+  animationSpeed: 1.1
   look:
     showArea: 1
     cast: []

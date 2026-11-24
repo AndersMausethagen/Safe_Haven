@@ -3289,8 +3289,17 @@ sample textures and flames are in `Art/Effects/VFX Graph/Additions` (Unity Compa
   never reports a cast it didn't start; Frost Rune leaves its own Frostbite (12 s, longer than its cooldown) so its next cast freezes;
   quest rewards name the abilities they teach; a cast cut short takes its area mark away; only blows that got through play their struck
   effects; the Abilities tutorial opens with the first fight; `Editor/VfxAuthoring` compiles only against VFX Graph 17.6.x.
-- Not yet: statuses for Beast/Wyrd/Steel, the paid casting animations (the user buys and imports Kevin Iglesias' Human Spellcasting
-  Animations), effects for the weapon arts themselves.
+- **Each ability its own move** (the user: "i have some casting animations from the stylized pack. also check what other animations we
+  can use for slam, whirlwind etc"): candidate clips were measured on the player's rig (hand speed, reach, lowest/highest hand, hips rise,
+  body turn) and each ability's Hit Delay set to its clip's contact. Frost Rune: `Cast High` (the strong forward throw); Ash Lad's Ember:
+  `Spell Push` (Spell_Unarmed_Forward_Impact, both hands); Huldra's Blessing: `Spell Raise` (Spell_Unarmed_Up_Impact; it played nothing
+  before); Heartroot's Grasp: `Staff Burst` (hands low, drawn up out of the ground); Trollsbane Wrath: `2H Slam` (the spinning leap);
+  Mountain Leap: `KI 2H Leap Slam` (0.76 m leap, contact 0.50 s); Whirling Steel: `Skill Whirlwind` (two turns of Combat_Whirlwind);
+  Wolf's Lunge: `1H Low Cut` (the reaching thrust). The three new states are on Combat Full Body, Upper Body and Attack Arms (walking
+  hands a swing over). `WalkOutOfSwing` leaves a skill's own dash alone until `PlayerSkills.LungeEndsAt`: the dash speed used to hand
+  Wolf's Lunge and Mountain Leap to the walking layers 0.15 s in. `SkillLookTests` keeps one move per ability, on a state the body has.
+  Unused but measured: Emote_Roar / Emote_Shout (2 s, for a war cry), Spell_*_Channel loops (for a held cast), Combat_Defend_Spell.
+- Not yet: statuses for Beast/Wyrd/Steel, effects for the weapon arts themselves.
 
 ## Loot on bodies (2026-11-24)
 

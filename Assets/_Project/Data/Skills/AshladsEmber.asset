@@ -27,8 +27,8 @@ MonoBehaviour:
   buffs: []
   buffDuration: 6
   playAttackAnimation: 1
-  animationState: Cast Wide
-  animationSpeed: 1.2
+  animationState: Spell Push
+  animationSpeed: 1.5
   look:
     showArea: 1
     cast:

@@ -27,7 +27,7 @@ MonoBehaviour:
   buffs: []
   buffDuration: 6
   playAttackAnimation: 1
-  animationState: Cast
+  animationState: Staff Burst
   animationSpeed: 1.1
   look:
     showArea: 1

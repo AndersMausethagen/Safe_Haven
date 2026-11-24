@@ -27,7 +27,7 @@ MonoBehaviour:
   buffs: []
   buffDuration: 6
   playAttackAnimation: 1
-  animationState: Cast
+  animationState: Cast High
   animationSpeed: 1.2
   look:
     showArea: 1

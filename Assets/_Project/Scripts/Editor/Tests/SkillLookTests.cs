@@ -117,6 +117,35 @@ public sealed class SkillLookTests
     }
 
     [Test]
+    public void EveryAbility_PlaysAMoveOfItsOwn_ThatTheBodyHas()
+    {
+        var controller = AssetDatabase.LoadAssetAtPath<UnityEditor.Animations.AnimatorController>("Assets/_Project/Animation/Controllers/PlayerAnimator.controller");
+        var fullBody = System.Array.Find(controller.layers, layer => layer.name == "Combat Full Body");
+        var states = new HashSet<string>();
+        foreach (var child in fullBody.stateMachine.states)
+        {
+            states.Add(child.state.name);
+        }
+
+        var used = new Dictionary<string, string>();
+        foreach (string guid in AssetDatabase.FindAssets("t:SkillDefinition", new[] { "Assets/_Project/Data/Skills" }))
+        {
+            var skill = AssetDatabase.LoadAssetAtPath<SkillDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            if (skill.WeaponArt != WeaponArtSlot.None)
+            {
+                continue; // the weapon's own art plays the art's swing
+            }
+
+            Assert.IsTrue(skill.PlayAttackAnimation, $"{skill.name} is seen to be cast");
+            Assert.IsTrue(states.Contains(skill.AnimationState), $"{skill.name}: no full-body state '{skill.AnimationState}'");
+            Assert.IsFalse(used.TryGetValue(skill.AnimationState, out string other), $"{skill.name} and {other} share '{skill.AnimationState}'");
+            used[skill.AnimationState] = skill.name;
+        }
+
+        Assert.GreaterOrEqual(used.Count, 8);
+    }
+
+    [Test]
     public void TheFirstSkills_AreDressedWithEffectsThatExist()
     {
         int cues = 0;

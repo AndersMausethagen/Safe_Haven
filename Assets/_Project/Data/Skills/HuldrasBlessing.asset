@@ -29,8 +29,8 @@ MonoBehaviour:
     op: 0
     value: 20
   buffDuration: 6
-  playAttackAnimation: 0
-  animationState: Cast High
+  playAttackAnimation: 1
+  animationState: Spell Raise
   animationSpeed: 1.1
   look:
     showArea: 0

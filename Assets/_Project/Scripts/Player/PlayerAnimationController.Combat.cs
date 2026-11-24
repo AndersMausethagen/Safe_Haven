@@ -98,6 +98,12 @@ public sealed partial class PlayerAnimationController
             return;
         }
 
+        // A skill's own dash (Wolf's Lunge, Mountain Leap) is the move, not walking: its whole-body clip plays on to the blow.
+        if (skills != null && Time.time < skills.LungeEndsAt)
+        {
+            return;
+        }
+
         // Settling back to the ready pose (its exit to Empty, up to 0.45 s) is walked out of too; another change on the way isn't.
         if (animator.IsInTransition(fullBodyLayer) && animator.GetNextAnimatorStateInfo(fullBodyLayer).shortNameHash != EmptyStateHash)
         {
