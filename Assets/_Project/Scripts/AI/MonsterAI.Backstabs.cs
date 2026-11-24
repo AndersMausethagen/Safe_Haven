@@ -41,7 +41,8 @@ public sealed partial class MonsterAI
     // that reaches, or some of the time anyway, it hops back. False when there is nobody near enough to answer.
     private bool AnswerBackstab()
     {
-        if (!CanTarget(target))
+        // Held fast (Frozen, Roots): no answer and no hop; the blow that frees it is the player's.
+        if (IsHeld || !CanTarget(target))
         {
             return false;
         }
@@ -72,7 +73,7 @@ public sealed partial class MonsterAI
     // the answer is to beat it from the front or parry it.
     private bool SeesBackstabComing()
     {
-        float chance = BackstabReadChance;
+        float chance = IsHeld ? 0f : BackstabReadChance;
         // Rooted in a strike that ends in a topple (Topple After), it doesn't turn: broken off, the strike's topple would never come.
         if (chance <= 0f || !(OpenWhileStriking || BackstabsForeknown > 0) || ToppleAfterNow > 0f || global::Player.Current == null
             || !global::Player.Current.TryGetComponent(out PlayerCombat swinger) || !swinger.IsWindingUp

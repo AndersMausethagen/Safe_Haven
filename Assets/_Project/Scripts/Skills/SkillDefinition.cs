@@ -40,6 +40,12 @@ public sealed class SkillDefinition : ScriptableObject
     [SerializeField, Min(0f)] private float lungeDistance;
     [SerializeField, Min(0.05f)] private float lungeDuration = 0.2f;
 
+    [Header("Left behind (Docs/CombatSkillsResearch_2026-11-24.md 6: lingering)")]
+    [Tooltip("A patch of ground (a GroundHazard prefab) left along its reach where it lands: smouldering ground, a rime patch. It hurts " +
+             "only the caster's foes. Empty: nothing is left.")]
+    [SerializeField] private GameObject leaves;
+    [SerializeField, Range(1, 8)] private int leavesCount = 3;
+
     [Header("Hit")]
     [Tooltip("Optional. The damage dealt, its area and when it lands (Hit Delay, counted after the lunge).")]
     [SerializeField] private AttackDefinition attack;
@@ -78,6 +84,8 @@ public sealed class SkillDefinition : ScriptableObject
     public float CastTime => castTime;
     public float LungeDistance => lungeDistance;
     public float LungeDuration => lungeDuration;
+    public GameObject Leaves => leaves;
+    public int LeavesCount => leavesCount;
     public AttackDefinition Attack => attack;
     public float Heal => heal;
     public IReadOnlyList<SkillStatBuff> Buffs => buffs;

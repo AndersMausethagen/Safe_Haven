@@ -144,7 +144,7 @@ public sealed partial class MonsterAI
         if (Time.time >= thiefNextStep)
         {
             thiefNextStep = Time.time + ThiefStep;
-            movement.SetSpeed(definition.MoveSpeed);
+            movement.SetSpeed(definition.MoveSpeed * HeldScale);
             movement.MoveTo(goal);
         }
     }
@@ -203,7 +203,7 @@ public sealed partial class MonsterAI
         Vector3 away = transform.position - playerAt;
         away.y = 0f;
         away = away.sqrMagnitude > 0.01f ? away.normalized : transform.forward;
-        movement.SetSpeed(definition.MoveSpeed);
+        movement.SetSpeed(definition.MoveSpeed * HeldScale);
         foreach (float turn in new[] { 0f, 45f, -45f, 90f, -90f, 135f, -135f })
         {
             Vector3 destination = transform.position + Quaternion.Euler(0f, turn, 0f) * away * FleeStride;

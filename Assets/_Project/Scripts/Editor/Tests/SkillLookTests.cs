@@ -205,6 +205,18 @@ public sealed class SkillLookTests
     }
 
     [Test]
+    public void FireAndFrost_LeaveTheirGroundBehind()
+    {
+        foreach (string name in new[] { "AshladsEmber", "FrostRune" })
+        {
+            var skill = AssetDatabase.LoadAssetAtPath<SkillDefinition>($"Assets/_Project/Data/Skills/{name}.asset");
+            Assert.IsNotNull(skill.Leaves, $"{name} leaves something where it lands");
+            Assert.IsNotNull(skill.Leaves.GetComponent<GroundHazard>(), $"{name}: a patch of ground that hurts the caster's foes");
+            Assert.Greater(skill.LeavesCount, 0);
+        }
+    }
+
+    [Test]
     public void EveryAbility_PlaysAMoveOfItsOwn_ThatTheBodyHas()
     {
         var controller = AssetDatabase.LoadAssetAtPath<UnityEditor.Animations.AnimatorController>("Assets/_Project/Animation/Controllers/PlayerAnimator.controller");

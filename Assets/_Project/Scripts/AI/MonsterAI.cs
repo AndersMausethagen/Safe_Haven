@@ -891,6 +891,36 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     /// <summary>Sets its speed again: a status that slows or holds it took hold or ended (StatusEffects).</summary>
     public void RefreshSpeed() => ApplySpeed();
 
+    // The share of its speed its statuses leave it (Frostbite slows, Frozen and Roots hold fast): every speed it sets goes by this.
+    private float HeldScale
+    {
+        get
+        {
+            if (statuses == null)
+            {
+                TryGetComponent(out statuses);
+            }
+
+            return statuses != null ? statuses.MoveScale : 1f;
+        }
+    }
+
+    /// <summary>Held fast by a status (Frozen, Roots): it neither hops aside nor answers a backstab.</summary>
+    public bool IsHeld => HeldScale <= 0f;
+
+    /// <summary>Strikes nothing for <paramref name="seconds"/> (Frozen): the strike under way broken off as a recoil does, and its next
+    /// blow held off even when it was staggered or toppling as it froze.</summary>
+    public void HoldStrikes(float seconds)
+    {
+        if (definition == null || CurrentState == State.Dead || seconds <= 0f)
+        {
+            return;
+        }
+
+        attacks.DelayAtLeast(seconds);
+        Recoil(seconds);
+    }
+
     // Going to look is a cautious walk and a patrol a stroll; everything else moves at full speed.
     private void ApplySpeed()
     {
@@ -904,13 +934,7 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
             : CurrentState == State.Returning && roaming ? roamSpeedScale
             : circling ? CombatTechniqueSettings.Current.CircleSpeed
             : 1f;
-        if (statuses == null)
-        {
-            TryGetComponent(out statuses);
-        }
-
-        float held = statuses != null ? statuses.MoveScale : 1f;
-        movement.SetSpeed(definition.MoveSpeed * scale * speedScale * held);
+        movement.SetSpeed(definition.MoveSpeed * scale * speedScale * HeldScale);
     }
 
     // Entering play mode doesn't reload scripts in this project, so the shared sound timer is reset here.

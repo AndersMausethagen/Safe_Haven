@@ -752,7 +752,10 @@ public sealed class CreatureHost
         hosted.Ai.JudgeAmbushFrom(blow.HitPoint - blow.Direction * 2f);
         // With how it lands (a hammer against a creature weak to blunt) and how its shield there took it (poise broken through a raised
         // shield breaks the guard here, toward the splinter).
-        hosted.Health.ApplyJudged(hit.Blow(host), hit.JudgedGuard);
+        DamageInfo landed = hit.Blow(host);
+        DamageResult result = hosted.Health.ApplyJudged(landed, hit.JudgedGuard);
+        // What the blow bursts (a friend's heavy shattering a frozen creature), as AttackResolver does for the host's own.
+        StatusEffects.BeforeHitStatuses(hosted.Health, landed, result);
         foreach (NetworkPlayerAvatar friend in NetworkPlayerAvatar.All)
         {
             if (friend != null && friend.OwnerClientId == sender && friend.Body != null && friend.Body.TryGetComponent(out FriendHitbox hitbox))

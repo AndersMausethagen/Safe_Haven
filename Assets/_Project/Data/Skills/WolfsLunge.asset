@@ -22,6 +22,8 @@ MonoBehaviour:
   castTime: 0.45
   lungeDistance: 5
   lungeDuration: 0.22
+  leaves: {fileID: 0}
+  leavesCount: 3
   attack: {fileID: 11400000, guid: f1223a6650010ea41a5a2d33756ab8f2, type: 2}
   heal: 0
   buffs: []

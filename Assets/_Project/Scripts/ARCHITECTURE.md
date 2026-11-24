@@ -3321,7 +3321,13 @@ sample textures and flames are in `Art/Effects/VFX Graph/Additions` (Unity Compa
   (`MonsterAI.Recoil`). `ConsumedBy` (HitTechnique flags), `ConsumeDamage`, `ConsumeLook`, `ConsumeLine`: a blow of those kinds ends the
   status and bursts it (`StatusEffects.BeforeHitStatuses`, from `AttackResolver.Apply` before the blow's own statuses). Frozen: a heavy,
   a finisher or a weapon art shatters it for 75% of the blow again as frost, "Shattered!", an ice burst (`Status Shatter`).
-- Not yet: effects for the weapon arts themselves; lingering zones (burning ground, ice patches).
+- **Ground left behind** (research 6, lingering): `SkillDefinition.Leaves` (a GroundHazard prefab) and `LeavesCount`; `PlayerSkills.
+  LeaveGround` spreads them along the reach as the blow lands, made by the caster (they hurt only their foes). Ash Lad's Ember leaves 3
+  `Ember Ground` (5 fire a second, 4 s; doesn't run through grass, so a cast in the Haven's meadow can't set it alight); Frost Rune 3
+  `Rime Patch` (Frostbite on whoever stands in them, 6 s; so its next lance freezes them). Both live with the monsters' hazards
+  (Prefabs/Enemies/Hazards) and meet fire and frost as theirs do. `GroundHazard` now plays its effect's own look (VfxValues) and draws
+  the player's side's patches as a plain soft disc: the hatching means "stay out", which a player's own ground is not.
+- Not yet: effects for the weapon arts themselves.
 
 ## Loot on bodies (2026-11-24)
 

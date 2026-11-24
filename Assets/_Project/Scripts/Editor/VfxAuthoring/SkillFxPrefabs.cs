@@ -158,6 +158,12 @@ public static class SkillFxPrefabs
             light = new Color(0.55f, 0.8f, 1f, 1f), lightIntensity = 6f, lightRange = 8f, lightSeconds = 0.3f, shake = 0.25f,
         };
         log.AppendLine(Dress("FrostRune", frost, chill, frozen, arc: 25f));
+        // Rime left along the lance: patches that chill whoever stands in them (only the caster's foes).
+        GameObject rimeMist = Make("Rime Patch Mist", new Design("Skill Mist").F("Rate", 16f).F("Radius", 1.1f).V("Color", new Vector3(0.75f, 0.9f, 1f))
+            .F("Alpha", 0.4f).F("Lifetime Min", 1.2f).F("Lifetime Max", 2f).F("Size Min", 0.6f).F("Size Max", 1.1f).F("Turbulence", 0.2f)
+            .V("Velocity Min", new Vector3(-0.1f, 0.02f, -0.1f)).V("Velocity Max", new Vector3(0.1f, 0.15f, 0.1f)));
+        GameObject rimePatch = Hazard("Rime Patch", "FrozenPool", 1.3f, 6f, 0f, chill, rimeMist);
+        log.AppendLine(Leaves("FrostRune", rimePatch, 3));
 
         // ----- The Ash Lad's Ember: a roaring cone of embers and flame. -----
         GameObject emberCircle = Make("Ember Cast Circle", new Design("Skill Ring").T("Texture", "Rune Circle").V("Color", new Vector3(3f, 1.3f, 0.3f))
@@ -188,6 +194,11 @@ public static class SkillFxPrefabs
             light = new Color(1f, 0.55f, 0.2f, 1f), lightIntensity = 7f, lightRange = 9f, lightSeconds = 0.4f, shake = 0.2f,
         };
         log.AppendLine(Dress("AshladsEmber", ember, burning, null, arc: -1f));
+        // Smouldering ground where the embers fell: it burns a while, but doesn't run through the grass (a cast in the Haven's meadow
+        // shouldn't set it alight).
+        GameObject emberGroundFlames = Make("Ember Ground Flames", new Design("Skill Flames").F("Spawn Rate", 30f).F("Initial Size", 1.8f).F("Lifetime", 0.7f));
+        GameObject emberGround = Hazard("Ember Ground", "FireTrail", 1.1f, 4f, 5f, null, emberGroundFlames);
+        log.AppendLine(Leaves("AshladsEmber", emberGround, 3));
 
         // ----- Trollsbane Wrath: the hammer comes down and the ground answers. -----
         GameObject wrathWave = Make("Wrath Shockwave", new Design("Skill Ring").T("Texture", "Ring").V("Color", new Vector3(1.6f, 1.1f, 0.45f)).F("Size", 8f)
@@ -439,6 +450,40 @@ public static class SkillFxPrefabs
         so.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(status);
         return status;
+    }
+
+    // A patch a skill leaves (GroundHazard), copied from a monster's of the same element and set to these numbers.
+    private static GameObject Hazard(string name, string from, float radius, float seconds, float damagePerSecond, StatusEffectDefinition status,
+        GameObject effect)
+    {
+        const string Folder = "Assets/_Project/Prefabs/Enemies/Hazards";
+        string path = $"{Folder}/{name}.prefab";
+        if (AssetDatabase.LoadAssetAtPath<GameObject>(path) == null)
+        {
+            AssetDatabase.CopyAsset($"{Folder}/{from}.prefab", path);
+        }
+
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+        var hazard = new SerializedObject(prefab.GetComponent<GroundHazard>());
+        hazard.FindProperty("radius").floatValue = radius;
+        hazard.FindProperty("seconds").floatValue = seconds;
+        hazard.FindProperty("damagePerSecond").floatValue = damagePerSecond;
+        hazard.FindProperty("status").objectReferenceValue = status;
+        hazard.FindProperty("effectPrefab").objectReferenceValue = effect;
+        hazard.FindProperty("spreadsOnGrass").boolValue = false;
+        hazard.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(prefab);
+        return prefab;
+    }
+
+    private static string Leaves(string skillName, GameObject hazard, int count)
+    {
+        var skill = AssetDatabase.LoadAssetAtPath<SkillDefinition>($"Assets/_Project/Data/Skills/{skillName}.asset");
+        var data = new SerializedObject(skill);
+        data.FindProperty("leaves").objectReferenceValue = hazard;
+        data.FindProperty("leavesCount").intValue = count;
+        data.ApplyModifiedPropertiesWithoutUndo();
+        return $"{skillName} leaves {count} x {hazard.name}";
     }
 
     // The skill's look, and on its attack the status it leaves and the one it adds on a creature already under it; a lance's arc.

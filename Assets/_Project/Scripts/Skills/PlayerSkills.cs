@@ -216,6 +216,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             }
 
             SkillFx.Release(skill, transform.position, pendingDirection, struck);
+            LeaveGround(skill, pendingDirection);
         }
 
         if (activeBuffs.Count > 0)
@@ -498,6 +499,21 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         }
 
         activeBuffs[skill] = now + skill.BuffDuration;
+    }
+
+    // What the skill leaves on the ground where it lands (Skill › Leaves): patches spread out along its reach, nearest first.
+    private void LeaveGround(SkillDefinition skill, Vector3 direction)
+    {
+        if (skill.Leaves == null || skill.Attack == null)
+        {
+            return;
+        }
+
+        var along = new SkillFxCue { place = SkillFxPlace.AlongReach, count = skill.LeavesCount };
+        foreach (Vector3 point in SkillFx.Points(along, transform.position, direction, skill.Attack.Range, skill.Attack.Arc, null))
+        {
+            GroundHazard.Spawn(skill.Leaves, point, combatant);
+        }
     }
 
     private void ExpireBuffs()

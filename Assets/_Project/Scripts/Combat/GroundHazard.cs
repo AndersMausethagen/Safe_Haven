@@ -327,7 +327,17 @@ public sealed class GroundHazard : MonoBehaviour
         MakeDisc();
         if (effectPrefab != null)
         {
-            Instantiate(effectPrefab, transform.position, Quaternion.identity, transform);
+            GameObject effect = Instantiate(effectPrefab, transform.position, Quaternion.identity, transform);
+            // A skill effect on a shared graph carries its own look (VfxValues): flames for smouldering ground, rime for a frost patch.
+            foreach (UnityEngine.VFX.VisualEffect visual in effect.GetComponentsInChildren<UnityEngine.VFX.VisualEffect>())
+            {
+                if (visual.TryGetComponent(out VfxValues values))
+                {
+                    values.Apply(visual);
+                    visual.Reinit();
+                    visual.Play();
+                }
+            }
         }
 
         if (loopSound != null && loopSound.HasClips)
@@ -362,8 +372,14 @@ public sealed class GroundHazard : MonoBehaviour
         disc.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         disc.receiveShadows = false;
         block = new MaterialPropertyBlock();
-        // Hatched: harm no guard stops, as an unblockable strike's fill; stay out.
-        GroundMarks.Shape(block, 360f, 0f, 0.06f, GroundMarks.Pattern.Hatched, 0.6f);
+        // Hatched: harm no guard stops, as an unblockable strike's fill; stay out. The player's own ground (a skill's smouldering
+        // embers, its rime) hurts only their foes: a plain soft disc, so it never reads as a warning to them.
+        bool ours = faction.IsPlayerSide();
+        GroundMarks.Shape(block, 360f, 0f, ours ? 0f : 0.06f, ours ? GroundMarks.Pattern.Solid : GroundMarks.Pattern.Hatched, 0.6f);
+        if (ours)
+        {
+            shown.a = 0.22f;
+        }
         GroundMarks.Ground(block, transform.position);
         Paint(0f);
     }

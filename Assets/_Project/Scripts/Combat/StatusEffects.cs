@@ -106,8 +106,14 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
             if (definition.ConsumeDamage > 0f && target.IsAlive)
             {
                 // A finisher's weight; not a technique that could burst another status in turn.
-                target.ApplyDamage(new DamageInfo(blow.Source, null, result.Damage * definition.ConsumeDamage, definition.DamageType, false,
-                    blow.HitPoint, blow.Direction, 0f, HitTechnique.None));
+                var burst = new DamageInfo(blow.Source, null, result.Damage * definition.ConsumeDamage, definition.DamageType, false,
+                    blow.HitPoint, blow.Direction, 0f, HitTechnique.None);
+                DamageResult burstResult = target.ApplyDamage(burst);
+                // The striker's as the blow was (lifesteal, Focus, a kill's Second Wind); no technique, so it bursts nothing in turn.
+                if (blow.Source != null)
+                {
+                    blow.Source.ReportDamageDealt(target, burst, burstResult);
+                }
             }
         }
     }
@@ -267,7 +273,7 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
     {
         if (effect != null && effect.StopsStrikes && !isCopy && TryGetComponent(out MonsterAI creature))
         {
-            creature.Recoil(endsAt - Time.time);
+            creature.HoldStrikes(endsAt - Time.time);
         }
     }
 

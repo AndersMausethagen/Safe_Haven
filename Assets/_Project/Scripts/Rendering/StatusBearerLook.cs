@@ -37,6 +37,16 @@ public sealed class StatusBearerLook : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void Hook()
     {
+        // Entering Play doesn't reload scripts here: last session's outline materials go.
+        foreach (Material material in OutlineMaterials.Values)
+        {
+            if (material != null)
+            {
+                DestroyImmediate(material);
+            }
+        }
+
+        OutlineMaterials.Clear();
         StatusEffects.Applied -= OnApplied;
         StatusEffects.Applied += OnApplied;
         StatusEffects.Consumed -= OnConsumed;
@@ -46,7 +56,8 @@ public sealed class StatusBearerLook : MonoBehaviour
     // A status burst by a blow (Shatter): its Consume Look, once, where the blow landed.
     private static void OnConsumed(Damageable target, StatusEffectDefinition effect, Vector3 at)
     {
-        if (effect == null || effect.ConsumeLook == null)
+        // Only in a game being played: an edit-mode test bursting a status leaves nothing in the open scene.
+        if (!Application.isPlaying || effect == null || effect.ConsumeLook == null)
         {
             return;
         }
@@ -68,7 +79,7 @@ public sealed class StatusBearerLook : MonoBehaviour
 
     private static void OnApplied(Damageable target, StatusEffectDefinition effect, Combatant source)
     {
-        if (target == null || effect == null || effect.Look == null)
+        if (!Application.isPlaying || target == null || effect == null || effect.Look == null)
         {
             return;
         }

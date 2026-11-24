@@ -63,7 +63,7 @@ public sealed partial class MonsterAI
             Vector3 away = transform.position - boltFrom;
             away.y = 0f;
             away = away.sqrMagnitude > 0.01f ? away.normalized : transform.forward;
-            movement.SetSpeed(definition.MoveSpeed);
+            movement.SetSpeed(definition.MoveSpeed * HeldScale);
             // Straight away if there is ground that way, else to one side or the other: a cliff or the water turns it, it does not stop.
             foreach (float turn in new[] { 0f, 50f, -50f, 100f, -100f })
             {

@@ -638,7 +638,7 @@ public sealed partial class MonsterAI
     // The nimble step aside from a bow held on them past its perfect release: one chance per draw, never from a perfect release.
     private bool DodgesArrow()
     {
-        if (definition.ArrowDodge <= 0f || targetComponent == null || !targetComponent.TryGetComponent(out PlayerArchery archery))
+        if (IsHeld || definition.ArrowDodge <= 0f || targetComponent == null || !targetComponent.TryGetComponent(out PlayerArchery archery))
         {
             return false;
         }
