@@ -39,6 +39,9 @@ public sealed class CoopCreatures : ICoopPart
     public const string StatusMessage = "SafeHaven.CreatureStatus";
     /// <summary>Friend to host: the friend's parry or crush wore a puppet's poise (MonsterAI.PoiseBlow): the real creature takes it.</summary>
     public const string PoiseMessage = "SafeHaven.CreaturePoise";
+    /// <summary>Host to friends: a status took hold on a creature (or ended: 0 seconds), for its look on their copy (StatusBearerLook,
+    /// the icon over its bar). Without this a friend never saw the host's frost, fire or bleeding on what they fought together.</summary>
+    public const string StatusShownMessage = "SafeHaven.CreatureStatusShown";
 
     /// <summary>Seconds between updates.</summary>
     public const float Interval = 0.1f;
@@ -379,6 +382,21 @@ public struct CreaturePoiseMessage : INetworkSerializable
     }
 }
 
+/// <summary><c>CreatureStatusShown</c>: which creature, the status's id, and the seconds it has left (0: it ended).</summary>
+public struct CreatureStatusShownMessage : INetworkSerializable
+{
+    public int Id;
+    public FixedString64Bytes StatusId;
+    public float Seconds;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref Id);
+        serializer.SerializeValue(ref StatusId);
+        serializer.SerializeValue(ref Seconds);
+    }
+}
+
 /// <summary><c>CreatureStatus</c>: which creature a friend laid a status on, and the status's id.</summary>
 public struct CreatureStatusMessage : INetworkSerializable
 {
@@ -390,4 +408,41 @@ public struct CreatureStatusMessage : INetworkSerializable
         serializer.SerializeValue(ref Id);
         serializer.SerializeValue(ref StatusId);
     }
+}
+
+/// <summary>
+/// Statuses by id, as co-op messages name them, found once each among the loaded definitions (a great enchantment or a skill holds
+/// them by reference): a friend in a hazard has its status refreshed every half second, and each message scanned every loaded object.
+/// </summary>
+public static class StatusCatalog
+{
+    private static readonly Dictionary<string, StatusEffectDefinition> ById_ = new Dictionary<string, StatusEffectDefinition>();
+
+    public static StatusEffectDefinition ById(string wanted)
+    {
+        if (string.IsNullOrEmpty(wanted))
+        {
+            return null;
+        }
+
+        if (ById_.TryGetValue(wanted, out StatusEffectDefinition known) && known != null)
+        {
+            return known;
+        }
+
+        foreach (StatusEffectDefinition status in Resources.FindObjectsOfTypeAll<StatusEffectDefinition>())
+        {
+            if (status != null && status.Id == wanted)
+            {
+                ById_[wanted] = status;
+                return status;
+            }
+        }
+
+        return null;
+    }
+
+    // Entering Play doesn't reload scripts in this project: statics carry over from the last session unless cleared.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => ById_.Clear();
 }

@@ -121,12 +121,16 @@ public sealed class CreatureHost
         link.On(CoopCreatures.PoiseMessage, OnPoise);
         Damageable.AnyDied += OnAnyDied;
         Damageable.AnyDamaged += OnAnyDamaged;
+        StatusEffects.Applied += OnStatusTookHold;
+        StatusEffects.EndedOn += OnStatusEnded;
     }
 
     public void End()
     {
         Damageable.AnyDied -= OnAnyDied;
         Damageable.AnyDamaged -= OnAnyDamaged;
+        StatusEffects.Applied -= OnStatusTookHold;
+        StatusEffects.EndedOn -= OnStatusEnded;
         Forget();
         link = null;
     }
@@ -158,6 +162,7 @@ public sealed class CreatureHost
 
         byId.Clear();
         byCreature.Clear();
+        statusShownUntil.Clear();
         told.Clear();
         sent.Clear();
         friendPlace.Clear();
@@ -290,6 +295,7 @@ public sealed class CreatureHost
         foreach (int id in vanished)
         {
             byId.Remove(id);
+            ForgetStatusesShown(id);
             foreach (KeyValuePair<ulong, HashSet<int>> pair in told)
             {
                 if (pair.Value.Remove(id))
@@ -341,6 +347,12 @@ public sealed class CreatureHost
 
             spawns.WriteNetworkSerializable(new CreatureSpawnMessage { Creatures = spawning });
             link.Send(CoopCreatures.SpawnMessage, clientId, spawns);
+
+            // What is already at work on them (a freeze, a war cry's fear): told after the spawn, so the copy exists to show it on.
+            foreach (Hosted hosted in scratch)
+            {
+                TellStatusesSoFar(clientId, hosted);
+            }
         }
 
         // Where the known ones are now, unreliable: only those that moved or changed (and each at least once a second, in case
@@ -700,35 +712,127 @@ public sealed class CreatureHost
             return;
         }
 
-        StatusEffectDefinition status = StatusById(statusId.ToString());
+        StatusEffectDefinition status = StatusCatalog.ById(statusId.ToString());
         if (status != null)
         {
             StatusEffects.Apply(hosted.Health, status, null);
         }
     }
 
-    // Statuses by id, found once each: a friend in a hazard refreshes its status every half second, and each message scanned every
-    // loaded object for it.
-    private readonly Dictionary<string, StatusEffectDefinition> statusesById = new Dictionary<string, StatusEffectDefinition>();
+    // When each status shown to friends was last said to end, per creature: a creature standing in a patch has its status laid again
+    // every half second, and friends only need telling when it is new or lasts noticeably longer.
+    private readonly Dictionary<(int, StatusEffectDefinition), float> statusShownUntil = new Dictionary<(int, StatusEffectDefinition), float>();
+    private readonly List<ulong> statusTo = new List<ulong>();
 
-    private StatusEffectDefinition StatusById(string wanted)
+    // A status took hold on one of the host's creatures: friends who know of it show it on their copy.
+    private void OnStatusTookHold(Damageable target, StatusEffectDefinition status, Combatant source)
     {
-        if (statusesById.TryGetValue(wanted, out StatusEffectDefinition known) && known != null)
+        if (!Hosts(target, out Hosted hosted) || status == null || !target.TryGetComponent(out StatusEffects effects))
         {
-            return known;
+            return;
         }
 
-        foreach (StatusEffectDefinition status in Resources.FindObjectsOfTypeAll<StatusEffectDefinition>())
+        float left = 0f;
+        foreach (StatusEffects.Active entry in effects.Current)
         {
-            if (status != null && status.Id == wanted)
+            if (entry.Definition == status)
             {
-                statusesById[wanted] = status;
-                return status;
+                left = entry.SecondsLeft;
             }
         }
 
-        return null;
+        var key = (hosted.Id, status);
+        float until = Time.time + left;
+        if (left <= 0f || (statusShownUntil.TryGetValue(key, out float said) && until < said + 1f))
+        {
+            return;
+        }
+
+        statusShownUntil[key] = until;
+        TellStatus(hosted.Id, status, left);
     }
+
+    private void OnStatusEnded(Damageable target, StatusEffectDefinition status)
+    {
+        if (!Hosts(target, out Hosted hosted) || status == null || !statusShownUntil.Remove((hosted.Id, status)))
+        {
+            return;
+        }
+
+        TellStatus(hosted.Id, status, 0f);
+    }
+
+    private bool Hosts(Damageable target, out Hosted hosted)
+    {
+        hosted = null;
+        return link != null && link.IsHost && target != null && target.TryGetComponent(out MonsterAI creature) && byCreature.TryGetValue(creature, out hosted);
+    }
+
+    // A friend newly told of a creature: each status at work on it now, with the seconds it has left.
+    private void TellStatusesSoFar(ulong clientId, Hosted hosted)
+    {
+        if (hosted.Health == null || !hosted.Health.TryGetComponent(out StatusEffects effects))
+        {
+            return;
+        }
+
+        statusTo.Clear();
+        statusTo.Add(clientId);
+        foreach (StatusEffects.Active entry in effects.Current)
+        {
+            if (entry.Definition != null && entry.SecondsLeft > 0f)
+            {
+                SendStatus(statusTo, hosted.Id, entry.Definition, entry.SecondsLeft);
+            }
+        }
+    }
+
+    private readonly List<(int, StatusEffectDefinition)> statusKeysGone = new List<(int, StatusEffectDefinition)>();
+
+    private void ForgetStatusesShown(int id)
+    {
+        statusKeysGone.Clear();
+        foreach ((int, StatusEffectDefinition) key in statusShownUntil.Keys)
+        {
+            if (key.Item1 == id)
+            {
+                statusKeysGone.Add(key);
+            }
+        }
+
+        foreach ((int, StatusEffectDefinition) key in statusKeysGone)
+        {
+            statusShownUntil.Remove(key);
+        }
+    }
+
+    // To each friend who has been told of this creature (the others have no copy of it to show it on).
+    private void TellStatus(int id, StatusEffectDefinition status, float seconds)
+    {
+        statusTo.Clear();
+        foreach (KeyValuePair<ulong, HashSet<int>> friend in told)
+        {
+            if (friend.Value.Contains(id))
+            {
+                statusTo.Add(friend.Key);
+            }
+        }
+
+        if (statusTo.Count == 0)
+        {
+            return;
+        }
+
+        SendStatus(statusTo, id, status, seconds);
+    }
+
+    private void SendStatus(IReadOnlyList<ulong> to, int id, StatusEffectDefinition status, float seconds)
+    {
+        using var writer = new FastBufferWriter(96, Allocator.Temp);
+        writer.WriteNetworkSerializable(new CreatureStatusShownMessage { Id = id, StatusId = new FixedString64Bytes(status.Id ?? string.Empty), Seconds = seconds });
+        link.Network.CustomMessagingManager.SendNamedMessage(CoopCreatures.StatusShownMessage, to, writer, NetworkDelivery.ReliableSequenced);
+    }
+
 
     // A friend's blow on one of the host's creatures: applied here, and the creature turns on them.
     private void OnHit(ulong sender, FastBufferReader reader)

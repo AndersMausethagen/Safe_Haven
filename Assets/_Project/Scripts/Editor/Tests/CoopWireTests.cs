@@ -43,6 +43,9 @@ public sealed class CoopWireTests
         [31] = "4ba9741053cf4aa27bcdec5ea5674d39",
         // HorseStats.tuning (2026-11-21: the gallop a fifth slower, horses tamed before retuned once).
         [32] = "617935cbc9115f5ddcafddfc6a946a7a",
+        // 2026-11-24 (skills): the host tells friends what statuses are on its creatures (CreatureStatusShown), and every player's
+        // skills show the ground they leave to the others (GroundLeft, CoopGround).
+        [33] = "a8f6cfbe8adce864b74cfa2b70072aa1",
     };
 
     /// <summary>The fingerprint of the messages as they are now.</summary>

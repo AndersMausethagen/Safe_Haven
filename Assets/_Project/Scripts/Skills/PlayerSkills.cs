@@ -54,6 +54,13 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     private float lungeEndsAt = float.NegativeInfinity;
     // The creatures a skill's blow struck as it landed (Damageable.AnyDamaged during its hit), for its look's struck effects.
     private readonly List<Vector3> struck = new List<Vector3>();
+    /// <summary>This player's skill left ground behind (Skill › Leaves), at these points: CoopGround shows it to the others.</summary>
+    public static event System.Action<SkillDefinition, IReadOnlyList<Vector3>> GroundLeft;
+
+    // Entering Play doesn't reload scripts in this project: statics carry over from the last session unless cleared.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetGroundLeft() => GroundLeft = null;
+
     // A war cry ringing out (Skill › Foes Status): which, and when.
     private SkillDefinition pendingCry;
     private float pendingCryAt;
@@ -182,6 +189,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         }
 
         pendingHit = null;
+        pendingCry = null;
         foreach (SkillDefinition skill in activeBuffs.Keys)
         {
             combatant.Stats.RemoveModifiersFrom(skill);
@@ -545,10 +553,13 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         }
 
         var along = new SkillFxCue { place = SkillFxPlace.AlongReach, count = skill.LeavesCount };
-        foreach (Vector3 point in SkillFx.Points(along, transform.position, direction, skill.Attack.Range, skill.Attack.Arc, null))
+        var points = SkillFx.Points(along, transform.position, direction, skill.Attack.Range, skill.Attack.Arc, null);
+        foreach (Vector3 point in points)
         {
             GroundHazard.Spawn(skill.Leaves, point, combatant);
         }
+
+        GroundLeft?.Invoke(skill, points);
     }
 
     private void ExpireBuffs()

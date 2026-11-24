@@ -128,6 +128,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         parts.Add(creatures);
         parts.Add(Downed);
         parts.Add(new CoopPings());
+        parts.Add(new CoopGround());
         parts.Add(new CoopLessons());
         parts.Add(new CoopLands());
         parts.Add(new CoopDrops());

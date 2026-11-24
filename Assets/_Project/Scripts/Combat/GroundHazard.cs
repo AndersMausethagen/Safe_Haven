@@ -89,7 +89,18 @@ public sealed class GroundHazard : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => Active.Clear();
 
-    private void OnEnable() => Active.Add(this);
+    private void OnEnable()
+    {
+        // Only the look of another player's patch (CoopGround): their own game does its touching, burning and meeting.
+        if (!lookOnly)
+        {
+            Active.Add(this);
+        }
+    }
+
+
+    // Another player's patch, shown here only (CoopGround): no touch, no burn, no meeting fire or frost.
+    private bool lookOnly;
 
     private void OnDisable() => Active.Remove(this);
 
@@ -291,6 +302,24 @@ public sealed class GroundHazard : MonoBehaviour
     }
 
     /// <summary>Lays the patch on the ground at <paramref name="at"/> (the NavMesh beneath it), made by <paramref name="by"/>.</summary>
+    /// <summary>Another player's patch, seen in this game only as it looks (CoopGround): it touches no one, burns nothing and meets
+    /// no fire or frost here, since that player's own game does all of it. Drawn as their side's patches are.</summary>
+    public static GroundHazard SpawnLook(GameObject prefab, Vector3 at, Faction side)
+    {
+        if (prefab == null)
+        {
+            return null;
+        }
+
+        GameObject made = Instantiate(prefab, at, Quaternion.Euler(0f, Random.Range(0f, 360f), 0f));
+        GroundHazard hazard = made.GetComponent<GroundHazard>();
+        // Set before its Start (next frame): nothing of a real patch happens to it. Out of the live list, so fire and frost pass it by.
+        hazard.lookOnly = true;
+        hazard.faction = side;
+        Active.Remove(hazard);
+        return hazard;
+    }
+
     public static GroundHazard Spawn(GameObject prefab, Vector3 at, Combatant by)
     {
         if (prefab == null || by == null || !prefab.TryGetComponent(out GroundHazard _))
@@ -317,7 +346,7 @@ public sealed class GroundHazard : MonoBehaviour
         startedAt = Time.time;
         nextTick = Time.time + 0.2f;
         nextSpread = Time.time + Random.Range(0.8f, 1.5f);
-        if (element == HazardElement.Fire && GroundImpacts.IsGrassy(transform.position))
+        if (!lookOnly && element == HazardElement.Fire && GroundImpacts.IsGrassy(transform.position))
         {
             // Burnt short and black where it burns, for the same two minutes as a blow's mark.
             GroundImpacts.Scorch(transform.position, radius, 120f);
@@ -405,7 +434,7 @@ public sealed class GroundHazard : MonoBehaviour
     private void Update()
     {
         Paint(Time.time - startedAt);
-        if (Time.time < nextTick)
+        if (lookOnly || Time.time < nextTick)
         {
             return;
         }

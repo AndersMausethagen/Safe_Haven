@@ -65,6 +65,10 @@ public sealed class SkillFx : MonoBehaviour
         if (attack != null && attack.Look != null && !attack.Look.IsEmpty)
         {
             Runner.PlayAll(attack.Look.cast, origin, aim, attack.Range, attack.Arc, null, origin);
+            if (attack.Look.castSound != null)
+            {
+                AudioManager.Play(attack.Look.castSound, origin);
+            }
         }
     }
 

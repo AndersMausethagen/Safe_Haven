@@ -3341,6 +3341,14 @@ sample textures and flames are in `Art/Effects/VFX Graph/Additions` (Unity Compa
 - **Sounds** (Docs/CombatSkillsResearch 6): `SkillLook.castSound/releaseSound/releaseSoundDelay` (SkillFx plays them; the effects builder
   keeps them when it remakes a look) and `StatusEffectDefinition.consumeSound` (Shatter). Takes for 13 sounds wait on the user's ear:
   MOSS and Stable Audio 3 (two each) and `Tools/Audio/skills.py` (two each; none for the war cry's voice) on the Skill sound picks page.
+- **Co-op: what friends see** (the user: "then fix the network issues"). Statuses: the host tells friends who know a creature when a
+  status takes hold on it (with the seconds it has left; only when new or lasting a second longer, as a patch refreshes it every half
+  second) and when it ends (`CreatureStatusShown`, `CreatureHost.OnStatusTookHold/OnStatusEnded`, `StatusEffects.EndedOn`); the friend's
+  copy shows it (`StatusEffects.Mirror`: the copy never ticks it), so its outline, effect and icon appear there too. Ground: a player's
+  skill that leaves ground (`PlayerSkills.GroundLeft`) is shown to everyone in the same place (`CoopGround`, `GroundLeft`, passed on by
+  the host as pings are) as a look-only patch (`GroundHazard.SpawnLook`: no touch, burn or meeting fire and frost there; the caster's own
+  game does those, and its touches reach the host's creatures as that player's blows). `StatusCatalog` finds statuses by id for both.
+  Wire format 33.
 
 ## Loot on bodies (2026-11-24)
 

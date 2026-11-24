@@ -368,6 +368,8 @@ public sealed class QuestObjective
         [ObjectiveType.GiveKit] = false,
         // A foray is the Haven's people going out.
         [ObjectiveType.CompleteForay] = false,
+        // A fall on a raid with a friend is still this player's own (the portal pulls them home as it would alone).
+        [ObjectiveType.FallInRaid] = true,
     };
 
     /// <summary>The types the co-op rule covers (for the check that none is missing).</summary>

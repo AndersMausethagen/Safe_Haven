@@ -42,6 +42,65 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
     /// <summary>A status was laid on something (co-op sends a friend's to the host's creature: CreaturePuppets).</summary>
     public static event System.Action<Damageable, StatusEffectDefinition, Combatant> Applied;
 
+    /// <summary>A status ended on something (ran out, cured, torn free, burst, or its bearer died): CreatureHost tells friends.</summary>
+    public static event System.Action<Damageable, StatusEffectDefinition> EndedOn;
+
+    /// <summary>
+    /// On a friend's copy of the host's creature: what the host's game says is at work on it, for its look (the outline, the icon, the
+    /// effect). <paramref name="seconds"/> left; 0 ends it. The copy's statuses never tick (CopyRule.HostOnly), so this only shows.
+    /// </summary>
+    public static void Mirror(Damageable target, StatusEffectDefinition effect, float seconds)
+    {
+        if (target == null || effect == null)
+        {
+            return;
+        }
+
+        if (seconds <= 0f)
+        {
+            if (target.TryGetComponent(out StatusEffects shown))
+            {
+                shown.EndNow(effect);
+            }
+
+            return;
+        }
+
+        // The host decided it took hold: the copy's own rest (its local copy of the last one ending, heard a moment late) can't refuse it.
+        if (target.TryGetComponent(out StatusEffects resting))
+        {
+            resting.restUntil.Remove(effect);
+        }
+
+        StatusEffects effects = Apply(target, effect, null);
+        Active entry = effects != null ? effects.Find(effect) : null;
+        if (entry != null)
+        {
+            entry.EndsAt = Time.time + seconds;
+        }
+    }
+
+    private void EndNow(StatusEffectDefinition effect)
+    {
+        Active entry = Find(effect);
+        if (entry == null)
+        {
+            return;
+        }
+
+        active.Remove(entry);
+        Ended(effect);
+        UpdateSpeed();
+        RaiseEnded(effect);
+    }
+
+    // Changed(false) for this bearer and Ended for everyone listening (co-op).
+    private void RaiseEnded(StatusEffectDefinition effect)
+    {
+        Changed?.Invoke(effect, false);
+        EndedOn?.Invoke(target != null ? target : GetComponent<Damageable>(), effect);
+    }
+
     /// <summary>A status burst by a blow (Shatter): its bearer, the status and where (StatusBearerLook shows it).</summary>
     public static event System.Action<Damageable, StatusEffectDefinition, Vector3> Consumed;
 
@@ -96,7 +155,7 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
             effects.active.RemoveAt(i);
             effects.Ended(definition);
             effects.UpdateSpeed();
-            effects.Changed?.Invoke(definition, false);
+            effects.RaiseEnded(definition);
             Consumed?.Invoke(target, definition, blow.HitPoint);
             if (!string.IsNullOrWhiteSpace(definition.ConsumeLine) && blow.Source != null && blow.Source.GetComponent<Player>() != null)
             {
@@ -204,7 +263,7 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
                 {
                     active.RemoveAt(i);
                     Ended(definition);
-                    Changed?.Invoke(definition, false);
+                    RaiseEnded(definition);
                     cured++;
                     break;
                 }
@@ -317,7 +376,7 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
             {
                 active.RemoveAt(i);
                 Ended(definition);
-                Changed?.Invoke(definition, false);
+                RaiseEnded(definition);
                 ended++;
             }
         }
@@ -340,7 +399,7 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
                 active.RemoveAt(i);
                 Ended(entry.Definition);
                 UpdateSpeed();
-                Changed?.Invoke(entry.Definition, false);
+                RaiseEnded(entry.Definition);
             }
             else if (entry.Definition.DamagePerSecond > 0f && Time.time >= entry.NextTick)
             {

@@ -252,6 +252,47 @@ public sealed class SkillLookTests
     }
 
     [Test]
+    public void InCoop_AFriendSeesTheHostsStatuses_AndTheGroundLeft()
+    {
+        var rend = AssetDatabase.LoadAssetAtPath<StatusEffectDefinition>("Assets/_Project/Data/Combat/Status/Rend.asset");
+        var copy = new GameObject("A test's copy of the host's creature");
+        made.Add(copy);
+        Damageable body = copy.AddComponent<Damageable>();
+        StatusEffectDefinition endedSeen = null;
+        System.Action<Damageable, StatusEffectDefinition> ended = (who, what) => endedSeen = what;
+        StatusEffects.EndedOn += ended;
+        try
+        {
+            StatusEffects.Mirror(body, rend, 3f);
+            var effects = copy.GetComponent<StatusEffects>();
+            Assert.IsTrue(effects.Has(rend), "the host says it bleeds: the copy shows it");
+            Assert.AreEqual(3f, effects.Current[0].SecondsLeft, 0.1f, "for as long as the host's has left");
+            StatusEffects.Mirror(body, rend, 0f);
+            Assert.IsFalse(effects.Has(rend), "the host says it ended");
+            Assert.AreSame(rend, endedSeen, "and its end is heard (the look goes, and a host would tell its friends)");
+        }
+        finally
+        {
+            StatusEffects.EndedOn -= ended;
+        }
+
+        var points = new List<Vector3>();
+        for (int i = 0; i < 10; i++)
+        {
+            points.Add(new Vector3(i, 0.5f * i, -i));
+        }
+
+        GroundLeftMessageData left = GroundLeftMessageData.Of(default, "AshladsEmber", points);
+        Assert.AreEqual(8, left.Count, "at most eight patches a cast");
+        for (int i = 0; i < left.Count; i++)
+        {
+            Assert.AreEqual(points[i], left.Point(i), "each where it was left");
+        }
+
+        Assert.AreEqual("AshladsEmber", left.Skill.ToString());
+    }
+
+    [Test]
     public void EveryAbility_PlaysAMoveOfItsOwn_ThatTheBodyHas()
     {
         var controller = AssetDatabase.LoadAssetAtPath<UnityEditor.Animations.AnimatorController>("Assets/_Project/Animation/Controllers/PlayerAnimator.controller");

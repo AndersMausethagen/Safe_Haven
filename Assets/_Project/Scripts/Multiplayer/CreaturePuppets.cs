@@ -55,6 +55,7 @@ public sealed class CreaturePuppets : IRaidCreatureSource
         link.On(CoopCreatures.StrikeMessage, OnStrike);
         link.On(CoopCreatures.DiedMessage, OnDied);
         link.On(CoopCreatures.GoneMessage, OnGone);
+        link.On(CoopCreatures.StatusShownMessage, OnStatusShown);
         Damageable.AnyDamaged += OnAnyDamaged;
         MonsterAI.RemoteStaggered += OnStaggeredHere;
         MonsterAI.RemotePoiseBlow += OnPoiseBlowHere;
@@ -558,6 +559,20 @@ public sealed class CreaturePuppets : IRaidCreatureSource
         writer.WriteNetworkSerializable(new CreatureStatusMessage { Id = puppet.Id, StatusId = new FixedString64Bytes(status.Id ?? string.Empty) });
         link.ToHost(CoopCreatures.StatusMessage, writer);
     }
+
+    // A status the host's game laid on (or took off) one of its creatures: shown on this copy, which never ticks it.
+    private void OnStatusShown(ulong sender, FastBufferReader reader)
+    {
+        reader.ReadNetworkSerializable(out CreatureStatusShownMessage shown);
+        if (!FromHost || !byId.TryGetValue(shown.Id, out Puppet puppet) || puppet.Health == null)
+        {
+            return;
+        }
+
+        StatusEffectDefinition status = StatusCatalog.ById(shown.StatusId.ToString());
+        StatusEffects.Mirror(puppet.Health, status, shown.Seconds);
+    }
+
 
     // This player, or the companion they brought on the raid: the blows that are theirs to send. Not anyone else on their
     // side who stands in this game too (the host's residents, in a visit: the host's game counts those itself).
