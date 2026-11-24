@@ -294,7 +294,9 @@ public sealed class ProgressionTests
         foreach (ProficiencyDefinition skill in settings.Skills)
         {
             Assert.IsFalse(string.IsNullOrWhiteSpace(skill.Description) || string.IsNullOrWhiteSpace(skill.TrainedBy), skill.name);
-            Assert.IsTrue(skill.LevelBonuses.Any(b => !Mathf.Approximately(b.atFirstLevel, 0f)), $"{skill.name}: a beginner is worse than the baseline");
+            // Except the two crafts: new gear starts whole (the user, 2026-11-23, 8ce7167c), so a beginner smith makes gear as good as anyone's.
+            bool startsWhole = skill.Id == "weaponcrafting" || skill.Id == "armorcrafting";
+            Assert.IsTrue(startsWhole || skill.LevelBonuses.Any(b => !Mathf.Approximately(b.atFirstLevel, 0f)), $"{skill.name}: a beginner is worse than the baseline");
             CollectionAssert.AreEqual(new[] { 10, 20, 30, 40, 50 }, skill.Milestones.Select(m => m.level).ToArray(), skill.name);
             foreach (ProficiencyDefinition.Milestone milestone in skill.Milestones)
             {

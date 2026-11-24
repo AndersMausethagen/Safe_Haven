@@ -3239,6 +3239,32 @@ Import workers are limited in the local Editor user settings (2 at most, none ke
 | Ambient occlusion | The SSAO feature on `Settings/Rendering/PC_Renderer` |
 | A new place's mood | Duplicate a volume profile, assign it to the new scene's Global Volume, set its lighting |
 
+## Skills that stand out: VFX Graph effects (2026-11-24, slice 1)
+
+Docs/CombatSkillsResearch_2026-11-24.md, the user: "do as you recommend, but the skills should be visible. ... stay 1-5 on the bar, and can
+be placed around. use the paid pack and if you can, use vfx graph to increase the vfx quality". VFX Graph 17.6 is installed; Unity's
+sample textures and flames are in `Art/Effects/VFX Graph/Additions` (Unity Companion License).
+- **Graphs from code.** VFX Graph's editor model is internal; `Editor/VfxAuthoring` is its own assembly named
+  `Unity.Testing.VisualEffectGraph.Editor` (a name the package grants internal access), editor-only. `VfxBuilder` adds contexts and blocks by
+  library name, links flows, sets and exposes inputs, saves. `SkillVfxArchetypes` (Safe Haven › Tools › Effects › Rebuild Skill VFX Graphs)
+  writes five reusable graphs to `Art/Effects/Skills/Graphs`, each with exposed values: Burst (sparks, shards, embers; capacity 512), Mist
+  (flipbook smoke, soft), Ring (a flat mark: shockwave or rune circle), Spikes (lit ice crystals, `SkillMeshes.Crystal`), Flames (the
+  sample's). Graph traps: Initialize bounds must be Automatic (empty bounds cull it), a mesh output needs its base colour map off for an
+  unwrapped mesh, a mesh particle's Size defaults to 0.1, flipbook blending is `uvMode Flipbook` + `flipbookBlendFrames`.
+- **Textures** by `Tools/Effects/skill_textures.py` (glow, ring, shard, a rune circle of elder futhark, ember).
+- **A skill's look** (`SkillDefinition.Look`, `SkillLook`): cues for the cast, the release and each creature struck, placed on the caster,
+  the ground under them, along the attack's reach, across its arc, round its reach or on what it struck (`SkillFxPlace`), stepped one after
+  another; a light flash and a shake at the release. `SkillFx` plays them from pools (one runner per scene); `VfxValues` on each prefab sets
+  its graph's exposed values. `SkillAreaMark` shows the attack's area on the ground in the school's colour while it winds up (the projected
+  telegraph's shader, faint, a softer flash than a monster's). `PlayerSkills` calls `SkillFx.Cast` and, after its hit (collecting what it
+  struck through `Damageable.AnyDamaged`), `SkillFx.Release`.
+- **Dressed so far** (`SkillFxPrefabs`, Safe Haven › Tools › Effects › Dress the First Skills; prefabs in `Art/Effects/Skills/Prefabs`):
+  Frost Rune (frost rune circle, hand mist; spikes, shards and mist racing along a lance now 25° wide; chills, and
+  `AttackDefinition.OnRepeatStatus` freezes what is already chilled: Frozen, 1.5 s rooted, 4 s before again), the Ash Lad's Ember (ember
+  circle, hand sparks; a breath of fire down the cone, embers, small fires left on the ground; Burning, 3 a second for 4 s), Trollsbane
+  Wrath (gold circle; shockwave ring, dust round its edge, sparks; a heavy shake). `SkillLookTests`.
+- Not yet: weapon skills on the bar, the other abilities' looks, the story's teachers, the paid casting animations (to be imported).
+
 ## Loot on bodies (2026-11-24)
 
 The user: "killing enemies is gonna change so we have to go to the killed monster and loot it. a window with the loot shows. The monster

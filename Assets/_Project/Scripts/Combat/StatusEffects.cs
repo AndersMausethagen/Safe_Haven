@@ -73,7 +73,13 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
         if (attack != null && attack.AppliesStatus != null && result.Damage > 0f && !result.Blocked && !result.Parried
             && victim is Damageable target && UnityEngine.Random.value < attack.StatusChance)
         {
+            // Already under it: the attack's stronger status on top (Frost Rune on a chilled creature freezes it).
+            bool already = attack.OnRepeatStatus != null && target.TryGetComponent(out StatusEffects effects) && effects.Has(attack.AppliesStatus);
             Apply(target, attack.AppliesStatus, source);
+            if (already)
+            {
+                Apply(target, attack.OnRepeatStatus, source);
+            }
         }
     }
 

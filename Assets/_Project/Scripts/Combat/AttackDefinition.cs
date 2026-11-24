@@ -64,6 +64,9 @@ public sealed class AttackDefinition : ScriptableObject
     [SerializeField] private StatusEffectDefinition appliesStatus;
     [Tooltip("Chance from 0 to 1 that a hit leaves the status.")]
     [SerializeField, Range(0f, 1f)] private float statusChance = 1f;
+    [Tooltip("On a creature that already has the status above, this one too: a frost spell on a chilled creature freezes it (the " +
+             "schools' statuses feeding each other, Docs/CombatSkillsResearch_2026-11-24.md §3.2). Empty: none. Only this attack does it.")]
+    [SerializeField] private StatusEffectDefinition onRepeatStatus;
 
     [Header("The world")]
     [Tooltip("What the blow does to the ground and the grass round it when it lands (dust, wind, a crater). Empty: nothing, " +
@@ -200,6 +203,7 @@ public sealed class AttackDefinition : ScriptableObject
     public float? OwnStaminaCost => staminaCost >= 0f ? staminaCost : (float?)null;
     public StatusEffectDefinition AppliesStatus => appliesStatus;
     public float StatusChance => statusChance;
+    public StatusEffectDefinition OnRepeatStatus => onRepeatStatus;
     /// <summary>Only a dodge gets out of it: no block or parry stops it.</summary>
     public bool Unblockable => unblockable;
     /// <summary>Metres a hit drags its target toward the attacker (negative: away).</summary>

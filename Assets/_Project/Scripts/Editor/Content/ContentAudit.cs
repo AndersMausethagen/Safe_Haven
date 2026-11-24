@@ -90,6 +90,7 @@ public static class ContentAudit
     {
         "BuildingDefinition.teachesRecipes", "BuildingDefinition.upgrades[].teachesRecipes", "ItemDefinition.teachesRecipes",
         "JobDefinition.teachesRecipes", "LootOnDeath.unlocksRecipes", "MonsterDefinition.unlocksRecipes", "QuestDefinition.rewardRecipes",
+        "QuestDefinition.teachesAtStart",
     };
 
     // A thrifty variant names the recipe it beats where its module is fitted (RecipeVariants): it neither teaches nor asks for it.

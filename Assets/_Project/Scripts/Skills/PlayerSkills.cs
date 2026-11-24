@@ -52,6 +52,9 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
     private float busyUntil;
     private float lungeEndsAt = float.NegativeInfinity;
+    // The creatures a skill's blow struck as it landed (Damageable.AnyDamaged during its hit), for its look's struck effects.
+    private readonly List<Vector3> struck = new List<Vector3>();
+    private bool collectingStruck;
 
     /// <summary>True while a skill is being cast or its lunge and hit are under way: a swing pressed now waits for it (PlayerCombat).</summary>
     public bool IsBusy => Time.time < busyUntil;
@@ -101,6 +104,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     private void OnEnable()
     {
         stateMachine.SkillRequested += OnSkillRequested;
+        Damageable.AnyDamaged += OnAnyDamaged;
         if (dodge != null)
         {
             dodge.Dodged += OnDodged;
@@ -115,6 +119,14 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     }
 
     private ItemInventory bagItems;
+
+    private void OnAnyDamaged(Damageable victim, DamageInfo damage, DamageResult result)
+    {
+        if (collectingStruck && victim != null && damage.Source == combatant && struck.Count < 16)
+        {
+            struck.Add(victim.transform.position);
+        }
+    }
 
     // A consumable new to the bag goes on the first empty slot of the bar, 1 to 9 (the user, 2026-11-15: with 1-5 full they
     // went nowhere). One already on the bar stays where the player put it.
@@ -135,6 +147,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     private void OnDisable()
     {
         stateMachine.SkillRequested -= OnSkillRequested;
+        Damageable.AnyDamaged -= OnAnyDamaged;
         if (dodge != null)
         {
             dodge.Dodged -= OnDodged;
@@ -174,8 +187,20 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             float weaponDamage = combat != null && combat.Weapon != null ? combat.Weapon.Damage : 0f;
             // The Runecraft skill scales every spell's damage; its hits carry the Spell technique, which trains it.
             float runecraft = Mathf.Max(0f, 1f + combatant.Stats.Get(StatType.SpellDamage));
-            AttackResolver.Execute(combatant, skill.Attack, weaponDamage, transform.position, pendingDirection, hitLayers, Power(skill) * runecraft,
-                1f, HitTechnique.Spell);
+            // What it strikes, for the effects that land on each creature hit (SkillLook.struck).
+            struck.Clear();
+            collectingStruck = true;
+            try
+            {
+                AttackResolver.Execute(combatant, skill.Attack, weaponDamage, transform.position, pendingDirection, hitLayers, Power(skill) * runecraft,
+                    1f, HitTechnique.Spell);
+            }
+            finally
+            {
+                collectingStruck = false;
+            }
+
+            SkillFx.Release(skill, transform.position, pendingDirection, struck);
         }
 
         if (activeBuffs.Count > 0)
@@ -350,6 +375,14 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
         // Like the weapon swing, the direction is locked in toward the cursor as the cast begins.
         Vector3 direction = movement.AimDirection;
+        // How it looks as it is cast, and its area on the ground until it lands (a skill without a blow still shows its cast).
+        float windUp = skill.Attack != null ? (skill.LungeDistance > 0f ? skill.LungeDuration : 0f) + skill.Attack.HitDelay : 0f;
+        SkillFx.Cast(skill, transform, direction, windUp);
+        if (skill.Attack == null)
+        {
+            SkillFx.Release(skill, transform.position, direction, null);
+        }
+
         float hitAfter = 0f;
         if (skill.LungeDistance > 0f)
         {

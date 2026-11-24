@@ -58,6 +58,9 @@ public sealed class SkillDefinition : ScriptableObject
     [SerializeField] private string animationState;
     [Tooltip("Playback speed of that state.")]
     [SerializeField, Range(0.25f, 3f)] private float animationSpeed = 1f;
+    [Tooltip("How it looks: effects as it is cast, as it is let go (over the attack's reach and arc) and on what it strikes; its area on " +
+             "the ground while it winds up; a flash and a shake (Docs/CombatSkillsResearch_2026-11-24.md §6).")]
+    [SerializeField] private SkillLook look = new SkillLook();
 
     /// <summary>Stable identifier, used for saves: the asset's name.</summary>
     public string Id => name;
@@ -78,5 +81,6 @@ public sealed class SkillDefinition : ScriptableObject
     public bool PlayAttackAnimation => playAttackAnimation;
     public string AnimationState => animationState;
     public float AnimationSpeed => animationSpeed;
+    public SkillLook Look => look;
     public bool HasBuffs => buffs.Count > 0 && buffDuration > 0f;
 }
