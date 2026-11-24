@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3acb2f7916c787e44bbe77d622bbb9e4, type: 3}
+  m_Name: BodyLootSettings
+  m_EditorClassIdentifier: SafeHaven::BodyLootSettings
+  lootFromBodies: 1
+  lootableSeconds: 600
+  reach: 2.2
+  windowReach: 4
+  glow: {r: 1, g: 0.84, b: 0.45, a: 0.85}
+  glowPixels: 2
+  glowLeast: 0.35
+  glowBreathSeconds: 2.4
+  sparkleMaterial: {fileID: 2100000, guid: 6b2e3212b5472034c83d747549eee3e1, type: 2}
+  sparkleColour: {r: 1, g: 0.88, b: 0.55, a: 0.9}
+  sparklesPerSecond: 9
+  sparkleSize: {x: 0.09, y: 0.18}
+  sparkleSeconds: 1.3
+  sparkleRise: 0.35

@@ -32,6 +32,31 @@ public sealed class DeathRagdoll : MonoBehaviour
 
     private static readonly List<DeathRagdoll> Corpses = new List<DeathRagdoll>();
 
+    /// <summary>The creature this body was (LootableRemains finds its corpse by it).</summary>
+    public Damageable Victim { get; private set; }
+
+    /// <summary>Loot waits on it (LootableRemains): it doesn't sink, and the corpse limit clears others first.</summary>
+    public bool HoldsLoot { get; set; }
+
+    /// <summary>The corpse <paramref name="victim"/> left, or null.</summary>
+    public static DeathRagdoll Of(Damageable victim)
+    {
+        if (victim == null)
+        {
+            return null;
+        }
+
+        for (int i = Corpses.Count - 1; i >= 0; i--)
+        {
+            if (Corpses[i] != null && Corpses[i].Victim == victim)
+            {
+                return Corpses[i];
+            }
+        }
+
+        return null;
+    }
+
     private readonly List<Rigidbody> bodies = new List<Rigidbody>();
     private readonly List<Mesh> bakedMeshes = new List<Mesh>();
     private static readonly int DeathState = Animator.StringToHash("Death");
@@ -68,6 +93,7 @@ public sealed class DeathRagdoll : MonoBehaviour
         Animator animator = victim.GetComponentInChildren<Animator>();
         bool humanoid = animator != null && animator.isHuman && animator.GetBoneTransform(HumanBodyBones.Hips) != null;
         var corpse = new GameObject($"{victim.name} (corpse)").AddComponent<DeathRagdoll>();
+        corpse.Victim = victim;
         corpse.transform.SetPositionAndRotation(victim.transform.position, victim.transform.rotation);
 
         bool byAnimation = monster.Definition.FallsByAnimation && animator != null && animator.HasState(0, DeathState);
@@ -847,14 +873,25 @@ public sealed class DeathRagdoll : MonoBehaviour
         Corpses.RemoveAll(corpse => corpse == null);
         Corpses.Add(this);
         int most = CombatFeelSettings.Current.CorpseLimit;
-        while (Corpses.Count > most)
+        // The oldest go first, but not one with loot on it (its loot ends it: LootableRemains).
+        for (int i = 0; i < Corpses.Count && Corpses.Count > most;)
         {
-            if (Corpses[0] != null)
+            if (Corpses[i] != null && Corpses[i].HoldsLoot && Corpses[i] != this)
             {
-                Destroy(Corpses[0].gameObject);
+                i++;
+                continue;
             }
 
-            Corpses.RemoveAt(0);
+            if (Corpses[i] != null && Corpses[i] != this)
+            {
+                Destroy(Corpses[i].gameObject);
+            }
+            else if (Corpses[i] == this)
+            {
+                break;
+            }
+
+            Corpses.RemoveAt(i);
         }
     }
 
@@ -872,6 +909,12 @@ public sealed class DeathRagdoll : MonoBehaviour
                     body.interpolation = RigidbodyInterpolation.None;
                 }
             }
+        }
+
+        // With loot on it, it waits; looted, it lies a little longer and sinks as any corpse.
+        if (HoldsLoot)
+        {
+            sinkAt = Mathf.Max(sinkAt, Time.time + 8f);
         }
 
         if (Time.time < sinkAt)

@@ -3239,6 +3239,29 @@ Import workers are limited in the local Editor user settings (2 at most, none ke
 | Ambient occlusion | The SSAO feature on `Settings/Rendering/PC_Renderer` |
 | A new place's mood | Duplicate a volume profile, assign it to the new scene's Global Volume, set its lighting |
 
+## Loot on bodies (2026-11-24)
+
+The user: "killing enemies is gonna change so we have to go to the killed monster and loot it. a window with the loot shows. The monster
+will glow faintly and have some glittering coming off the body". Settings: `Resources/BodyLootSettings` (Systems Editor › World › Loot on
+Bodies; Loot From Bodies off restores the old straight-to-bag behaviour).
+- **`LootOnDeath`** rolls as before (tier, raid loot and stage bonus, what the raid allows, raid-only parts and essence kept from home,
+  Essence Find now the local player's). When `LootOnDeath.LeavesOnBody` (a creature with `MonsterAI`, struck down by the player's side, a
+  player present) the roll goes to `LootableRemains.Leave` instead of the bag; a relic and an inscription are rolled now and found on
+  opening (their own `Grant`s: words, sound, InscriptionFound). Boss recipes are learned at once. Breakables and the Lost's rest reward
+  are unchanged; gathering never went through here.
+- **`LootableRemains`**: an Ignore Raycast trigger with an `Interactable` (Use, `Reach`) and verb "Loot", named for the creature. It finds
+  its corpse (`DeathRagdoll.Of(victim)`) over the first frames and sets `DeathRagdoll.HoldsLoot` (no sinking, and the corpse limit clears
+  others first). It follows the corpse's renderer bounds every 0.4 s and re-files its `Interactable` when it moves (`InteractableGrid`
+  files by position). Glow: `OutlineCopies` of the corpse with a copy of the player's hover outline material (made hidden: shown with
+  `SetShown`), one shared material breathing (`BodyLootSettings.GlowAt`). Glitter: a world-space box `ParticleSystem` over the body
+  (`Materials/Effects/Loot Glitter`, Effect Particle additive, the combat star). Emptied: destroyed, the corpse sinks. Past Lootable
+  Seconds, or when the scene ends with loot on it: a `LootLeft` playtest row.
+- **`LootWindow`** (`UIWindowId.Loot`, canvas 98, under the full-screen layer so the world stays in view): the body's items as the bag's
+  slots (click takes into the bag through `ItemInventory.Give`, so pickups count as before), resources as icon chips (click takes;
+  hover names it), Take all (selected first on a controller); closes past `WindowReach` or when the body empties. Tests:
+  `BodyLootTests`, `DamageRulesTests.ACreatureStruckDown...`.
+- Co-op: personal as before (`OnAFriendsCopy` Same): each game rolls and leaves its own; a kill by a friend leaves a body to loot too.
+
 ## Storage: a chest each, quick stack, water as a cost (2026-11-15)
 
 From the user's playtest list. **Each chest has its own items**: `StashStorage.Items` is cut into blocks of

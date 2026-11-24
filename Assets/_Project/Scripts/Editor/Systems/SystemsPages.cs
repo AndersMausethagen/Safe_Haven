@@ -256,6 +256,31 @@ public sealed class LockpickingPage : SystemsPage
     }
 }
 
+/// <summary>Loot on bodies: a creature's loot waits on its body until it is looted (BodyLootSettings).</summary>
+public sealed class BodyLootPage : SystemsPage
+{
+    public override string Title => "Loot on Bodies";
+    public override string Group => "World";
+    public override string Help => "A slain creature's loot waits on its body: it glows faintly and glitters until the player loots it (Interact) " +
+                                   "in the loot window, a stack at a time or all at once. A relic or inscription it holds is found on opening. " +
+                                   "Gathering, crates and caches still hand things over at once. A body keeps its loot for Lootable Seconds, " +
+                                   "then fades with it; looted, it sinks as any corpse.";
+
+    public override void Draw()
+    {
+        var settings = Settings<BodyLootSettings>(BodyLootSettings.ResourceName);
+        if (settings == null)
+        {
+            return;
+        }
+
+        SettingsPanel(settings, "Loot on Bodies", "Resources/BodyLootSettings");
+        BeginDerived();
+        Derived("A body keeps its loot", $"{settings.LootableSeconds / 60f:0.#} minutes");
+        EndDerived();
+    }
+}
+
 /// <summary>The Lost: named, mist-taken settlers who hunt the Keeper and grow when they win (LostOneSettings).</summary>
 public sealed class LostOnesPage : SystemsPage
 {

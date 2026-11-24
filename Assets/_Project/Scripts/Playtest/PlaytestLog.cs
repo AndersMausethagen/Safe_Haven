@@ -167,6 +167,9 @@ public static class PlaytestLog
     /// <summary>What the game runs on, once a session and when the display settings change: subject the GPU, amount its memory in MB,
     /// detail the screen, quality, vsync, frame cap, graphics API, CPU, RAM and OS.</summary>
     public const string Machine = "Machine";
+    /// <summary>Loot left on a creature's body (BodyLootSettings): subject its name, amount the stacks and resources it still held, detail
+    /// "faded" (its time ran out) or "left" (the scene ended first).</summary>
+    public const string LootLeft = "LootLeft";
 
     public static string Folder => Path.Combine(Application.persistentDataPath, "Playtests");
 

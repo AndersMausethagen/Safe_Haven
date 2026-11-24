@@ -311,4 +311,20 @@ public sealed class DamageRulesTests
         Assert.IsNull(LootOnDeath.TakerOf(null, player), "nor is the forest's");
         Assert.AreSame(companion, LootOnDeath.TakerOf(companion, null));
     }
+
+    [Test]
+    public void ACreatureStruckDownByThePlayersSide_LeavesItsLootOnTheBody_ACrateDoesNot()
+    {
+        Combatant player = Fighter("Player", Faction.Player);
+        Combatant companion = Fighter("Companion", Faction.Ally);
+        Combatant wolf = Fighter("Wolf", Faction.Enemy);
+
+        Assert.IsTrue(LootOnDeath.LeavesOnBody(true, true, player, true));
+        Assert.IsTrue(LootOnDeath.LeavesOnBody(true, true, companion, true), "a companion's kill waits for the player too");
+        Assert.IsFalse(LootOnDeath.LeavesOnBody(true, false, player, true), "a crate or a pot still hands its loot over");
+        Assert.IsFalse(LootOnDeath.LeavesOnBody(true, true, wolf, true), "one creature killing another leaves nothing");
+        Assert.IsFalse(LootOnDeath.LeavesOnBody(true, true, null, true), "nor does the forest");
+        Assert.IsFalse(LootOnDeath.LeavesOnBody(false, true, player, true), "bodies off: into the bag, as before");
+        Assert.IsFalse(LootOnDeath.LeavesOnBody(true, true, player, false), "nobody here to loot it");
+    }
 }

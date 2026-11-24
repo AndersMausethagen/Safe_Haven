@@ -56,4 +56,6 @@ public enum UIWindowId
     PlaytestReport = 24,
     /// <summary>Who does what: everyone's level in every known trade (WorkGridWindow).</summary>
     WorkGrid = 25,
+    /// <summary>What a slain creature carried, opened by looting its body (LootWindow, LootableRemains).</summary>
+    Loot = 26,
 }

@@ -57,6 +57,7 @@ public sealed class SystemsEditorWindow : EditorWindow
             new MovementAndCombatPage(),
             new SensesAndStealthPage(),
             new LockpickingPage(),
+            new BodyLootPage(),
             new LostOnesPage(),
             new RaidsAndPortalPage(),
             new HomePortalAndBuildingPage(),

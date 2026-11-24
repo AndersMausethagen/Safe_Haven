@@ -9,6 +9,11 @@ using UnityEngine;
 /// (a companion, a spike trap, a watch post's archer) is the player's haul (<see cref="TakerOf"/>). Whatever doesn't fit is
 /// reported rather than silently lost.
 /// <para>
+/// A creature's loot waits on its body (BodyLootSettings, 2026-11-24): the same roll, left in LootableRemains for the player to loot,
+/// whoever on the player's side struck the last blow; a relic or inscription it holds is found on opening it. What breaks (a crate, a
+/// pot) still hands its loot over at once, and a boss's recipes are learned at once.
+/// </para>
+/// <para>
 /// The loot comes from its Loot Table asset (the creature's own, shared with its MonsterDefinition) when one is set. In a raid the
 /// rows of the raid's tier drop, scaled by the tier's Loot (not the hour's or the modifiers': the night already doubles essence in
 /// Reaped, 2026-11-17 review), Fixed Amount rows not at all; at home (where the Haven's portal
@@ -80,6 +85,11 @@ public sealed class LootOnDeath : MonoBehaviour
         return player;
     }
 
+    /// <summary>Whether a death leaves its loot on the body (BodyLootSettings): bodies on, a creature (not a crate or a pot), struck down
+    /// by the player's side, and a player here to loot it.</summary>
+    public static bool LeavesOnBody(bool fromBodies, bool creature, Combatant taker, bool playerHere) =>
+        fromBodies && creature && taker != null && taker.Faction.IsPlayerSide() && playerHere;
+
     /// <summary><see cref="TakerOf(Combatant, Combatant)"/> for the player in this scene.</summary>
     public static Combatant TakerOf(Combatant killer) => TakerOf(killer, Player.Current != null ? Player.Current.Combatant : null);
 
@@ -101,6 +111,13 @@ public sealed class LootOnDeath : MonoBehaviour
         int tier = here != null ? here.Session.Tier : 0;
         float multiplier = here != null && here.Session.Difficulty != null ? here.Session.Difficulty.loot : 1f;
         bool atHome = KilledAtHome;
+        if (LeavesOnBody(BodyLootSettings.Current.LootFromBodies, TryGetComponent(out MonsterAI creature), taker, Player.Current != null))
+        {
+            LeaveOnBody(creature, taker, tier, multiplier, atHome);
+            LearnRecipes(taker);
+            return;
+        }
+
         var inventory = taker.GetComponentInParent<ItemInventory>();
         if (inventory != null)
         {
@@ -161,11 +178,63 @@ public sealed class LootOnDeath : MonoBehaviour
             }
         }
 
+        LearnRecipes(taker);
+    }
+
+    private void LearnRecipes(Combatant taker)
+    {
         var crafting = taker.GetComponentInParent<PlayerCrafting>();
+        if (crafting == null && Player.Current != null && taker.Faction.IsPlayerSide())
+        {
+            crafting = Player.Current.GetComponent<PlayerCrafting>();
+        }
+
         if (crafting != null && unlocksRecipes.Count > 0)
         {
             crafting.Unlock(unlocksRecipes);
         }
+    }
+
+    // The roll the bag used to get, the same rules (the raid's tier and loot, what the raid allows, raid-only parts and essence kept from
+    // home), left on the body for the local player to loot.
+    private void LeaveOnBody(MonsterAI creature, Combatant taker, int tier, float multiplier, bool atHome)
+    {
+        List<ItemAmount> items = Drops.Roll(tier, multiplier * RaidDirector.StageLootNow);
+        if (GameSession.ActiveRaid != null)
+        {
+            items.RemoveAll(drop => !GameSession.ActiveRaid.Allows(drop.Item));
+        }
+
+        if (atHome)
+        {
+            items.RemoveAll(drop => drop.Item.RaidOnly);
+        }
+
+        List<ResourceAmount> rolled = Drops.RollResources(tier, multiplier);
+        if (WithholdsEssence || atHome)
+        {
+            rolled.RemoveAll(entry => entry.Resource == SettlementSettings.Current.CursedEssence);
+        }
+
+        // Essence Find is the looter's: the player's own gear, whoever struck the last blow.
+        Combatant looter = Player.Current.Combatant != null ? Player.Current.Combatant : taker;
+        IReadOnlyList<ResourceAmount> reaped = Reaped(rolled, looter);
+
+        RaidDirector raid = RaidDirector.Current;
+        bool relic = raid != null && relicChance > 0f && Random.value < relicChance;
+        EnchantmentDefinition inscription = null;
+        if (raid != null && inscriptions.Count > 0)
+        {
+            var random = new System.Random(Random.Range(0, int.MaxValue));
+            inscription = global::Inscriptions.Pick(inscriptions, Player.Current.gameObject, random, copies: false);
+            if (inscription == null && Random.value < EssenceSettings.Current.BossRepeatChance)
+            {
+                inscription = inscriptions[random.Next(inscriptions.Count)];
+            }
+        }
+
+        string title = creature.Definition != null ? creature.Definition.DisplayName : name;
+        LootableRemains.Leave(damageable, title, items, reaped, relic, raid != null ? raid.Session.Tier : 0, inscription);
     }
 
     private static IReadOnlyList<ResourceAmount> Reaped(IReadOnlyList<ResourceAmount> rolled, Combatant killer)
