@@ -301,6 +301,27 @@ public static class SkillFxPrefabs
             light = new Color(1f, 0.85f, 0.6f, 1f), lightIntensity = 2.5f, lightRange = 6f, lightSeconds = 0.25f, shake = 0.3f,
         };
         log.AppendLine(Dress("WarCry", cry, null, null, arc: -1f));
+
+        // ----- Troll's Hurl: a stone torn up and thrown (the stone flies as the troll's does). -----
+        var trollHurl = new SkillLook
+        {
+            showArea = false,
+            cast = { Cue(dust, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.7f), Cue(debris, SkillFxPlace.CasterGround, 1, 0.05f, 0f, 1f) },
+            release = { Cue(streaksAhead, SkillFxPlace.Caster, 1, 0f, 0f, 0.4f) },
+            struck = { Cue(debris, SkillFxPlace.Struck, 1, 0f, 0f, 1f), Cue(flash, SkillFxPlace.Struck, 1, 0f, 0f, 0.3f) },
+            shake = 0.2f,
+        };
+        log.AppendLine(Dress("TrollsHurl", trollHurl, null, null, arc: -1f));
+
+        // ----- Winter's Breath: a cone of rolling frost each breath (its release plays every tick while held). -----
+        var breath = new SkillLook
+        {
+            showArea = false,
+            cast = { Cue(frostHands, SkillFxPlace.Caster, 1, 0f, 0f, 0.6f) },
+            release = { Cue(frostMist, SkillFxPlace.AcrossArc, 3, 0f, 0.02f, 1.2f), Cue(frostShards, SkillFxPlace.AlongReach, 2, 0f, 0.03f, 0.8f) },
+            struck = { Cue(frostHit, SkillFxPlace.Struck, 1, 0f, 0f, 0.8f) },
+        };
+        log.AppendLine(Dress("WintersBreath", breath, null, null, arc: -1f));
         var cryData = new SerializedObject(AssetDatabase.LoadAssetAtPath<SkillDefinition>("Assets/_Project/Data/Skills/WarCry.asset"));
         cryData.FindProperty("foesStatus").objectReferenceValue = cowed;
         cryData.ApplyModifiedPropertiesWithoutUndo();
@@ -568,6 +589,7 @@ public static class SkillFxPrefabs
             "TrollsbaneWrath" => (0.09f, 0.25f),
             "MountainLeap" or "WhirlingSteel" => (0.06f, 0.15f),
             "WarCry" => (0f, 0.1f),
+            "WintersBreath" => (0f, 0f),
             "HuldrasBlessing" => (0f, 0f),
             _ => (0.04f, 0.08f),
         };

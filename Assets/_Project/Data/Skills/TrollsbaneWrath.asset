@@ -22,6 +22,8 @@ MonoBehaviour:
   castTime: 0.9
   lungeDistance: 0
   lungeDuration: 0.22
+  channelSeconds: 0
+  channelTick: 0.3
   foesStatus: {fileID: 0}
   foesRadius: 7
   foesDelay: 0.5

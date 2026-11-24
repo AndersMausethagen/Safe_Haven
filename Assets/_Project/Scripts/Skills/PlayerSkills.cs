@@ -84,6 +84,17 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     private int bufferedSlot = -1;
     private float bufferedUntil;
 
+    // A channel under way (Skill › Channel Seconds): which, from which slot, until when, and its next strike.
+    private SkillDefinition channeling;
+    private int channelSlot = -1;
+    private float channelEndsAt;
+    private float nextChannelTick = float.MaxValue;
+
+    /// <summary>A channel ended (let go, run out, dodged or staggered): the body leaves its loop (PlayerAnimationController).</summary>
+    public event Action ChannelEnded;
+
+    public bool IsChanneling => channeling != null;
+
     // A war cry ringing out (Skill › Foes Status): which, and when.
     private SkillDefinition pendingCry;
     private float pendingCryAt;
@@ -300,8 +311,15 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             collectingStruck = true;
             try
             {
-                AttackResolver.Execute(combatant, skill.Attack, weaponDamage, transform.position, pendingDirection, hitLayers,
-                    Power(skill) * runecraft * SkillChoices.For(skill).Damage, 1f, kind);
+                float multiplier = Power(skill) * runecraft * SkillChoices.For(skill).Damage;
+                if (skill.Throws)
+                {
+                    Throw(skill, weaponDamage, multiplier, kind);
+                }
+                else
+                {
+                    AttackResolver.Execute(combatant, skill.Attack, weaponDamage, transform.position, pendingDirection, hitLayers, multiplier, 1f, kind);
+                }
             }
             finally
             {
@@ -311,6 +329,15 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             SkillFx.Release(skill, transform.position, pendingDirection, struck);
             AfterOptions(skill, struckFoes);
             LeaveGround(skill, pendingDirection);
+            if (skill.ChannelSeconds > 0f && channeling == skill)
+            {
+                nextChannelTick = Time.time + skill.ChannelTick;
+            }
+        }
+
+        if (channeling != null)
+        {
+            Channel();
         }
 
         if (activeBuffs.Count > 0)
@@ -557,11 +584,19 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             hitAfter = skill.LungeDuration;
         }
 
+        if (skill.Attack != null && skill.ChannelSeconds > 0f)
+        {
+            channeling = skill;
+            channelSlot = loadout.IndexOf(skill);
+            channelEndsAt = now + skill.Attack.HitDelay + skill.ChannelSeconds;
+            nextChannelTick = float.MaxValue;
+        }
+
         if (skill.Attack != null)
         {
             pendingHit = skill;
             pendingHitAt = now + hitAfter + skill.Attack.HitDelay;
-            busyUntil = Mathf.Max(busyUntil, pendingHitAt);
+            busyUntil = Mathf.Max(busyUntil, skill.ChannelSeconds > 0f ? channelEndsAt : pendingHitAt);
             pendingDirection = direction;
             if (skill.LungeDistance > 0f)
             {
@@ -637,6 +672,88 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         }
 
         heard.Clear();
+    }
+
+    // A thrown skill: its attack's projectile(s) flung along the aim, as a staff's cast is (PlayerCombat.Cast). Each strikes as the
+    // skill's blow would: its technique, its power, its options' scale.
+    private void Throw(SkillDefinition skill, float weaponDamage, float multiplier, HitTechnique kind)
+    {
+        AttackDefinition attack = skill.Attack;
+        var volley = new CastVolley { Multiplier = multiplier, Poise = 1f, Technique = kind };
+        var flight = new MonsterAttack
+        {
+            attack = attack, damage = weaponDamage, projectileSpeed = attack.CastSpeed, projectileRadius = attack.CastRadius,
+            maximumRange = attack.CastRange, hazardPrefab = attack.CastHazard,
+        };
+        Vector3 from = transform.position + Vector3.up * 1.4f + pendingDirection * 0.6f;
+        int count = Mathf.Max(1, attack.CastCount);
+        for (int i = 0; i < count; i++)
+        {
+            float turn = (i - (count - 1) * 0.5f) * attack.CastSpread;
+            Vector3 aim = Quaternion.Euler(0f, turn, 0f) * pendingDirection;
+            GameObject thrown = PrefabPool.Spawn(attack.CastProjectile, from, Quaternion.LookRotation(aim));
+            if (thrown.TryGetComponent(out MonsterProjectile projectile))
+            {
+                projectile.Initialize(combatant, flight, aim, volley);
+            }
+        }
+    }
+
+    // A channel's strikes while its key is held: each another blow round the caster, with its look; it ends when let go or run out.
+    private void Channel()
+    {
+        if (!health.IsAlive || Time.time >= channelEndsAt)
+        {
+            EndChannel();
+            return;
+        }
+
+        if (Time.time < nextChannelTick)
+        {
+            return;
+        }
+
+        nextChannelTick += channeling.ChannelTick;
+        float weaponDamage = combat != null && combat.Weapon != null ? combat.Weapon.Damage : 0f;
+        float runecraft = channeling.IsPhysical ? 1f : Mathf.Max(0f, 1f + combatant.Stats.Get(StatType.SpellDamage));
+        HitTechnique kind = channeling.IsPhysical ? HitTechnique.Melee | HitTechnique.Heavy : HitTechnique.Spell;
+        Vector3 aim = movement.AimDirection;
+        aim.y = 0f;
+        if (aim.sqrMagnitude > 0.0001f)
+        {
+            pendingDirection = aim.normalized;
+            transform.rotation = Quaternion.LookRotation(pendingDirection, Vector3.up);
+        }
+
+        struck.Clear();
+        struckFoes.Clear();
+        collectingStruck = true;
+        try
+        {
+            AttackResolver.Execute(combatant, channeling.Attack, weaponDamage, transform.position, pendingDirection, hitLayers,
+                Power(channeling) * runecraft * SkillChoices.For(channeling).Damage, 1f, kind);
+        }
+        finally
+        {
+            collectingStruck = false;
+        }
+
+        SkillFx.Release(channeling, transform.position, pendingDirection, struck);
+        AfterOptions(channeling, struckFoes);
+    }
+
+    private void EndChannel()
+    {
+        if (channeling == null)
+        {
+            return;
+        }
+
+        channeling = null;
+        channelSlot = -1;
+        nextChannelTick = float.MaxValue;
+        busyUntil = Mathf.Min(busyUntil, Time.time);
+        ChannelEnded?.Invoke();
     }
 
     // The chosen altar options on what the skill struck (Docs/SkillsImprovementResearch_2026-11-24.md 4): a status laid, or one used
@@ -728,6 +845,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     // A dodge is the way out of trouble: like a weapon swing, a skill hit that hadn't landed yet is lost.
     private void OnDodged(Vector3 direction)
     {
+        EndChannel();
         // A dodge readies the next swing with the status of the ability cast last (V Rising's veils).
         StatusEffectDefinition school = lastCast != null ? SchoolStatusOf(lastCast) : null;
         if (school != null)
@@ -753,6 +871,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     {
         pendingCry = null; // a cry cut short never rings out
         bufferedSlot = -1;
+        EndChannel();
         if (pendingHit != null)
         {
             SkillAreaMark.Hide();
@@ -783,6 +902,12 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
     private void OnSkillReleased(int slot)
     {
+        if (channeling != null && channelSlot == slot)
+        {
+            EndChannel();
+            return;
+        }
+
         if (aimingSlot != slot)
         {
             return;

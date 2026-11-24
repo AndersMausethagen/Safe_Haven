@@ -21,7 +21,7 @@ public sealed partial class PlayerCombat
 
         // The weapon is out on a throw (a spear toss): nothing to swing until it is back in the hand. And an art waits out its
         // cooldown, so a second press mid-throw doesn't strike again.
-        if (WeaponInFlight || (kind == SwingKind.Art && Time.time < artReadyAt))
+        if (WeaponInFlight || (kind == SwingKind.Art && Time.time < artReadyAt && !ArtFollowUpOpen))
         {
             if (kind == SwingKind.Art)
             {
@@ -150,10 +150,21 @@ public sealed partial class PlayerCombat
 
         forcedAttack = null;
         activeIsFollowUp = followUp;
-        // The cooldown runs from an art that really begins: one refused for want of stamina above doesn't start it.
+        // The cooldown runs from an art that really begins: one refused for want of stamina above doesn't start it. A follow-up keeps
+        // the first one's cooldown and spends one of its follow-ups; the window shuts until this one lands.
         if (kind == SwingKind.Art)
         {
-            artReadyAt = Time.time + Rules.ArtCooldown;
+            if (ArtFollowUpOpen)
+            {
+                artFollowUpsLeft--;
+            }
+            else
+            {
+                artReadyAt = Time.time + Rules.ArtCooldown;
+                artFollowUpsLeft = ArtFollowUps;
+            }
+
+            artFollowUpUntil = -1f;
         }
 
         fumbled = false;
@@ -746,6 +757,10 @@ public sealed partial class PlayerCombat
             }
 
             SkillFx.ArtLand(activeAttack, origin, activeDirection, artStruck, activeMotion == ArtMotion.DashThrough ? dashFrom : origin);
+            if (artFollowUpsLeft > 0)
+            {
+                artFollowUpUntil = Time.time + ArtFollowUpWindow;
+            }
         }
 
         // A heavy blow or a weapon art strikes the ground too, hit or miss: wind, dust, a mark (GroundImpacts).

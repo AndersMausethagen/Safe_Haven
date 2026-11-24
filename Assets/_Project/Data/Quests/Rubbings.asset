@@ -55,9 +55,12 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   closedBy: {fileID: 0}
   startDelay: 0
   startsInAFight: 0
+  startsWithoutWaiting: 0
   onStarted: []
   objectivesInOrder: 1
   objectives:
@@ -85,6 +88,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 0
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   - type: 11
     description: Read a carved stone in the deep woods
     amount: 1
@@ -109,6 +114,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 0
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   - type: 20
     description: Learn an enchantment from a rubbing (read it at home)
     amount: 1
@@ -133,6 +140,10 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 1
     source: 1
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
+  unlocksBuildings: []
+  unlocksModules: []
   turnInToGiver: 0
   turnInTo: 
   rewardItems:
@@ -140,9 +151,14 @@ MonoBehaviour:
     amount: 2
   rewardResources: []
   rewardRecipes: []
+  rewardSkills:
+  - {fileID: 11400000, guid: 4d3aed2e971f1f44d9fb3b8cc1585b5c, type: 2}
+  teachesAtStart: []
   rewardEnchantments: []
   rewardWorkFor: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
   rewardWork: 15
+  rewardPassion: 0
+  rewardMark: {fileID: 0}
   experience: 0
   completionEvent: {fileID: 0}
   onCompleted: []

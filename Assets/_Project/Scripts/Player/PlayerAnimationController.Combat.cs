@@ -476,6 +476,15 @@ public sealed partial class PlayerAnimationController
     }
 
     // A skill plays its own state (a cast, a dash, a spin) where it has one; else the weapon stance's old attack.
+    // A channel let go or run out: the whole body leaves its loop for the ready pose.
+    private void OnChannelEnded()
+    {
+        if (fullBodyLayer >= 0)
+        {
+            animator.CrossFadeInFixedTime(EmptyStateHash, 0.2f, fullBodyLayer);
+        }
+    }
+
     private void OnSkillCast(int slot, SkillDefinition skill)
     {
         if (!skill.PlayAttackAnimation)

@@ -40,6 +40,12 @@ public sealed class SkillDefinition : ScriptableObject
     [SerializeField, Min(0f)] private float lungeDistance;
     [SerializeField, Min(0.05f)] private float lungeDuration = 0.2f;
 
+    [Header("Held (Docs/SkillsImprovementResearch_2026-11-24.md 10: a channel)")]
+    [Tooltip("Above 0: a channel. It strikes again every Channel Tick while its key is held, for at most this long; letting go, a dodge or " +
+             "a stagger ends it. Its first strike lands at the attack's Hit Delay. 0: one blow, as most skills.")]
+    [SerializeField, Min(0f)] private float channelSeconds;
+    [SerializeField, Min(0.1f)] private float channelTick = 0.3f;
+
     [Header("Around the caster (a war cry)")]
     [Tooltip("Laid on every foe within Foes Radius when it rings out (Cowed: they deal less). Empty: none.")]
     [SerializeField] private StatusEffectDefinition foesStatus;
@@ -100,6 +106,10 @@ public sealed class SkillDefinition : ScriptableObject
     /// melee blows (Melee trains, a frozen foe shatters), scale with the weapon side, and Runecraft has no say in them.</summary>
     public bool IsPhysical => school == SkillSchool.Steel || school == SkillSchool.Beast;
     public GameObject Leaves => leaves;
+    public float ChannelSeconds => channelSeconds;
+    public float ChannelTick => channelTick;
+    /// <summary>A thrown skill (its attack has a Cast Projectile: a boulder, a spear): it flies to what it hits, not a blow round the caster.</summary>
+    public bool Throws => attack != null && attack.CastProjectile != null;
     public IReadOnlyList<SkillOption> Options => options;
     public StatusEffectDefinition FoesStatus => foesStatus;
     public float FoesRadius => foesRadius;

@@ -53,6 +53,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   closedBy: {fileID: 0}
   startDelay: 0
   startsInAFight: 0
@@ -84,6 +86,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   - type: 23
     description: "Fit Brukam's Horn to the Watch Post (build menu \u203A Manage \u203A Upgrade, Tier III)"
     amount: 1
@@ -108,6 +112,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   - type: 14
     description: Hold the next breach
     amount: 1
@@ -132,6 +138,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   unlocksBuildings: []
   unlocksModules:
   - {fileID: 11400000, guid: 9c77e5b0a3c16ce42b38b6b4b96fb4cb, type: 2}
@@ -140,9 +148,14 @@ MonoBehaviour:
   rewardItems: []
   rewardResources: []
   rewardRecipes: []
+  rewardSkills:
+  - {fileID: 11400000, guid: 8f48b8411eaf29845b33f493a27649e5, type: 2}
+  teachesAtStart: []
   rewardEnchantments: []
   rewardWorkFor: {fileID: 0}
   rewardWork: 0
+  rewardPassion: 0
+  rewardMark: {fileID: 0}
   experience: 0
   completionEvent: {fileID: 0}
   onCompleted: []

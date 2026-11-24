@@ -161,7 +161,8 @@ public sealed partial class PlayerCombat
     private bool artFromRune;
     private ItemDefinition ArtRune => artFromRune ? ArtRunes.For(weapon) : null;
     private AttackDefinition ArtAttack => ArtRune != null ? ArtRune.RuneArt : weapon != null ? weapon.WeaponArt : null;
-    private float ArtFocus => ArtRune != null ? ArtRune.RuneFocus : weapon != null ? weapon.WeaponArtFocus : 0f;
+    private float ArtFocus => (ArtRune != null ? ArtRune.RuneFocus : weapon != null ? weapon.WeaponArtFocus : 0f)
+        * (ArtFollowUpOpen ? ArtFollowUpFocusShare : 1f);
 
     // Whether attacking out of the guard would start an art now: one to strike, Focus for it, and off its cooldown.
     private bool ArtReadyFromGuard()
@@ -222,7 +223,7 @@ public sealed partial class PlayerCombat
     public bool HasArt(bool fromRune) => weapon != null && (fromRune ? ArtRunes.For(weapon) != null && ArtRunes.For(weapon).RuneArt != null : weapon.WeaponArt != null);
 
     /// <summary>Share of the art's cooldown still to go (the bar's sweep), 1 just used to 0 ready.</summary>
-    public float ArtCooldownFraction => Rules.ArtCooldown > 0f ? Mathf.Clamp01((artReadyAt - Time.time) / Rules.ArtCooldown) : 0f;
+    public float ArtCooldownFraction => ArtFollowUpOpen ? 0f : Rules.ArtCooldown > 0f ? Mathf.Clamp01((artReadyAt - Time.time) / Rules.ArtCooldown) : 0f;
 
     // The middle button: the next arrow with a bow (PlayerArchery), the weapon's art with anything else.
     private void OnArtRequested()

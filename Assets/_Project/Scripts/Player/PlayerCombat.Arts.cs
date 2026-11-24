@@ -59,7 +59,18 @@ public sealed partial class PlayerCombat
     public event Action ArtNotReady;
 
     // The art can't start yet: still cooling down from the last one, or the weapon is out on a throw.
-    private bool ArtCoolingDown => Time.time < artReadyAt || WeaponInFlight;
+    private bool ArtCoolingDown => (Time.time < artReadyAt && !ArtFollowUpOpen) || WeaponInFlight;
+
+    // Follow-ups (Docs/SkillsImprovementResearch_2026-11-24.md 11, Elden Ring's): once an art lands, pressing it again within the window
+    // strikes it again for half its Focus, up to twice; the cooldown still runs from the first.
+    private const float ArtFollowUpWindow = 0.8f;
+    private const int ArtFollowUps = 2;
+    private const float ArtFollowUpFocusShare = 0.5f;
+    private float artFollowUpUntil = -1f;
+    private int artFollowUpsLeft;
+
+    /// <summary>An art just landed and may be struck again now, for less (a follow-up).</summary>
+    public bool ArtFollowUpOpen => artFollowUpsLeft > 0 && Time.time < artFollowUpUntil;
 
     /// <summary>Raised when the weapon's signature does its thing to a creature (a crush, a stopped charge, a broken guard), for feedback.</summary>
     public event Action<WeaponSignature, MonsterAI> SignatureUsed;

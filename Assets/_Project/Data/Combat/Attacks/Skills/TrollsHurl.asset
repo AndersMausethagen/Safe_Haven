@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5517319b40a047489a8fdcb2b152b82, type: 3}
+  m_Name: TrollsHurl
+  m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
+  displayName: Troll's Hurl
+  damageType: 0
+  strike: 1
+  baseDamage: 25
+  weaponDamageRatio: 1.2
+  powerScaling: 1
+  structureDamageMultiplier: 1.5
+  canCrit: 1
+  range: 2
+  arc: 60
+  maxTargets: 10
+  hitDelay: 0.3
+  recoveryTime: 0.9
+  poiseDamage: 60
+  impact: 1.5
+  lunge: 0
+  hop: 0
+  staminaCost: -1
+  appliesStatus: {fileID: 0}
+  statusChance: 1
+  onRepeatStatus: {fileID: 0}
+  look:
+    showArea: 0
+    cast: []
+    release: []
+    struck: []
+    light: {r: 0, g: 0, b: 0, a: 0}
+    lightIntensity: 6
+    lightRange: 8
+    lightSeconds: 0.35
+    shake: 0
+    hitStop: 0
+    kick: 0
+    castSound: {fileID: 0}
+    releaseSound: {fileID: 0}
+    releaseSoundDelay: 0
+  groundImpact: {fileID: 0}
+  unblockable: 0
+  pull: 0
+  lassoSeconds: 0
+  windupMove: -1
+  afterContactMove: -1
+  windupTurnRate: -1
+  moveAt: -1
+  lungeShare: -1
+  ownCancels: 0
+  windupCancels: 1
+  recoveryCancels: 3
+  motion: 0
+  motionDistance: 3.5
+  alwaysCritical: 0
+  castProjectile: {fileID: 4774033439812504928, guid: f88eca45a0f3397429ff4fa29af1b9ae, type: 3}
+  castCount: 1
+  castSpread: 12
+  castSpeed: 16
+  castRadius: 0.5
+  castRange: 18
+  castHazard: {fileID: 0}
+  animationState: 
+  animationSpeed: 1
+  strikeSpeed: 1
+  strikeLead: 0
+  followThroughSpeed: 1
+  growsFromLight: 1
+  blendIn: 0
+  blendInFromReady: 0
+  fromGuardStart: 0
+  blendInFromGuard: 0
+  fromHeavyStart: 0
+  swingSound: {fileID: 0}
+  hitSound: {fileID: 0}
+  slashColor: {r: 1, g: 0.95, b: 0.85, a: 0.8}
+  slashSweep: 1
+  slashTilt: 0

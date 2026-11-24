@@ -272,6 +272,7 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
         if (skills != null)
         {
             skills.SkillCast += OnSkillCast;
+            skills.ChannelEnded += OnChannelEnded;
         }
 
         if (equipment != null)
@@ -336,6 +337,7 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
         if (skills != null)
         {
             skills.SkillCast -= OnSkillCast;
+            skills.ChannelEnded -= OnChannelEnded;
         }
 
         if (equipment != null)
