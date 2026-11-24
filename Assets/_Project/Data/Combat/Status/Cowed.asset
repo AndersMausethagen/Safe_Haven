@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::StatusEffectDefinition
   id: cowed
   displayName: Cowed
-  description: 'Shaken by a war cry: its blows land weaker for a while.'
+  description: 'Shaken by a war cry: its blows deal 20% less for a while.'
   color: {r: 0.62, g: 0.56, b: 0.78, a: 1}
   icon: {fileID: 21300000, guid: b14d90592f70c6e43b5b5abd3488767f, type: 3}
   look: {fileID: 4701929759527877157, guid: fba4df655b4741e4da1fe52fcecbd90a, type: 3}

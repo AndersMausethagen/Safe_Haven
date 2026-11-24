@@ -99,7 +99,7 @@ public static class SkillFxPrefabs
         // a second longer), Steel cracks armour so everything after it bites deeper.
         StatusEffectDefinition rend = Status("Rend", "Torn by fangs: it bleeds a while.", new Color(0.75f, 0.06f, 0.05f), 5f, 3f, DamageType.Physical, 1f,
             refreshes: true, restSeconds: 0f, look: rendLook);
-        StatusEffectDefinition sundered = Status("Sundered", "Armour cracked: it takes more from every blow for a while.", new Color(0.8f, 0.8f, 0.84f),
+        StatusEffectDefinition sundered = Status("Sundered", "Armour cracked: it takes 15% more from every blow for a while.", new Color(0.8f, 0.8f, 0.84f),
             8f, 0f, DamageType.Physical, 1f, refreshes: true, restSeconds: 0f, damageTaken: 1.15f, look: sunderedLook);
 
         // ----- The physical kit (the user, 2026-11-24: "a lot of the skills and vfx be physical skills. not necessary magic"): steel, dust,
@@ -271,7 +271,7 @@ public static class SkillFxPrefabs
         GameObject cowedLook = Make("Status Cowed", new Design("Skill Mist").F("Rate", 8f).F("Radius", 0.5f).V("Color", new Vector3(0.35f, 0.32f, 0.42f))
             .F("Alpha", 0.35f).F("Lifetime Min", 1f).F("Lifetime Max", 1.6f).F("Size Min", 0.5f).F("Size Max", 0.9f).F("Turbulence", 0.2f)
             .V("Velocity Min", new Vector3(-0.05f, -0.1f, -0.05f)).V("Velocity Max", new Vector3(0.05f, 0.02f, 0.05f)));
-        StatusEffectDefinition cowed = Status("Cowed", "Shaken by a war cry: its blows land weaker for a while.", new Color(0.62f, 0.56f, 0.78f), 8f, 0f,
+        StatusEffectDefinition cowed = Status("Cowed", "Shaken by a war cry: its blows deal 20% less for a while.", new Color(0.62f, 0.56f, 0.78f), 8f, 0f,
             DamageType.Physical, 1f, refreshes: true, restSeconds: 0f, look: cowedLook);
         var cowedData = new SerializedObject(cowed);
         cowedData.FindProperty("damageDealt").floatValue = 0.8f;
@@ -540,6 +540,18 @@ public static class SkillFxPrefabs
             look.releaseSound = skill.Look.releaseSound;
             look.releaseSoundDelay = skill.Look.releaseSoundDelay;
         }
+
+        // Its weight by size (Docs/SkillsImprovementResearch_2026-11-24.md 6): light, heavy, ultimate.
+        (float stop, float push) = skillName switch
+        {
+            "TrollsbaneWrath" => (0.09f, 0.25f),
+            "MountainLeap" or "WhirlingSteel" => (0.06f, 0.15f),
+            "WarCry" => (0f, 0.1f),
+            "HuldrasBlessing" => (0f, 0f),
+            _ => (0.04f, 0.08f),
+        };
+        look.hitStop = stop;
+        look.kick = push;
 
         typeof(SkillDefinition).GetField("look", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).SetValue(skill, look);
         EditorUtility.SetDirty(skill);

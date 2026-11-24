@@ -91,6 +91,10 @@ public sealed class SkillDefinition : ScriptableObject
     public float CastTime => castTime;
     public float LungeDistance => lungeDistance;
     public float LungeDuration => lungeDuration;
+
+    /// <summary>Steel and the beasts' skills are blows, not spells (Docs/SkillsImprovementResearch_2026-11-24.md 1): they land as heavy
+    /// melee blows (Melee trains, a frozen foe shatters), scale with the weapon side, and Runecraft has no say in them.</summary>
+    public bool IsPhysical => school == SkillSchool.Steel || school == SkillSchool.Beast;
     public GameObject Leaves => leaves;
     public StatusEffectDefinition FoesStatus => foesStatus;
     public float FoesRadius => foesRadius;

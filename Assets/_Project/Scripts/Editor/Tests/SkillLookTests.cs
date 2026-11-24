@@ -293,6 +293,23 @@ public sealed class SkillLookTests
     }
 
     [Test]
+    public void SteelAndBeastSkills_AreBlows_FrostEmberAndWyrdAreSpells()
+    {
+        foreach (string guid in AssetDatabase.FindAssets("t:SkillDefinition", new[] { "Assets/_Project/Data/Skills" }))
+        {
+            var skill = AssetDatabase.LoadAssetAtPath<SkillDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            bool blow = skill.School == SkillSchool.Steel || skill.School == SkillSchool.Beast;
+            Assert.AreEqual(blow, skill.IsPhysical, $"{skill.name} ({skill.School})");
+        }
+
+        Assert.IsTrue(AssetDatabase.LoadAssetAtPath<SkillDefinition>("Assets/_Project/Data/Skills/TrollsbaneWrath.asset").IsPhysical,
+            "the troll-slaying hammer is a blow: it shatters the frozen and trains Melee");
+        Assert.IsFalse(AssetDatabase.LoadAssetAtPath<SkillDefinition>("Assets/_Project/Data/Skills/FrostRune.asset").IsPhysical);
+        string card = SkillText.Describe(AssetDatabase.LoadAssetAtPath<SkillDefinition>("Assets/_Project/Data/Skills/TrollsbaneWrath.asset"), -1);
+        StringAssert.Contains("takes 15% more", card, "its card says what Sundered does");
+    }
+
+    [Test]
     public void EveryAbility_PlaysAMoveOfItsOwn_ThatTheBodyHas()
     {
         var controller = AssetDatabase.LoadAssetAtPath<UnityEditor.Animations.AnimatorController>("Assets/_Project/Animation/Controllers/PlayerAnimator.controller");

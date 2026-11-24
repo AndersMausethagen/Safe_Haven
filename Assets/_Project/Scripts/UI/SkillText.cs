@@ -39,6 +39,26 @@ public static class SkillText
             builder.Append($" damage {area}.</color>");
         }
 
+        // What it leaves on foes, in the statuses' own words and numbers (Docs/SkillsImprovementResearch_2026-11-24.md 8).
+        if (attack != null && attack.AppliesStatus != null)
+        {
+            builder.Append($"\n<color={UIStyle.Current.AccentHex}>{Keyword(attack.AppliesStatus)}</color>");
+            if (attack.OnRepeatStatus != null)
+            {
+                builder.Append($"\n<color={UIStyle.Current.AccentHex}>Again on one already {attack.AppliesStatus.DisplayName.ToLowerInvariant()}: {Keyword(attack.OnRepeatStatus)}</color>");
+            }
+        }
+
+        if (skill.FoesStatus != null)
+        {
+            builder.Append($"\n<color={UIStyle.Current.AccentHex}>Foes within {skill.FoesRadius:0.#} m: {Keyword(skill.FoesStatus)}</color>");
+        }
+
+        if (attack != null)
+        {
+            builder.Append($"\n<color={UIStyle.Current.MutedHex}>{(skill.IsPhysical ? "A heavy blow: Melee trains, the frozen shatter." : "A spell: Runecraft trains and strengthens it.")}</color>");
+        }
+
         if (skill.Heal > 0f)
         {
             builder.Append($"\n<color={UIStyle.Current.GoodHex}>Restores {skill.Heal:0} health.</color>");
@@ -62,6 +82,20 @@ public static class SkillText
             ? $"\n\n<color={UIStyle.Current.AccentHex}>On the skill bar: {PlayerInputHandler.SkillKeyLabel(equippedSlot)}</color>"
             : $"\n\n<color={UIStyle.Current.MutedHex}>Drag onto the skill bar, or right-click to slot it.</color>");
         return builder.ToString();
+    }
+
+    /// <summary>A status in a few words with its numbers: "Sundered (8 s): takes 15% more".</summary>
+    public static string Keyword(StatusEffectDefinition status)
+    {
+        var parts = new System.Collections.Generic.List<string>();
+        if (status.DamagePerSecond > 0f) parts.Add($"{status.DamagePerSecond:0.#} {status.DamageType} a second");
+        if (status.DamageTaken > 1f) parts.Add($"takes {(status.DamageTaken - 1f) * 100f:0}% more");
+        if (status.DamageDealt < 1f) parts.Add($"deals {(1f - status.DamageDealt) * 100f:0}% less");
+        if (status.MoveSpeed <= 0f) parts.Add("held fast");
+        else if (status.MoveSpeed < 1f) parts.Add($"{(1f - status.MoveSpeed) * 100f:0}% slower");
+        if (status.StopsStrikes) parts.Add("strikes nothing");
+        if (status.ConsumedBy != HitTechnique.None && status.ConsumeDamage > 0f) parts.Add("a heavy bursts it");
+        return $"{status.DisplayName} ({status.Seconds:0.#} s){(parts.Count > 0 ? ": " + string.Join(", ", parts) : "")}";
     }
 
     private static string Spaced(string name)

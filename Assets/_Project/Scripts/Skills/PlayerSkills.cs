@@ -61,6 +61,11 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetGroundLeft() => GroundLeft = null;
 
+    // A skill pressed while busy, cast when it can be within this long (Docs/SkillsImprovementResearch_2026-11-24.md 2).
+    private const float BufferSeconds = 0.25f;
+    private int bufferedSlot = -1;
+    private float bufferedUntil;
+
     // A war cry ringing out (Skill › Foes Status): which, and when.
     private SkillDefinition pendingCry;
     private float pendingCryAt;
@@ -207,6 +212,20 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             SkillAreaMark.Hide();
         }
 
+        if (bufferedSlot >= 0)
+        {
+            int slot = bufferedSlot;
+            if (Time.time > bufferedUntil || !health.IsAlive)
+            {
+                bufferedSlot = -1;
+            }
+            else if (CheckCast(loadout.Get(slot)) != SkillCastResult.Busy)
+            {
+                bufferedSlot = -1;
+                TryCast(slot);
+            }
+        }
+
         if (pendingCry != null && (!health.IsAlive || Time.time >= pendingCryAt))
         {
             SkillDefinition cry = pendingCry;
@@ -222,15 +241,17 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             SkillDefinition skill = pendingHit;
             pendingHit = null;
             float weaponDamage = combat != null && combat.Weapon != null ? combat.Weapon.Damage : 0f;
-            // The Runecraft skill scales every spell's damage; its hits carry the Spell technique, which trains it.
-            float runecraft = Mathf.Max(0f, 1f + combatant.Stats.Get(StatType.SpellDamage));
+            // The Runecraft skill scales every spell's damage; its hits carry the Spell technique, which trains it. A physical skill
+            // (Steel, Beast) is a heavy melee blow instead: Melee trains, and a frozen foe shatters under it.
+            float runecraft = skill.IsPhysical ? 1f : Mathf.Max(0f, 1f + combatant.Stats.Get(StatType.SpellDamage));
+            HitTechnique kind = skill.IsPhysical ? HitTechnique.Melee | HitTechnique.Heavy : HitTechnique.Spell;
             // What it strikes, for the effects that land on each creature hit (SkillLook.struck).
             struck.Clear();
             collectingStruck = true;
             try
             {
                 AttackResolver.Execute(combatant, skill.Attack, weaponDamage, transform.position, pendingDirection, hitLayers, Power(skill) * runecraft,
-                    1f, HitTechnique.Spell);
+                    1f, kind);
             }
             finally
             {
@@ -362,6 +383,14 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         }
 
         SkillCastResult result = CheckCast(skill);
+        // Pressed a moment before the swing or cast under way ends: kept, and cast as soon as it can be (as a swing's press is).
+        if (result == SkillCastResult.Busy && health.IsAlive)
+        {
+            bufferedSlot = slot;
+            bufferedUntil = Time.time + BufferSeconds;
+            return result;
+        }
+
         PlayerFocus focus = GetComponent<PlayerFocus>();
         if (result == SkillCastResult.Cast && skill.FocusCost > 0f && focus != null && !focus.CanSpend(skill.FocusCost))
         {
@@ -511,7 +540,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     /// <summary>The skill's cooldown at its rank.</summary>
     // A spell's stamina after the Runecraft skill: a beginner's words cost more breath.
     private float SpellCost(SkillDefinition skill) =>
-        skill.StaminaCost * (combatant != null ? Mathf.Max(0.1f, 1f + combatant.Stats.Get(StatType.SpellStaminaCost)) : 1f);
+        skill.IsPhysical || combatant == null ? skill.StaminaCost : skill.StaminaCost * Mathf.Max(0.1f, 1f + combatant.Stats.Get(StatType.SpellStaminaCost));
 
     public static float CooldownOf(SkillDefinition skill) =>
         skill.Cooldown * (1f - EssenceSettings.Current.CooldownCutAt(GameSession.Progress.RankOf(skill)));
@@ -598,6 +627,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     public void Interrupt(PlayerInterrupt reason)
     {
         pendingCry = null; // a cry cut short never rings out
+        bufferedSlot = -1;
         if (pendingHit != null)
         {
             SkillAreaMark.Hide();

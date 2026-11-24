@@ -121,6 +121,18 @@ public sealed class SkillFx : MonoBehaviour
         {
             CameraShake.Add(look.shake);
         }
+
+        // Its weight by size (Docs/SkillsImprovementResearch_2026-11-24.md 6): a freeze when it struck something, and the frame pushed
+        // toward the blow.
+        if (look.hitStop > 0f && struck != null && struck.Count > 0 && CombatFeedback.Current != null)
+        {
+            CombatFeedback.Current.HitStop(look.hitStop);
+        }
+
+        if (look.kick > 0f)
+        {
+            CameraShake.Kick(aim, look.kick);
+        }
     }
 
     private void PlayAll(List<SkillFxCue> cues, Vector3 origin, Vector3 aim, float reach, float arc, IReadOnlyList<Vector3> struck, Vector3 from)

@@ -75,6 +75,8 @@ MonoBehaviour:
     lightRange: 6
     lightSeconds: 0.25
     shake: 0.3
+    hitStop: 0
+    kick: 0.1
     castSound: {fileID: 0}
     releaseSound: {fileID: 0}
     releaseSoundDelay: 0

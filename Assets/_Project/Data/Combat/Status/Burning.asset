@@ -28,6 +28,7 @@ MonoBehaviour:
   consumedBy: 0
   consumeDamage: 0
   consumeLook: {fileID: 0}
+  consumeSound: {fileID: 0}
   consumeLine: 
   refreshes: 1
   endsOnDodge: 0

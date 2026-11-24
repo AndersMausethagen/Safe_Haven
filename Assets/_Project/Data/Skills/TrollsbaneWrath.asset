@@ -100,4 +100,9 @@ MonoBehaviour:
     lightRange: 10
     lightSeconds: 0.4
     shake: 0.6
+    hitStop: 0.09
+    kick: 0.25
+    castSound: {fileID: 0}
+    releaseSound: {fileID: 0}
+    releaseSoundDelay: 0
   weaponArt: 0
