@@ -16,7 +16,8 @@ MonoBehaviour:
   displayName: Burning
   description: 'Alight: it burns a while.'
   color: {r: 1, g: 0.5, b: 0.15, a: 1}
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 54dc58b899728734a8e5c85da994b196, type: 3}
+  look: {fileID: 4326980925463342867, guid: c54fe77968135584cb98aae6b174e07f, type: 3}
   seconds: 4
   damagePerSecond: 3
   damageType: 1

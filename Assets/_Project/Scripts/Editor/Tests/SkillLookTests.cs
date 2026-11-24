@@ -154,6 +154,20 @@ public sealed class SkillLookTests
     }
 
     [Test]
+    public void TheSchoolsStatuses_ShowOnTheirBearer_WithAnEffectThatKeepsGoing()
+    {
+        foreach (string name in new[] { "Burning", "Frostbite", "Frozen", "Rend", "Sundered" })
+        {
+            var status = AssetDatabase.LoadAssetAtPath<StatusEffectDefinition>($"Assets/_Project/Data/Combat/Status/{name}.asset");
+            Assert.IsNotNull(status.Look, $"{name} shows on what bears it");
+            var visual = status.Look.GetComponentInChildren<UnityEngine.VFX.VisualEffect>();
+            Assert.IsNotNull(visual, name);
+            Assert.IsNotNull(visual.visualEffectAsset, name);
+            Assert.IsNotNull(status.Look.GetComponent<VfxValues>(), $"{name} carries its own look on the shared graph");
+        }
+    }
+
+    [Test]
     public void EveryAbility_PlaysAMoveOfItsOwn_ThatTheBodyHas()
     {
         var controller = AssetDatabase.LoadAssetAtPath<UnityEditor.Animations.AnimatorController>("Assets/_Project/Animation/Controllers/PlayerAnimator.controller");

@@ -524,7 +524,7 @@ public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteract
         bool any = false;
         foreach (Renderer part in root.GetComponentsInChildren<Renderer>())
         {
-            if (!part.enabled || OutlineCopies.IsCopy(part) || part is ParticleSystemRenderer)
+            if (!part.enabled || OutlineCopies.IsCopy(part) || part is ParticleSystemRenderer || part is UnityEngine.VFX.VFXRenderer)
             {
                 continue;
             }

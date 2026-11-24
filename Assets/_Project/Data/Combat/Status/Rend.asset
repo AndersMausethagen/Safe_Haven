@@ -16,7 +16,8 @@ MonoBehaviour:
   displayName: Rend
   description: 'Torn by fangs: it bleeds a while.'
   color: {r: 0.75, g: 0.06, b: 0.05, a: 1}
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 195db0da8380b8344bcc2ff29debf55f, type: 3}
+  look: {fileID: 6445174905079347178, guid: 89a4bb31731791a4691f4433acef9fc2, type: 3}
   seconds: 5
   damagePerSecond: 3
   damageType: 0

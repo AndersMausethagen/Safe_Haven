@@ -3305,7 +3305,16 @@ sample textures and flames are in `Art/Effects/VFX Graph/Additions` (Unity Compa
   takes after armour, and every estimate of one uses it too: the heart strike (`MonsterAI.Answers`), co-op kill credit
   (`CreatureHost.WouldKill`) and the takedown ring (`PlayerBlows.UnawareBlowWorth`, by `StatusTakenScale`). Sundered also deepens
   damage over time (bleeds, burns). Wyrd's is Heartroot's roots, as before. Numbers are first guesses, unplayed.
-- Not yet: effects for the weapon arts themselves; a status look on the creature bearing it.
+- **Statuses you can see on what bears them** (the user: "it could also just be a subtle icon over the object or a color tint. or both"):
+  `StatusBearerLook` (Rendering; added by itself on the first status with a look, from `StatusEffects.Applied`/`Changed`, never
+  changes a status) draws an outline in the colour of the status laid last (OutlineCopies, as the loot glow is; this is the tint, and
+  what reads from the high camera) and the status's `Look` (a looping VFX prefab, `Status *` in Art/Effects/Skills/Prefabs, spread over
+  the body by its Radius). `WorldHealthBar` shows up to four status icons (`StatusEffectDefinition.Icon`, 36 units, a dark edge) over a
+  creature's bar and keeps the bar up while any lasts; the player's own stay beside the vitals. Burning orange (flames), Frostbite pale
+  blue (rime), Frozen ice glints, Rend red (drips), Sundered steel grey (glints; not tan, which read as the gold loot glow). Icons
+  painted for Burning, Frostbite, Frozen, Rend, Sundered, Weapon's Art and Rune Art (they were missing, so PaintedIconTests failed since
+  slice 1); put in by hand as BuildIcons does (it is retired): half size, Chill's/Frost Rune's importer, `painted:<md5>` userData.
+- Not yet: effects for the weapon arts themselves.
 
 ## Loot on bodies (2026-11-24)
 

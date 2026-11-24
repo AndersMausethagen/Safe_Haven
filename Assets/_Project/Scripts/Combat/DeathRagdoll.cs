@@ -584,7 +584,7 @@ public sealed class DeathRagdoll : MonoBehaviour
         var lying = new Bounds();
         foreach (Renderer part in GetComponentsInChildren<Renderer>())
         {
-            if (OutlineCopies.IsCopy(part) || part is ParticleSystemRenderer)
+            if (OutlineCopies.IsCopy(part) || part is ParticleSystemRenderer || part is UnityEngine.VFX.VFXRenderer)
             {
                 continue;
             }

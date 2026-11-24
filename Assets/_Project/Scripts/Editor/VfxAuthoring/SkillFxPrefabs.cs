@@ -53,20 +53,41 @@ public static class SkillFxPrefabs
         }
 
         var log = new System.Text.StringBuilder();
+        // ----- Each status as it shows on its bearer while it lasts (StatusBearerLook): looping, spread over the body by its Radius. -----
+        GameObject burningLook = Make("Status Burning", new Design("Skill Flames").F("Spawn Rate", 45f).F("Initial Size", 3f).F("Lifetime", 0.7f));
+        GameObject frostbiteLook = Make("Status Frostbite", new Design("Skill Mist").F("Rate", 18f).F("Radius", 0.5f).V("Color", new Vector3(0.7f, 0.88f, 1f))
+            .F("Alpha", 0.55f).F("Lifetime Min", 1f).F("Lifetime Max", 1.6f).F("Size Min", 0.6f).F("Size Max", 1.1f).F("Turbulence", 0.3f)
+            .V("Velocity Min", new Vector3(-0.1f, 0.15f, -0.1f)).V("Velocity Max", new Vector3(0.1f, 0.4f, 0.1f)));
+        // Ice glittering over the whole body.
+        GameObject frozenLook = Make("Status Frozen", new Design("Skill Mist").T("Texture", "Shard").V("Flipbook Size", new Vector3(1f, 1f, 0f))
+            .F("Rate", 60f).F("Radius", 0.5f).V("Color", new Vector3(1.5f, 3f, 5f)).F("Alpha", 0.9f).F("Lifetime Min", 0.6f).F("Lifetime Max", 1f)
+            .F("Size Min", 0.18f).F("Size Max", 0.34f).F("Turbulence", 0.1f).V("Velocity Min", new Vector3(-0.05f, -0.02f, -0.05f))
+            .V("Velocity Max", new Vector3(0.05f, 0.06f, 0.05f)));
+        // Drops of blood falling from the wound.
+        GameObject rendLook = Make("Status Rend", new Design("Skill Mist").T("Texture", "Glow").V("Flipbook Size", new Vector3(1f, 1f, 0f))
+            .F("Rate", 24f).F("Radius", 0.4f).V("Color", new Vector3(0.7f, 0.04f, 0.03f)).F("Alpha", 0.95f).F("Lifetime Min", 0.5f).F("Lifetime Max", 0.8f)
+            .F("Size Min", 0.12f).F("Size Max", 0.2f).F("Turbulence", 0f).V("Velocity Min", new Vector3(-0.1f, -1.2f, -0.1f))
+            .V("Velocity Max", new Vector3(0.1f, -0.6f, 0.1f)));
+        // Hot glints off cracked armour.
+        GameObject sunderedLook = Make("Status Sundered", new Design("Skill Mist").T("Texture", "Glow").V("Flipbook Size", new Vector3(1f, 1f, 0f))
+            .F("Rate", 18f).F("Radius", 0.5f).V("Color", new Vector3(3.2f, 2.1f, 1f)).F("Alpha", 0.9f).F("Lifetime Min", 0.4f).F("Lifetime Max", 0.7f)
+            .F("Size Min", 0.12f).F("Size Max", 0.22f).F("Turbulence", 0.2f).V("Velocity Min", new Vector3(-0.4f, 0.2f, -0.4f))
+            .V("Velocity Max", new Vector3(0.4f, 0.8f, 0.4f)));
+
         StatusEffectDefinition frozen = Status("Frozen", "Held fast in ice: it can't move until it thaws.", new Color(0.8f, 0.93f, 1f), 1.5f, 0f,
-            DamageType.Frost, 0f, refreshes: false, restSeconds: 4f);
+            DamageType.Frost, 0f, refreshes: false, restSeconds: 4f, look: frozenLook);
         StatusEffectDefinition burning = Status("Burning", "Alight: it burns a while.", new Color(1f, 0.5f, 0.15f), 4f, 3f, DamageType.Fire, 1f,
-            refreshes: true, restSeconds: 0f);
+            refreshes: true, restSeconds: 0f, look: burningLook);
         // Frost Rune's own chill, outlasting its cooldown (10 s), so the next lance freezes what the last one chilled (review 2026-11-24:
         // with the shared 5 s Chill it never could). The monsters' Chill on the player stays as it was.
         StatusEffectDefinition chill = Status("Frostbite", "Rime in the joints: slowed, and the next frost spell freezes it.", new Color(0.6f, 0.85f, 1f),
-            12f, 0f, DamageType.Frost, 0.7f, refreshes: true, restSeconds: 0f);
+            12f, 0f, DamageType.Frost, 0.7f, refreshes: true, restSeconds: 0f, look: frostbiteLook);
         // The schools' own statuses (Docs/CombatSkillsResearch_2026-11-24.md 3.2): Beast tears a wound that bleeds (Burning's measure,
         // a second longer), Steel cracks armour so everything after it bites deeper.
         StatusEffectDefinition rend = Status("Rend", "Torn by fangs: it bleeds a while.", new Color(0.75f, 0.06f, 0.05f), 5f, 3f, DamageType.Physical, 1f,
-            refreshes: true, restSeconds: 0f);
-        StatusEffectDefinition sundered = Status("Sundered", "Armour cracked: it takes more from every blow for a while.", new Color(0.78f, 0.7f, 0.55f),
-            8f, 0f, DamageType.Physical, 1f, refreshes: true, restSeconds: 0f, damageTaken: 1.15f);
+            refreshes: true, restSeconds: 0f, look: rendLook);
+        StatusEffectDefinition sundered = Status("Sundered", "Armour cracked: it takes more from every blow for a while.", new Color(0.8f, 0.8f, 0.84f),
+            8f, 0f, DamageType.Physical, 1f, refreshes: true, restSeconds: 0f, damageTaken: 1.15f, look: sunderedLook);
 
         // ----- The physical kit (the user, 2026-11-24: "a lot of the skills and vfx be physical skills. not necessary magic"): steel, dust,
         // stone and wind, no runes or glows of power. -----
@@ -379,7 +400,7 @@ public static class SkillFxPrefabs
     }
 
     private static StatusEffectDefinition Status(string name, string description, Color colour, float seconds, float damagePerSecond, DamageType type,
-        float moveSpeed, bool refreshes, float restSeconds, float damageTaken = 1f)
+        float moveSpeed, bool refreshes, float restSeconds, float damageTaken = 1f, GameObject look = null)
     {
         string path = $"Assets/_Project/Data/Combat/Status/{name}.asset";
         var status = AssetDatabase.LoadAssetAtPath<StatusEffectDefinition>(path);
@@ -401,6 +422,7 @@ public static class SkillFxPrefabs
         so.FindProperty("refreshes").boolValue = refreshes;
         so.FindProperty("restSeconds").floatValue = restSeconds;
         so.FindProperty("damageTaken").floatValue = damageTaken;
+        so.FindProperty("look").objectReferenceValue = look;
         so.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(status);
         return status;

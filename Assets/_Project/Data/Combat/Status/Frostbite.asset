@@ -16,7 +16,8 @@ MonoBehaviour:
   displayName: Frostbite
   description: 'Rime in the joints: slowed, and the next frost spell freezes it.'
   color: {r: 0.6, g: 0.85, b: 1, a: 1}
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: cb78ed41c115a7342939c7adb8ad1127, type: 3}
+  look: {fileID: 2665792101396171980, guid: 35069806df8d0154fb4a107e18dbb265, type: 3}
   seconds: 12
   damagePerSecond: 0
   damageType: 2

@@ -4,7 +4,8 @@ using UnityEngine;
 /// A floating health bar above a Damageable. It appears when the target is hurt, fades out when the fight goes quiet and
 /// disappears on death. It only listens to the Damageable's events and never changes it. Put it under the target's
 /// object on a world-space canvas; it follows the target, faces the camera, and ignores the parent's scale so the bar
-/// keeps its shape on a stretched target.
+/// keeps its shape on a stretched target. Over a creature's bar, the icons of the statuses at work on it (StatusEffectDefinition.Icon),
+/// in the order laid; the bar stays up while any lasts.
 /// </summary>
 [OnAFriendsCopy(CopyRule.Same, "shows the health the host sends")]
 public sealed class WorldHealthBar : MonoBehaviour
@@ -23,7 +24,17 @@ public sealed class WorldHealthBar : MonoBehaviour
     [Tooltip("Height of the poise bar under a monster's health, in canvas units.")]
     [SerializeField, Min(1f)] private float poiseHeight = 5f;
 
+    // Status icons over the bar: canvas units each, and at most this many shown.
+    private const float StatusIconSize = 36f;
+    private const float StatusIconGap = 3f;
+    private const int MaxStatusIcons = 4;
+
     private MonsterAI monster;
+    private StatusEffects statuses;
+    private bool showsStatuses;
+    private RectTransform statusRow;
+    private int statusIconsPlaced = -1;
+    private readonly System.Collections.Generic.List<UnityEngine.UI.Image> statusIcons = new System.Collections.Generic.List<UnityEngine.UI.Image>();
     private RectTransform poiseFill;
     private UnityEngine.UI.Graphic poiseGraphic;
     private GameObject poiseBar;
@@ -70,6 +81,9 @@ public sealed class WorldHealthBar : MonoBehaviour
             {
                 BuildPoiseBar();
             }
+
+            // The player's own are beside the vitals (PlayerConditionsView).
+            showsStatuses = target.GetComponent<Player>() == null;
         }
     }
 
@@ -134,10 +148,110 @@ public sealed class WorldHealthBar : MonoBehaviour
 
         ApplyScale();
 
+        UpdateStatusIcons();
         float sinceChange = Time.time - lastChangeTime;
         float fade = Mathf.Clamp01((visibleSeconds + fadeSeconds - sinceChange) / fadeSeconds);
         group.alpha = dead ? 0f : fade;
         UpdatePoise();
+    }
+
+    private void UpdateStatusIcons()
+    {
+        if (!showsStatuses || dead)
+        {
+            return;
+        }
+
+        // Added by itself on the first status, so looked for until there.
+        if (statuses == null && !target.TryGetComponent(out statuses))
+        {
+            return;
+        }
+
+        int shown = 0;
+        var current = statuses.Current;
+        for (int i = 0; i < current.Count && shown < MaxStatusIcons; i++)
+        {
+            StatusEffectDefinition effect = current[i].Definition;
+            if (effect == null || effect.Icon == null)
+            {
+                continue;
+            }
+
+            UnityEngine.UI.Image icon = StatusIcon(shown);
+            if (icon.sprite != effect.Icon)
+            {
+                icon.sprite = effect.Icon;
+            }
+
+            if (!icon.gameObject.activeSelf)
+            {
+                icon.gameObject.SetActive(true);
+            }
+
+            shown++;
+        }
+
+        for (int i = shown; i < statusIcons.Count; i++)
+        {
+            if (statusIcons[i].gameObject.activeSelf)
+            {
+                statusIcons[i].gameObject.SetActive(false);
+            }
+        }
+
+        if (shown == 0)
+        {
+            statusIconsPlaced = 0;
+            return;
+        }
+
+        // Centred over the bar (placed again only when how many changes); and the bar stays up while something is at work on it.
+        if (shown != statusIconsPlaced)
+        {
+            statusIconsPlaced = shown;
+            float width = shown * StatusIconSize + (shown - 1) * StatusIconGap;
+            for (int i = 0; i < shown; i++)
+            {
+                ((RectTransform)statusIcons[i].transform).anchoredPosition = new Vector2(-width * 0.5f + i * (StatusIconSize + StatusIconGap), 0f);
+            }
+        }
+
+        lastChangeTime = Mathf.Max(lastChangeTime, Time.time - visibleSeconds * 0.5f);
+    }
+
+    private UnityEngine.UI.Image StatusIcon(int index)
+    {
+        if (statusRow == null)
+        {
+            var row = new GameObject("Status Icons", typeof(RectTransform));
+            statusRow = (RectTransform)row.transform;
+            statusRow.SetParent(transform, false);
+            statusRow.anchorMin = statusRow.anchorMax = new Vector2(0.5f, 1f);
+            statusRow.pivot = new Vector2(0.5f, 0f);
+            statusRow.sizeDelta = Vector2.zero;
+            statusRow.anchoredPosition = Vector2.up * StatusIconGap;
+        }
+
+        while (statusIcons.Count <= index)
+        {
+            var icon = new GameObject("Status Icon", typeof(RectTransform), typeof(UnityEngine.UI.Image));
+            var rect = (RectTransform)icon.transform;
+            rect.SetParent(statusRow, false);
+            rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0f);
+            rect.pivot = new Vector2(0f, 0f);
+            rect.sizeDelta = new Vector2(StatusIconSize, StatusIconSize);
+            var image = icon.GetComponent<UnityEngine.UI.Image>();
+            image.preserveAspect = true;
+            image.raycastTarget = false;
+            // A thin dark edge, so a dark-red bleed still reads over the ground.
+            var edge = icon.AddComponent<UnityEngine.UI.Outline>();
+            edge.effectColor = new Color(0f, 0f, 0f, 0.7f);
+            edge.effectDistance = new Vector2(1.5f, -1.5f);
+            statusIcons.Add(image);
+        }
+
+        return statusIcons[index];
     }
 
     private void UpdatePoise()

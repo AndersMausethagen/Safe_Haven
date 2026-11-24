@@ -18,6 +18,8 @@ public sealed class StatusEffectDefinition : ScriptableObject, IDisplayName
     [SerializeField] private Color color = Color.white;
     [Tooltip("Its icon beside the vitals (LocalSpawn: Tools/LocalSpawn/condition_icons.json). Empty: the name alone.")]
     [SerializeField] private Sprite icon;
+    [Tooltip("A looping effect shown on whatever bears it while it lasts (StatusBearerLook): flames, rime, a bleed. Empty: nothing shows.")]
+    [SerializeField] private GameObject look;
 
     [Header("Effect")]
     [Tooltip("Seconds it lasts. A new hit restarts the time; effects don't stack.")]
@@ -52,6 +54,7 @@ public sealed class StatusEffectDefinition : ScriptableObject, IDisplayName
     public DamageType DamageType => damageType;
     public float MoveSpeed => moveSpeed;
     public float DamageTaken => damageTaken;
+    public GameObject Look => look;
     public bool Refreshes => refreshes;
     public bool EndsOnDodge => endsOnDodge;
     public float RestSeconds => restSeconds;

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SkillDefinition
   displayName: Rune Art
   description: The art of the rune attuned to the weapon in your hand. Carve and attune an art rune to give a weapon a second art.
-  icon: {fileID: 21300000, guid: 461b6b2aa6a982247a1ec2a5a582dfff, type: 3}
+  icon: {fileID: 21300000, guid: 792933711f752014b9c9a5ca282b4d56, type: 3}
   school: 0
   cooldown: 0
   staminaCost: 0

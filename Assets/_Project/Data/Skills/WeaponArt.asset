@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SkillDefinition
   displayName: Weapon's Art
   description: 'The art of the weapon in your hand: a sword''s dash, a thrown axe, a leap slam. It changes with what you hold, paid in Focus.'
-  icon: {fileID: 21300000, guid: 128d0ccd3ecefe3448bc899f7c75e6d9, type: 3}
+  icon: {fileID: 21300000, guid: e9d68ba363004e84c92ac2f401c77306, type: 3}
   school: 0
   cooldown: 0
   staminaCost: 0
