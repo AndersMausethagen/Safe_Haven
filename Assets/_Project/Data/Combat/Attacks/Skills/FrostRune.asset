@@ -30,9 +30,19 @@ MonoBehaviour:
   lunge: 0
   hop: 0
   staminaCost: -1
-  appliesStatus: {fileID: 11400000, guid: 32e9e33fb8f2e0748970b5e855fe720e, type: 2}
+  appliesStatus: {fileID: 11400000, guid: eb29ff49b3b2c554a8747c7f55c3b1d0, type: 2}
   statusChance: 1
   onRepeatStatus: {fileID: 11400000, guid: 1fc6fc7dd9d031c4ea2810d1eddddc86, type: 2}
+  look:
+    showArea: 0
+    cast: []
+    release: []
+    struck: []
+    light: {r: 0, g: 0, b: 0, a: 0}
+    lightIntensity: 6
+    lightRange: 8
+    lightSeconds: 0.35
+    shake: 0
   groundImpact: {fileID: 0}
   unblockable: 0
   pull: 0

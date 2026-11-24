@@ -14,7 +14,15 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
+    "defineConstraints": [
+        "SH_VFX_GRAPH_17_6"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.visualeffectgraph",
+            "expression": "[17.6.0,17.7.0)",
+            "define": "SH_VFX_GRAPH_17_6"
+        }
+    ],
     "noEngineReferences": false
 }

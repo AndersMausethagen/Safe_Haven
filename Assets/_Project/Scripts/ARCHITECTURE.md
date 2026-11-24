@@ -3275,6 +3275,20 @@ sample textures and flames are in `Art/Effects/VFX Graph/Additions` (Unity Compa
 - **All eight abilities dressed** (slice 3): Wolf's Lunge (dust, a red bite on what it strikes), Whirling Steel (a gold ring, sparks),
   Huldra's Blessing (a green rune circle, golden motes rising), Mountain Leap (an earth shockwave, dust round the landing), Heartroot's
   Grasp (thorns breaking out along the line, dust). A lunging skill's area shows where it lands.
+- **Physical skills stand out too** (slice 4; the user: "a lot of the skills and vfx be physical skills. not necessary magic"):
+  `AttackDefinition.Look` gives a weapon art its own cues, played by `SkillFx.ArtBegin` (as the swing starts) and `ArtLand` (in
+  `PlayerCombat.LandSwing`, with what it struck and, for a dash, where it began: `SkillFxPlace.Trail`). The physical kit (`Phys *` prefabs):
+  a crescent slash (`Slash.png` on the Ring graph), a wind ring, dust, rock debris (`Skill Debris` graph, `SkillMeshes.Rock`), an impact
+  flash, hit sparks, speed lines (`Streak.png`), a smoke puff, a punch ring, blood. All 16 arts dressed by how they move: spins (slash,
+  wind, dust), the sword's dash (dust and speed lines along its path, a slash at its end), the dagger's blink (smoke where it leaves and
+  arrives), leap slams (flash, wind, debris, dust, a shake by weight), the fists' and the knee's strikes (a punch ring), throws (a gust,
+  lines ahead). Trollsbane Wrath, Mountain Leap, Whirling Steel and Wolf's Lunge are physical now (no rune circles: dust, debris, slashes,
+  speed lines, blood).
+- **Review fixes (2026-11-24):** saves from before keep gaining Weapon's Art and Rune Art (`PlayerSkills.Restore`); the altar doesn't deepen
+  the art entries; consumables take slots 6-9 first so 1-5 stay free for taught abilities; an art refused says so (`CastRefused`) and
+  never reports a cast it didn't start; Frost Rune leaves its own Frostbite (12 s, longer than its cooldown) so its next cast freezes;
+  quest rewards name the abilities they teach; a cast cut short takes its area mark away; only blows that got through play their struck
+  effects; the Abilities tutorial opens with the first fight; `Editor/VfxAuthoring` compiles only against VFX Graph 17.6.x.
 - Not yet: statuses for Beast/Wyrd/Steel, the paid casting animations (the user buys and imports Kevin Iglesias' Human Spellcasting
   Animations), effects for the weapon arts themselves.
 

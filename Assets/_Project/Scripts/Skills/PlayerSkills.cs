@@ -122,7 +122,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
     private void OnAnyDamaged(Damageable victim, DamageInfo damage, DamageResult result)
     {
-        if (collectingStruck && victim != null && damage.Source == combatant && struck.Count < 16)
+        if (collectingStruck && victim != null && damage.Source == combatant && struck.Count < 16 && result.Damage > 0f && !result.Blocked && !result.Parried)
         {
             struck.Add(victim.transform.position);
         }
@@ -137,7 +137,21 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             return;
         }
 
-        int free = loadout.FirstEmptySlot();
+        // Slots 6-9 first: 1-5 are where abilities go as they are learned (the user, 2026-11-24: skills stay 1-5); then any free one.
+        int free = -1;
+        for (int slot = 5; slot < SkillLoadout.SlotCount && free < 0; slot++)
+        {
+            if (loadout.Get(slot) == null && loadout.GetItem(slot) == null)
+            {
+                free = slot;
+            }
+        }
+
+        if (free < 0)
+        {
+            free = loadout.FirstEmptySlot();
+        }
+
         if (free >= 0)
         {
             loadout.EquipItem(free, item);
@@ -175,9 +189,10 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     private void Update()
     {
         // Death cancels a hit that has not landed yet, just as a dodge does.
-        if (!health.IsAlive)
+        if (!health.IsAlive && pendingHit != null)
         {
             pendingHit = null;
+            SkillAreaMark.Hide();
         }
 
         if (pendingHit != null && Time.time >= pendingHitAt)
@@ -271,6 +286,18 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             }
         }
 
+        // A save from before the weapon-art entries (2026-11-24) knows them too: they come with every game, and are put on no slot here.
+        if (settings != null)
+        {
+            foreach (SkillDefinition starting in settings.StartingSkills)
+            {
+                if (starting != null && starting.WeaponArt != WeaponArtSlot.None)
+                {
+                    AddKnown(starting);
+                }
+            }
+        }
+
         var allowed = new SkillDefinition[SkillLoadout.SlotCount];
         for (int i = 0; i < allowed.Length && slots != null && i < slots.Length; i++)
         {
@@ -301,7 +328,14 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
                 return SkillCastResult.EmptySlot;
             }
 
-            return combat.TryArt(skill.WeaponArt == WeaponArtSlot.Rune) ? SkillCastResult.Cast : SkillCastResult.CoolingDown;
+            if (combat.TryArt(skill.WeaponArt == WeaponArtSlot.Rune))
+            {
+                return SkillCastResult.Cast;
+            }
+
+            SkillCastResult refused = combat.ArtCooldownFraction > 0f ? SkillCastResult.CoolingDown : SkillCastResult.Busy;
+            CastRefused?.Invoke(slot, refused);
+            return refused;
         }
 
         SkillCastResult result = CheckCast(skill);
@@ -487,6 +521,11 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     // A dodge is the way out of trouble: like a weapon swing, a skill hit that hadn't landed yet is lost.
     private void OnDodged(Vector3 direction)
     {
+        if (pendingHit != null)
+        {
+            SkillAreaMark.Hide();
+        }
+
         pendingHit = null;
     }
 
@@ -495,6 +534,11 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
     public void Interrupt(PlayerInterrupt reason)
     {
+        if (pendingHit != null)
+        {
+            SkillAreaMark.Hide();
+        }
+
         pendingHit = null;
     }
 

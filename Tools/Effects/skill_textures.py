@@ -7,6 +7,8 @@ Assets/_Project/Art/Effects/Skills/Textures:
   Shard.png        a long thin diamond (ice shards, splinters)
   Rune Circle.png  a double ring carrying runes of the elder futhark (the cast circle under the feet)
   Ember.png        a small hot ember with a faint tail
+  Slash.png        a crescent swept by a blade: bright at its leading edge, thin at the tips (physical arts)
+  Streak.png       a long soft line, for speed lines along a dash
 Run: python Tools/Effects/skill_textures.py
 """
 import math
@@ -123,10 +125,44 @@ def ember():
     save(a, "Ember.png")
 
 
+def slash():
+    a = blank()
+    px = a.load()
+    c = SIZE / 2
+    for y in range(SIZE):
+        for x in range(SIZE):
+            dx, dy = (x - c) / c, (y - c) / c
+            r = math.hypot(dx, dy)
+            ang = math.atan2(dy, dx)  # the crescent spans the upper half, its middle at the top
+            along = (ang + math.pi) / math.pi - 1.0  # -1..1 over the upper half
+            if dy > 0.05:
+                continue
+            span = max(0.0, 1 - abs(along + 0.5) / 0.5) if -1 <= along <= 0 else 0.0
+            width = 0.07 + 0.11 * span
+            band = math.exp(-((r - 0.8) / width) ** 2)
+            edge = math.exp(-((r - 0.86) / 0.025) ** 2) * 0.8
+            px[x, y] = int(min(1.0, (band * 0.7 + edge) * span ** 0.6) * 255)
+    save(a, "Slash.png")
+
+
+def streak():
+    a = blank()
+    px = a.load()
+    c = SIZE / 2
+    for y in range(SIZE):
+        for x in range(SIZE):
+            dx, dy = (x - c) / c, (y - c) / c
+            v = math.exp(-(dx / 0.06) ** 2) * max(0.0, 1 - abs(dy)) ** 1.5
+            px[x, y] = int(min(1.0, v) * 255)
+    save(a, "Streak.png")
+
+
 if __name__ == "__main__":
     glow()
     ring()
     shard()
     rune_circle()
     ember()
+    slash()
+    streak()
     print("written to", os.path.abspath(OUT))

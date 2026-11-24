@@ -43,12 +43,16 @@ public sealed class SkillLookTests
         foreach (Vector3 point in ring)
         {
             Assert.AreEqual(4f, Vector3.Distance(new Vector3(point.x, origin.y, point.z), origin), 0.01f, "round the reach");
+            Assert.AreEqual(4f, new Vector2(point.x - origin.x, point.z - origin.z).magnitude, 0.01f);
         }
 
         var arc = SkillFx.Points(new SkillFxCue { place = SkillFxPlace.AcrossArc, count = 5 }, origin, Vector3.forward, 5f, 90f, null);
         foreach (Vector3 point in arc)
         {
-            Assert.LessOrEqual(Vector3.Angle(Vector3.forward, point - origin), 45.01f, "inside the arc");
+            // Flat: over a scene's terrain the points sit on the ground, below the origin.
+            Vector3 flat = point - origin;
+            flat.y = 0f;
+            Assert.LessOrEqual(Vector3.Angle(Vector3.forward, flat), 45.01f, "inside the arc");
         }
 
         var struck = SkillFx.Points(new SkillFxCue { place = SkillFxPlace.Struck }, origin, Vector3.forward, 5f, 90f,
@@ -62,6 +66,8 @@ public sealed class SkillLookTests
         var attack = AssetDatabase.LoadAssetAtPath<AttackDefinition>("Assets/_Project/Data/Combat/Attacks/Skills/FrostRune.asset");
         Assert.IsNotNull(attack.AppliesStatus, "it chills");
         Assert.IsNotNull(attack.OnRepeatStatus, "and freezes the chilled");
+        var frostRune = AssetDatabase.LoadAssetAtPath<SkillDefinition>("Assets/_Project/Data/Skills/FrostRune.asset");
+        Assert.Greater(attack.AppliesStatus.Seconds, frostRune.Cooldown, "its chill outlasts its cooldown, so its next cast can freeze (not only a double hit)");
         var target = new GameObject("A test's creature");
         made.Add(target);
         Damageable body = target.AddComponent<Damageable>();

@@ -32,20 +32,41 @@ MonoBehaviour:
   look:
     showArea: 1
     cast:
-    - prefab: {fileID: 1427224481811129364, guid: 0dc66c94267ef43498f9a5d9327d5f76, type: 3}
+    - prefab: {fileID: 4047249316231547844, guid: 470b560476fcda647a51ec6ad778232e, type: 3}
       place: 1
       count: 1
       delay: 0
       stepDelay: 0
-      seconds: 1
+      seconds: 0.6
       scale: 1
     release:
+    - prefab: {fileID: 9094924754952946362, guid: f6aa8ea3f98f40f49909360b12272fcb, type: 3}
+      place: 1
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 0.3
+      scale: 1
     - prefab: {fileID: 6165302538196151827, guid: a4dec363fcb893a43892b757a154758d, type: 3}
       place: 1
       count: 1
       delay: 0
       stepDelay: 0
       seconds: 0.6
+      scale: 1
+    - prefab: {fileID: 2681584111135180071, guid: 3944ddcf25c73224393184634d06ba50, type: 3}
+      place: 1
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 1.3
+      scale: 1
+    - prefab: {fileID: 2681584111135180071, guid: 3944ddcf25c73224393184634d06ba50, type: 3}
+      place: 4
+      count: 4
+      delay: 0.04
+      stepDelay: 0
+      seconds: 1.3
       scale: 1
     - prefab: {fileID: 4025133171583311569, guid: 4c35bb8e3b7944746a23f992b5375464, type: 3}
       place: 4
@@ -61,7 +82,14 @@ MonoBehaviour:
       stepDelay: 0
       seconds: 1.2
       scale: 1
-    struck: []
+    struck:
+    - prefab: {fileID: 7695878944792941921, guid: 91c82be48bd6a2c46b2cbd1b38c5f670, type: 3}
+      place: 5
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 0.8
+      scale: 1
     light: {r: 1, g: 0.8, b: 0.45, a: 1}
     lightIntensity: 9
     lightRange: 10

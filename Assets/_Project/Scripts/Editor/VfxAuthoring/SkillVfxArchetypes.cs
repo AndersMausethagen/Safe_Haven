@@ -22,6 +22,7 @@ public static class SkillVfxArchetypes
         Ring();
         Spikes();
         Flames();
+        Debris();
     }
 
     private static Texture2D Tex(string path) => AssetDatabase.LoadAssetAtPath<Texture2D>(path);
@@ -179,6 +180,60 @@ public static class SkillVfxArchetypes
         // Up out of the ground fast, stand, then sink.
         VfxBuilder.Set(sizeOverLife, "Size", new AnimationCurve(new Keyframe(0f, 0f, 0f, 9f), new Keyframe(0.12f, 1.05f), new Keyframe(0.2f, 1f),
             new Keyframe(0.8f, 1f), new Keyframe(1f, 0f)));
+        b.Save();
+        return VfxGraphAuthoring.Describe(path);
+    }
+
+    /// <summary>Rock chunks thrown up by a slam: lit meshes flung out and up, tumbling, falling, shrinking away as they land.</summary>
+    public static string Debris()
+    {
+        EnsureFolder();
+        string path = Folder + "/Skill Debris.vfx";
+        Mesh rock = SkillMeshes.Rock();
+        VfxBuilder b = VfxBuilder.Create(path);
+        VFXContext spawn = b.Context("Spawn");
+        VFXBlock burst = b.Block(spawn, "Single Burst");
+        VFXContext init = b.Context("Initialize Particle");
+        VfxBuilder.SetEnum(init.GetData(), "boundsMode", "Automatic");
+        VFXBlock position = b.Block(init, "|Set|_Position Shape|Sphere");
+        VFXBlock velocity = b.Block(init, "|Set|_Velocity");
+        VfxBuilder.SetEnum(velocity, "Random", "Uniform");
+        VFXBlock lifetime = b.Block(init, "|Set|_Lifetime");
+        VfxBuilder.SetEnum(lifetime, "Random", "Uniform");
+        VFXBlock size = b.Block(init, "|Set|_Size");
+        VfxBuilder.SetEnum(size, "Random", "Uniform");
+        VFXBlock spin = b.Block(init, "|Set|_Angular Velocity");
+        VfxBuilder.SetEnum(spin, "Random", "Uniform");
+        VFXBlock angle = b.Block(init, "|Set|_Angle");
+        VfxBuilder.SetEnum(angle, "Random", "Uniform");
+        VFXBlock colour = b.Block(init, "|Set|_Color");
+        VFXContext update = b.Context("Update Particle");
+        VFXBlock gravity = b.Block(update, "Gravity");
+        b.Block(update, "Integration Update|Rotation");
+        VFXContext output = b.Context("Output Particle|URP Lit|Mesh");
+        VfxBuilder.SetEnum(output, "useBaseColorMap", "None");
+        VFXBlock sizeOverLife = b.Block(output, "|Set|_Size|Over Life");
+        VfxBuilder.SetEnum(sizeOverLife, "Composition", "Multiply");
+        VfxBuilder.Flow(spawn, init);
+        VfxBuilder.Flow(init, update);
+        VfxBuilder.Flow(update, output);
+        b.Expose("Count", 10f, VfxBuilder.Slot(burst, "Count"));
+        b.Expose("Radius", 0.6f, VfxBuilder.Slot(position, "radius"));
+        b.Expose("Velocity Min", new Vector3(-3.5f, 3f, -3.5f), VfxBuilder.Slot(velocity, "A"));
+        b.Expose("Velocity Max", new Vector3(3.5f, 7f, 3.5f), VfxBuilder.Slot(velocity, "B"));
+        b.Expose("Lifetime Min", 0.7f, VfxBuilder.Slot(lifetime, "A"));
+        b.Expose("Lifetime Max", 1.1f, VfxBuilder.Slot(lifetime, "B"));
+        b.Expose("Size Min", 0.6f, VfxBuilder.Slot(size, "A"));
+        b.Expose("Size Max", 1.4f, VfxBuilder.Slot(size, "B"));
+        VfxBuilder.Set(spin, "A", new Vector3(-540f, -540f, -540f));
+        VfxBuilder.Set(spin, "B", new Vector3(540f, 540f, 540f));
+        VfxBuilder.Set(angle, "A", Vector3.zero);
+        VfxBuilder.Set(angle, "B", new Vector3(360f, 360f, 360f));
+        b.Expose("Color", new Vector3(0.42f, 0.38f, 0.32f), VfxBuilder.Slot(colour, "_Color"));
+        b.Expose("Gravity", new Vector3(0f, -18f, 0f), VfxBuilder.Slot(gravity, "Force"));
+        b.Expose("Mesh", rock, VfxBuilder.Slot(output, "mesh"));
+        b.Expose("Smoothness", 0.15f, VfxBuilder.Slot(output, "smoothness"));
+        VfxBuilder.Set(sizeOverLife, "Size", new AnimationCurve(new Keyframe(0f, 1f), new Keyframe(0.75f, 1f), new Keyframe(1f, 0f)));
         b.Save();
         return VfxGraphAuthoring.Describe(path);
     }

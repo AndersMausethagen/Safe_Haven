@@ -263,9 +263,16 @@ public sealed partial class PlayerCombat
 
         activeDirection = toFinish != null ? toFinish.transform.forward : AimAssist(movement.AimDirection, attack, out _);
         activeMotion = kind == SwingKind.Art && attack != null ? attack.Motion : ArtMotion.None;
+        // A weapon art's own look as it begins (a dagger's smoke where it leaves, a dash's dust kicked up, a throw's gust).
+        Vector3 artFrom = transform.position;
         if (activeMotion == ArtMotion.BlinkBehind && !BlinkBehindFocus(attack.MotionDistance))
         {
             activeMotion = ArtMotion.None;
+        }
+
+        if (kind == SwingKind.Art)
+        {
+            SkillFx.ArtBegin(attack, artFrom, activeDirection);
         }
 
         movement.SnapFacing(activeDirection);
@@ -727,6 +734,18 @@ public sealed partial class PlayerCombat
         if (foundHits.Count == 0)
         {
             HitMaterials.Glance(origin, activeDirection, activeAttack.Range, gameObject);
+        }
+
+        // A weapon art's own look as it lands: over its reach, along a dash's path, on everything it struck.
+        if (activeKind == SwingKind.Art)
+        {
+            artStruck.Clear();
+            foreach (HitDetector.Hit hit in foundHits)
+            {
+                artStruck.Add(hit.Point);
+            }
+
+            SkillFx.ArtLand(activeAttack, origin, activeDirection, artStruck, activeMotion == ArtMotion.DashThrough ? dashFrom : origin);
         }
 
         // A heavy blow or a weapon art strikes the ground too, hit or miss: wind, dust, a mark (GroundImpacts).

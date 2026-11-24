@@ -52,8 +52,31 @@ public sealed class SkillFx : MonoBehaviour
             SkillAreaMark.Show(lands, aim, skill.Attack.Range, skill.Attack.Arc, SkillSchools.ColorOf(skill.School), windUp);
         }
 
-        Runner.PlayAll(look.cast, caster.position, aim, skill, null);
+        Runner.PlayAll(look.cast, caster.position, aim, Reach(skill.Attack), Arc(skill.Attack), null, caster.position);
     }
+
+    /// <summary>A weapon art begins (its attack's own look, AttackDefinition.Look): its cast cues round the striker.</summary>
+    public static void ArtBegin(AttackDefinition attack, Vector3 origin, Vector3 aim)
+    {
+        if (attack != null && attack.Look != null && !attack.Look.IsEmpty)
+        {
+            Runner.PlayAll(attack.Look.cast, origin, aim, attack.Range, attack.Arc, null, origin);
+        }
+    }
+
+    /// <summary>A weapon art lands: its release cues over its reach and arc (and along the path a dash came, from <paramref name="from"/>),
+    /// on what it struck, a flash and a shake.</summary>
+    public static void ArtLand(AttackDefinition attack, Vector3 origin, Vector3 aim, IReadOnlyList<Vector3> struck, Vector3 from)
+    {
+        if (attack != null && attack.Look != null && !attack.Look.IsEmpty)
+        {
+            Runner.Land(attack.Look, origin, aim, attack.Range, attack.Arc, struck, from);
+        }
+    }
+
+    private static float Reach(AttackDefinition attack) => attack != null ? attack.Range : 2f;
+
+    private static float Arc(AttackDefinition attack) => attack != null ? attack.Arc : 60f;
 
     /// <summary>The release: its cues over the attack's reach and arc, on what it struck, a flash and a shake.</summary>
     public static void Release(SkillDefinition skill, Vector3 origin, Vector3 aim, IReadOnlyList<Vector3> struck)
@@ -63,13 +86,16 @@ public sealed class SkillFx : MonoBehaviour
             return;
         }
 
-        SkillLook look = skill.Look;
-        SkillFx fx = Runner;
-        fx.PlayAll(look.release, origin, aim, skill, null);
-        fx.PlayAll(look.struck, origin, aim, skill, struck);
+        Runner.Land(skill.Look, origin, aim, Reach(skill.Attack), Arc(skill.Attack), struck, origin);
+    }
+
+    private void Land(SkillLook look, Vector3 origin, Vector3 aim, float reach, float arc, IReadOnlyList<Vector3> struck, Vector3 from)
+    {
+        PlayAll(look.release, origin, aim, reach, arc, null, from);
+        PlayAll(look.struck, origin, aim, reach, arc, struck, from);
         if (look.light.a > 0f && look.lightIntensity > 0f)
         {
-            fx.Flash(origin + Vector3.up * 1.2f, look.light, look.lightIntensity, look.lightRange, look.lightSeconds);
+            Flash(origin + Vector3.up * 1.2f, look.light, look.lightIntensity, look.lightRange, look.lightSeconds);
         }
 
         if (look.shake > 0f)
@@ -78,12 +104,10 @@ public sealed class SkillFx : MonoBehaviour
         }
     }
 
-    private void PlayAll(List<SkillFxCue> cues, Vector3 origin, Vector3 aim, SkillDefinition skill, IReadOnlyList<Vector3> struck)
+    private void PlayAll(List<SkillFxCue> cues, Vector3 origin, Vector3 aim, float reach, float arc, IReadOnlyList<Vector3> struck, Vector3 from)
     {
         aim.y = 0f;
         aim = aim.sqrMagnitude > 0.0001f ? aim.normalized : Vector3.forward;
-        float reach = skill.Attack != null ? skill.Attack.Range : 2f;
-        float arc = skill.Attack != null ? skill.Attack.Arc : 60f;
         foreach (SkillFxCue cue in cues)
         {
             if (cue == null || cue.prefab == null)
@@ -91,7 +115,7 @@ public sealed class SkillFx : MonoBehaviour
                 continue;
             }
 
-            List<Vector3> points = Points(cue, origin, aim, reach, arc, struck);
+            List<Vector3> points = Points(cue, origin, aim, reach, arc, struck, from);
             for (int i = 0; i < points.Count; i++)
             {
                 StartCoroutine(PlayLater(cue, points[i], aim, cue.delay + cue.stepDelay * i));
@@ -100,7 +124,8 @@ public sealed class SkillFx : MonoBehaviour
     }
 
     /// <summary>Where a cue's effects go (public for tests): its place over the caster, the reach, the arc or what was struck.</summary>
-    public static List<Vector3> Points(SkillFxCue cue, Vector3 origin, Vector3 aim, float reach, float arc, IReadOnlyList<Vector3> struck)
+    public static List<Vector3> Points(SkillFxCue cue, Vector3 origin, Vector3 aim, float reach, float arc, IReadOnlyList<Vector3> struck,
+        Vector3? from = null)
     {
         var points = new List<Vector3>();
         int count = Mathf.Max(1, cue.count);
@@ -133,6 +158,15 @@ public sealed class SkillFx : MonoBehaviour
                 {
                     float angle = i * 360f / count;
                     points.Add(Grounded(origin + Quaternion.Euler(0f, angle, 0f) * aim * reach));
+                }
+
+                break;
+            case SkillFxPlace.Trail:
+                // From where a dash began to where it ended, evenly (one at the end when it didn't move).
+                Vector3 start = from ?? origin;
+                for (int i = 0; i < count; i++)
+                {
+                    points.Add(Grounded(Vector3.Lerp(start, origin, count == 1 ? 1f : i / (float)(count - 1))));
                 }
 
                 break;

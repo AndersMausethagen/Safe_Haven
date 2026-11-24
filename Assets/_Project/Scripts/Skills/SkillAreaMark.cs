@@ -58,6 +58,15 @@ public sealed class SkillAreaMark : MonoBehaviour
         current.Paint(0f, 0f);
     }
 
+    /// <summary>Takes the mark away at once: the cast was cut short (a dodge, a stagger, a death).</summary>
+    public static void Hide()
+    {
+        if (current != null)
+        {
+            current.gameObject.SetActive(false);
+        }
+    }
+
     private void Update()
     {
         float now = Time.time;

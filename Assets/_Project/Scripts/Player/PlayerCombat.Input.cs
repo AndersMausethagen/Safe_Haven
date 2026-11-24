@@ -208,7 +208,13 @@ public sealed partial class PlayerCombat
             guard.Lower();
         }
 
-        Request(SwingKind.Art, ChainPress.Late);
+        // The swing may still refuse (eating, a lock after a dodge): then nothing started, and the rune is forgotten.
+        if (!Request(SwingKind.Art, ChainPress.Late))
+        {
+            artFromRune = false;
+            return false;
+        }
+
         return true;
     }
 

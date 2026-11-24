@@ -57,7 +57,39 @@ public static class SkillFxPrefabs
             DamageType.Frost, 0f, refreshes: false, restSeconds: 4f);
         StatusEffectDefinition burning = Status("Burning", "Alight: it burns a while.", new Color(1f, 0.5f, 0.15f), 4f, 3f, DamageType.Fire, 1f,
             refreshes: true, restSeconds: 0f);
-        StatusEffectDefinition chill = AssetDatabase.LoadAssetAtPath<StatusEffectDefinition>("Assets/_Project/Data/Combat/Status/Chill.asset");
+        // Frost Rune's own chill, outlasting its cooldown (10 s), so the next lance freezes what the last one chilled (review 2026-11-24:
+        // with the shared 5 s Chill it never could). The monsters' Chill on the player stays as it was.
+        StatusEffectDefinition chill = Status("Frostbite", "Rime in the joints: slowed, and the next frost spell freezes it.", new Color(0.6f, 0.85f, 1f),
+            12f, 0f, DamageType.Frost, 0.7f, refreshes: true, restSeconds: 0f);
+
+        // ----- The physical kit (the user, 2026-11-24: "a lot of the skills and vfx be physical skills. not necessary magic"): steel, dust,
+        // stone and wind, no runes or glows of power. -----
+        GameObject slash = Make("Phys Slash", new Design("Skill Ring").T("Texture", "Slash").V("Color", new Vector3(2.4f, 2.1f, 1.6f)).F("Size", 5f)
+            .F("Lifetime", 0.22f));
+        GameObject windRing = Make("Phys Wind Ring", new Design("Skill Ring").T("Texture", "Ring").V("Color", new Vector3(0.7f, 0.75f, 0.8f)).F("Size", 6f)
+            .F("Lifetime", 0.3f));
+        GameObject dust = Make("Phys Dust", new Design("Skill Mist").F("Rate", 90f).F("Radius", 0.6f).V("Color", new Vector3(0.52f, 0.47f, 0.4f))
+            .F("Alpha", 0.5f).F("Lifetime Min", 0.6f).F("Lifetime Max", 1.1f).F("Size Min", 0.5f).F("Size Max", 1f)
+            .V("Velocity Min", new Vector3(-0.8f, 0.2f, -0.8f)).V("Velocity Max", new Vector3(0.8f, 1f, 0.8f)));
+        GameObject debris = Make("Phys Debris", new Design("Skill Debris").F("Count", 10f));
+        GameObject flash = Make("Phys Flash", new Design("Skill Burst").T("Texture", "Glow").V("Color", new Vector3(3f, 2.6f, 2f)).F("Count", 1f)
+            .V("Velocity Min", Vector3.zero).V("Velocity Max", Vector3.zero).V("Gravity", Vector3.zero).F("Size Min", 2.2f).F("Size Max", 2.6f)
+            .F("Lifetime Min", 0.12f).F("Lifetime Max", 0.14f));
+        GameObject sparks = Make("Phys Hit Sparks", new Design("Skill Burst").V("Color", new Vector3(4f, 3f, 1.6f)).F("Count", 26f)
+            .V("Velocity Min", new Vector3(-4f, 1f, -4f)).V("Velocity Max", new Vector3(4f, 4.5f, 4f)).F("Size Min", 0.05f).F("Size Max", 0.12f));
+        GameObject streaksBack = Make("Phys Speed Lines", new Design("Skill Burst").T("Texture", "Streak").V("Color", new Vector3(1.6f, 1.6f, 1.7f))
+            .F("Count", 18f).V("Velocity Min", new Vector3(-0.6f, 0f, -10f)).V("Velocity Max", new Vector3(0.6f, 0.6f, -6f)).V("Gravity", Vector3.zero)
+            .F("Drag", 3f).F("Size Min", 0.25f).F("Size Max", 0.5f).F("Lifetime Min", 0.2f).F("Lifetime Max", 0.35f));
+        GameObject streaksAhead = Make("Phys Throw Lines", new Design("Skill Burst").T("Texture", "Streak").V("Color", new Vector3(1.6f, 1.6f, 1.7f))
+            .F("Count", 14f).V("Velocity Min", new Vector3(-0.4f, 0f, 7f)).V("Velocity Max", new Vector3(0.4f, 0.5f, 11f)).V("Gravity", Vector3.zero)
+            .F("Drag", 3f).F("Size Min", 0.25f).F("Size Max", 0.5f).F("Lifetime Min", 0.2f).F("Lifetime Max", 0.3f));
+        GameObject smoke = Make("Phys Smoke Puff", new Design("Skill Mist").F("Rate", 120f).F("Radius", 0.5f).V("Color", new Vector3(0.18f, 0.18f, 0.2f))
+            .F("Alpha", 0.6f).F("Lifetime Min", 0.5f).F("Lifetime Max", 0.8f).F("Size Min", 0.6f).F("Size Max", 1.1f));
+        GameObject punchRing = Make("Phys Punch Ring", new Design("Skill Ring").T("Texture", "Ring").V("Color", new Vector3(1.8f, 1.6f, 1.3f)).F("Size", 2.4f)
+            .F("Lifetime", 0.2f));
+        GameObject bloodHit = Make("Phys Blood Hit", new Design("Skill Burst").T("Texture", "Glow").V("Color", new Vector3(0.9f, 0.08f, 0.05f)).F("Count", 18f)
+            .V("Velocity Min", new Vector3(-2.5f, 0.5f, -2.5f)).V("Velocity Max", new Vector3(2.5f, 3f, 2.5f)).F("Size Min", 0.06f).F("Size Max", 0.14f)
+            .F("Lifetime Min", 0.3f).F("Lifetime Max", 0.55f));
 
         // ----- Frost Rune: a lance of ice racing out along the aim. -----
         GameObject frostCircle = Make("Frost Cast Circle", new Design("Skill Ring").T("Texture", "Rune Circle").V("Color", new Vector3(0.5f, 1.4f, 3f))
@@ -118,8 +150,6 @@ public static class SkillFxPrefabs
         log.AppendLine(Dress("AshladsEmber", ember, burning, null, arc: -1f));
 
         // ----- Trollsbane Wrath: the hammer comes down and the ground answers. -----
-        GameObject wrathCircle = Make("Wrath Cast Circle", new Design("Skill Ring").T("Texture", "Rune Circle").V("Color", new Vector3(3f, 2.2f, 1f))
-            .F("Size", 3.4f).F("Lifetime", 0.8f));
         GameObject wrathWave = Make("Wrath Shockwave", new Design("Skill Ring").T("Texture", "Ring").V("Color", new Vector3(1.6f, 1.1f, 0.45f)).F("Size", 8f)
             .F("Lifetime", 0.45f));
         GameObject wrathDust = Make("Wrath Dust", new Design("Skill Mist").F("Rate", 70f).F("Radius", 0.8f).V("Color", new Vector3(0.55f, 0.5f, 0.42f))
@@ -129,12 +159,14 @@ public static class SkillFxPrefabs
             .V("Velocity Min", new Vector3(-6f, 2f, -6f)).V("Velocity Max", new Vector3(6f, 7f, 6f)));
         var wrath = new SkillLook
         {
-            cast = { Cue(wrathCircle, SkillFxPlace.CasterGround, 1, 0f, 0f, 1f) },
+            cast = { Cue(dust, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.6f) },
             release =
             {
-                Cue(wrathWave, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.6f), Cue(wrathDust, SkillFxPlace.Ring, 8, 0.03f, 0f, 0.7f),
-                Cue(wrathSparks, SkillFxPlace.CasterGround, 1, 0f, 0f, 1.2f),
+                Cue(flash, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.3f), Cue(wrathWave, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.6f),
+                Cue(debris, SkillFxPlace.CasterGround, 1, 0f, 0f, 1.3f), Cue(debris, SkillFxPlace.Ring, 4, 0.04f, 0f, 1.3f),
+                Cue(wrathDust, SkillFxPlace.Ring, 8, 0.03f, 0f, 0.7f), Cue(wrathSparks, SkillFxPlace.CasterGround, 1, 0f, 0f, 1.2f),
             },
+            struck = { Cue(sparks, SkillFxPlace.Struck, 1, 0f, 0f, 0.8f) },
             light = new Color(1f, 0.8f, 0.45f, 1f), lightIntensity = 9f, lightRange = 10f, lightSeconds = 0.4f, shake = 0.6f,
         };
         log.AppendLine(Dress("TrollsbaneWrath", wrath, null, null, arc: -1f));
@@ -148,9 +180,9 @@ public static class SkillFxPrefabs
         var lunge = new SkillLook
         {
             showArea = false,
-            cast = { Cue(beastDust, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.8f) },
-            release = { Cue(beastDust, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.9f) },
-            struck = { Cue(beastBite, SkillFxPlace.Struck, 1, 0f, 0f, 0.8f) },
+            cast = { Cue(beastDust, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.8f), Cue(streaksBack, SkillFxPlace.Caster, 1, 0.05f, 0f, 0.5f) },
+            release = { Cue(beastDust, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.9f), Cue(slash, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.3f) },
+            struck = { Cue(beastBite, SkillFxPlace.Struck, 1, 0f, 0f, 0.8f), Cue(bloodHit, SkillFxPlace.Struck, 1, 0f, 0f, 0.7f) },
             light = new Color(1f, 0.5f, 0.4f, 1f), lightIntensity = 3f, lightRange = 5f, lightSeconds = 0.2f, shake = 0.2f,
         };
         log.AppendLine(Dress("WolfsLunge", lunge, null, null, arc: -1f));
@@ -162,7 +194,12 @@ public static class SkillFxPrefabs
             .V("Velocity Min", new Vector3(-5f, 0.5f, -5f)).V("Velocity Max", new Vector3(5f, 3f, 5f)));
         var whirl = new SkillLook
         {
-            release = { Cue(steelRing, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.5f), Cue(steelSparks, SkillFxPlace.Caster, 1, 0f, 0f, 0.9f) },
+            release =
+            {
+                Cue(slash, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.3f), Cue(windRing, SkillFxPlace.CasterGround, 1, 0.02f, 0f, 0.4f),
+                Cue(steelRing, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.5f), Cue(steelSparks, SkillFxPlace.Caster, 1, 0f, 0f, 0.9f),
+                Cue(dust, SkillFxPlace.Ring, 5, 0.03f, 0f, 0.6f),
+            },
             struck = { Cue(steelSparks, SkillFxPlace.Struck, 1, 0f, 0f, 0.8f) },
             light = new Color(1f, 0.8f, 0.45f, 1f), lightIntensity = 4f, lightRange = 6f, lightSeconds = 0.25f, shake = 0.15f,
         };
@@ -191,7 +228,12 @@ public static class SkillFxPrefabs
             .V("Velocity Max", new Vector3(1f, 1.4f, 1f)));
         var leap = new SkillLook
         {
-            release = { Cue(earthWave, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.7f), Cue(earthDust, SkillFxPlace.Ring, 6, 0.02f, 0f, 0.8f) },
+            release =
+            {
+                Cue(flash, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.3f), Cue(earthWave, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.7f),
+                Cue(debris, SkillFxPlace.CasterGround, 1, 0f, 0f, 1.3f), Cue(earthDust, SkillFxPlace.Ring, 6, 0.02f, 0f, 0.8f),
+            },
+            struck = { Cue(sparks, SkillFxPlace.Struck, 1, 0f, 0f, 0.8f) },
             light = new Color(1f, 0.85f, 0.6f, 1f), lightIntensity = 5f, lightRange = 8f, lightSeconds = 0.3f, shake = 0.5f,
         };
         log.AppendLine(Dress("MountainLeap", leap, null, null, arc: -1f));
@@ -211,8 +253,98 @@ public static class SkillFxPrefabs
         };
         log.AppendLine(Dress("HeartrootsGrasp", grasp, null, null, arc: -1f));
 
+        // ----- The weapon arts (AttackDefinition.Look), by how they move. -----
+        SkillLook Spin(float range) => new SkillLook
+        {
+            showArea = false,
+            release =
+            {
+                Scaled(Cue(slash, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.3f), range / 2.5f),
+                Scaled(Cue(windRing, SkillFxPlace.CasterGround, 1, 0.02f, 0f, 0.4f), range / 3f), Cue(dust, SkillFxPlace.Ring, 5, 0.03f, 0f, 0.6f),
+            },
+            struck = { Cue(sparks, SkillFxPlace.Struck, 1, 0f, 0f, 0.8f) },
+            shake = 0.12f,
+        };
+        SkillLook Sweep(float range) => new SkillLook
+        {
+            showArea = false,
+            release = { Scaled(Cue(slash, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.3f), range / 2.5f), Cue(dust, SkillFxPlace.AcrossArc, 3, 0.03f, 0.02f, 0.6f) },
+            struck = { Cue(sparks, SkillFxPlace.Struck, 1, 0f, 0f, 0.8f) },
+            shake = 0.1f,
+        };
+        SkillLook Slam(float range, float weight) => new SkillLook
+        {
+            showArea = false,
+            cast = { Cue(dust, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.5f) },
+            release =
+            {
+                Scaled(Cue(flash, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.3f), weight), Scaled(Cue(windRing, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.4f), range / 3f),
+                Scaled(Cue(debris, SkillFxPlace.CasterGround, 1, 0f, 0f, 1.3f), weight), Cue(dust, SkillFxPlace.Ring, 6, 0.02f, 0f, 0.8f),
+            },
+            struck = { Cue(sparks, SkillFxPlace.Struck, 1, 0f, 0f, 0.8f) },
+            light = new Color(1f, 0.85f, 0.65f, 1f), lightIntensity = 3f * weight, lightRange = 6f, lightSeconds = 0.2f, shake = 0.35f * weight,
+        };
+        SkillLook Strike() => new SkillLook
+        {
+            showArea = false,
+            release = { Cue(punchRing, SkillFxPlace.AlongReach, 1, 0f, 0f, 0.3f), Cue(flash, SkillFxPlace.AlongReach, 1, 0f, 0f, 0.25f) },
+            struck = { Cue(sparks, SkillFxPlace.Struck, 1, 0f, 0f, 0.8f) },
+            shake = 0.2f,
+        };
+        var dash = new SkillLook
+        {
+            showArea = false,
+            cast = { Cue(dust, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.5f) },
+            release =
+            {
+                Cue(streaksBack, SkillFxPlace.Trail, 4, 0f, 0.02f, 0.45f), Cue(dust, SkillFxPlace.Trail, 4, 0f, 0.03f, 0.7f),
+                Cue(slash, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.3f),
+            },
+            struck = { Cue(sparks, SkillFxPlace.Struck, 1, 0f, 0f, 0.8f) },
+            shake = 0.12f,
+        };
+        var blink = new SkillLook
+        {
+            showArea = false,
+            cast = { Cue(smoke, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.45f) },
+            release = { Cue(smoke, SkillFxPlace.CasterGround, 1, 0f, 0f, 0.45f) },
+            struck = { Cue(bloodHit, SkillFxPlace.Struck, 1, 0f, 0f, 0.7f), Cue(sparks, SkillFxPlace.Struck, 1, 0f, 0f, 0.7f) },
+            shake = 0.1f,
+        };
+        var hurl = new SkillLook
+        {
+            showArea = false,
+            cast = { Scaled(Cue(windRing, SkillFxPlace.CasterGround, 1, 0.12f, 0f, 0.4f), 0.5f), Cue(streaksAhead, SkillFxPlace.Caster, 1, 0.12f, 0f, 0.45f) },
+        };
+        var arts = new (string file, SkillLook look)[]
+        {
+            ("Axe Art", Spin(3f)), ("Rune Art Full Turn", Spin(3f)), ("Rune Art Millstone", Spin(3f)), ("Rune Art Whirling Cut", Spin(2.8f)),
+            ("Rune Art Many Cuts", Spin(2.2f)), ("Rune Art Reaping Cut", Sweep(2.6f)), ("Sword Art", dash), ("Dagger Art", blink),
+            ("Greatsword Art", Slam(3.1f, 1f)), ("Hammer Art", Slam(3.2f, 1.25f)), ("Rune Art Cleaving Leap", Slam(3f, 1f)),
+            ("Rune Art Vaulting Slam", Slam(3.6f, 1.1f)), ("Fists Art", Strike()), ("Rune Art Flying Knee", Strike()), ("Chop Art", hurl), ("Spear Art", hurl),
+        };
+        foreach ((string file, SkillLook look) in arts)
+        {
+            var attack = AssetDatabase.LoadAssetAtPath<AttackDefinition>($"Assets/_Project/Data/Combat/Attacks/Combos/{file}.asset");
+            if (attack == null)
+            {
+                log.AppendLine("no art " + file);
+                continue;
+            }
+
+            typeof(AttackDefinition).GetField("look", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).SetValue(attack, look);
+            EditorUtility.SetDirty(attack);
+            log.AppendLine($"art {file}: {look.cast.Count} cast, {look.release.Count} release, {look.struck.Count} struck");
+        }
+
         AssetDatabase.SaveAssets();
         return log.ToString();
+    }
+
+    private static SkillFxCue Scaled(SkillFxCue cue, float scale)
+    {
+        cue.scale = Mathf.Max(0.2f, scale);
+        return cue;
     }
 
     private static SkillFxCue Cue(GameObject prefab, SkillFxPlace place, int count, float delay, float step, float seconds) =>

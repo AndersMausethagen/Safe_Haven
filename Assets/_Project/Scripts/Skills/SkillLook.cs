@@ -17,6 +17,8 @@ public enum SkillFxPlace
     Ring = 4,
     /// <summary>One on each creature the skill struck.</summary>
     Struck = 5,
+    /// <summary>Count of them on the ground along the path a dash took, from where it began to where it ended.</summary>
+    Trail = 6,
 }
 
 /// <summary>One effect a skill plays: what, where, how many, when, and for how long.</summary>

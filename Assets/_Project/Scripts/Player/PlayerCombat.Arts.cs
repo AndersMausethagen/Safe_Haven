@@ -37,6 +37,8 @@ public sealed partial class PlayerCombat
     private readonly List<Collider> passedThrough = new List<Collider>(8);
     private HeldItemView heldView;
     private float artReadyAt;
+    // Where an art's blow met what it struck, for its look (SkillFx.ArtLand).
+    private readonly List<Vector3> artStruck = new List<Vector3>(8);
 
     /// <summary>True while the weapon is out on a throw and not yet back in the hand.</summary>
     public bool WeaponInFlight

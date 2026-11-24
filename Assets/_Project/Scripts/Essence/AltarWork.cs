@@ -318,6 +318,12 @@ public static class AltarWork
         ResourceDefinition purified = SettlementSettings.Current.PurifiedEssence;
         foreach (SkillDefinition skill in skills.KnownSkills)
         {
+            // The weapon-art entries are the weapon's arts: nothing of theirs deepens (their cost and cooldown are the art's).
+            if (skill.WeaponArt != WeaponArtSlot.None)
+            {
+                continue;
+            }
+
             int rank = GameSession.Progress.RankOf(skill);
             var subject = new AltarSubject { Title = skill.DisplayName, Detail = rank > 0 ? $"Rank {Roman(rank)}" : "Not deepened", Icon = skill.Icon };
             for (int i = 1; i <= settings.SkillRanks.Count; i++)

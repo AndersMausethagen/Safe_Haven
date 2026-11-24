@@ -68,6 +68,12 @@ public sealed class AttackDefinition : ScriptableObject
              "schools' statuses feeding each other, Docs/CombatSkillsResearch_2026-11-24.md §3.2). Empty: none. Only this attack does it.")]
     [SerializeField] private StatusEffectDefinition onRepeatStatus;
 
+    [Header("Look")]
+    [Tooltip("A weapon art's effects (the user, 2026-11-24: \"a lot of the skills and vfx be physical skills\"): dust, streaks, a crescent " +
+             "slash, rock debris, an impact flash, sparks on what it strikes; played as the art begins and as it lands (SkillFx.ArtBegin, " +
+             "ArtLand). Empty: the art's ribbon and ground impact alone, as before.")]
+    [SerializeField] private SkillLook look = new SkillLook { showArea = false };
+
     [Header("The world")]
     [Tooltip("What the blow does to the ground and the grass round it when it lands (dust, wind, a crater). Empty: nothing, " +
              "except the player's heavy swings, which use Ground Impact Settings by the kind of blow.")]
@@ -204,6 +210,7 @@ public sealed class AttackDefinition : ScriptableObject
     public StatusEffectDefinition AppliesStatus => appliesStatus;
     public float StatusChance => statusChance;
     public StatusEffectDefinition OnRepeatStatus => onRepeatStatus;
+    public SkillLook Look => look;
     /// <summary>Only a dodge gets out of it: no block or parry stops it.</summary>
     public bool Unblockable => unblockable;
     /// <summary>Metres a hit drags its target toward the attacker (negative: away).</summary>

@@ -239,6 +239,14 @@ public sealed class QuestDefinition : ScriptableObject
             }
         }
 
+        foreach (SkillDefinition skill in rewardSkills)
+        {
+            if (skill != null)
+            {
+                parts.Add("ability: " + skill.DisplayName);
+            }
+        }
+
         if (rewardWorkFor != null && rewardPassion)
         {
             parts.Add($"a passion for {rewardWorkFor.DisplayName}");

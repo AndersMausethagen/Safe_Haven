@@ -896,7 +896,7 @@ MonoBehaviour:
       An ability costs Focus, the gold bar you earn by fighting well, and stamina, and then has to cool down before it can be used again.
 
 
-      New abilities come from rune books. At the altar, Purified Essence deepens the ones you know.
+      Your weapon''s art sits on (1) from the start and changes with what you hold. The people you bring home and the great foes you lay low teach more; each goes onto a free slot of 1 to 5, and you can drag them anywhere. At the altar, Purified Essence deepens the ones you know.
 
 
       Every spell you cast trains Runecraft, and a better Runecraft makes them hit harder.'
@@ -904,10 +904,10 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
-    unlockedBySkill: {fileID: 11400000, guid: 0bf8c75e4c32304428c7000e1e01913b, type: 2}
+    unlockedBySkill: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
     unlockedByTechnique: 
     art: {fileID: 21300000, guid: d03cfd5169e5ca240a4efca33f4f72f5, type: 3}
-    summary: Abilities are strong moves and spells on keys 1 to 5, paid for with Focus and stamina.
+    summary: Strong moves and spells on keys 1 to 5, paid for with Focus. Your weapon's art is on 1; people and great foes teach more.
     steps:
     - '[{key:Skills}] Open the skill book'
     - '[{key:Skill1}] Use what is in the first slot'
