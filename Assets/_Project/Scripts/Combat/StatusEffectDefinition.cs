@@ -27,6 +27,8 @@ public sealed class StatusEffectDefinition : ScriptableObject, IDisplayName
     [SerializeField] private DamageType damageType = DamageType.Physical;
     [Tooltip("Share of normal speed the player moves at while it lasts: 1 is unhindered, 0 holds them in place.")]
     [SerializeField, Range(0f, 1f)] private float moveSpeed = 1f;
+    [Tooltip("Share of damage its bearer takes while it lasts, after armour: 1 is normal, 1.15 is 15% more (Sundered: armour broken).")]
+    [SerializeField, Range(1f, 2f)] private float damageTaken = 1f;
 
     [Header("Getting free (Docs/HeartrootPlaytest_2026-11-23.md P5)")]
     [Tooltip("A new hit while it is at work restarts its time. Off: it runs out on its first time, so a volley's later blows (Root " +
@@ -49,6 +51,7 @@ public sealed class StatusEffectDefinition : ScriptableObject, IDisplayName
     public float DamagePerSecond => damagePerSecond;
     public DamageType DamageType => damageType;
     public float MoveSpeed => moveSpeed;
+    public float DamageTaken => damageTaken;
     public bool Refreshes => refreshes;
     public bool EndsOnDodge => endsOnDodge;
     public float RestSeconds => restSeconds;

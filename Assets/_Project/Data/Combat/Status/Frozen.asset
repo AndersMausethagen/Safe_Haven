@@ -21,6 +21,7 @@ MonoBehaviour:
   damagePerSecond: 0
   damageType: 2
   moveSpeed: 0
+  damageTaken: 1
   refreshes: 0
   endsOnDodge: 0
   restSeconds: 4

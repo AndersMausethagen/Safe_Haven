@@ -345,7 +345,7 @@ public sealed partial class MonsterAI
 
         heartStrikeDue = false;
         float amount = DamageCalculator.BeforeDefenses(definition.ToppleStrike * damageable.MaxHealth, DamageType.Physical, StrikeKind.None,
-            combatant.Stats, combatant.Rules, damageable.DamageTakenMultiplier);
+            combatant.Stats, combatant.Rules, damageable.TakenScale);
         // A finisher's weight (a strong hit's flash, sound and stop), not a backstab's: it isn't a second backstab to answer or remember.
         damageable.ApplyDamage(new DamageInfo(by, null, amount, DamageType.Physical, true, point, direction, 0f, HitTechnique.Finisher));
     }

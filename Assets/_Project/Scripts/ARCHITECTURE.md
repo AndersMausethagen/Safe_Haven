@@ -3299,7 +3299,13 @@ sample textures and flames are in `Art/Effects/VFX Graph/Additions` (Unity Compa
   hands a swing over). `WalkOutOfSwing` leaves a skill's own dash alone until `PlayerSkills.LungeEndsAt`: the dash speed used to hand
   Wolf's Lunge and Mountain Leap to the walking layers 0.15 s in. `SkillLookTests` keeps one move per ability, on a state the body has.
   Unused but measured: Emote_Roar / Emote_Shout (2 s, for a war cry), Spell_*_Channel loops (for a held cast), Combat_Defend_Spell.
-- Not yet: statuses for Beast/Wyrd/Steel, effects for the weapon arts themselves.
+- **The schools' statuses** (research 3.2): Beast's **Rend** (a bleed: 3 a second for 5 s, Burning's measure) on Wolf's Lunge; Steel's
+  **Sundered** (armour cracked: 15% more taken for 8 s) on Whirling Steel and Trollsbane Wrath. Made by `SkillFxPrefabs.DressAll` with
+  the others. `StatusEffectDefinition.DamageTaken` is the new lever; `Damageable.TakenScale` (stagger/ambush × statuses) is what a blow
+  takes after armour, and every estimate of one uses it too: the heart strike (`MonsterAI.Answers`), co-op kill credit
+  (`CreatureHost.WouldKill`) and the takedown ring (`PlayerBlows.UnawareBlowWorth`, by `StatusTakenScale`). Sundered also deepens
+  damage over time (bleeds, burns). Wyrd's is Heartroot's roots, as before. Numbers are first guesses, unplayed.
+- Not yet: effects for the weapon arts themselves; a status look on the creature bearing it.
 
 ## Loot on bodies (2026-11-24)
 

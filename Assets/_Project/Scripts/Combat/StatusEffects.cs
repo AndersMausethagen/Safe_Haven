@@ -85,6 +85,24 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
 
     public bool Has(StatusEffectDefinition effect) => Find(effect) != null;
 
+    /// <summary>How much more its bearer takes while these last (Status Effect › Damage Taken; Sundered): 1 when none asks for more.</summary>
+    public float DamageTakenScale
+    {
+        get
+        {
+            float scale = 1f;
+            foreach (Active entry in active)
+            {
+                if (entry.Definition != null && Time.time < entry.EndsAt)
+                {
+                    scale *= entry.Definition.DamageTaken;
+                }
+            }
+
+            return scale;
+        }
+    }
+
     /// <summary>Takes these effects off. Returns how many were at work.</summary>
     public int Cure(IReadOnlyList<StatusEffectDefinition> effects)
     {

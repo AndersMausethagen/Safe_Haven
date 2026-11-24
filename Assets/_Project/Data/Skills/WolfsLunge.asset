@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: WolfsLunge
   m_EditorClassIdentifier: Assembly-CSharp::SkillDefinition
   displayName: Wolf's Lunge
-  description: Bound forward like the grey wolf of the north and bite into whatever stands at the end.
+  description: Bound forward like the grey wolf of the north and bite into whatever stands at the end. The wound bleeds.
   icon: {fileID: 21300000, guid: c59e2e1466b0a5742938e72a88fde724, type: 3}
   school: 1
   cooldown: 8

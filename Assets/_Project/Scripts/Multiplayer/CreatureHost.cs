@@ -652,7 +652,7 @@ public sealed class CreatureHost
             return false;
         }
 
-        float worth = DamageCalculator.Mitigate(amount, type, strike, hosted.Combatant.Stats, hosted.Combatant.Rules) * hosted.Health.DamageTakenMultiplier;
+        float worth = DamageCalculator.Mitigate(amount, type, strike, hosted.Combatant.Stats, hosted.Combatant.Rules) * hosted.Health.TakenScale;
         return worth >= hosted.Health.CurrentHealth - hosted.Health.HealthFloor;
     }
 

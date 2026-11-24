@@ -87,6 +87,27 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
     /// <summary>Multiplies the damage this object takes, after its defenses (a staggered monster takes more). 1 = normal.</summary>
     public float DamageTakenMultiplier { get; set; } = 1f;
 
+    private StatusEffects statuses;
+
+    /// <summary>How much more it takes from its statuses (Status Effect › Damage Taken; Sundered): 1 when none asks for more.
+    /// Every estimate of a blow (a heart strike, co-op kill credit, a takedown) goes by this as the blow itself does.</summary>
+    public float StatusTakenScale
+    {
+        get
+        {
+            // Added on the first status, so looked up late (Unity's == re-runs the lookup once a destroyed one is gone).
+            if (statuses == null)
+            {
+                statuses = GetComponent<StatusEffects>();
+            }
+
+            return statuses != null ? statuses.DamageTakenScale : 1f;
+        }
+    }
+
+    /// <summary>All it takes after armour: stagger or ambush (<see cref="DamageTakenMultiplier"/>) times its statuses.</summary>
+    public float TakenScale => DamageTakenMultiplier * StatusTakenScale;
+
     /// <summary>A hit can't take its health below this, so it can't die: a building breaks and waits for repairs, but is never lost.</summary>
     public float HealthFloor
     {
@@ -211,7 +232,7 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
             }
         }
 
-        float final = exact ? damage.Amount : DamageCalculator.Mitigate(damage.Amount, damage.Type, damage.Strike, Owner.Stats, Owner.Rules) * DamageTakenMultiplier;
+        float final = exact ? damage.Amount : DamageCalculator.Mitigate(damage.Amount, damage.Type, damage.Strike, Owner.Stats, Owner.Rules) * TakenScale;
         float healthBefore = currentHealth;
         float healthLost = Mathf.Min(final, Mathf.Max(0f, currentHealth - HealthFloor));
         currentHealth -= healthLost;

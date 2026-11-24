@@ -117,6 +117,43 @@ public sealed class SkillLookTests
     }
 
     [Test]
+    public void SteelSundersAndTheWolfRends_AndTheSunderedTakeMore()
+    {
+        var whirl = AssetDatabase.LoadAssetAtPath<SkillDefinition>("Assets/_Project/Data/Skills/WhirlingSteel.asset");
+        var wrath = AssetDatabase.LoadAssetAtPath<SkillDefinition>("Assets/_Project/Data/Skills/TrollsbaneWrath.asset");
+        var wolf = AssetDatabase.LoadAssetAtPath<SkillDefinition>("Assets/_Project/Data/Skills/WolfsLunge.asset");
+        StatusEffectDefinition sundered = whirl.Attack.AppliesStatus;
+        Assert.IsNotNull(sundered, "Whirling Steel cracks armour");
+        Assert.AreSame(sundered, wrath.Attack.AppliesStatus, "so does Trollsbane Wrath: one Steel status");
+        Assert.Greater(sundered.DamageTaken, 1f);
+        Assert.IsNotNull(wolf.Attack.AppliesStatus, "Wolf's Lunge leaves a wound");
+        Assert.Greater(wolf.Attack.AppliesStatus.DamagePerSecond, 0f, "that bleeds");
+
+        var target = new GameObject("A test's armoured creature");
+        made.Add(target);
+        var combatant = target.AddComponent<Combatant>();
+        combatant.SetFaction(Faction.Enemy);
+        // No stats definition (it warns): the values come from here.
+        combatant.Stats.SetBase(StatType.MaxHealth, 500f);
+        combatant.Stats.SetBase(StatType.Armor, 40f);
+        Damageable body = target.AddComponent<Damageable>();
+        var data = new SerializedObject(body);
+        data.FindProperty("destroyOnDeath").boolValue = false;
+        data.ApplyModifiedPropertiesWithoutUndo();
+        typeof(Damageable).GetMethod("Awake", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)?.Invoke(body, null);
+        var blow = new DamageInfo(null, null, 20f, DamageType.Physical, false, Vector3.zero, Vector3.forward);
+        float before = body.CurrentHealth;
+        body.ApplyDamage(blow);
+        float plain = before - body.CurrentHealth;
+        Assert.Greater(plain, 0f);
+
+        StatusEffects.Apply(body, sundered, null);
+        before = body.CurrentHealth;
+        body.ApplyDamage(blow);
+        Assert.AreEqual(plain * sundered.DamageTaken, before - body.CurrentHealth, 0.01f, "the same blow bites deeper on cracked armour");
+    }
+
+    [Test]
     public void EveryAbility_PlaysAMoveOfItsOwn_ThatTheBodyHas()
     {
         var controller = AssetDatabase.LoadAssetAtPath<UnityEditor.Animations.AnimatorController>("Assets/_Project/Animation/Controllers/PlayerAnimator.controller");
@@ -138,6 +175,14 @@ public sealed class SkillLookTests
 
             Assert.IsTrue(skill.PlayAttackAnimation, $"{skill.name} is seen to be cast");
             Assert.IsTrue(states.Contains(skill.AnimationState), $"{skill.name}: no full-body state '{skill.AnimationState}'");
+            // Walking hands the move to the arms and the upper body: without it there, the whole-body clip slides along the ground.
+            foreach (string walking in new[] { "Attack Arms", "Upper Body" })
+            {
+                var layer = System.Array.Find(controller.layers, l => l.name == walking);
+                Assert.IsTrue(System.Array.Exists(layer.stateMachine.states, s => s.state.name == skill.AnimationState),
+                    $"{skill.name}: '{skill.AnimationState}' missing on {walking}");
+            }
+
             Assert.IsFalse(used.TryGetValue(skill.AnimationState, out string other), $"{skill.name} and {other} share '{skill.AnimationState}'");
             used[skill.AnimationState] = skill.name;
         }

@@ -30,7 +30,7 @@ MonoBehaviour:
   lunge: 0
   hop: 0
   staminaCost: -1
-  appliesStatus: {fileID: 0}
+  appliesStatus: {fileID: 11400000, guid: a8db118dd0428b24db4d193af6815683, type: 2}
   statusChance: 1
   onRepeatStatus: {fileID: 0}
   look:

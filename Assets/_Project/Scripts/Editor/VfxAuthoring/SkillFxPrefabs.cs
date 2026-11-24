@@ -6,7 +6,7 @@ using UnityEngine.VFX;
 /// <summary>
 /// The first skills dressed with effects (Docs/CombatSkillsResearch_2026-11-24.md §8, slice 1): Frost Rune, the Ash Lad's Ember and
 /// Trollsbane Wrath. Makes the effect prefabs (a VisualEffect on a shared graph, its look in VfxValues) under Art/Effects/Skills/Prefabs,
-/// the statuses the schools own (Frozen, Burning), and sets each skill's SkillLook and its attack's statuses. It owns only those: the
+/// the statuses the schools own (Frozen, Burning, Frostbite, Rend, Sundered), and sets each skill's SkillLook and its attack's statuses. It owns only those: the
 /// prefabs and statuses it makes, the three skills' Look, and their attacks' status fields (and Frost Rune's arc, a lance now).
 /// Run again after changing a design here. Safe Haven › Tools › Effects › Dress the First Skills.
 /// </summary>
@@ -61,6 +61,12 @@ public static class SkillFxPrefabs
         // with the shared 5 s Chill it never could). The monsters' Chill on the player stays as it was.
         StatusEffectDefinition chill = Status("Frostbite", "Rime in the joints: slowed, and the next frost spell freezes it.", new Color(0.6f, 0.85f, 1f),
             12f, 0f, DamageType.Frost, 0.7f, refreshes: true, restSeconds: 0f);
+        // The schools' own statuses (Docs/CombatSkillsResearch_2026-11-24.md 3.2): Beast tears a wound that bleeds (Burning's measure,
+        // a second longer), Steel cracks armour so everything after it bites deeper.
+        StatusEffectDefinition rend = Status("Rend", "Torn by fangs: it bleeds a while.", new Color(0.75f, 0.06f, 0.05f), 5f, 3f, DamageType.Physical, 1f,
+            refreshes: true, restSeconds: 0f);
+        StatusEffectDefinition sundered = Status("Sundered", "Armour cracked: it takes more from every blow for a while.", new Color(0.78f, 0.7f, 0.55f),
+            8f, 0f, DamageType.Physical, 1f, refreshes: true, restSeconds: 0f, damageTaken: 1.15f);
 
         // ----- The physical kit (the user, 2026-11-24: "a lot of the skills and vfx be physical skills. not necessary magic"): steel, dust,
         // stone and wind, no runes or glows of power. -----
@@ -169,7 +175,7 @@ public static class SkillFxPrefabs
             struck = { Cue(sparks, SkillFxPlace.Struck, 1, 0f, 0f, 0.8f) },
             light = new Color(1f, 0.8f, 0.45f, 1f), lightIntensity = 9f, lightRange = 10f, lightSeconds = 0.4f, shake = 0.6f,
         };
-        log.AppendLine(Dress("TrollsbaneWrath", wrath, null, null, arc: -1f));
+        log.AppendLine(Dress("TrollsbaneWrath", wrath, sundered, null, arc: -1f));
 
         // ----- Wolf's Lunge: a grey bound, dust behind, and the bite. -----
         GameObject beastDust = Make("Beast Dust", new Design("Skill Mist").F("Rate", 40f).F("Radius", 0.5f).V("Color", new Vector3(0.5f, 0.48f, 0.44f))
@@ -185,7 +191,7 @@ public static class SkillFxPrefabs
             struck = { Cue(beastBite, SkillFxPlace.Struck, 1, 0f, 0f, 0.8f), Cue(bloodHit, SkillFxPlace.Struck, 1, 0f, 0f, 0.7f) },
             light = new Color(1f, 0.5f, 0.4f, 1f), lightIntensity = 3f, lightRange = 5f, lightSeconds = 0.2f, shake = 0.2f,
         };
-        log.AppendLine(Dress("WolfsLunge", lunge, null, null, arc: -1f));
+        log.AppendLine(Dress("WolfsLunge", lunge, rend, null, arc: -1f));
 
         // ----- Whirling Steel: the blade's circle, in gold. -----
         GameObject steelRing = Make("Steel Ring", new Design("Skill Ring").T("Texture", "Ring").V("Color", new Vector3(3.2f, 2.3f, 1f)).F("Size", 4.5f)
@@ -203,7 +209,7 @@ public static class SkillFxPrefabs
             struck = { Cue(steelSparks, SkillFxPlace.Struck, 1, 0f, 0f, 0.8f) },
             light = new Color(1f, 0.8f, 0.45f, 1f), lightIntensity = 4f, lightRange = 6f, lightSeconds = 0.25f, shake = 0.15f,
         };
-        log.AppendLine(Dress("WhirlingSteel", whirl, null, null, arc: -1f));
+        log.AppendLine(Dress("WhirlingSteel", whirl, sundered, null, arc: -1f));
 
         // ----- Huldra's Blessing: the hidden folk's gift, green and gold, rising. -----
         GameObject wyrdCircle = Make("Wyrd Cast Circle", new Design("Skill Ring").T("Texture", "Rune Circle").V("Color", new Vector3(0.9f, 2.4f, 0.6f))
@@ -373,7 +379,7 @@ public static class SkillFxPrefabs
     }
 
     private static StatusEffectDefinition Status(string name, string description, Color colour, float seconds, float damagePerSecond, DamageType type,
-        float moveSpeed, bool refreshes, float restSeconds)
+        float moveSpeed, bool refreshes, float restSeconds, float damageTaken = 1f)
     {
         string path = $"Assets/_Project/Data/Combat/Status/{name}.asset";
         var status = AssetDatabase.LoadAssetAtPath<StatusEffectDefinition>(path);
@@ -394,6 +400,7 @@ public static class SkillFxPrefabs
         so.FindProperty("moveSpeed").floatValue = moveSpeed;
         so.FindProperty("refreshes").boolValue = refreshes;
         so.FindProperty("restSeconds").floatValue = restSeconds;
+        so.FindProperty("damageTaken").floatValue = damageTaken;
         so.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(status);
         return status;
