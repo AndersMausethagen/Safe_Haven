@@ -81,6 +81,8 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     private MonsterMovement movement;
     private MonsterAttacks attacks;
     private float speedScale = 1f;
+    // Its statuses (added on the first): Frostbite slows it, Frozen and Roots hold it fast.
+    private StatusEffects statuses;
     private MonsterPose pose;
 
     private IDamageable target;
@@ -886,6 +888,9 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
         StateChanged?.Invoke(previous, next);
     }
 
+    /// <summary>Sets its speed again: a status that slows or holds it took hold or ended (StatusEffects).</summary>
+    public void RefreshSpeed() => ApplySpeed();
+
     // Going to look is a cautious walk and a patrol a stroll; everything else moves at full speed.
     private void ApplySpeed()
     {
@@ -899,7 +904,13 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
             : CurrentState == State.Returning && roaming ? roamSpeedScale
             : circling ? CombatTechniqueSettings.Current.CircleSpeed
             : 1f;
-        movement.SetSpeed(definition.MoveSpeed * scale * speedScale);
+        if (statuses == null)
+        {
+            TryGetComponent(out statuses);
+        }
+
+        float held = statuses != null ? statuses.MoveScale : 1f;
+        movement.SetSpeed(definition.MoveSpeed * scale * speedScale * held);
     }
 
     // Entering play mode doesn't reload scripts in this project, so the shared sound timer is reset here.

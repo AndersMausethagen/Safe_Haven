@@ -6,7 +6,8 @@ using UnityEngine;
 /// The status effects on a creature or the player (StatusEffectDefinition): poison ticking, chill slowing, roots holding.
 /// Added by itself the first time something applies an effect. A new hit of the same effect restarts its time; the
 /// slowest effect sets the player's speed. Ticks are marked <see cref="HitTechnique.OverTime"/>, so they show damage
-/// numbers but no hit stop, shake, flinch or guard. Only the player's speed is changed: monsters keep walking.
+/// numbers but no hit stop, shake, flinch or guard. The slowest effect sets the player's speed here, and a creature's (MonsterAI asks
+/// MoveScale); one that Stops Strikes (Frozen) holds a creature's blows while it lasts.
 /// </summary>
 [DisallowMultipleComponent]
 [OnAFriendsCopy(CopyRule.HostOnly, "a status this player lays is sent to the host's creature, which ticks it; the copy's own don't tick")]
@@ -30,6 +31,7 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
     private readonly List<Active> active = new List<Active>();
     private Damageable target;
     private PlayerMovement movement;
+    private MonsterAI creatureMind;
 
     public IReadOnlyList<Active> Current => active;
 
@@ -39,6 +41,9 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
     /// <summary>Puts <paramref name="effect"/> on <paramref name="target"/>. Null when it can't take it.</summary>
     /// <summary>A status was laid on something (co-op sends a friend's to the host's creature: CreaturePuppets).</summary>
     public static event System.Action<Damageable, StatusEffectDefinition, Combatant> Applied;
+
+    /// <summary>A status burst by a blow (Shatter): its bearer, the status and where (StatusBearerLook shows it).</summary>
+    public static event System.Action<Damageable, StatusEffectDefinition, Vector3> Consumed;
 
     public static StatusEffects Apply(Damageable target, StatusEffectDefinition effect, Combatant source)
     {
@@ -67,6 +72,46 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
         return effects;
     }
 
+    /// <summary>
+    /// What a blow that got through bursts (Status Effect › Consumed By; a heavy on a frozen creature shatters it): the status ends at once
+    /// and its bearer takes Consume Damage, a share of the blow, as its own Damage Type. Asked before the blow's own statuses are laid,
+    /// so a blow never bursts what it lays itself.
+    /// </summary>
+    public static void BeforeHitStatuses(IDamageable victim, in DamageInfo blow, in DamageResult result)
+    {
+        if (blow.Technique == HitTechnique.None || blow.IsOverTime || result.Damage <= 0f || result.Blocked || result.Parried
+            || !(victim is Damageable target) || !target.IsAlive || !target.TryGetComponent(out StatusEffects effects) || effects.isCopy)
+        {
+            return;
+        }
+
+        for (int i = effects.active.Count - 1; i >= 0; i--)
+        {
+            StatusEffectDefinition definition = effects.active[i].Definition;
+            if (definition == null || (definition.ConsumedBy & blow.Technique) == 0 || Time.time >= effects.active[i].EndsAt)
+            {
+                continue;
+            }
+
+            effects.active.RemoveAt(i);
+            effects.Ended(definition);
+            effects.UpdateSpeed();
+            effects.Changed?.Invoke(definition, false);
+            Consumed?.Invoke(target, definition, blow.HitPoint);
+            if (!string.IsNullOrWhiteSpace(definition.ConsumeLine) && blow.Source != null && blow.Source.GetComponent<Player>() != null)
+            {
+                GameMessages.Post(definition.ConsumeLine, MessageKind.Gain);
+            }
+
+            if (definition.ConsumeDamage > 0f && target.IsAlive)
+            {
+                // A finisher's weight; not a technique that could burst another status in turn.
+                target.ApplyDamage(new DamageInfo(blow.Source, null, result.Damage * definition.ConsumeDamage, definition.DamageType, false,
+                    blow.HitPoint, blow.Direction, 0f, HitTechnique.None));
+            }
+        }
+    }
+
     /// <summary>What a hit by <paramref name="attack"/> leaves behind: only a hit that got through, and by its chance.</summary>
     public static void AfterHit(AttackDefinition attack, IDamageable victim, Combatant source, in DamageResult result)
     {
@@ -84,6 +129,25 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
     }
 
     public bool Has(StatusEffectDefinition effect) => Find(effect) != null;
+
+    /// <summary>The slowest of what is at work (Status Effect › Move Speed): 1 unhindered, 0 held fast. The player's speed is set from it
+    /// here; a creature's movement asks for it (MonsterAI).</summary>
+    public float MoveScale
+    {
+        get
+        {
+            float scale = 1f;
+            foreach (Active entry in active)
+            {
+                if (entry.Definition != null && Time.time < entry.EndsAt)
+                {
+                    scale = Mathf.Min(scale, entry.Definition.MoveSpeed);
+                }
+            }
+
+            return scale;
+        }
+    }
 
     /// <summary>How much more its bearer takes while these last (Status Effect › Damage Taken; Sundered): 1 when none asks for more.</summary>
     public float DamageTakenScale
@@ -178,6 +242,7 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
             entry.EndsAt = StatusTiming.EndsAt(effect, true, entry.EndsAt, Time.time);
             entry.Source = source;
             entry.Scale = DamageCalculator.BonusScale(source);
+            HoldStrikes(entry.Definition, entry.EndsAt);
             return true;
         }
 
@@ -192,8 +257,18 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
             GameMessages.Post(effect.TakesHoldLine, MessageKind.Warning);
         }
 
+        HoldStrikes(effect, active[active.Count - 1].EndsAt);
         Changed?.Invoke(effect, true);
         return true;
+    }
+
+    // A creature held fast (Frozen) breaks off its strike and strikes again only once it is free.
+    private void HoldStrikes(StatusEffectDefinition effect, float endsAt)
+    {
+        if (effect != null && effect.StopsStrikes && !isCopy && TryGetComponent(out MonsterAI creature))
+        {
+            creature.Recoil(endsAt - Time.time);
+        }
     }
 
     // When each effect that ended may take hold again (Status Effect › Rest Seconds).
@@ -270,6 +345,12 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
     {
         if (movement == null)
         {
+            // A creature's speed is its own to set: told to look again (MonsterAI asks MoveScale).
+            if (creatureMind != null || TryGetComponent(out creatureMind))
+            {
+                creatureMind.RefreshSpeed();
+            }
+
             return;
         }
 

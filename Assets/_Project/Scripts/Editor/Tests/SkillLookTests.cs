@@ -168,6 +168,43 @@ public sealed class SkillLookTests
     }
 
     [Test]
+    public void AHeavyShattersTheFrozen_AndTheChilledAreSlowed()
+    {
+        var frozen = AssetDatabase.LoadAssetAtPath<StatusEffectDefinition>("Assets/_Project/Data/Combat/Status/Frozen.asset");
+        var frostbite = AssetDatabase.LoadAssetAtPath<StatusEffectDefinition>("Assets/_Project/Data/Combat/Status/Frostbite.asset");
+        Assert.IsTrue(frozen.StopsStrikes, "a frozen creature strikes no blow");
+        Assert.AreEqual(0f, frozen.MoveSpeed, "nor moves");
+
+        var target = new GameObject("A test's creature to freeze");
+        made.Add(target);
+        var combatant = target.AddComponent<Combatant>();
+        combatant.SetFaction(Faction.Enemy);
+        combatant.Stats.SetBase(StatType.MaxHealth, 500f);
+        Damageable body = target.AddComponent<Damageable>();
+        var data = new SerializedObject(body);
+        data.FindProperty("destroyOnDeath").boolValue = false;
+        data.ApplyModifiedPropertiesWithoutUndo();
+        typeof(Damageable).GetMethod("Awake", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)?.Invoke(body, null);
+
+        StatusEffects effects = StatusEffects.Apply(body, frostbite, null);
+        Assert.AreEqual(frostbite.MoveSpeed, effects.MoveScale, 1e-4f, "the chilled creature is slowed too, not only the player");
+        StatusEffects.Apply(body, frozen, null);
+        Assert.AreEqual(0f, effects.MoveScale, 1e-4f, "and the frozen held fast");
+
+        var landed = new DamageResult(40f, 40f, 40f, false, false, DamageType.Physical);
+        StatusEffects.BeforeHitStatuses(body, new DamageInfo(null, null, 40f, DamageType.Physical, false, Vector3.zero, Vector3.forward, 0f,
+            HitTechnique.Melee), landed);
+        Assert.IsTrue(effects.Has(frozen), "an ordinary swing doesn't shatter it");
+
+        float before = body.CurrentHealth;
+        StatusEffects.BeforeHitStatuses(body, new DamageInfo(null, null, 40f, DamageType.Physical, false, Vector3.zero, Vector3.forward, 0f,
+            HitTechnique.Heavy | HitTechnique.Melee), landed);
+        Assert.IsFalse(effects.Has(frozen), "a heavy shatters it");
+        Assert.Greater(before - body.CurrentHealth, 0f, "and the shards hurt");
+        Assert.IsTrue(effects.Has(frostbite), "the chill under it stays");
+    }
+
+    [Test]
     public void EveryAbility_PlaysAMoveOfItsOwn_ThatTheBodyHas()
     {
         var controller = AssetDatabase.LoadAssetAtPath<UnityEditor.Animations.AnimatorController>("Assets/_Project/Animation/Controllers/PlayerAnimator.controller");

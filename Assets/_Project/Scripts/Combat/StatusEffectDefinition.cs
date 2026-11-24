@@ -27,10 +27,22 @@ public sealed class StatusEffectDefinition : ScriptableObject, IDisplayName
     [Tooltip("Damage each second. Armor and resistances of this Damage Type reduce it. 0: none.")]
     [SerializeField, Min(0f)] private float damagePerSecond;
     [SerializeField] private DamageType damageType = DamageType.Physical;
-    [Tooltip("Share of normal speed the player moves at while it lasts: 1 is unhindered, 0 holds them in place.")]
+    [Tooltip("Share of normal speed its bearer (the player or a creature) moves at while it lasts: 1 is unhindered, 0 holds it in place.")]
     [SerializeField, Range(0f, 1f)] private float moveSpeed = 1f;
     [Tooltip("Share of damage its bearer takes while it lasts, after armour: 1 is normal, 1.15 is 15% more (Sundered: armour broken).")]
     [SerializeField, Range(1f, 2f)] private float damageTaken = 1f;
+    [Tooltip("A creature under it strikes no blow while it lasts (Frozen): the strike under way is broken off, as a recoil does.")]
+    [SerializeField] private bool stopsStrikes;
+
+    [Header("Consumed by a blow (Docs/CombatSkillsResearch_2026-11-24.md 3.2: Shatter)")]
+    [Tooltip("Blows of these kinds end it at once and burst it: a heavy, a finisher or a weapon art on a frozen creature shatters it. None: nothing does.")]
+    [SerializeField] private HitTechnique consumedBy;
+    [Tooltip("The burst's damage, as a share of the blow that set it off, of this status's Damage Type.")]
+    [SerializeField, Min(0f)] private float consumeDamage;
+    [Tooltip("What shows where it bursts (StatusBearerLook), once.")]
+    [SerializeField] private GameObject consumeLook;
+    [Tooltip("What the player is told when it bursts (\"Shattered!\"). Empty: nothing.")]
+    [SerializeField] private string consumeLine;
 
     [Header("Getting free (Docs/HeartrootPlaytest_2026-11-23.md P5)")]
     [Tooltip("A new hit while it is at work restarts its time. Off: it runs out on its first time, so a volley's later blows (Root " +
@@ -54,6 +66,11 @@ public sealed class StatusEffectDefinition : ScriptableObject, IDisplayName
     public DamageType DamageType => damageType;
     public float MoveSpeed => moveSpeed;
     public float DamageTaken => damageTaken;
+    public bool StopsStrikes => stopsStrikes;
+    public HitTechnique ConsumedBy => consumedBy;
+    public float ConsumeDamage => consumeDamage;
+    public GameObject ConsumeLook => consumeLook;
+    public string ConsumeLine => consumeLine;
     public GameObject Look => look;
     public bool Refreshes => refreshes;
     public bool EndsOnDodge => endsOnDodge;

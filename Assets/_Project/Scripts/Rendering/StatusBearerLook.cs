@@ -15,6 +15,8 @@ public sealed class StatusBearerLook : MonoBehaviour
 {
     // How long an ended status's last particles have to fade before its effect is taken away.
     private const float FadeSeconds = 1.5f;
+    // How long a burst (Shatter) is left to play out.
+    private const float BurstSeconds = 2.5f;
     private const float OutlinePixels = 2.5f;
     private static readonly int OutlineColorId = Shader.PropertyToID("_OutlineColor");
     private static readonly int OutlinePixelsId = Shader.PropertyToID("_OutlinePixels");
@@ -37,6 +39,31 @@ public sealed class StatusBearerLook : MonoBehaviour
     {
         StatusEffects.Applied -= OnApplied;
         StatusEffects.Applied += OnApplied;
+        StatusEffects.Consumed -= OnConsumed;
+        StatusEffects.Consumed += OnConsumed;
+    }
+
+    // A status burst by a blow (Shatter): its Consume Look, once, where the blow landed.
+    private static void OnConsumed(Damageable target, StatusEffectDefinition effect, Vector3 at)
+    {
+        if (effect == null || effect.ConsumeLook == null)
+        {
+            return;
+        }
+
+        GameObject burst = Instantiate(effect.ConsumeLook, at, Quaternion.identity);
+        foreach (VisualEffect visual in burst.GetComponentsInChildren<VisualEffect>())
+        {
+            if (visual.TryGetComponent(out VfxValues values))
+            {
+                values.Apply(visual);
+            }
+
+            visual.Reinit();
+            visual.Play();
+        }
+
+        Destroy(burst, BurstSeconds);
     }
 
     private static void OnApplied(Damageable target, StatusEffectDefinition effect, Combatant source)

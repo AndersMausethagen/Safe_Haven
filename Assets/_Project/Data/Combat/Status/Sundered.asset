@@ -23,6 +23,11 @@ MonoBehaviour:
   damageType: 0
   moveSpeed: 1
   damageTaken: 1.15
+  stopsStrikes: 0
+  consumedBy: 0
+  consumeDamage: 0
+  consumeLook: {fileID: 0}
+  consumeLine: 
   refreshes: 1
   endsOnDodge: 0
   restSeconds: 0

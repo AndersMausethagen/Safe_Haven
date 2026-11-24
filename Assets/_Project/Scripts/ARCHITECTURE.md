@@ -3314,7 +3314,14 @@ sample textures and flames are in `Art/Effects/VFX Graph/Additions` (Unity Compa
   blue (rime), Frozen ice glints, Rend red (drips), Sundered steel grey (glints; not tan, which read as the gold loot glow). Icons
   painted for Burning, Frostbite, Frozen, Rend, Sundered, Weapon's Art and Rune Art (they were missing, so PaintedIconTests failed since
   slice 1); put in by hand as BuildIcons does (it is retired): half size, Chill's/Frost Rune's importer, `painted:<md5>` userData.
-- Not yet: effects for the weapon arts themselves.
+- **Statuses hold creatures too, and Shatter** (research 3.2, the consume): a status's Move Speed slowed only the player; creatures
+  now ask `StatusEffects.MoveScale` (`MonsterAI.ApplySpeed`, refreshed by `RefreshSpeed` when a status starts or ends), so Frost
+  Rune's Frostbite slows (x0.7), Frozen and Heartroot's Grasp's Roots hold fast, and the runic staff's Chill slows (x0.65): all were
+  only looks on creatures before. `StopsStrikes` (Frozen) breaks off the creature's strike and holds its blows while it lasts
+  (`MonsterAI.Recoil`). `ConsumedBy` (HitTechnique flags), `ConsumeDamage`, `ConsumeLook`, `ConsumeLine`: a blow of those kinds ends the
+  status and bursts it (`StatusEffects.BeforeHitStatuses`, from `AttackResolver.Apply` before the blow's own statuses). Frozen: a heavy,
+  a finisher or a weapon art shatters it for 75% of the blow again as frost, "Shattered!", an ice burst (`Status Shatter`).
+- Not yet: effects for the weapon arts themselves; lingering zones (burning ground, ice patches).
 
 ## Loot on bodies (2026-11-24)
 

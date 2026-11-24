@@ -74,8 +74,21 @@ public static class SkillFxPrefabs
             .F("Size Min", 0.12f).F("Size Max", 0.22f).F("Turbulence", 0.2f).V("Velocity Min", new Vector3(-0.4f, 0.2f, -0.4f))
             .V("Velocity Max", new Vector3(0.4f, 0.8f, 0.4f)));
 
+        // Shatter: a frozen creature struck by a heavy, a finisher or a weapon art bursts in ice.
+        GameObject shatterShards = Make("Status Shatter", new Design("Skill Burst").T("Texture", "Shard").V("Color", new Vector3(1.4f, 2.8f, 5f)).F("Count", 70f)
+            .V("Velocity Min", new Vector3(-5f, 1.5f, -5f)).V("Velocity Max", new Vector3(5f, 6f, 5f)).F("Size Min", 0.15f).F("Size Max", 0.35f)
+            .F("Lifetime Min", 0.5f).F("Lifetime Max", 1f));
+
         StatusEffectDefinition frozen = Status("Frozen", "Held fast in ice: it can't move until it thaws.", new Color(0.8f, 0.93f, 1f), 1.5f, 0f,
             DamageType.Frost, 0f, refreshes: false, restSeconds: 4f, look: frozenLook);
+        // Held fast: no blows while frozen; and a heavy, a finisher or a weapon art shatters it for three quarters of that blow again, as frost.
+        var frozenData = new SerializedObject(frozen);
+        frozenData.FindProperty("stopsStrikes").boolValue = true;
+        frozenData.FindProperty("consumedBy").intValue = (int)(HitTechnique.Heavy | HitTechnique.Finisher | HitTechnique.WeaponArt);
+        frozenData.FindProperty("consumeDamage").floatValue = 0.75f;
+        frozenData.FindProperty("consumeLook").objectReferenceValue = shatterShards;
+        frozenData.FindProperty("consumeLine").stringValue = "Shattered!";
+        frozenData.ApplyModifiedPropertiesWithoutUndo();
         StatusEffectDefinition burning = Status("Burning", "Alight: it burns a while.", new Color(1f, 0.5f, 0.15f), 4f, 3f, DamageType.Fire, 1f,
             refreshes: true, restSeconds: 0f, look: burningLook);
         // Frost Rune's own chill, outlasting its cooldown (10 s), so the next lance freezes what the last one chilled (review 2026-11-24:

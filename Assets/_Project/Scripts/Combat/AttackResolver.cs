@@ -90,6 +90,7 @@ public static class AttackResolver
 
         DamageResult result = hit.Target.ApplyDamage(damage);
         attacker.ReportDamageDealt(hit.Target, damage, result);
+        StatusEffects.BeforeHitStatuses(hit.Target, damage, result);
         StatusEffects.AfterHit(attack, hit.Target, attacker, result);
         ForcedMove.AfterHit(attack, hit.Target, attacker, result);
         return result;
