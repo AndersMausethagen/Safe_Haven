@@ -131,6 +131,7 @@ public sealed class TutorialTests
         foreach (JournalPage page in Settings.Mechanics)
         {
             Assert.IsFalse(writtenOut.IsMatch(page.body), $"{page.title} writes a key out: use {{key:Action}}");
+            Assert.LessOrEqual(page.steps.Count, 4, $"{page.title}: the card shows four steps at most");
             foreach (string step in page.steps)
             {
                 string token = TutorialLesson.TokenOf(step);
@@ -184,6 +185,27 @@ public sealed class TutorialTests
             Assert.IsTrue(notice.Lesson.Finished);
             Assert.IsTrue(GameSession.Progress.Journal.HasRead(Tutorials.ReadKeyOf(page)), "learned is read");
             CollectionAssert.DoesNotContain(Tutorials.Pending, page);
+        }
+        finally
+        {
+            Object.DestroyImmediate(notice.gameObject);
+        }
+    }
+
+    [Test]
+    public void ATutorialThatOpensLater_TakesTheCardFromAnUnfinishedOne()
+    {
+        TutorialNoticeHud notice = TutorialNoticeHud.Create();
+        try
+        {
+            JournalNotices.Tried(LevelingSettings.Current.FindSkill("woodcutting"));
+            notice.Refresh(); // an edit-mode test doesn't run OnEnable, so Tutorials.Changed isn't heard
+            JournalPage first = notice.Lesson.Page;
+            JournalNotices.Tried(LevelingSettings.Current.FindSkill("mining"));
+            notice.Refresh();
+            JournalPage newest = Tutorials.Pending[Tutorials.Pending.Count - 1];
+            Assert.AreNotEqual(first, newest, "mining opened a page of its own");
+            Assert.AreEqual(newest, notice.Lesson.Page, "the page that just opened is taught, not the older unfinished one");
         }
         finally
         {

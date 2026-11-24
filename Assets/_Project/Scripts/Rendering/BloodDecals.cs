@@ -105,6 +105,9 @@ public static class BloodDecals
     }
 
     // Entering Play doesn't reload scripts in this project: statics carry over from the last session unless cleared.
+    /// <summary>Frees every tint and forgets what waits (an Edit Mode test: out of Play nothing else resets them).</summary>
+    internal static void ForgetForTests() => ResetForNewPlaySession();
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession()
     {

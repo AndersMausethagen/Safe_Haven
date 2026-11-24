@@ -7,6 +7,10 @@ using UnityEngine;
 /// </summary>
 public sealed class BloodTintWarmTests
 {
+    [SetUp]
+    [TearDown]
+    public void Forget() => BloodDecals.ForgetForTests();
+
     [Test]
     public void APreparedColour_IsTintedByTheWarmUp_OneAFrame()
     {

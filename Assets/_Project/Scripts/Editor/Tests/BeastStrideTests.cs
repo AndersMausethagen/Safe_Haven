@@ -59,6 +59,11 @@ public sealed class BeastStrideTests
                 var driver = new SerializedObject(prefab.GetComponentInChildren<MonsterAnimationDriver>(true));
                 float stride = driver.FindProperty("strideSpeed").floatValue;
                 float walk = driver.FindProperty("walkStrideSpeed").floatValue;
+                float measuredAt = driver.FindProperty("strideMeasuredScale").floatValue;
+                if (Mathf.Abs(measuredAt - fit.MeasuredScale) > 0.01f * fit.MeasuredScale)
+                {
+                    problems.Add($"{path}: strides measured at scale {fit.MeasuredScale}, recorded {measuredAt} (a scaled body would over-run)");
+                }
                 if (Mathf.Abs(stride - fit.Fastest) > 0.1f * fit.Fastest || Mathf.Abs(walk - fit.Feet[fit.Walk]) > 0.1f * fit.Feet[fit.Walk])
                 {
                     problems.Add($"{path}: strides {walk}/{stride}, its clips' feet {fit.Feet[fit.Walk]:0.00}/{fit.Fastest:0.00}");

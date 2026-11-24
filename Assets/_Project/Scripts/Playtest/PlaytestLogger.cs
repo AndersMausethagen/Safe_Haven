@@ -172,6 +172,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
 
     public void OnSceneEntered(Scene scene)
     {
+        sceneName = scene.name;
         kills.Clear();
         Write(PlaytestLog.SceneEntered, scene.name);
         if (!string.IsNullOrEmpty(GameOptions.AssistsInUse))
@@ -215,6 +216,11 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
     // The display settings last written in a Machine row: a change (resolution, quality, frame cap) writes a new one.
     private string machineWritten;
     private static float averageFrame = 1f / 60f;
+    // The active scene's name, read when a scene is entered (GetActiveScene().name makes a string a call: it was read every frame).
+    private string sceneName = "";
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetFrameRate() => averageFrame = 1f / 60f;
 
     /// <summary>The frame rate of the last second or so of real frames, in every build: what F8's report says. Time.smoothDeltaTime
     /// follows the time scale, so a report written while paused said 10000 fps (2026-11-21).</summary>
@@ -238,7 +244,13 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         }
 
         wasLoading = loading;
-        if (loading || Time.unscaledTime < settledAt || GamePause.IsPaused || !Application.isFocused)
+        // Paused or away, then the frame after: one long frame of coming back is not a hitch (review 2026-11-24: alt-tab set "worst").
+        if (GamePause.IsPaused || !Application.isFocused)
+        {
+            settledAt = Mathf.Max(settledAt, Time.unscaledTime + 0.25f);
+        }
+
+        if (loading || Time.unscaledTime < settledAt)
         {
             return;
         }
@@ -258,7 +270,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         }
     }
 
-    private static string FramesPlace()
+    private string FramesPlace()
     {
         RaidDirector raid = RaidDirector.Current;
         if (raid != null && raid.Session != null && raid.Session.Definition != null)
@@ -266,7 +278,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
             return raid.Session.Definition.Id;
         }
 
-        return Place.InAHaven && Place.AtHome ? "home" : SceneManager.GetActiveScene().name;
+        return Place.InAHaven && Place.AtHome ? "home" : sceneName;
     }
 
     // A minute's frames (or fewer, at a change of place) as one Perf row: subject the place, amount the 95th percentile in whole ms.

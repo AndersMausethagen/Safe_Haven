@@ -1,7 +1,19 @@
 # Where quality is cheapest to win (2026-11-24)
 
 The user: "what system can we improve which will mostly increase the quality of the game? ... no balancing or changes that require a
-lot of playtesting." Nothing is built from this yet.
+lot of playtesting." Then: "do all".
+
+## Status: built 2026-11-24 (unplayed by hand)
+
+- **§2 first** (6075e96f): Perf and Machine rows in the playtest log, F8's real fps, LeaseWatch's lasting holds, blood tints made before
+  the first blow (profiled at 9 ms on the hit frame). Profiling one arrival in the Editor also showed a spawn zone making its whole group
+  in one frame (about 18 ms) and the realtime reflection probe (4-9 ms a face); both left for the friends' Perf rows to weigh.
+- **§1** (8a114bd8): the tutorial card teaches while you play (TRY IT, steps ticked by their keys, LEARNED); 29 pages have steps;
+  written-out keys made tokens; the Stamina page's wrong art button fixed. Correction to §1 below: the no-text-walls rule allows
+  reading in tutorials, so the full page stays in the window; what changed is that it no longer needs a trip there. The window-trip
+  clicks (§1, third point) wait for the per-window HomeStay rows from real runs: nothing was cut without them.
+- **§3** (9d944141, 66e98a55): wolves, foxes, deer and stags fitted to their clips' measured feet (BeastStrides), and they step round
+  when turning on the spot. Boars still glide: their only stride is a walk; they need a run clip.
 
 **Short answer:** the game isn't missing systems. It loses quality in three places a player meets every session, and none of them
 needs balance data:

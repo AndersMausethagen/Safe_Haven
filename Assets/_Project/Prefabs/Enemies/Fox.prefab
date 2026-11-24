@@ -212,6 +212,7 @@ MonoBehaviour:
   flinchShare: 0.04
   strideSpeed: 2.17
   walkStrideSpeed: 0.74
+  strideMeasuredScale: 0.22
   swingsLikeThePlayer: 0
   strikeClips: []
   walkClipSpeed: 1.86

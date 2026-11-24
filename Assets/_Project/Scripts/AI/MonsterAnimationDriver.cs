@@ -42,6 +42,9 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
              "blend keeps up at playback 1, and faster plays the fastest clip faster. 0: one stride clip, as before. Set by Safe Haven › " +
              "Tools › Fit Beast Strides (BeastStrides), which measures the clips.")]
     [SerializeField, Min(0f)] private float walkStrideSpeed;
+    [Tooltip("The model's scale (its lossy height scale) when the strides were measured. A body made bigger (a pack leader, an elite, a " +
+             "look's size) takes longer strides: its speed is divided by how much bigger it is now. Set by Fit Beast Strides.")]
+    [SerializeField, Min(0f)] private float strideMeasuredScale;
     [Tooltip("Swings as the player does (the Lost Ones, once settlers): a strike fitted to a player's clip (CombatClipKit.FitAttack) builds up at its " +
              "Animation Speed, strikes at Strike Speed for the Strike Lead before the blow, and plays out at Follow Through Speed. Off: one speed throughout.")]
     [SerializeField] private bool swingsLikeThePlayer;
@@ -228,11 +231,17 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         // Story movement owns locomotion while the AI is disabled.
         float speed = MovedSpeed();
         UpdateStrikeTail(speed);
-        // Walking and galloping beasts step round as they turn on the spot.
+        // Walking and galloping beasts step round as they turn on the spot, and a bigger one takes longer strides (review 2026-11-24: a
+        // pack leader at 1.2 over-ran the ground by a fifth).
         if (walkStrideSpeed > 0f)
         {
             speed = Mathf.Max(speed, TurnStep());
+            if (strideMeasuredScale > 0f)
+            {
+                speed /= Mathf.Max(0.05f, animator.transform.lossyScale.y / strideMeasuredScale);
+            }
         }
+
         if (ai.enabled && hasSpeed)
         {
             animator.SetFloat(speedHash, speed / bodyScale, speedDampTime, Time.deltaTime);

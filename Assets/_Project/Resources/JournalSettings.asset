@@ -617,7 +617,7 @@ MonoBehaviour:
     summary: Moving slowly and quietly so the forest's creatures don't notice you, and striking first when they haven't.
     steps:
     - '[{key:Sneak}] Sneak: slow, quiet, hard to see'
-    - '[{key:Attack}] Strike one that hasn''t seen you'
+    - '[{key:Attack}] Try an ambush: strike unseen'
   - group: Gathering
     title: Woodcutting
     line: Fell it, then work it where it lies
@@ -735,7 +735,7 @@ MonoBehaviour:
     summary: Your weapon's attacks come as a chain of swings, and timing matters more than speed.
     steps:
     - '[{key:Attack}] Tap, and tap again as it lands'
-    - '[{key:Attack}] Hold for a heavy blow'
+    - '[{key:Attack}] Try a heavy: hold it'
   - group: Combat
     title: Guard and Parry
     line: Part of a blow, or none of it
@@ -759,7 +759,7 @@ MonoBehaviour:
     summary: A guard takes part of a blow. A guard raised at the last moment takes none of it and opens the attacker up.
     steps:
     - '[{key:Guard}] Hold to guard'
-    - '[{key:Guard}] Raise it just as a blow lands: a parry'
+    - '[{key:Guard}] Try a parry: raise it as a blow lands'
   - group: Combat
     title: Dodging
     line: Your way out of almost anything
@@ -820,7 +820,7 @@ MonoBehaviour:
     art: {fileID: 21300000, guid: 3ec88d50adef5e849a6e644c1b950c1d, type: 3}
     summary: Wear a creature down and it staggers, open to your best blows.
     steps:
-    - '[{key:Attack}] Hold for a heavy: it breaks poise'
+    - '[{key:Attack}] Try a heavy: it breaks poise'
   - group: Combat
     title: Backstabs and Finishing Blows
     line: The best blow there is
@@ -843,9 +843,9 @@ MonoBehaviour:
     art: {fileID: 21300000, guid: c4d1a7d56cb31d8409bdd56417434419, type: 3}
     summary: Striking a staggered enemy from behind is the strongest blow there is.
     steps:
-    - '[{key:Guard}] Parry a blow'
+    - '[{key:Guard}] Try a parry'
     - '[{key:Dodge}] Roll behind it'
-    - '[{key:Attack}] Strike from the pale wedge'
+    - '[{key:Attack}] Then strike from the pale wedge'
   - group: Combat
     title: Getting Hit
     line: Don't trade blows

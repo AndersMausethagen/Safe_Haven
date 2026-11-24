@@ -27,6 +27,7 @@ public static class BeastStrides
         public BlendTree Tree;
         public readonly List<string> Prefabs = new List<string>();
         public float[] Feet;
+        public float MeasuredScale;
 
         public int Walk => Feet.Length >= 3 ? 1 : -1;
         public float Fastest => Feet.Length > 0 ? Feet[Feet.Length - 1] : 0f;
@@ -52,7 +53,7 @@ public static class BeastStrides
 
             if (!fits.TryGetValue(controller, out Fit fit))
             {
-                fit = new Fit { Controller = controller, Tree = tree, Feet = Measure(path, tree) };
+                fit = new Fit { Controller = controller, Tree = tree, Feet = Measure(path, tree, out float scale), MeasuredScale = scale };
                 fits[controller] = fit;
             }
 
@@ -103,6 +104,7 @@ public static class BeastStrides
                 var so = new SerializedObject(driver);
                 so.FindProperty("strideSpeed").floatValue = Mathf.Round(fit.Fastest * 100f) / 100f;
                 so.FindProperty("walkStrideSpeed").floatValue = Mathf.Round(fit.Feet[fit.Walk] * 100f) / 100f;
+                so.FindProperty("strideMeasuredScale").floatValue = fit.MeasuredScale;
                 so.ApplyModifiedPropertiesWithoutUndo();
                 EditorUtility.SetDirty(driver);
             }
@@ -141,7 +143,7 @@ public static class BeastStrides
         controller as AnimatorController ?? (controller as AnimatorOverrideController)?.runtimeAnimatorController as AnimatorController;
 
     // Each child's feet speed on the prefab's own body (its import scale included); the first child, the idle, is 0.
-    private static float[] Measure(string prefabPath, BlendTree tree)
+    private static float[] Measure(string prefabPath, BlendTree tree, out float scale)
     {
         ChildMotion[] children = tree.children;
         var feet = new float[children.Length];
@@ -149,6 +151,7 @@ public static class BeastStrides
         try
         {
             Animator animator = root.GetComponentInChildren<Animator>(true);
+            scale = animator.transform.lossyScale.y;
             List<Transform> ends = Feet(animator);
             for (int i = 1; i < children.Length; i++)
             {

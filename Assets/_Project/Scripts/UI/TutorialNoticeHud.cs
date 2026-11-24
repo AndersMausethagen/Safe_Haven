@@ -51,6 +51,10 @@ public sealed class TutorialNoticeHud : MonoBehaviour
     private float learnedUntil = -1f;
     // The frame the lesson began: the press that opened its page (the first swing at a tree) doesn't also do its first step.
     private int lessonFrame;
+    // The step's action, looked up once per step and key change (ActionForToken builds strings).
+    private string actionToken;
+    private int actionKeys = -1;
+    private UnityEngine.InputSystem.InputAction stepAction;
     private CanvasGroup cardFade;
     private RectTransform line;
     private CanvasGroup lineFade;
@@ -265,12 +269,20 @@ public sealed class TutorialNoticeHud : MonoBehaviour
 
         // Out of the way while a window is up (the tutorial itself, the bag, a station...), back when it closes. The card only for a
         // while after a tutorial opens (longer while the pointer rests on it); then the small line.
-        // The step's key, pressed in play (a window's own keys don't count: the gameplay keys are off under it).
-        string token = lesson != null ? lesson.CurrentToken : null;
-        if (token != null && Time.frameCount > lessonFrame)
+        // The step's key, pressed in play while the card teaches: not a click on a window, a slot or the HUD, not while building or
+        // paused (review 2026-11-24: clicking a bag slot ticked "strike"), and a wheel's choice counts (GameInput.WasPressed).
+        bool listening = lesson != null && !lesson.Finished && Time.unscaledTime < lessonUntil && Time.frameCount > lessonFrame;
+        string token = listening ? lesson.CurrentToken : null;
+        if (token != null && InPlay())
         {
-            UnityEngine.InputSystem.InputAction action = GameInput.ActionForToken(token);
-            if (action != null && action.enabled && action.WasPressedThisFrame())
+            if (token != actionToken || actionKeys != GameInput.KeysVersion)
+            {
+                actionToken = token;
+                actionKeys = GameInput.KeysVersion;
+                stepAction = GameInput.ActionForToken(token);
+            }
+
+            if (stepAction != null && stepAction.enabled && GameInput.WasPressed(stepAction))
             {
                 Pressed(token);
             }
@@ -349,8 +361,15 @@ public sealed class TutorialNoticeHud : MonoBehaviour
             return;
         }
 
-        // The lesson: the newest waiting page with steps; one read in the window meanwhile is no longer taught.
+        // The lesson: the newest waiting page with steps; one read in the window meanwhile is no longer taught, and a page that has
+        // just opened takes over (review 2026-11-24: Fishing opened under an unfinished Woodcutting and was never shown).
         if (lesson != null && !Contains(Tutorials.Pending, lesson.Page))
+        {
+            lesson = null;
+        }
+
+        JournalPage arrived = Tutorials.Pending[count - 1];
+        if (count > shownCount && TutorialLesson.HasSteps(arrived) && (lesson == null || lesson.Page != arrived))
         {
             lesson = null;
         }
@@ -387,6 +406,11 @@ public sealed class TutorialNoticeHud : MonoBehaviour
 
         shownCount = count;
     }
+
+    // Playing, not in a menu: no window, no pointer on the UI, not placing a building, not paused.
+    private static bool InPlay() =>
+        (UIStateManager.Current == null || !UIStateManager.Current.IsAnyWindowOpen) && !GamePause.IsPaused && !BuildPlacer.IsBusy &&
+        (UnityEngine.EventSystems.EventSystem.current == null || !UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject());
 
     private static bool Contains(System.Collections.Generic.IReadOnlyList<JournalPage> pages, JournalPage page)
     {
