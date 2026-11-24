@@ -76,11 +76,9 @@ public sealed class WeaponDefinition : ScriptableObject
     [SerializeField, Min(0f)] private float signaturePower = 1f;
 
     [Header("Weapon art")]
-    [Tooltip("The special attack this weapon knows: paid for with Focus, not stamina (middle mouse, or attack while guarding " +
-             "without a shield). Empty: none.")]
+    [Tooltip("The special attack this weapon knows: paid for with a full Focus circle, not stamina (middle mouse, or attack while " +
+             "guarding without a shield). Empty: none.")]
     [SerializeField] private AttackDefinition weaponArt;
-    [Tooltip("Focus the weapon art costs.")]
-    [SerializeField, Min(0f)] private float weaponArtFocus = 30f;
 
     [Header("Guard")]
     [Tooltip("Share of a blocked hit that still gets through with this weapon (a shield blocks better).")]
@@ -107,9 +105,9 @@ public sealed class WeaponDefinition : ScriptableObject
     [SerializeField, Range(1f, 3f)] private float perfectReleaseDamage = 1.25f;
     [Tooltip("Multiplies the arrow's damage: a stronger bow drives the same arrow harder, so bows grow with the tiers as blades do. 1: the arrow as it is.")]
     [SerializeField, Min(0.1f)] private float drawWeight = 1f;
-    [Tooltip("Escape Shot, the bow's art: Focus it costs to loose a full draw as the player dodges away from the aim (perfect if the window " +
-             "was open), instead of the dodge dropping the draw. 0: no Escape Shot.")]
-    [SerializeField, Min(0f)] private float escapeShotFocus;
+    [Tooltip("Escape Shot, the bow's art: for a full Focus circle, a dodge away from the aim at full draw looses the arrow (perfect if " +
+             "the window was open) instead of dropping the draw.")]
+    [SerializeField] private bool escapeShot;
     [Tooltip("Spread while aiming (holding guard) as a share of normal.")]
     [SerializeField, Range(0.1f, 1f)] private float aimSpread = 0.5f;
     [Tooltip("Share of a normal shot's damage the instant shot after a perfect dodge deals.")]
@@ -144,7 +142,7 @@ public sealed class WeaponDefinition : ScriptableObject
     public float PerfectReleaseSeconds => perfectReleaseSeconds;
     public float PerfectReleaseDamage => perfectReleaseDamage;
     public float DrawWeight => drawWeight;
-    public float EscapeShotFocus => escapeShotFocus;
+    public bool HasEscapeShot => escapeShot;
     public float AimSpread => aimSpread;
     public float CounterShotDamage => counterShotDamage;
     public AttackDefinition ShotAttack => shotAttack;
@@ -188,7 +186,6 @@ public sealed class WeaponDefinition : ScriptableObject
     public float SecondHandDistance => secondHandDistance;
     public float HeavySwingArmor => heavySwingArmor;
     public AttackDefinition WeaponArt => weaponArt;
-    public float WeaponArtFocus => weaponArtFocus;
     public float GuardLetThrough => guardLetThrough;
     public SoundDefinition SwingSound => swingSound;
     public SoundDefinition HitSound => hitSound;
@@ -238,10 +235,9 @@ public sealed class WeaponDefinition : ScriptableObject
     }
 
     /// <summary>Sets the weapon art (editor setup and tests).</summary>
-    public void ConfigureArt(AttackDefinition art, float focus)
+    public void ConfigureArt(AttackDefinition art)
     {
         weaponArt = art;
-        weaponArtFocus = focus;
     }
 
     /// <summary>Sets the chain and heavy attack (editor setup and tests).</summary>

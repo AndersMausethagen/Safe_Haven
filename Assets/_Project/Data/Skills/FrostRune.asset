@@ -18,7 +18,7 @@ MonoBehaviour:
   school: 2
   cooldown: 10
   staminaCost: 20
-  focusCost: 35
+  focusCircles: 1
   castTime: 0.5
   lungeDistance: 0
   lungeDuration: 0.22
@@ -46,7 +46,7 @@ MonoBehaviour:
     consumeInto: {fileID: 0}
   - id: frost_light
     displayName: Light Words
-    description: Costs 40% less stamina.
+    description: Costs 40% less stamina, and 40% of its Focus circle comes back.
     rank: 1
     damageScale: 1
     cooldownScale: 1

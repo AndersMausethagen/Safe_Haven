@@ -129,6 +129,42 @@ public sealed class CombatTechniqueTests
         Assert.Greater(rules.FocusOnParry, one * 3f, "a parry is worth more than trading hits");
     }
 
+    // Focus is kept in circles (the user, 2026-11-24): full ones count, the one filling is a share, and there are at most three.
+    [Test]
+    public void Focus_IsKeptInCircles()
+    {
+        Assert.AreEqual(0, PlayerFocus.CirclesIn(99f, 100f, 3), "not full yet");
+        Assert.AreEqual(0.99f, PlayerFocus.FillingOf(99f, 100f, 3), 1e-4f);
+        Assert.AreEqual(1, PlayerFocus.CirclesIn(100f, 100f, 3));
+        Assert.AreEqual(0f, PlayerFocus.FillingOf(100f, 100f, 3), 1e-4f, "the next starts empty");
+        Assert.AreEqual(2, PlayerFocus.CirclesIn(240f, 100f, 3));
+        Assert.AreEqual(0.4f, PlayerFocus.FillingOf(240f, 100f, 3), 1e-4f, "spending one keeps what the next had filled");
+        Assert.AreEqual(3, PlayerFocus.CirclesIn(300f, 100f, 3));
+        Assert.AreEqual(1f, PlayerFocus.FillingOf(300f, 100f, 3), 1e-4f, "all full");
+        Assert.AreEqual(3, PlayerFocus.CirclesIn(450f, 100f, 3), "never more than there are");
+        Assert.AreEqual(1, PlayerFocus.CirclesIn(99.9995f, 100f, 3), "float dust doesn't cost a circle");
+
+        var defaults = ScriptableObject.CreateInstance<CombatTechniqueSettings>();
+        Assert.AreEqual(3, defaults.FocusCircles);
+        Assert.AreEqual(defaults.FocusPerCircle * 3f, defaults.FocusMax, 1e-3f);
+        Object.DestroyImmediate(defaults);
+    }
+
+    // Every ability and spell takes a circle; a weapon art's own skill takes none, as the art pays (PlayerCombat).
+    [Test]
+    public void EverySkill_TakesAFocusCircle()
+    {
+        int skills = 0;
+        foreach (string guid in UnityEditor.AssetDatabase.FindAssets("t:SkillDefinition"))
+        {
+            var skill = UnityEditor.AssetDatabase.LoadAssetAtPath<SkillDefinition>(UnityEditor.AssetDatabase.GUIDToAssetPath(guid));
+            Assert.AreEqual(skill.WeaponArt != WeaponArtSlot.None ? 0 : 1, skill.FocusCircles, skill.name);
+            skills++;
+        }
+
+        Assert.Greater(skills, 5);
+    }
+
     [Test]
     public void GearWeight_DecidesTheDodge()
     {

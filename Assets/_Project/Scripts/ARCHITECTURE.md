@@ -1647,7 +1647,7 @@ The player is no super soldier: combat is about reading the enemy and committing
   where it comes (`MonsterAI.IsUnawareOf`, `JudgeAmbushFrom` from `Guard` and the host's friend-hit path; `PlayerProficiencies.CaughtUnaware`
   and `AmbushScale` overloads). Quiet kills (`PlayerNoise.IsAmbushKill`, Perception Settings › Ambush), `SuspectAt` for creatures that see
   a kill, `Concealment` on shrub prefabs (`PlayerStealth.Cover`), `BirdProfile.AlarmRadius`. Bows: `WeaponDefinition.DrawWeight`,
-  `EscapeShotFocus` (`PlayerArchery.TryEscapeShot`), `WeaponSignature.HuntersMark` → `HitTechnique.Marking` → `MonsterAI.IsMarked`
+  `HasEscapeShot` (a Focus circle, `PlayerArchery.TryEscapeShot`), `WeaponSignature.HuntersMark` → `HitTechnique.Marking` → `MonsterAI.IsMarked`
   (poise ×, ring; pose bit 0x10); `ArcheryRules.DamagePerSecond`. Staff: `CastVolley` through `MonsterProjectile` (spell, multipliers,
   half on a repeat), `PlayerCombat.IsCasting`/`CastTarget`/`CastLoosed`, `CastAimLine`. Telemetry: `CombatTally` Bow.*, Staff.*, Ambush,
   Spotted.* (`MonsterAI.SpottedPlayer`). Co-op: `PlayerLookState.Drawing` → `FriendHitbox.IsDrawing`; `NetworkPlayerAvatar` NoiseRpc,
@@ -1701,7 +1701,7 @@ The player is no super soldier: combat is about reading the enemy and committing
   `GameState.Combat` with a melee weapon, and calls `PlayerMovement.SetFocusDirection`. `AimDirection` then means "toward the focused enemy",
   so swings, skills and facing follow it with no change of their own; `RawAimDirection` is still the cursor. It stands aside while the aim
   points past `FocusFreeAimAngle`. `PlayerCombat.TrackFocus` keeps a winding swing turning toward it. Ring: `Graphics.RenderMesh`.
-- **Weapon arts and backstabs:** `WeaponDefinition.WeaponArt` / `WeaponArtFocus`, `SwingKind.Art`, `HitTechnique.WeaponArt`. Input is the
+- **Weapon arts and backstabs:** `WeaponDefinition.WeaponArt` (a Focus circle; its follow-ups free in their window), `SwingKind.Art`, `HitTechnique.WeaponArt`. Input is the
   CycleArrows action (the bow ignores melee, and melee ignores the bow) or attacking while guarding without a shield. Focus pays and `CostOf`
   charges no stamina; arts earn no Focus. A hit on a `MonsterAI.IsOpenToBackstab` from within `BackstabArc` behind it is `HitTechnique.Backstab`
   (`PlayerCombat.IsBackstab`); `BackstabMarker` draws the wedge, added by `CombatFeedback` on `AnyStaggered`, warming with `BackstabReadChance`.
@@ -1757,9 +1757,13 @@ The player is no super soldier: combat is about reading the enemy and committing
   which `CombatFeedback` keeps quiet); stuck arrows may be `Recoverable` (walk over them). Content:
   `AgentScripts/BuildArchery.cs`; the layer: `CombatAnimationSetup.BuildBowLayer` (part of Set Up Combat Animations).
   Tests: `ArcheryTests`.
-- **Focus** (`PlayerFocus`): earned from `SwingLanded`, parries, perfect dodges and blocks, drains after a hold; skills
-  with a `SkillDefinition.FocusCost` need it (`SkillCastResult.NoFocus`). Shown as the gold bar in `PlayerVitalsView`
-  (added by Safe Haven › Setup › UI › Add Focus Bar to Vitals HUD).
+- **Focus** (`PlayerFocus`): earned from `SwingLanded`, parries, perfect dodges and blocks, kept in circles (the user, 2026-11-24:
+  `CombatTechniqueSettings.FocusPerCircle` 100 × `FocusCircles` 3). A full circle never drains; only the one filling drains after a
+  hold. Every ability, spell, weapon art and escape shot spends one (`TrySpendCircles`, `SkillDefinition.FocusCircles`, 0 on the art
+  proxies; `SkillCastResult.NoFocus`); a cheaper option (`SkillOption.costScale`) gives its share of the circle back. The player is
+  made anew per scene, so circles start empty entering or leaving a raid. Full circles: `FocusCirclesView` on the SkillHUD's Skill
+  Bar; the one filling: the thin bar in `PlayerVitalsView` (`Filling`). Tested: `CombatTechniqueTests.Focus_IsKeptInCircles`,
+  `EverySkill_TakesAFocusCircle`, `ParryEconomyTests`.
 - **Dodge by gear weight:** `PlayerEquipment.EquipLoad` (armour, rings, weapon) picks a `DodgeStyle` from
   `PlayerMovementSettings` (Quickstep / Roll / Heavy Roll, each a `DodgeShape` of multipliers, move speed and animation);
   `PlayerDodge.DodgeStarted` plays it; the heavy roll ends in the `shoulderBarge` attack. While the dodge cools down the
@@ -1861,7 +1865,7 @@ Everything in [the combat research](../../../Docs/CombatResearch.md) was built, 
   the bag. Saved as `ProgressSaveData.attunedRunes` ("Kind=itemId"). `PlayerCombat.Input` strikes the rune's art when attacking
   out of the guard without a shield. `ArtRuneTests`.
 - **Teaching and feel.** `JournalPage.unlockedByTechnique` (guard, parry, dodge, stagger, stamina, hurt; `JournalNotices.TriedTechnique`)
-  opens each combat page on its own trigger. `HeldItemView` lights the art-ready ember while `PlayerFocus` can pay for the art.
+  opens each combat page on its own trigger. `HeldItemView` lights the art-ready ember while `PlayerFocus` has a full circle.
   `SkillDefinition` › Animation State plays a skill's own clip. `CombatFeedback` sparks and clangs on `AnyInterrupted` and flashes on
   `SignatureUsed`.
 - **Telemetry**: `CombatTally` listens only to the player's own events, so no fighting code knows of it; `PlaytestLogger` writes one

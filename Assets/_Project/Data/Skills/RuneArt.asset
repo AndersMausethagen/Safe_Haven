@@ -18,10 +18,18 @@ MonoBehaviour:
   school: 0
   cooldown: 0
   staminaCost: 0
-  focusCost: 0
+  focusCircles: 0
   castTime: 0.45
   lungeDistance: 0
   lungeDuration: 0.2
+  channelSeconds: 0
+  channelTick: 0.3
+  foesStatus: {fileID: 0}
+  foesRadius: 7
+  foesDelay: 0.5
+  options: []
+  leaves: {fileID: 0}
+  leavesCount: 3
   attack: {fileID: 0}
   heal: 0
   buffs: []
@@ -39,4 +47,9 @@ MonoBehaviour:
     lightRange: 8
     lightSeconds: 0.35
     shake: 0
+    hitStop: 0
+    kick: 0
+    castSound: {fileID: 0}
+    releaseSound: {fileID: 0}
+    releaseSoundDelay: 0
   weaponArt: 2

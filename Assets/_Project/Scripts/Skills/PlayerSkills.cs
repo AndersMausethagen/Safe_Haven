@@ -470,10 +470,10 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         }
 
         PlayerFocus focus = GetComponent<PlayerFocus>();
-        float focusCost = skill.FocusCost * SkillChoices.For(skill).Cost;
-        if (result == SkillCastResult.Cast && focusCost > 0f && focus != null && !focus.CanSpend(focusCost))
+        int circles = skill.FocusCircles;
+        if (result == SkillCastResult.Cast && circles > 0 && focus != null && focus.Circles < circles)
         {
-            focus.TrySpend(focusCost); // refused: lets the HUD say so
+            focus.TrySpendCircles(circles); // refused: lets the HUD say so
             result = SkillCastResult.NoFocus;
         }
 
@@ -482,9 +482,11 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             result = SkillCastResult.NoStamina;
         }
 
-        if (result == SkillCastResult.Cast && focusCost > 0f && focus != null)
+        if (result == SkillCastResult.Cast && circles > 0 && focus != null)
         {
-            focus.TrySpend(focusCost);
+            // An option that makes it cheaper (Cost under 1) gives that share of what it took back, into the circle filling.
+            float spent = focus.TrySpendCircles(circles);
+            focus.Gain(spent * Mathf.Clamp01(1f - SkillChoices.For(skill).Cost));
         }
 
         if (result != SkillCastResult.Cast)

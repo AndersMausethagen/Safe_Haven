@@ -142,7 +142,7 @@ public sealed class HeldItemView : MonoBehaviour
     {
         WeaponDefinition weapon = artCombat != null ? artCombat.Weapon : null;
         ArtReady = current != null && current.activeInHierarchy && weapon != null && weapon.WeaponArt != null && !weapon.TakesAttackInput
-            && artFocus != null && artFocus.CanSpend(weapon.WeaponArtFocus) && weapon.WeaponArtFocus > 0f;
+            && artFocus != null && artFocus.HasCircle;
         // A counter ready (after a parry or a perfect dodge) lights the weapon in the counter's own pale steel for as long as it lasts:
         // the window was a sound alone, with nothing to say how long it stays (Docs/CombatFeelReview_2026-11-19.md §7).
         bool counter = current != null && current.activeInHierarchy && artCombat != null && artCombat.CounterIsReady;

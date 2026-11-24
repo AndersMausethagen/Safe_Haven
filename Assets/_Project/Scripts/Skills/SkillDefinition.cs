@@ -30,8 +30,10 @@ public sealed class SkillDefinition : ScriptableObject
     [SerializeField, Min(0f)] private float cooldown = 8f;
     [Tooltip("Stamina paid when cast. An empty stamina pool refuses the skill.")]
     [SerializeField, Min(0f)] private float staminaCost = 20f;
-    [Tooltip("Focus it needs and spends. Focus is earned by fighting well (hits, parries, perfect dodges); 0 = none.")]
-    [SerializeField, Min(0f)] private float focusCost;
+    [Tooltip("Full Focus circles it needs and spends (the user, 2026-11-24: every ability and spell takes one). Focus is earned by " +
+             "fighting well (hits, parries, perfect dodges) and kept in circles above the skill bar. 0: none (a weapon art's own skill, " +
+             "which the art pays for).")]
+    [SerializeField, Range(0, 3)] private int focusCircles = 1;
     [Tooltip("Seconds after casting before another skill can be cast.")]
     [SerializeField, Min(0f)] private float castTime = 0.45f;
 
@@ -97,7 +99,7 @@ public sealed class SkillDefinition : ScriptableObject
     public SkillSchool School => school;
     public float Cooldown => cooldown;
     public float StaminaCost => staminaCost;
-    public float FocusCost => focusCost;
+    public int FocusCircles => focusCircles;
     public float CastTime => castTime;
     public float LungeDistance => lungeDistance;
     public float LungeDuration => lungeDuration;

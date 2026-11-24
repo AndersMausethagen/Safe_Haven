@@ -3,9 +3,11 @@ using UnityEngine;
 
 /// <summary>
 /// Focus: what fighting well earns and skills spend. Landing hits builds it (finishers and heavy swings more, counters
-/// more still), a parry or a perfect dodge builds a lot, blocking a little; it holds for a while after the last gain and
-/// then drains away, so it can't be saved up between fights. Skills with a Focus Cost need it on top of their cooldown.
-/// Rules are in <see cref="CombatTechniqueSettings"/> (Focus).
+/// more still), a parry or a perfect dodge builds a lot, blocking a little. It is kept in circles (the user, 2026-11-24): when one
+/// fills it lights above the skill bar and stays lit, never draining, until an ability, a spell or a weapon art spends it; up to
+/// three are kept. Only the circle still filling holds for a while after the last gain and then drains away. The player is made
+/// anew with each scene, so the circles start empty on entering or leaving a raid. Rules are in
+/// <see cref="CombatTechniqueSettings"/> (Focus).
 /// </summary>
 [RequireComponent(typeof(PlayerCombat))]
 public sealed class PlayerFocus : MonoBehaviour
@@ -15,9 +17,19 @@ public sealed class PlayerFocus : MonoBehaviour
     private Combatant combatant;
     private float lastGain = float.NegativeInfinity;
 
+    /// <summary>All the Focus held: the full circles' and the one filling.</summary>
     public float Current { get; private set; }
-    public float Max => CombatTechniqueSettings.Current.FocusMax;
-    public float Fraction => Max > 0f ? Mathf.Clamp01(Current / Max) : 0f;
+    public float Max => Rules.FocusMax;
+    public float PerCircle => Rules.FocusPerCircle;
+    public int MaxCircles => Rules.FocusCircles;
+
+    /// <summary>Full circles, ready to spend.</summary>
+    public int Circles => CirclesIn(Current, PerCircle, MaxCircles);
+
+    /// <summary>How full the next circle is, 0-1: 1 once every circle is full.</summary>
+    public float Filling => FillingOf(Current, PerCircle, MaxCircles);
+
+    public bool HasCircle => Circles > 0;
 
     /// <summary>Raised when Focus changes. Arguments: current, max.</summary>
     public event Action<float, float> FocusChanged;
@@ -76,12 +88,25 @@ public sealed class PlayerFocus : MonoBehaviour
         }
     }
 
+    // Only the circle still filling drains; full circles are kept.
     private void Update()
     {
-        if (Current > 0f && Time.time - lastGain > Rules.FocusHoldSeconds)
+        float kept = Circles * PerCircle;
+        if (Current > kept && Time.time - lastGain > Rules.FocusHoldSeconds)
         {
-            Set(Current - Rules.FocusDrainPerSecond * Time.deltaTime);
+            Set(Mathf.Max(kept, Current - Rules.FocusDrainPerSecond * Time.deltaTime));
         }
+    }
+
+    /// <summary>Full circles in that much Focus.</summary>
+    public static int CirclesIn(float focus, float perCircle, int maxCircles) =>
+        perCircle > 0f ? Mathf.Clamp(Mathf.FloorToInt((focus + 0.001f) / perCircle), 0, maxCircles) : 0;
+
+    /// <summary>How full the circle after the full ones is, 0-1; 1 when all are full.</summary>
+    public static float FillingOf(float focus, float perCircle, int maxCircles)
+    {
+        int full = CirclesIn(focus, perCircle, maxCircles);
+        return full >= maxCircles ? 1f : perCircle > 0f ? Mathf.Clamp01((focus - full * perCircle) / perCircle) : 0f;
     }
 
     /// <summary>Focus a swing earns: per target hit (two at most), more for finishers, heavy swings and counters.</summary>
@@ -124,23 +149,29 @@ public sealed class PlayerFocus : MonoBehaviour
         Set(Current + amount);
     }
 
-    public bool CanSpend(float cost) => cost <= 0f || Current >= cost - 0.001f;
+    /// <summary>
+    /// Spends one full circle, keeping what the next had filled; with none full, spends nothing and raises <see cref="SpendRefused"/>.
+    /// Returns the Focus spent (0 when refused).
+    /// </summary>
+    public float TrySpendCircle() => TrySpendCircles(1);
 
-    /// <summary>Spends Focus if there is enough; otherwise spends nothing and raises <see cref="SpendRefused"/>.</summary>
-    public bool TrySpend(float cost)
+    /// <summary>Spends that many full circles at once, or none (raising <see cref="SpendRefused"/>). Returns the Focus spent.</summary>
+    public float TrySpendCircles(int count)
     {
-        if (!CanSpend(cost))
+        if (count <= 0)
+        {
+            return 0f;
+        }
+
+        if (Circles < count)
         {
             SpendRefused?.Invoke();
-            return false;
+            return 0f;
         }
 
-        if (cost > 0f)
-        {
-            Set(Current - cost);
-        }
-
-        return true;
+        float spent = PerCircle * count;
+        Set(Current - spent);
+        return spent;
     }
 
     private void Set(float value)

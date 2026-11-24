@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// The rules that make combat slow, deliberate and dangerous, about timing rather than clicking (Resources/CombatTechniqueSettings, Systems Editor ›
@@ -296,13 +297,17 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [SerializeField, Min(0f)] private float flinchDodgeAfter = 0.25f;
 
     [Header("Focus (earned by fighting well, spent on skills)")]
-    [SerializeField, Min(1f)] private float focusMax = 100f;
+    [Tooltip("Focus is kept in circles (the user, 2026-11-24): a full one lights above the skill bar and stays lit until spent; every " +
+             "ability, spell and weapon art takes one. This is the Focus one circle takes to fill.")]
+    [FormerlySerializedAs("focusMax"), SerializeField, Min(1f)] private float focusPerCircle = 100f;
+    [Tooltip("How many circles can be kept.")]
+    [SerializeField, Range(1, 5)] private int focusCircles = 3;
     [Tooltip("Focus per target a swing hits (at most two count). Finishers count double, heavy swings 1.5 times, counters 1.5 times more.")]
     [SerializeField, Min(0f)] private float focusPerHit = 6f;
     [SerializeField, Min(0f)] private float focusOnParry = 35f;
     [SerializeField, Min(0f)] private float focusOnPerfectDodge = 25f;
     [SerializeField, Min(0f)] private float focusOnBlock = 2f;
-    [Tooltip("Seconds Focus holds after the last gain, then how fast it drains away (per second).")]
+    [Tooltip("Seconds the circle still filling holds after the last gain, then how fast it drains away (per second). Full circles never drain.")]
     [SerializeField, Min(0f)] private float focusHoldSeconds = 10f;
     [SerializeField, Min(0f)] private float focusDrainPerSecond = 4f;
 
@@ -498,7 +503,9 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float PerfectDodgeStop => perfectDodgeStop;
     public float FlinchTurnGrace => flinchTurnGrace;
     public float FlinchDodgeAfter => flinchDodgeAfter;
-    public float FocusMax => focusMax;
+    public float FocusPerCircle => focusPerCircle;
+    public int FocusCircles => focusCircles;
+    public float FocusMax => focusPerCircle * focusCircles;
     public float FocusPerHit => focusPerHit;
     public float FocusOnParry => focusOnParry;
     public float FocusOnPerfectDodge => focusOnPerfectDodge;

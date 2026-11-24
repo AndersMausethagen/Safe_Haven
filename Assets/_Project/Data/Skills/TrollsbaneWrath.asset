@@ -18,7 +18,7 @@ MonoBehaviour:
   school: 0
   cooldown: 40
   staminaCost: 40
-  focusCost: 60
+  focusCircles: 1
   castTime: 0.9
   lungeDistance: 0
   lungeDuration: 0.22

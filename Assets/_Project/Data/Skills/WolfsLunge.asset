@@ -18,7 +18,7 @@ MonoBehaviour:
   school: 1
   cooldown: 8
   staminaCost: 25
-  focusCost: 25
+  focusCircles: 1
   castTime: 0.45
   lungeDistance: 5
   lungeDuration: 0.22
@@ -46,7 +46,7 @@ MonoBehaviour:
     consumeInto: {fileID: 0}
   - id: wolf_light
     displayName: Light Step
-    description: Costs 40% less stamina.
+    description: Costs 40% less stamina, and 40% of its Focus circle comes back.
     rank: 1
     damageScale: 1
     cooldownScale: 1

@@ -32,7 +32,6 @@ MonoBehaviour:
   signature: 10
   signaturePower: 1
   weaponArt: {fileID: 0}
-  weaponArtFocus: 30
   guardLetThrough: 0.6
   blockPoise: 0
   drawSeconds: 0.85
@@ -44,7 +43,7 @@ MonoBehaviour:
   perfectReleaseSeconds: 0.2
   perfectReleaseDamage: 1
   drawWeight: 1.4
-  escapeShotFocus: 25
+  escapeShot: 1
   aimSpread: 0.5
   counterShotDamage: 0.6
   shotAttack: {fileID: 11400000, guid: ce3c793cb6a27644ea3474e6fe877fd9, type: 2}

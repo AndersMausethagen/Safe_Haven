@@ -36,4 +36,4 @@ MonoBehaviour:
     - rid: 2623126133347975290
       type: {class: FocusOnArtKillEffect, ns: , asm: SafeHaven}
       data:
-        focus: 20
+        focus: 35

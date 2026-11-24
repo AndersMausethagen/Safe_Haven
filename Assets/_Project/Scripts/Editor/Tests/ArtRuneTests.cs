@@ -24,7 +24,6 @@ public sealed class ArtRuneTests
             kinds.Add(item.RuneFor);
             Assert.IsTrue(item.IsUsable, item.name);
             Assert.IsNull(item.RaidModifier, $"{item.name} is no raid modifier");
-            Assert.Greater(item.RuneFocus, 0f, item.name);
             Assert.IsNotEmpty(item.RuneArt.AnimationState, item.name);
         }
 

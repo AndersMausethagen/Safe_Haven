@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// The player's health and stamina bars, the thin Focus bar (earned by fighting well, spent on skills), and the smaller
+/// The player's health and stamina bars, the thin Focus bar (earned by fighting well: it shows the circle filling, FocusCirclesView the full ones), and the smaller
 /// hunger and thirst bars (GDD §11, §18.2). Each bar has a fill that tracks the value at once and a pale trail behind it
 /// that lingers and then drains, so a hit or a spend reads at a glance. Refused attacks, skills and dodges flash the
 /// stamina bar and post a warning through the existing message feed. While the dodge cools down the stamina bar glows
@@ -275,7 +275,7 @@ public sealed class PlayerVitalsView : MonoBehaviour
         {
             boundFocus.FocusChanged += OnFocusChanged;
             boundFocus.SpendRefused += OnFocusRefused;
-            SetTarget(focus, boundFocus.Current, boundFocus.Max, snap: true);
+            SetTarget(focus, boundFocus.Filling, 1f, snap: true);
         }
 
         SetVisible(true);
@@ -319,7 +319,7 @@ public sealed class PlayerVitalsView : MonoBehaviour
         SetTarget(stamina, current, max, snap: false);
     }
 
-    private void OnFocusChanged(float current, float max) => SetTarget(focus, current, max, snap: false);
+    private void OnFocusChanged(float current, float max) => SetTarget(focus, boundFocus != null ? boundFocus.Filling : 0f, 1f, snap: false);
 
     private void OnFocusRefused()
     {
@@ -330,7 +330,7 @@ public sealed class PlayerVitalsView : MonoBehaviour
         }
 
         nextStaminaMessageAt = now + StaminaMessageInterval;
-        GameMessages.Post("Not enough Focus. Fight well to earn it: land hits, parry, dodge at the last moment.", MessageKind.Warning);
+        GameMessages.Post("No Focus circle is full. Fight well to fill one: land hits, parry, dodge at the last moment.", MessageKind.Warning);
     }
 
     private void OnSpendRefused()

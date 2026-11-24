@@ -72,8 +72,10 @@ public sealed partial class PlayerCombat
                     return false;
                 }
 
-                // Paid in Focus alone, and no stamina: a buffered art Focus can no longer pay for doesn't start.
-                if (focus != null && !focus.TrySpend(ArtFocus))
+                // Paid in Focus alone, and no stamina: a circle, or nothing for a follow-up in its window. A buffered art no full
+                // circle can pay for any more doesn't start.
+                artPaid = 0f;
+                if (focus != null && !ArtFollowUpOpen && (artPaid = focus.TrySpendCircle()) <= 0f)
                 {
                     return false;
                 }
@@ -145,7 +147,7 @@ public sealed partial class PlayerCombat
         if (kind == SwingKind.Art)
         {
             ArtsBegun++;
-            ArtFocusPaid = focus == null ? 0f : ArtFocus;
+            ArtFocusPaid = artPaid;
         }
 
         forcedAttack = null;

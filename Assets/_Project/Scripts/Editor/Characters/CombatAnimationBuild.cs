@@ -51,7 +51,7 @@ public static partial class CombatAnimationSetup
         AddGuardToPlayer();
         FitDodges();
         AddShoulderBarge();
-        SetSkillFocusCosts();
+        // Skill Focus is a circle each (SkillDefinition.focusCircles defaults to one): nothing to set.
         AssetDatabase.SaveAssets();
         Debug.Log($"Combat animations set up: player and monster states, {attacks} attack(s), weapon chains, the player's guard.");
     }
@@ -658,29 +658,6 @@ public static partial class CombatAnimationSetup
         finally
         {
             PrefabUtility.UnloadPrefabContents(root);
-        }
-    }
-
-    // Skills are paid with Focus, earned by fighting well; the stronger the skill, the more it takes. Only skills that
-    // have no cost yet are set.
-    private static void SetSkillFocusCosts()
-    {
-        var costs = new Dictionary<string, float>
-        {
-            ["WolfsLunge"] = 25f, ["WhirlingSteel"] = 40f, ["AshladsEmber"] = 35f, ["FrostRune"] = 35f,
-            ["TrollsbaneWrath"] = 60f, ["HuldrasBlessing"] = 30f,
-        };
-        foreach (string guid in AssetDatabase.FindAssets("t:SkillDefinition"))
-        {
-            var skill = AssetDatabase.LoadAssetAtPath<SkillDefinition>(AssetDatabase.GUIDToAssetPath(guid));
-            if (skill == null || skill.FocusCost > 0f || !costs.TryGetValue(skill.name, out float cost))
-            {
-                continue;
-            }
-
-            var data = new SerializedObject(skill);
-            data.FindProperty("focusCost").floatValue = cost;
-            data.ApplyModifiedPropertiesWithoutUndo();
         }
     }
 

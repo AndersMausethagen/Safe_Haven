@@ -194,7 +194,6 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
              "second weapon art, struck by attacking out of the guard (without a shield); the middle button keeps the weapon's own. It " +
              "stays in the bag; using another rune of the same kind swaps them. Empty for other items.")]
     [SerializeField] private AttackDefinition runeArt;
-    [SerializeField, Min(0f)] private float runeFocus = 30f;
     [SerializeField] private WeaponSignature runeFor;
 
     [Header("Raid")]
@@ -302,7 +301,6 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     /// <summary>An art rune: attuning it gives the weapons of its kind a second art (ArtRunes).</summary>
     public bool IsArtRune => runeArt != null && runeFor != WeaponSignature.None;
     public AttackDefinition RuneArt => runeArt;
-    public float RuneFocus => runeFocus;
     public WeaponSignature RuneFor => runeFor;
     public TransportDefinition Transport => transport;
     public int CarryCapacityBonus => carryCapacityBonus;

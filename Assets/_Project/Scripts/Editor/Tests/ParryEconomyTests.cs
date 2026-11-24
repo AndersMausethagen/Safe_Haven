@@ -43,7 +43,8 @@ public sealed class ParryEconomyTests
         Assert.AreEqual(0.3f, GuardRules.RelockAfter(false, 1.2f, 0.5f, 0.3f, 0.6f), 1e-5f, "held up, not tapped");
     }
 
-    // The settings as tuned: a parry is worth about two landed hits, not six, and an art costs about four hits or a parry and two.
+    // The settings as tuned: a parry is worth about two landed hits, not six, and a Focus circle (what an art or a skill takes) is
+    // earned over a fight: more than one chain, no more than three and a parry.
     [Test]
     public void AttackingEarnsFocus_AsWellAsParrying()
     {
@@ -59,7 +60,8 @@ public sealed class ParryEconomyTests
         }
 
         Assert.Greater(chain, rules.FocusOnParry * 1.5f, "a whole chain landed earns more than a parry");
-        Assert.GreaterOrEqual(chain + rules.FocusOnParry, sword.WeaponArtFocus, "a parry and a chain pay for the art");
+        Assert.Less(chain + rules.FocusOnParry, rules.FocusPerCircle, "one chain and a parry don't fill a circle");
+        Assert.GreaterOrEqual(chain * 3f + rules.FocusOnParry, rules.FocusPerCircle, "three chains and a parry fill one");
         Assert.Greater(rules.BreakThroughPoiseShare, 0f);
         Assert.Greater(rules.WhiffRelock, rules.GuardRelock);
     }

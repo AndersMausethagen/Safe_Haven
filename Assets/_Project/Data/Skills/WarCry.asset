@@ -18,7 +18,7 @@ MonoBehaviour:
   school: 0
   cooldown: 30
   staminaCost: 25
-  focusCost: 30
+  focusCircles: 1
   castTime: 0.9
   lungeDistance: 0
   lungeDuration: 0.2
@@ -46,7 +46,7 @@ MonoBehaviour:
     consumeInto: {fileID: 0}
   - id: cry_lungs
     displayName: Steady Lungs
-    description: Costs 40% less stamina and Focus.
+    description: Costs 40% less stamina, and 40% of its Focus circle comes back.
     rank: 1
     damageScale: 1
     cooldownScale: 1

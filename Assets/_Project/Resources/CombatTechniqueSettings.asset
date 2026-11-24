@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: CombatTechniqueSettings
   m_EditorClassIdentifier: SafeHaven::CombatTechniqueSettings
   chainGrace: 0.6
+  swingHoldSeconds: 0.4
   rhythmEarly: 0.16
   rhythmLate: 0.1
   maxRhythm: 2
@@ -124,7 +125,8 @@ MonoBehaviour:
   perfectDodgeStop: 0.08
   flinchTurnGrace: 0.2
   flinchDodgeAfter: 0.25
-  focusMax: 100
+  focusPerCircle: 100
+  focusCircles: 3
   focusPerHit: 8
   focusOnParry: 18
   focusOnPerfectDodge: 18
@@ -152,6 +154,8 @@ MonoBehaviour:
   artCooldown: 2
   huntersMarkSeconds: 6
   huntersMarkPoise: 1.5
+  meleeBurnShare: 0.35
+  meleeBurnSeconds: 4
   finishStab: {fileID: 11400000, guid: 1734cf527328c454dbfac4ce4ca6b391, type: 2}
   finishReach: 2.6
   finishGap: 0.95

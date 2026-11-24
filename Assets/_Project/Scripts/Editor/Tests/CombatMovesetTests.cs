@@ -52,7 +52,6 @@ public sealed class CombatMovesetTests
         foreach (WeaponDefinition weapon in MeleeWeapons().Where(weapon => weapon.Stance != WeaponStance.Unarmed))
         {
             Assert.IsNotNull(weapon.WeaponArt, $"{weapon.name} has no weapon art");
-            Assert.Greater(weapon.WeaponArtFocus, 0f, $"{weapon.name}'s art costs nothing");
         }
     }
 

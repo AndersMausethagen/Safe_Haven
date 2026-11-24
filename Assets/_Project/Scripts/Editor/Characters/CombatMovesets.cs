@@ -154,7 +154,6 @@ public static partial class CombatAnimationSetup
                 {
                     var data = new SerializedObject(definition);
                     data.FindProperty("weaponArt").objectReferenceValue = art != null ? made[art] : null;
-                    data.FindProperty("weaponArtFocus").floatValue = focus;
                     data.FindProperty("rushAttack").objectReferenceValue = made[rush];
                     data.FindProperty("secondHandDistance").floatValue = secondHand;
                     data.ApplyModifiedPropertiesWithoutUndo();

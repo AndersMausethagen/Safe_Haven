@@ -757,11 +757,11 @@ public sealed class PlayerArchery : MonoBehaviour
     }
 
     // Escape Shot (the bow's art): a dodge away from the aim at full draw looses the arrow as the hop starts, perfect if the window was
-    // open, for the bow's Escape Shot Focus. Without the Focus, or the draw not full, the dodge drops the draw as it always did.
+    // open, for a full Focus circle. Without one, or the draw not full, the dodge drops the draw as it always did.
     private bool TryEscapeShot(Vector3 direction)
     {
         WeaponDefinition bow = Bow;
-        if (bow == null || bow.EscapeShotFocus <= 0f || State != Phase.Drawing || Draw < 1f || focus == null)
+        if (bow == null || !bow.HasEscapeShot || State != Phase.Drawing || Draw < 1f || focus == null)
         {
             return false;
         }
@@ -770,7 +770,7 @@ public sealed class PlayerArchery : MonoBehaviour
         aim.y = 0f;
         direction.y = 0f;
         if (aim.sqrMagnitude < 0.01f || direction.sqrMagnitude < 0.01f || Vector3.Dot(aim.normalized, direction.normalized) > EscapeShotAway
-            || !focus.TrySpend(bow.EscapeShotFocus))
+            || focus.TrySpendCircle() <= 0f)
         {
             return false;
         }

@@ -154,15 +154,13 @@ public sealed partial class PlayerCombat
     }
 
     // Focus alone pays for an art (the user, 2026-11-16: arts were far too strong on stamina as well; short of Focus, guard then
-    // attack is a plain swing).
-    private bool CanAffordArt => weapon != null && ArtAttack != null && !weapon.TakesAttackInput && (focus == null || focus.CanSpend(ArtFocus));
+    // attack is a plain swing): one full circle (2026-11-24), and its follow-ups nothing while their window is open.
+    private bool CanAffordArt => weapon != null && ArtAttack != null && !weapon.TakesAttackInput && (focus == null || ArtFollowUpOpen || focus.HasCircle);
 
     // The art the next Art swing strikes: the attuned rune's, asked for by attacking out of the guard, else the weapon's own.
     private bool artFromRune;
     private ItemDefinition ArtRune => artFromRune ? ArtRunes.For(weapon) : null;
     private AttackDefinition ArtAttack => ArtRune != null ? ArtRune.RuneArt : weapon != null ? weapon.WeaponArt : null;
-    private float ArtFocus => (ArtRune != null ? ArtRune.RuneFocus : weapon != null ? weapon.WeaponArtFocus : 0f)
-        * (ArtFollowUpOpen ? ArtFollowUpFocusShare : 1f);
 
     // Whether attacking out of the guard would start an art now: one to strike, Focus for it, and off its cooldown.
     private bool ArtReadyFromGuard()
@@ -192,7 +190,7 @@ public sealed partial class PlayerCombat
 
         if (!CanAffordArt)
         {
-            if (focus != null) focus.TrySpend(ArtFocus); // refused: lets the HUD say so
+            if (focus != null) focus.TrySpendCircle(); // refused: lets the HUD say so
             artFromRune = false;
             return false;
         }
@@ -237,7 +235,7 @@ public sealed partial class PlayerCombat
 
         if (!CanAffordArt)
         {
-            if (focus != null) focus.TrySpend(weapon.WeaponArtFocus); // refused: lets the HUD say so
+            if (focus != null) focus.TrySpendCircle(); // refused: lets the HUD say so
             return;
         }
 

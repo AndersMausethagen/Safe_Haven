@@ -542,7 +542,9 @@ public sealed class BloodPriceEffect : RelicEffect
     [SerializeField, Range(0f, 0.05f)] private float healthPerFocus = 0.004f;
 
     public override string DisplayName => "Blood-Price";
-    public override string Describe() => $"Half of the Focus you spend comes back, paid in health ({Mathf.Round(healthPerFocus * 1000f) / 10f}% of your health a point).";
+    // Told per circle (Focus is spent a circle at a time): 0.0015 a point is 7.5% of your health for half a circle back.
+    public override string Describe() =>
+        $"Half of each Focus circle you spend comes back, paid in health ({healthPerFocus * refund * CombatTechniqueSettings.Current.FocusPerCircle * 100f:0.#}% of yours).";
 
     public override Action Attach(PlayerRelics wearer)
     {

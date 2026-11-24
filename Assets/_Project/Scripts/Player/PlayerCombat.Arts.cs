@@ -65,7 +65,8 @@ public sealed partial class PlayerCombat
     // strikes it again for half its Focus, up to twice; the cooldown still runs from the first.
     private const float ArtFollowUpWindow = 0.8f;
     private const int ArtFollowUps = 2;
-    private const float ArtFollowUpFocusShare = 0.5f;
+    // The Focus the art being struck took: a circle, nothing for a follow-up.
+    private float artPaid;
     private float artFollowUpUntil = -1f;
     private int artFollowUpsLeft;
 
