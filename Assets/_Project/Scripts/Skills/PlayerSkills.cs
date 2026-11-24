@@ -72,6 +72,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     private const float ReadiedAfterCastSeconds = 8f;
     private SkillDefinition lastCast;
     private float lastCastAt = float.NegativeInfinity;
+    private bool toldReadied;
     private StatusEffectDefinition readiedStatus;
     private float readiedUntil;
     private float readiedLanded = -1f;
@@ -629,6 +630,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         }
 
         GameSession.Progress.CountUse(skill);
+        TellPractised(skill);
         lastCast = skill;
         lastCastAt = now;
         float optionHeal = SkillChoices.For(skill).Heal;
@@ -863,6 +865,17 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         }
     }
 
+    // The cast that makes an ability practised enough for its next rank says so once (the altar was the only place to find out).
+    private static void TellPractised(SkillDefinition skill)
+    {
+        int rank = GameSession.Progress.RankOf(skill);
+        IReadOnlyList<EssenceSettings.SkillRank> ranks = EssenceSettings.Current.SkillRanks;
+        if (rank < ranks.Count && ranks[rank].practisedUses > 0 && GameSession.Progress.UsesOf(skill) == ranks[rank].practisedUses)
+        {
+            GameMessages.Post($"{skill.DisplayName} is practised: rank {AltarWork.Roman(rank + 1)} is free at the altar.", MessageKind.Gain);
+        }
+    }
+
     // A dodge is the way out of trouble: like a weapon swing, a skill hit that hadn't landed yet is lost.
     private void OnDodged(Vector3 direction)
     {
@@ -875,6 +888,13 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             readiedUntil = Time.time + ReadiedSeconds;
             readiedLanded = -1f;
             lastCastAt = float.NegativeInfinity;
+            // Said once a scene (the blade's tint was the only sign, and small from the high camera); the journal's Abilities page
+            // tells it too.
+            if (!toldReadied)
+            {
+                toldReadied = true;
+                GameMessages.Post($"Your next swing lays {school.DisplayName}: a dodge after an ability readies its mark.", MessageKind.Info);
+            }
         }
 
         pendingCry = null; // a cry cut short never rings out
@@ -918,6 +938,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
     // Aim Skills First (GameOptions.AimSkillsFirst): the held skill's area follows the aim until the key is let go, then it casts.
     private int aimingSlot = -1;
+    private PlayerFocus aimFocus;
 
     private void OnSkillAimed(int slot)
     {
@@ -970,7 +991,15 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         Vector3 aim = movement.AimDirection;
         Vector3 flat = new Vector3(aim.x, 0f, aim.z);
         Vector3 lands = transform.position + (flat.sqrMagnitude > 0.0001f ? flat.normalized : Vector3.zero) * skill.LungeDistance;
-        SkillAreaMark.Show(lands, aim, skill.Attack.Range, skill.Attack.Arc, SkillSchools.ColorOf(skill.School), 10f);
+        // Grey while letting go would be refused (cooling down, no Focus circle full): it looked castable until the refusal on release.
+        if (aimFocus == null)
+        {
+            aimFocus = GetComponent<PlayerFocus>();
+        }
+
+        bool refused = CheckCast(skill) == SkillCastResult.CoolingDown || (aimFocus != null && aimFocus.Circles < skill.FocusCircles);
+        Color colour = refused ? new Color(0.55f, 0.55f, 0.55f, 0.6f) : SkillSchools.ColorOf(skill.School);
+        SkillAreaMark.Show(lands, aim, skill.Attack.Range, skill.Attack.Arc, colour, 10f);
     }
 
     private void EnsureInitialised()

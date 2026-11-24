@@ -35,6 +35,8 @@ public sealed class WorldHealthBar : MonoBehaviour
     private RectTransform statusRow;
     private int statusIconsPlaced = -1;
     private readonly System.Collections.Generic.List<UnityEngine.UI.Image> statusIcons = new System.Collections.Generic.List<UnityEngine.UI.Image>();
+    // Over each icon, a shade that sweeps round as the status runs out (the UX pass of 2026-11-24: how long it had left was unseen).
+    private readonly System.Collections.Generic.List<UnityEngine.UI.Image> statusDrains = new System.Collections.Generic.List<UnityEngine.UI.Image>();
     private RectTransform poiseFill;
     private UnityEngine.UI.Graphic poiseGraphic;
     private GameObject poiseBar;
@@ -189,6 +191,8 @@ public sealed class WorldHealthBar : MonoBehaviour
                 icon.gameObject.SetActive(true);
             }
 
+            float left = current[i].SecondsLeft;
+            statusDrains[shown].fillAmount = 1f - Mathf.Clamp01(left / Mathf.Max(0.01f, Mathf.Max(effect.Seconds, left)));
             shown++;
         }
 
@@ -249,6 +253,23 @@ public sealed class WorldHealthBar : MonoBehaviour
             edge.effectColor = new Color(0f, 0f, 0f, 0.7f);
             edge.effectDistance = new Vector2(1.5f, -1.5f);
             statusIcons.Add(image);
+
+            var drain = new GameObject("Drain", typeof(RectTransform), typeof(UnityEngine.UI.Image));
+            var drainRect = (RectTransform)drain.transform;
+            drainRect.SetParent(rect, false);
+            drainRect.anchorMin = Vector2.zero;
+            drainRect.anchorMax = Vector2.one;
+            drainRect.offsetMin = drainRect.offsetMax = Vector2.zero;
+            var shade = drain.GetComponent<UnityEngine.UI.Image>();
+            shade.sprite = UISprites.Disc;
+            shade.color = new Color(0f, 0f, 0f, 0.55f);
+            shade.type = UnityEngine.UI.Image.Type.Filled;
+            shade.fillMethod = UnityEngine.UI.Image.FillMethod.Radial360;
+            shade.fillOrigin = (int)UnityEngine.UI.Image.Origin360.Top;
+            shade.fillClockwise = true;
+            shade.fillAmount = 0f;
+            shade.raycastTarget = false;
+            statusDrains.Add(shade);
         }
 
         return statusIcons[index];

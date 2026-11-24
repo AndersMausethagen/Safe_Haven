@@ -30,7 +30,7 @@ MonoBehaviour:
   options:
   - id: frost_quick
     displayName: Quick Rune
-    description: Its cooldown is a fifth shorter.
+    description: Its cooldown is 20% shorter.
     rank: 1
     damageScale: 1
     cooldownScale: 0.8

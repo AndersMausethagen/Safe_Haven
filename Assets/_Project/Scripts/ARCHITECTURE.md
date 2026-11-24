@@ -1764,6 +1764,10 @@ The player is no super soldier: combat is about reading the enemy and committing
   made anew per scene, so circles start empty entering or leaving a raid. Full circles: `FocusCirclesView` on the SkillHUD's Skill
   Bar; the one filling: the thin bar in `PlayerVitalsView` (`Filling`). Tested: `CombatTechniqueTests.Focus_IsKeptInCircles`,
   `EverySkill_TakesAFocusCircle`, `ParryEconomyTests`.
+  UX (2026-11-24 pass): a slot greys while no circle is full and pulses gold through an art's free follow-up window (`SkillBarView`,
+  `ItemSlotView.SetDimmed`); the tooltip names the circle (`SkillText.Costs`); an aimed area greys when release would be refused; the
+  journal's Stamina and Focus / Abilities pages teach circles, follow-ups, readied marks and reactions; status icons over health bars
+  shade round as they run out (`WorldHealthBar`); the loot window takes all on Interact; a practised ability says so once.
 - **Dodge by gear weight:** `PlayerEquipment.EquipLoad` (armour, rings, weapon) picks a `DodgeStyle` from
   `PlayerMovementSettings` (Quickstep / Roll / Heavy Roll, each a `DodgeShape` of multipliers, move speed and animation);
   `PlayerDodge.DodgeStarted` plays it; the heavy roll ends in the `shoulderBarge` attack. While the dodge cools down the

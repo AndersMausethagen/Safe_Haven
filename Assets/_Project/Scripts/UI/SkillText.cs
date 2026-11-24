@@ -7,8 +7,7 @@ public static class SkillText
     public static string Describe(SkillDefinition skill, int equippedSlot)
     {
         var builder = new StringBuilder();
-        builder.Append(SkillSchools.Rich(skill.School))
-            .Append($"  <color={UIStyle.Current.MutedHex}>Cooldown {PlayerSkills.CooldownOf(skill):0.#}s  ·  Stamina {skill.StaminaCost:0}</color>");
+        builder.Append(SkillSchools.Rich(skill.School)).Append($"  <color={UIStyle.Current.MutedHex}>{Costs(skill)}</color>");
         int rank = GameSession.Progress.RankOf(skill);
         if (rank > 0)
         {
@@ -61,7 +60,12 @@ public static class SkillText
 
         if (attack != null)
         {
-            builder.Append($"\n<color={UIStyle.Current.MutedHex}>{(skill.IsPhysical ? "A heavy blow: Melee trains, the frozen shatter." : "A spell: Runecraft trains and strengthens it.")}</color>");
+            builder.Append($"\n<color={UIStyle.Current.MutedHex}>{(skill.IsPhysical ? "A heavy blow: it shatters frozen foes and trains Melee." : "A spell: Runecraft trains and strengthens it.")}</color>");
+        }
+
+        if (skill.WeaponArt != WeaponArtSlot.None)
+        {
+            builder.Append($"\n<color={UIStyle.Current.AccentHex}>Press again just after it lands to strike it again, free (twice).</color>");
         }
 
         if (skill.Heal > 0f)
@@ -87,6 +91,20 @@ public static class SkillText
             ? $"\n\n<color={UIStyle.Current.AccentHex}>On the skill bar: {PlayerInputHandler.SkillKeyLabel(equippedSlot)}</color>"
             : $"\n\n<color={UIStyle.Current.MutedHex}>Drag onto the skill bar, or right-click to slot it.</color>");
         return builder.ToString();
+    }
+
+    // What it takes to cast: its cooldown (an art's is the arts' own), its stamina, and the Focus circles it spends.
+    private static string Costs(SkillDefinition skill)
+    {
+        bool art = skill.WeaponArt != WeaponArtSlot.None;
+        var parts = new System.Collections.Generic.List<string>
+        {
+            $"Cooldown {(art ? CombatTechniqueSettings.Current.ArtCooldown : PlayerSkills.CooldownOf(skill)):0.#}s",
+        };
+        if (!art && skill.StaminaCost > 0f) parts.Add($"Stamina {skill.StaminaCost:0}");
+        int circles = art ? 1 : skill.FocusCircles;
+        if (circles > 0) parts.Add(circles == 1 ? "1 Focus circle" : $"{circles} Focus circles");
+        return string.Join("  ·  ", parts);
     }
 
     /// <summary>A status in a few words with its numbers: "Sundered (8 s): takes 15% more".</summary>

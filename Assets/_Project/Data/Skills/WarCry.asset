@@ -30,7 +30,7 @@ MonoBehaviour:
   options:
   - id: cry_breath
     displayName: Long Breath
-    description: Its cooldown is a fifth shorter.
+    description: Its cooldown is 20% shorter.
     rank: 1
     damageScale: 1
     cooldownScale: 0.8
@@ -126,7 +126,7 @@ MonoBehaviour:
     consumeInto: {fileID: 0}
   - id: cry_fury
     displayName: Battle Fury
-    description: Your fury is twice as strong, on a cooldown a quarter longer.
+    description: Your fury is twice as strong, with a 25% longer cooldown.
     rank: 3
     damageScale: 1
     cooldownScale: 1.25

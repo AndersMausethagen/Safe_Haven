@@ -333,7 +333,9 @@ public sealed class FocusOnArtKillEffect : RelicEffect
     [SerializeField, Min(0f)] private float focus = 20f;
 
     public override string DisplayName => "Focus From Art Kills";
-    public override string Describe() => $"A kill with a weapon art gives back {focus:0} Focus.";
+    // In circles (Focus is spent a circle at a time): 35 is "a third of a circle".
+    public override string Describe() =>
+        $"A kill with a weapon art fills {focus / Mathf.Max(1f, CombatTechniqueSettings.Current.FocusPerCircle) * 100f:0}% of a Focus circle.";
 
     public override Action Attach(PlayerRelics wearer)
     {

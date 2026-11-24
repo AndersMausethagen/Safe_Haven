@@ -347,7 +347,7 @@ public sealed class AltarWindow : MonoBehaviour
     {
         subjects = page == Page.Empower ? AltarWork.Empowering(viewer) : page == Page.Enchant ? AltarWork.Enchanting(viewer) : AltarWork.Deepening(viewer);
         subjectHeading.text = page == Page.Skills ? "SKILLS" : "GEAR";
-        offerHeading.text = page == Page.Empower ? "LEVELS" : page == Page.Enchant ? "ENCHANTMENTS" : "RANKS";
+        offerHeading.text = page == Page.Empower ? "LEVELS" : page == Page.Enchant ? "ENCHANTMENTS" : "RANKS AND CHOICES";
         emptyLine.gameObject.SetActive(subjects.Count == 0);
         emptyLine.text = page == Page.Skills ? "No skills to deepen yet." : "Nothing to work on. Carry or wear the gear you want changed.";
         subjectIndex = Mathf.Clamp(subjectIndex, 0, Mathf.Max(0, subjects.Count - 1));

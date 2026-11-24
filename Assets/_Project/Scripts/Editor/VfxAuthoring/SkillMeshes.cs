@@ -97,6 +97,14 @@ public static class SkillMeshes
                 var q0 = new Vector3(Mathf.Cos(a0) * radii[ring + 1], heights[ring + 1], Mathf.Sin(a0) * radii[ring + 1]);
                 var q1 = new Vector3(Mathf.Cos(a1) * radii[ring + 1], heights[ring + 1], Mathf.Sin(a1) * radii[ring + 1]);
                 int i = vertices.Count;
+                if (radii[ring + 1] <= 0f)
+                {
+                    // Up to the point: one triangle a side (a quad there had a second, empty triangle, and its point no normal).
+                    vertices.AddRange(new[] { p0, p1, q0 });
+                    triangles.AddRange(new[] { i, i + 2, i + 1 });
+                    continue;
+                }
+
                 vertices.AddRange(new[] { p0, p1, q1, q0 });
                 triangles.AddRange(new[] { i, i + 2, i + 1, i, i + 3, i + 2 });
             }

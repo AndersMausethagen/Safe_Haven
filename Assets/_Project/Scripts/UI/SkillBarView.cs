@@ -35,6 +35,7 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
         [NonSerialized] public Color flashColor;
         [NonSerialized] public int shownSeconds = -1;
         [NonSerialized] public int shownCount = -1;
+        [NonSerialized] public bool dimmed;
     }
 
     [SerializeField] private Slot[] slots = new Slot[SkillLoadout.SlotCount];
@@ -47,6 +48,10 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
     private Player bound;
     private PlayerSkills skills;
     private ItemInventory inventory;
+    private PlayerFocus focus;
+    private PlayerCombat combat;
+    [Tooltip("The pulse on the weapon art's slot while a free follow-up can be struck.")]
+    [SerializeField] private Color followUpColor = new Color(0.98f, 0.80f, 0.40f, 0.5f);
     private Vector3 baseScale;
     private bool baseScaleKnown;
     // A slot of this bar being dragged onto another (-1: none), and the icon that follows the pointer meanwhile.
@@ -239,6 +244,8 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
         bound = player;
         skills = bound != null ? bound.Skills : null;
         inventory = bound != null ? bound.GetComponent<ItemInventory>() : null;
+        focus = bound != null ? bound.GetComponent<PlayerFocus>() : null;
+        combat = bound != null ? bound.GetComponent<PlayerCombat>() : null;
         if (skills == null)
         {
             return;
@@ -298,6 +305,7 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
         }
 
         slots[index].shownSeconds = -1;
+        slots[index].dimmed = false; // Show set the icon afresh: UpdateSlot greys it again if it still can't be paid for
     }
 
     private void OnSkillCast(int index, SkillDefinition skill) => Flash(index, castColor);
@@ -398,18 +406,38 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
             }
         }
 
+        // Grey while no Focus circle is full to pay for it (an art's free follow-up needs none): it showed ready until pressed.
+        bool followUp = skill != null && skill.WeaponArt == WeaponArtSlot.Own && combat != null && combat.ArtFollowUpOpen;
+        bool unpaid = skill != null && focus != null && !followUp
+            && (skill.WeaponArt != WeaponArtSlot.None ? !focus.HasCircle : focus.Circles < skill.FocusCircles);
+        if (slot.view != null && unpaid != slot.dimmed)
+        {
+            slot.dimmed = unpaid;
+            slot.view.SetDimmed(unpaid);
+        }
+
         if (slot.flash != null)
         {
             float t = slot.flashUntil >= 0f ? Mathf.Clamp01((slot.flashUntil - Time.unscaledTime) / flashDuration) : 0f;
-            slot.flash.enabled = t > 0f;
             if (t > 0f)
             {
+                slot.flash.enabled = true;
                 Color color = slot.flashColor;
                 color.a *= t;
                 slot.flash.color = color;
             }
+            else if (followUp)
+            {
+                // The art may be struck again, free: the slot pulses gold until the window shuts.
+                slot.flashUntil = -1f;
+                slot.flash.enabled = true;
+                Color color = followUpColor;
+                color.a *= 0.55f + 0.45f * Mathf.Sin(Time.unscaledTime * 14f);
+                slot.flash.color = color;
+            }
             else
             {
+                slot.flash.enabled = false;
                 slot.flashUntil = -1f;
             }
         }

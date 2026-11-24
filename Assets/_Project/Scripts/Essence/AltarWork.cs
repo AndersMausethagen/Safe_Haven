@@ -345,7 +345,9 @@ public static class AltarWork
                 bool practised = step.practisedUses > 0 && uses >= step.practisedUses;
                 if (practised)
                 {
-                    offer.Detail += "  ·  practised: no essence";
+                    // Short, as the row is one line: what it gives is on the right when it is picked.
+                    offer.Detail = "Practised: free";
+                    offer.Effect += $"\n<color=#{Hex(UIStyle.Current.Good)}>Practised: cast {uses} times, so no essence is needed.</color>";
                 }
                 else
                 {
@@ -379,16 +381,32 @@ public static class AltarWork
             }
 
             SkillOption chosen = option;
-            bool taken = GameSession.Progress.ChoiceOf(skill, option.rank) == option.id;
+            string current = GameSession.Progress.ChoiceOf(skill, option.rank);
+            bool taken = current == option.id;
+            SkillOption replaced = null;
+            foreach (SkillOption other in skill.Options)
+            {
+                if (!taken && other != null && other.rank == option.rank && other.id == current)
+                {
+                    replaced = other;
+                }
+            }
+
+            // The row is one line (its words were cut mid-word): the choice's name and where it stands; its words are on the right
+            // when it is picked.
             var offer = new AltarOffer
             {
-                Title = $"{Roman(option.rank)}: {option.displayName}",
-                Detail = option.description,
+                Title = $"Choice {Roman(option.rank)}: {option.displayName}",
+                Detail = taken ? "Your choice" : replaced != null ? $"Instead of {replaced.displayName}" : $"Opens at rank {Roman(option.rank)}",
                 Effect = $"<b>{skill.DisplayName}: {option.displayName}</b>\n{option.description}\n\n<color=#{Hex(UIStyle.Current.Muted)}>One choice at rank " +
                          $"{Roman(option.rank)}; free to change here.</color>",
-                Verb = taken ? "Chosen" : "Choose",
+                Verb = taken ? "Chosen" : replaced != null ? "Change to this" : "Choose",
                 Done = taken,
             };
+            if (replaced != null)
+            {
+                offer.Effect += $"\n<color=#{Hex(UIStyle.Current.Muted)}>It replaces {replaced.displayName}.</color>";
+            }
             offer.Problem = taken ? "Already chosen." : rank < option.rank ? $"Deepen to rank {Roman(option.rank)} first." : null;
             offer.Apply = () =>
             {

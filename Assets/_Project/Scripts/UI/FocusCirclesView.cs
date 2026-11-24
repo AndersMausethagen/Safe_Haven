@@ -13,7 +13,7 @@ using UnityEngine.UI;
 /// </summary>
 public sealed class FocusCirclesView : MonoBehaviour
 {
-    [SerializeField, Min(8f)] private float size = 17f;
+    [SerializeField, Min(8f)] private float size = 20f;
     [SerializeField, Min(0f)] private float spacing = 7f;
     [Tooltip("Height of the circles' centres above the top of the bar.")]
     [SerializeField] private float above = 18f;

@@ -786,10 +786,13 @@ MonoBehaviour:
     body: 'Stamina runs everything physical and comes back quickly once you stop spending it, sooner after a swing than after a dodge or a block. Watch it: an empty bar in the middle of a fight is how most people die.
 
 
-      Focus, the gold bar, is earned by fighting well: every blow that lands adds some, a parry or a perfect dodge about as much as two blows. It holds for ten seconds after your last gain, then drains. Your weapon''s art (attack out of your guard) and your skills cost Focus, so attacking well pays for them; your weapon glows when its art is ready.
+      Focus is earned by fighting well: every blow that lands adds some, a parry or a perfect dodge about as much as two blows. It fills the circles above your skill bar one at a time; the thin gold line under your stamina shows the one filling. A full circle glows and stays lit until you spend it, up to three. The circle still filling drains away if you stop fighting, and all three start empty when you set out on a raid or come home.
 
 
-      Every kind of weapon has an art that moves you: a sword dashes through, a dagger steps behind, an axe or a spear is thrown and comes back, a greatsword or a hammer leaps in, a greataxe whirls as you walk.'
+      Every ability, spell and weapon art spends one full circle. Your weapon glows when its art is ready.
+
+
+      Every kind of weapon has an art that moves you: a sword dashes through, a dagger steps behind, an axe or a spear is thrown and comes back, a greatsword or a hammer leaps in, a greataxe whirls as you walk. Press it again just after it lands to strike again, free, twice.'
     unlockedByQuest: {fileID: 0}
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
@@ -797,10 +800,10 @@ MonoBehaviour:
     unlockedBySkill: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
     unlockedByTechnique: stamina
     art: {fileID: 21300000, guid: 97a1cd59086df964295e568fcf764acc, type: 3}
-    summary: 'Two bars run a fight: stamina for everything you do, Focus for your abilities.'
+    summary: Stamina runs everything you do. Focus, kept in three circles above your skill bar, pays for your abilities.
     steps:
-    - '[{key:Attack}] Land blows to earn Focus'
-    - '[{key:Guard}] Guard, then attack: your weapon''s art'
+    - '[{key:Attack}] Land blows to fill a Focus circle'
+    - '[{key:Skill1}] Spend a full circle on your weapon''s art'
   - group: Combat
     title: Poise and Stagger
     line: The thin amber bar
@@ -890,13 +893,16 @@ MonoBehaviour:
   - group: Combat
     title: Abilities
     line: What Focus is for
-    body: 'Your abilities are in the skill book ({key:Skills}). Drag one onto the bar to use it, and press (1) to (5) to use what is in each slot.
+    body: 'Your abilities are in the skill book ({key:Skills}). Drag one onto the bar to use it, and press {key:Skill1} to {key:Skill5} to use what is in each slot.
 
 
-      An ability costs Focus, the gold bar you earn by fighting well, and stamina, and then has to cool down before it can be used again.
+      An ability spends one full Focus circle (the glowing circles above your skill bar) and some stamina, and then has to cool down before it can be used again. A slot shows grey while no circle is full.
 
 
-      Your weapon''s art sits on (1) from the start and changes with what you hold. The people you bring home and the great foes you lay low teach more; each goes onto a free slot of 1 to 5, and you can drag them anywhere. At the altar, Purified Essence deepens the ones you know.
+      Your weapon''s art sits on the first slot from the start and changes with what you hold. The people you bring home and the great foes you lay low teach more; each goes onto a free slot, and you can drag them anywhere. At the altar, Purified Essence deepens the ones you know, and each rank opens a choice of how it works. Use one often enough and the altar deepens it for nothing.
+
+
+      Dodge soon after casting one and your next swing carries its mark: frost, fire, a bleed. Some marks meet: fire on frost bursts into steam.
 
 
       Every spell you cast trains Runecraft, and a better Runecraft makes them hit harder.'
@@ -907,7 +913,7 @@ MonoBehaviour:
     unlockedBySkill: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
     unlockedByTechnique: 
     art: {fileID: 21300000, guid: d03cfd5169e5ca240a4efca33f4f72f5, type: 3}
-    summary: Strong moves and spells on keys 1 to 5, paid for with Focus. Your weapon's art is on 1; people and great foes teach more.
+    summary: Strong moves and spells on the skill bar, each paid with a Focus circle. Your weapon's art is on the first slot; people and great foes teach more.
     steps:
     - '[{key:Skills}] Open the skill book'
     - '[{key:Skill1}] Use what is in the first slot'

@@ -62,7 +62,7 @@ MonoBehaviour:
   objectivesInOrder: 0
   objectives:
   - type: 9
-    description: Listen to the portal (E)
+    description: Listen to the portal ({key:Interact})
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}

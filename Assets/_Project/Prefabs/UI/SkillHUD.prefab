@@ -816,6 +816,7 @@ MonoBehaviour:
   refusedColor: {r: 0.85, g: 0.18, b: 0.12, a: 0.6}
   flashDuration: 0.35
   group: {fileID: 3755303470160145283}
+  followUpColor: {r: 0.98, g: 0.8, b: 0.4, a: 0.5}
 --- !u!114 &2477394113847863770
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -828,7 +829,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8528536a0c6c5c439201e19b33e8103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::FocusCirclesView
-  size: 17
+  size: 20
   spacing: 7
   above: 18
   lit: {r: 0.85, g: 0.655, b: 0.353, a: 1}

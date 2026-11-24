@@ -143,6 +143,15 @@ public sealed class ItemSlotView : MonoBehaviour,
         UpdateFrame();
     }
 
+    /// <summary>Greys the icon (a skill that can't be paid for yet), or shows it as Show left it.</summary>
+    public void SetDimmed(bool dimmed)
+    {
+        if (filled)
+        {
+            icon.color = dimmed ? new Color(0.55f, 0.55f, 0.55f, 0.6f) : locked ? new Color(1f, 1f, 1f, 0.45f) : Color.white;
+        }
+    }
+
     public void OnPointerClick(PointerEventData eventData) => owner?.OnSlotClicked(this, eventData);
 
     public void OnBeginDrag(PointerEventData eventData) => owner?.OnSlotDragStarted(this, eventData);

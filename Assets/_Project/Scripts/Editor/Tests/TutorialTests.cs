@@ -130,7 +130,7 @@ public sealed class TutorialTests
         int checkedSteps = 0;
         foreach (JournalPage page in Settings.Mechanics)
         {
-            Assert.IsFalse(writtenOut.IsMatch(page.body), $"{page.title} writes a key out: use {{key:Action}}");
+            Assert.IsFalse(writtenOut.IsMatch(page.body), $"{page.title} writes a key out: use a key token ({{key:Interact}} and the like)");
             Assert.LessOrEqual(page.steps.Count, 4, $"{page.title}: the card shows four steps at most");
             foreach (string step in page.steps)
             {

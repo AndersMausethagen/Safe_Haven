@@ -137,6 +137,9 @@ public sealed class LootWindow : MonoBehaviour
     private RectTransform hairline;
     private RectTransform chips;
     private Button takeAll;
+    private TMP_Text takeAllLabel;
+    // The frame it opened on: the Interact press that opened it mustn't also take everything.
+    private int openedFrame = -1;
     private ItemTooltipView tooltip;
     private Grid grid;
     private LootableRemains shown;
@@ -197,6 +200,12 @@ public sealed class LootWindow : MonoBehaviour
             return;
         }
 
+        // Interact on the body it already shows: Update takes everything instead of opening it again.
+        if (window != null && window.IsOpen && shown == remains)
+        {
+            return;
+        }
+
         shown = remains;
         looter = user;
         titleLabel.text = remains.Title;
@@ -205,6 +214,13 @@ public sealed class LootWindow : MonoBehaviour
         drawnWeight = -1f;
         Describe(ItemStack.Empty);
         window.Open();
+        openedFrame = Time.frameCount;
+        if (takeAllLabel != null)
+        {
+            // On a pad the button is selected and pressed as it is; a glyph's name doesn't fit its 112 px.
+            takeAllLabel.text = InputDevices.UsingGamepad ? "Take all" : $"Take all ({GameInput.KeyLabel(GameInput.Interact)})";
+        }
+
         Refresh();
         if (Application.isPlaying)
         {
@@ -239,6 +255,12 @@ public sealed class LootWindow : MonoBehaviour
         {
             window.Close();
             return;
+        }
+
+        // Interact again takes everything (the window was mouse-only on a keyboard; a pad presses the selected Take all).
+        if (Time.frameCount != openedFrame && GameInput.Interact.WasPressedThisFrame())
+        {
+            TakeAll();
         }
 
         Refresh();
@@ -351,7 +373,7 @@ public sealed class LootWindow : MonoBehaviour
             button.onClick.AddListener(() => TakeResource(index));
             var hover = chip.gameObject.AddComponent<UIHover>();
             string named = resource.Resource.DisplayName;
-            hover.Entered = () => hint.text = named + "  ·  click to take it";
+            hover.Entered = () => hint.text = named + (InputDevices.UsingGamepad ? "  ·  press to take it" : "  ·  click to take it");
             hover.Exited = () => hint.text = "";
             if (resource.Resource.Icon != null)
             {
@@ -374,7 +396,7 @@ public sealed class LootWindow : MonoBehaviour
         }
         else
         {
-            tooltip.Show(stack, "Click to take it.");
+            tooltip.Show(stack, InputDevices.UsingGamepad ? "Press to take it." : "Click to take it.");
         }
     }
 
@@ -410,6 +432,7 @@ public sealed class LootWindow : MonoBehaviour
         bagLabel = Label("Bag", panel, Margin, 0f, 120f, ButtonHeight, 15f, style.Muted);
         AtFoot(bagLabel.rectTransform);
         TMP_Text take = AddButton("Take All", panel, LeastInside + Margin - ButtonWidth, 0f, ButtonWidth, UIRole.Kind.PrimaryButton, TakeAll, out takeAll);
+        takeAllLabel = take;
         take.text = "Take all";
         take.fontSize = 17f;
         var takeRect = (RectTransform)takeAll.transform;
