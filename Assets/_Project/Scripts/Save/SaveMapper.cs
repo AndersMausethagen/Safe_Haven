@@ -1052,6 +1052,15 @@ public static class SaveMapper
 
         into.crafted.AddRange(progress.CraftedItems);
         into.stones.AddRange(progress.UsedStones);
+        foreach (KeyValuePair<string, string> choice in progress.SkillChoices)
+        {
+            into.skillChoices.Add(new SkillChoiceSaveData { at = choice.Key, option = choice.Value });
+        }
+
+        foreach (KeyValuePair<string, int> use in progress.SkillUses)
+        {
+            into.skillUses.Add(new AmountSaveData { id = use.Key, amount = use.Value });
+        }
         into.tracked.AddRange(progress.Tracked);
         into.falls = progress.Falls;
         foreach (KeyValuePair<string, int> kit in progress.SetOut)
@@ -1207,6 +1216,22 @@ public static class SaveMapper
         }
 
         progress.Restore(experience, perks, insight, saved.crafted, saved.stones, skillRanks);
+        var choices = new List<KeyValuePair<string, string>>();
+        foreach (SkillChoiceSaveData choice in saved.skillChoices ?? new List<SkillChoiceSaveData>())
+        {
+            if (choice != null && !string.IsNullOrEmpty(choice.at))
+            {
+                choices.Add(new KeyValuePair<string, string>(choice.at, choice.option));
+            }
+        }
+
+        var uses = new List<KeyValuePair<string, int>>();
+        foreach (AmountSaveData use in saved.skillUses ?? new List<AmountSaveData>())
+        {
+            uses.Add(new KeyValuePair<string, int>(use.id, use.amount));
+        }
+
+        progress.RestoreSkillChoices(choices, uses);
         progress.RestoreTracked(saved.tracked);
         progress.RestoreFalls(saved.falls);
         progress.DeathRules = System.Enum.IsDefined(typeof(DeathRules), saved.deathRules) ? (DeathRules)saved.deathRules : DeathRules.Normal;

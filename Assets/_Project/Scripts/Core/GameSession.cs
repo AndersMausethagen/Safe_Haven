@@ -212,6 +212,10 @@ public static class GameSession
         DeathSettings.ChosenForNewGame = null;
     }
 
+    /// <summary>Edit-mode tests only: puts a progress of their own in place for what reads GameSession.Progress (a skill's cooldown, its
+    /// altar choices), and the one they kept back afterwards. A game never calls this.</summary>
+    public static void UseProgressForTests(CharacterProgress testProgress) => progress = testProgress;
+
     /// <summary>Replaces everything with a loaded game. The player takes it on arriving in the next scene.</summary>
     public static void LoadGame(LoadedGame game)
     {

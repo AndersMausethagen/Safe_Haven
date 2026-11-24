@@ -47,6 +47,10 @@ public sealed class SkillDefinition : ScriptableObject
     [Tooltip("Seconds after the cast that it rings out: the roar's loudest moment in its animation.")]
     [SerializeField, Min(0f)] private float foesDelay = 0.5f;
 
+    [Header("Choices at the altar (Docs/SkillsImprovementResearch_2026-11-24.md 3)")]
+    [Tooltip("What the altar offers it, one choice per rank: rank I small tweaks, rank II ones that change how it plays, rank III two that redefine it.")]
+    [SerializeField] private List<SkillOption> options = new List<SkillOption>();
+
     [Header("Left behind (Docs/CombatSkillsResearch_2026-11-24.md 6: lingering)")]
     [Tooltip("A patch of ground (a GroundHazard prefab) left along its reach where it lands: smouldering ground, a rime patch. It hurts " +
              "only the caster's foes. Empty: nothing is left.")]
@@ -96,6 +100,7 @@ public sealed class SkillDefinition : ScriptableObject
     /// melee blows (Melee trains, a frozen foe shatters), scale with the weapon side, and Runecraft has no say in them.</summary>
     public bool IsPhysical => school == SkillSchool.Steel || school == SkillSchool.Beast;
     public GameObject Leaves => leaves;
+    public IReadOnlyList<SkillOption> Options => options;
     public StatusEffectDefinition FoesStatus => foesStatus;
     public float FoesRadius => foesRadius;
     public float FoesDelay => foesDelay;

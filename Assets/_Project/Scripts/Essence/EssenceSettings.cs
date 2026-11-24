@@ -28,6 +28,8 @@ public sealed class EssenceSettings : GameSettings<EssenceSettings>
         [Min(0f)] public float power = 0.15f;
         [Tooltip("Share off the cooldown in all, at this rank.")]
         [Range(0f, 0.9f)] public float cooldownCut = 0.08f;
+        [Tooltip("Mastery (Docs/SkillsImprovementResearch_2026-11-24.md 12): cast this many times, the rank costs no essence. 0: never.")]
+        [Min(0)] public int practisedUses;
     }
 
     [Header("Empowering gear")]
@@ -93,9 +95,9 @@ public sealed class EssenceSettings : GameSettings<EssenceSettings>
     [Tooltip("Ranks a known skill can be deepened through, in order. Each states its totals, not what it adds.")]
     [SerializeField] private List<SkillRank> skillRanks = new List<SkillRank>
     {
-        new SkillRank { purified = 10, power = 0.15f, cooldownCut = 0.08f },
-        new SkillRank { purified = 20, power = 0.3f, cooldownCut = 0.16f },
-        new SkillRank { purified = 35, power = 0.5f, cooldownCut = 0.25f },
+        new SkillRank { purified = 10, power = 0.15f, cooldownCut = 0.08f, practisedUses = 30 },
+        new SkillRank { purified = 20, power = 0.3f, cooldownCut = 0.16f, practisedUses = 90 },
+        new SkillRank { purified = 35, power = 0.5f, cooldownCut = 0.25f, practisedUses = 200 },
     };
 
     public IReadOnlyList<EmpowerLevel> EmpowerLevels => empowerLevels;

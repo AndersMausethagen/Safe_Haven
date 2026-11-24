@@ -80,6 +80,9 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
         }
     }
 
+    /// <summary>Ends <paramref name="effect"/> on this bearer now, if it is at work (an altar option using it up).</summary>
+    public void End(StatusEffectDefinition effect) => EndNow(effect);
+
     private void EndNow(StatusEffectDefinition effect)
     {
         Active entry = Find(effect);

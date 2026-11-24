@@ -15,6 +15,11 @@ public static class SkillText
             builder.Append($"\n<color={UIStyle.Current.AccentHex}>Deepened to rank {AltarWork.Roman(rank)}: {(PlayerSkills.Power(skill) - 1f) * 100f:+0}% power.</color>");
         }
 
+        foreach (SkillOption option in SkillChoices.For(skill).Chosen)
+        {
+            builder.Append($"\n<color={UIStyle.Current.AccentHex}>{option.displayName}: {option.description}</color>");
+        }
+
         if (skill.LungeDistance > 0f)
         {
             builder.Append($"\n<color={UIStyle.Current.AccentHex}>Lunges {skill.LungeDistance:0.#} m toward the cursor.</color>");

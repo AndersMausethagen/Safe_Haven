@@ -16,6 +16,9 @@ public sealed class CharacterProgress
     private readonly Dictionary<string, int> skillRanks = new Dictionary<string, int>();
     private readonly HashSet<string> crafted = new HashSet<string>();
     private readonly HashSet<string> stones = new HashSet<string>();
+    // An ability's altar choices (SkillOption), by "skill id#rank" -> option id; and how often each ability has been cast.
+    private readonly Dictionary<string, string> skillChoices = new Dictionary<string, string>();
+    private readonly Dictionary<string, int> skillUses = new Dictionary<string, int>();
     // What the player is gathering for (WantedAtHome): "building:<id>:<tier>", at most WantedAtHome.MostTracked, oldest first.
     private readonly List<string> tracked = new List<string>();
     // What the last raid set out with (PackForRaid): item id to how many.
@@ -416,11 +419,93 @@ public sealed class CharacterProgress
     public int RankOf(SkillDefinition skill) => skill != null && skillRanks.TryGetValue(skill.Id, out int rank) ? rank : 0;
 
     /// <summary>Deepens a skill one rank. What it costs and how far it goes are the altar's business (AltarWork).</summary>
+    /// <summary>The option chosen for <paramref name="skill"/> at <paramref name="rank"/>, or null.</summary>
+    public string ChoiceOf(SkillDefinition skill, int rank) =>
+        skill != null && skillChoices.TryGetValue(skill.Id + "#" + rank, out string id) ? id : null;
+
+    /// <summary>Chooses (or changes) the option at a rank; free, at the altar.</summary>
+    public void Choose(SkillDefinition skill, int rank, string optionId)
+    {
+        if (skill == null || string.IsNullOrEmpty(optionId))
+        {
+            return;
+        }
+
+        skillChoices[skill.Id + "#" + rank] = optionId;
+        choiceVersion++;
+        Changed?.Invoke();
+    }
+
+    /// <summary>The options at work on <paramref name="skill"/>: chosen, at ranks it has been deepened to. Allocates: not for a frame loop.</summary>
+    public List<SkillOption> ChosenOptions(SkillDefinition skill)
+    {
+        var chosen = new List<SkillOption>();
+        if (skill == null)
+        {
+            return chosen;
+        }
+
+        int rank = RankOf(skill);
+        foreach (SkillOption option in skill.Options)
+        {
+            if (option != null && option.rank <= rank && ChoiceOf(skill, option.rank) == option.id)
+            {
+                chosen.Add(option);
+            }
+        }
+
+        return chosen;
+    }
+
+    /// <summary>How often the ability has been cast (mastery: Docs/SkillsImprovementResearch_2026-11-24.md 12).</summary>
+    public int UsesOf(SkillDefinition skill) => skill != null && skillUses.TryGetValue(skill.Id, out int uses) ? uses : 0;
+
+    public void CountUse(SkillDefinition skill)
+    {
+        if (skill != null)
+        {
+            skillUses[skill.Id] = UsesOf(skill) + 1;
+        }
+    }
+
+    public IReadOnlyDictionary<string, string> SkillChoices => skillChoices;
+
+    /// <summary>Raised by every change of an ability's choices or rank: what SkillChoices keeps is made again.</summary>
+    public int ChoiceVersion => choiceVersion;
+
+    [NotSaved("a counter for what SkillChoices keeps in memory; it starts again with each game")]
+    private int choiceVersion;
+    public IReadOnlyDictionary<string, int> SkillUses => skillUses;
+
+    /// <summary>Puts back saved choices and uses (loading).</summary>
+    public void RestoreSkillChoices(IEnumerable<KeyValuePair<string, string>> choices, IEnumerable<KeyValuePair<string, int>> uses)
+    {
+        choiceVersion++;
+        skillChoices.Clear();
+        skillUses.Clear();
+        if (choices != null)
+        {
+            foreach (KeyValuePair<string, string> choice in choices)
+            {
+                skillChoices[choice.Key] = choice.Value;
+            }
+        }
+
+        if (uses != null)
+        {
+            foreach (KeyValuePair<string, int> use in uses)
+            {
+                skillUses[use.Key] = use.Value;
+            }
+        }
+    }
+
     public void DeepenSkill(SkillDefinition skill)
     {
         if (skill != null)
         {
             skillRanks[skill.Id] = RankOf(skill) + 1;
+            choiceVersion++;
             Changed?.Invoke();
         }
     }
@@ -589,6 +674,7 @@ public sealed class CharacterProgress
     {
         Fill(experience, savedExperience);
         Fill(skillRanks, savedSkillRanks);
+        choiceVersion++;
         Insight = Math.Max(0, savedInsight);
         PerkVersion++;
         perks.Clear();

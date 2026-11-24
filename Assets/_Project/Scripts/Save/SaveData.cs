@@ -327,6 +327,10 @@ public sealed class ProgressSaveData
     public List<string> stones = new List<string>();
     /// <summary>What the player is gathering for (WantedAtHome keys). Missing in older saves.</summary>
     public List<string> tracked = new List<string>();
+    /// <summary>Abilities' altar choices: "skill id#rank" in id, the option's id in name.</summary>
+    public List<SkillChoiceSaveData> skillChoices = new List<SkillChoiceSaveData>();
+    /// <summary>How often each ability has been cast (mastery).</summary>
+    public List<AmountSaveData> skillUses = new List<AmountSaveData>();
     /// <summary>What the last raid set out with (PackForRaid): id and how many. Missing in older saves.</summary>
     public List<AmountSaveData> setOut = new List<AmountSaveData>();
     /// <summary>Raids fallen in (Damage Taken › Grows With Falls). Missing in older saves.</summary>
@@ -637,4 +641,12 @@ public sealed class RingSaveData
     public int standingSeen = -1;
     /// <summary>What the ring is for (RingKind: 0 felling, 1 quarry); saves from before quarry rings read 0.</summary>
     public int kind;
+}
+
+/// <summary>One altar choice for an ability: where ("skill id#rank") and which option.</summary>
+[System.Serializable]
+public sealed class SkillChoiceSaveData
+{
+    public string at;
+    public string option;
 }

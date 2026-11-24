@@ -340,16 +340,63 @@ public static class AltarWork
                     Verb = $"Deepen to rank {Roman(target)}",
                     Done = target <= rank,
                 };
-                offer.Cost.Resources.Add(new ResourceAmount(purified, step.purified));
+                // Mastery: an ability cast often enough earns the rank without essence.
+                int uses = GameSession.Progress.UsesOf(skill);
+                bool practised = step.practisedUses > 0 && uses >= step.practisedUses;
+                if (practised)
+                {
+                    offer.Detail += "  ·  practised: no essence";
+                }
+                else
+                {
+                    offer.Cost.Resources.Add(new ResourceAmount(purified, step.purified));
+                    if (step.practisedUses > 0)
+                    {
+                        offer.Effect += $"\n<color=#{Hex(UIStyle.Current.Muted)}>Or free once cast {step.practisedUses} times ({uses} so far).</color>";
+                    }
+                }
+
                 offer.Problem = offer.Done ? "It already holds this." : target > rank + 1 ? $"Reach rank {Roman(rank + 1)} first." : Missing(user, offer.Cost);
                 offer.Apply = () => Deepen(user, skill, target, offer.Cost);
                 subject.Offers.Add(offer);
             }
 
+            AddChoices(user, skill, rank, subject);
             subjects.Add(subject);
         }
 
         return subjects;
+    }
+
+    // The ability's choices, one per rank (Docs/SkillsImprovementResearch_2026-11-24.md 3): free to take or change once it holds that rank.
+    private static void AddChoices(GameObject user, SkillDefinition skill, int rank, AltarSubject subject)
+    {
+        foreach (SkillOption option in skill.Options)
+        {
+            if (option == null || string.IsNullOrEmpty(option.id))
+            {
+                continue;
+            }
+
+            SkillOption chosen = option;
+            bool taken = GameSession.Progress.ChoiceOf(skill, option.rank) == option.id;
+            var offer = new AltarOffer
+            {
+                Title = $"{Roman(option.rank)}: {option.displayName}",
+                Detail = option.description,
+                Effect = $"<b>{skill.DisplayName}: {option.displayName}</b>\n{option.description}\n\n<color=#{Hex(UIStyle.Current.Muted)}>One choice at rank " +
+                         $"{Roman(option.rank)}; free to change here.</color>",
+                Verb = taken ? "Chosen" : "Choose",
+                Done = taken,
+            };
+            offer.Problem = taken ? "Already chosen." : rank < option.rank ? $"Deepen to rank {Roman(option.rank)} first." : null;
+            offer.Apply = () =>
+            {
+                GameSession.Progress.Choose(skill, chosen.rank, chosen.id);
+                Finished(user, $"{skill.DisplayName}: {chosen.displayName}.");
+            };
+            subject.Offers.Add(offer);
+        }
     }
 
     private static void Deepen(GameObject user, SkillDefinition skill, int rank, RepairCost cost)

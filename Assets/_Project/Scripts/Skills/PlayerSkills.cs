@@ -54,6 +54,8 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     private float lungeEndsAt = float.NegativeInfinity;
     // The creatures a skill's blow struck as it landed (Damageable.AnyDamaged during its hit), for its look's struck effects.
     private readonly List<Vector3> struck = new List<Vector3>();
+    // The creatures the landing skill struck and what each took, for its altar options' statuses and payoffs.
+    private readonly List<(Damageable foe, float took)> struckFoes = new List<(Damageable foe, float took)>();
     /// <summary>This player's skill left ground behind (Skill › Leaves), at these points: CoopGround shows it to the others.</summary>
     public static event System.Action<SkillDefinition, IReadOnlyList<Vector3>> GroundLeft;
 
@@ -141,6 +143,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         if (collectingStruck && victim != null && damage.Source == combatant && struck.Count < 16 && result.Damage > 0f && !result.Blocked && !result.Parried)
         {
             struck.Add(victim.transform.position);
+            struckFoes.Add((victim, result.Damage));
         }
     }
 
@@ -247,11 +250,12 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             HitTechnique kind = skill.IsPhysical ? HitTechnique.Melee | HitTechnique.Heavy : HitTechnique.Spell;
             // What it strikes, for the effects that land on each creature hit (SkillLook.struck).
             struck.Clear();
+            struckFoes.Clear();
             collectingStruck = true;
             try
             {
-                AttackResolver.Execute(combatant, skill.Attack, weaponDamage, transform.position, pendingDirection, hitLayers, Power(skill) * runecraft,
-                    1f, kind);
+                AttackResolver.Execute(combatant, skill.Attack, weaponDamage, transform.position, pendingDirection, hitLayers,
+                    Power(skill) * runecraft * SkillChoices.For(skill).Damage, 1f, kind);
             }
             finally
             {
@@ -259,6 +263,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             }
 
             SkillFx.Release(skill, transform.position, pendingDirection, struck);
+            AfterOptions(skill, struckFoes);
             LeaveGround(skill, pendingDirection);
         }
 
@@ -392,9 +397,10 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         }
 
         PlayerFocus focus = GetComponent<PlayerFocus>();
-        if (result == SkillCastResult.Cast && skill.FocusCost > 0f && focus != null && !focus.CanSpend(skill.FocusCost))
+        float focusCost = skill.FocusCost * SkillChoices.For(skill).Cost;
+        if (result == SkillCastResult.Cast && focusCost > 0f && focus != null && !focus.CanSpend(focusCost))
         {
-            focus.TrySpend(skill.FocusCost); // refused: lets the HUD say so
+            focus.TrySpend(focusCost); // refused: lets the HUD say so
             result = SkillCastResult.NoFocus;
         }
 
@@ -403,9 +409,9 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             result = SkillCastResult.NoStamina;
         }
 
-        if (result == SkillCastResult.Cast && skill.FocusCost > 0f && focus != null)
+        if (result == SkillCastResult.Cast && focusCost > 0f && focus != null)
         {
-            focus.TrySpend(skill.FocusCost);
+            focus.TrySpend(focusCost);
         }
 
         if (result != SkillCastResult.Cast)
@@ -523,6 +529,13 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             }
         }
 
+        GameSession.Progress.CountUse(skill);
+        float optionHeal = SkillChoices.For(skill).Heal;
+        if (optionHeal > 0f)
+        {
+            health.Heal(optionHeal);
+        }
+
         if (skill.Heal > 0f)
         {
             health.Heal(skill.Heal * Power(skill));
@@ -540,10 +553,11 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     /// <summary>The skill's cooldown at its rank.</summary>
     // A spell's stamina after the Runecraft skill: a beginner's words cost more breath.
     private float SpellCost(SkillDefinition skill) =>
-        skill.IsPhysical || combatant == null ? skill.StaminaCost : skill.StaminaCost * Mathf.Max(0.1f, 1f + combatant.Stats.Get(StatType.SpellStaminaCost));
+        SkillChoices.For(skill).Cost * (skill.IsPhysical || combatant == null ? skill.StaminaCost
+            : skill.StaminaCost * Mathf.Max(0.1f, 1f + combatant.Stats.Get(StatType.SpellStaminaCost)));
 
     public static float CooldownOf(SkillDefinition skill) =>
-        skill.Cooldown * (1f - EssenceSettings.Current.CooldownCutAt(GameSession.Progress.RankOf(skill)));
+        skill.Cooldown * (1f - EssenceSettings.Current.CooldownCutAt(GameSession.Progress.RankOf(skill))) * SkillChoices.For(skill).Cooldown;
 
     private void ApplyBuffs(SkillDefinition skill, float now)
     {
@@ -551,7 +565,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         combatant.Stats.RemoveModifiersFrom(skill);
         foreach (SkillStatBuff buff in skill.Buffs)
         {
-            float value = buff.value > 0f ? buff.value * Power(skill) : buff.value;
+            float value = buff.value > 0f ? buff.value * Power(skill) * SkillChoices.For(skill).Buff : buff.value;
             combatant.Stats.AddModifier(new StatModifier(buff.stat, buff.op, value, skill));
         }
 
@@ -561,16 +575,71 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     // A war cry rings out: every foe in earshot (not behind a wall) is laid under its status.
     private void RingOut(SkillDefinition skill)
     {
-        HitDetector.FindAround(transform.position, skill.FoesRadius, combatant.Faction, hitLayers, heard);
+        SkillChoices.Totals options = SkillChoices.For(skill);
+        HitDetector.FindAround(transform.position, skill.FoesRadius * options.FoesRadius, combatant.Faction, hitLayers, heard);
         foreach (HitDetector.Hit hit in heard)
         {
             if (hit.Target is Damageable foe)
             {
                 StatusEffects.Apply(foe, skill.FoesStatus, combatant);
+                foreach (SkillOption option in options.Chosen)
+                {
+                    StatusEffects.Apply(foe, option.addsStatus, combatant);
+                }
             }
         }
 
         heard.Clear();
+    }
+
+    // The chosen altar options on what the skill struck (Docs/SkillsImprovementResearch_2026-11-24.md 4): a status laid, or one used
+    // up for a payoff (health back, a burst of extra damage, another status in its place).
+    private void AfterOptions(SkillDefinition skill, List<(Damageable foe, float took)> foes)
+    {
+        SkillChoices.Totals options = SkillChoices.For(skill);
+        if (options.Chosen.Count == 0 || foes.Count == 0)
+        {
+            return;
+        }
+
+        foreach ((Damageable foe, float took) in foes)
+        {
+            if (foe == null || !foe.IsAlive)
+            {
+                continue;
+            }
+
+            foreach (SkillOption option in options.Chosen)
+            {
+                if (option.consumes != null && foe.TryGetComponent(out StatusEffects effects) && effects.Has(option.consumes))
+                {
+                    effects.End(option.consumes);
+                    if (option.consumeHeal > 0f)
+                    {
+                        health.Heal(option.consumeHeal);
+                    }
+
+                    if (option.consumeDamage > 0f && foe.IsAlive)
+                    {
+                        var burst = new DamageInfo(combatant, null, took * option.consumeDamage, skill.Attack.DamageType, false,
+                            foe.transform.position + Vector3.up, pendingDirection, 0f, HitTechnique.None);
+                        combatant.ReportDamageDealt(foe, burst, foe.ApplyDamage(burst));
+                    }
+
+                    if (option.consumeInto != null && foe.IsAlive)
+                    {
+                        StatusEffects.Apply(foe, option.consumeInto, combatant);
+                    }
+
+                    GameMessages.Post(option.displayName + "!", MessageKind.Gain);
+                }
+
+                if (option.addsStatus != null && foe.IsAlive)
+                {
+                    StatusEffects.Apply(foe, option.addsStatus, combatant);
+                }
+            }
+        }
     }
 
     // What the skill leaves on the ground where it lands (Skill › Leaves): patches spread out along its reach, nearest first.
@@ -581,7 +650,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             return;
         }
 
-        var along = new SkillFxCue { place = SkillFxPlace.AlongReach, count = skill.LeavesCount };
+        var along = new SkillFxCue { place = SkillFxPlace.AlongReach, count = Mathf.Min(8, skill.LeavesCount + SkillChoices.For(skill).ExtraLeaves) };
         var points = SkillFx.Points(along, transform.position, direction, skill.Attack.Range, skill.Attack.Arc, null);
         foreach (Vector3 point in points)
         {

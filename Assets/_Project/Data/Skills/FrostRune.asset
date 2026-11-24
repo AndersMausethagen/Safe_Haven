@@ -25,6 +25,135 @@ MonoBehaviour:
   foesStatus: {fileID: 0}
   foesRadius: 7
   foesDelay: 0.5
+  options:
+  - id: frost_quick
+    displayName: Quick Rune
+    description: Its cooldown is a fifth shorter.
+    rank: 1
+    damageScale: 1
+    cooldownScale: 0.8
+    costScale: 1
+    buffScale: 1
+    heal: 0
+    extraLeaves: 0
+    foesRadiusScale: 1
+    addsStatus: {fileID: 0}
+    consumes: {fileID: 0}
+    consumeHeal: 0
+    consumeDamage: 0
+    consumeInto: {fileID: 0}
+  - id: frost_light
+    displayName: Light Words
+    description: Costs 40% less stamina.
+    rank: 1
+    damageScale: 1
+    cooldownScale: 1
+    costScale: 0.6
+    buffScale: 1
+    heal: 0
+    extraLeaves: 0
+    foesRadiusScale: 1
+    addsStatus: {fileID: 0}
+    consumes: {fileID: 0}
+    consumeHeal: 0
+    consumeDamage: 0
+    consumeInto: {fileID: 0}
+  - id: frost_keen
+    displayName: Keen Ice
+    description: Deals 20% more.
+    rank: 1
+    damageScale: 1.2
+    cooldownScale: 1
+    costScale: 1
+    buffScale: 1
+    heal: 0
+    extraLeaves: 0
+    foesRadiusScale: 1
+    addsStatus: {fileID: 0}
+    consumes: {fileID: 0}
+    consumeHeal: 0
+    consumeDamage: 0
+    consumeInto: {fileID: 0}
+  - id: frost_shatter
+    displayName: Shattering Lance
+    description: A foe it freezes shatters at once, for the lance's damage again.
+    rank: 2
+    damageScale: 1
+    cooldownScale: 1
+    costScale: 1
+    buffScale: 1
+    heal: 0
+    extraLeaves: 0
+    foesRadiusScale: 1
+    addsStatus: {fileID: 0}
+    consumes: {fileID: 11400000, guid: 1fc6fc7dd9d031c4ea2810d1eddddc86, type: 2}
+    consumeHeal: 0
+    consumeDamage: 1
+    consumeInto: {fileID: 0}
+  - id: frost_field
+    displayName: Rime Field
+    description: Leaves two more patches of rime.
+    rank: 2
+    damageScale: 1
+    cooldownScale: 1
+    costScale: 1
+    buffScale: 1
+    heal: 0
+    extraLeaves: 2
+    foesRadiusScale: 1
+    addsStatus: {fileID: 0}
+    consumes: {fileID: 0}
+    consumeHeal: 0
+    consumeDamage: 0
+    consumeInto: {fileID: 0}
+  - id: frost_brittle
+    displayName: Brittle Cold
+    description: The cold cracks the armour of all it strikes (Sundered).
+    rank: 2
+    damageScale: 1
+    cooldownScale: 1
+    costScale: 1
+    buffScale: 1
+    heal: 0
+    extraLeaves: 0
+    foesRadiusScale: 1
+    addsStatus: {fileID: 11400000, guid: a8db118dd0428b24db4d193af6815683, type: 2}
+    consumes: {fileID: 0}
+    consumeHeal: 0
+    consumeDamage: 0
+    consumeInto: {fileID: 0}
+  - id: frost_winter
+    displayName: Deep Winter
+    description: Deals half again as much, on a cooldown a third longer.
+    rank: 3
+    damageScale: 1.5
+    cooldownScale: 1.3
+    costScale: 1
+    buffScale: 1
+    heal: 0
+    extraLeaves: 0
+    foesRadiusScale: 1
+    addsStatus: {fileID: 0}
+    consumes: {fileID: 0}
+    consumeHeal: 0
+    consumeDamage: 0
+    consumeInto: {fileID: 0}
+  - id: frost_comfort
+    displayName: Cold Comfort
+    description: 'The chill turns to warmth for you: 8 health for each foe struck, but they are left unchilled.'
+    rank: 3
+    damageScale: 1
+    cooldownScale: 1
+    costScale: 1
+    buffScale: 1
+    heal: 0
+    extraLeaves: 0
+    foesRadiusScale: 1
+    addsStatus: {fileID: 0}
+    consumes: {fileID: 11400000, guid: eb29ff49b3b2c554a8747c7f55c3b1d0, type: 2}
+    consumeHeal: 8
+    consumeDamage: 0
+    consumeInto: {fileID: 0}
   leaves: {fileID: 67207903237708939, guid: f8b1e9160d7ba314b8c4c987d7025ec9, type: 3}
   leavesCount: 3
   attack: {fileID: 11400000, guid: d9df1470c2ea8354097732539734932a, type: 2}

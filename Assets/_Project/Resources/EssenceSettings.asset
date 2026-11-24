@@ -100,9 +100,12 @@ MonoBehaviour:
   - purified: 10
     power: 0.15
     cooldownCut: 0.08
+    practisedUses: 30
   - purified: 20
     power: 0.3
     cooldownCut: 0.16
+    practisedUses: 90
   - purified: 35
     power: 0.5
     cooldownCut: 0.25
+    practisedUses: 200
