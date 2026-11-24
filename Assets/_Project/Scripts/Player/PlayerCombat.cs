@@ -250,6 +250,9 @@ public sealed partial class PlayerCombat : MonoBehaviour
     /// <summary>True while a swing is going.</summary>
     public bool IsAttacking => activeKind != SwingKind.None;
 
+    /// <summary>A weapon art under way, its blow still to land (ArtBladeView lights the blade through it).</summary>
+    public bool ArtBlowPending => activeKind == SwingKind.Art && hitPending;
+
     /// <summary>When the swing in progress started (Time.time); meaningful while <see cref="IsAttacking"/>.</summary>
     public float SwingStartTime => activeStartTime;
 

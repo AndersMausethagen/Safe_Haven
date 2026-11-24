@@ -131,6 +131,17 @@ public static class SkillFxPrefabs
             .V("Velocity Min", new Vector3(-2.5f, 0.5f, -2.5f)).V("Velocity Max", new Vector3(2.5f, 3f, 2.5f)).F("Size Min", 0.06f).F("Size Max", 0.14f)
             .F("Lifetime Min", 0.3f).F("Lifetime Max", 0.55f));
 
+        // Light along the blade through a weapon art (ArtBladeView sets its Color to the art's and its Radius to the blade's length).
+        GameObject artBladeGlow = Make("Art Blade Glow", new Design("Skill Mist").T("Texture", "Glow").V("Flipbook Size", new Vector3(1f, 1f, 0f))
+            .F("Rate", 90f).F("Radius", 0.4f).V("Color", new Vector3(3f, 1.9f, 0.9f)).F("Alpha", 1f).F("Lifetime Min", 0.2f).F("Lifetime Max", 0.35f)
+            .F("Size Min", 0.05f).F("Size Max", 0.11f).F("Turbulence", 0.4f).V("Velocity Min", new Vector3(-0.15f, -0.05f, -0.15f))
+            .V("Velocity Max", new Vector3(0.15f, 0.25f, 0.15f)));
+        var feel = AssetDatabase.LoadAssetAtPath<CombatFeelSettings>("Assets/_Project/Resources/CombatFeel.asset");
+        var feelData = new SerializedObject(feel);
+        feelData.FindProperty("artBladeGlow").objectReferenceValue = artBladeGlow;
+        feelData.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(feel);
+
         // ----- Frost Rune: a lance of ice racing out along the aim. -----
         GameObject frostCircle = Make("Frost Cast Circle", new Design("Skill Ring").T("Texture", "Rune Circle").V("Color", new Vector3(0.5f, 1.4f, 3f))
             .F("Size", 3f).F("Lifetime", 0.9f).V("Spin", new Vector3(0f, 0f, 45f)));

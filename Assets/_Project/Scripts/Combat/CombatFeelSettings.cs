@@ -150,6 +150,9 @@ public sealed class CombatFeelSettings : ScriptableObject
     [Tooltip("Looping flames on the weapon in hand while a coating's fire is on it (CoatedBladeView): its shape is set to the weapon's " +
              "own mesh, it smoulders at rest and roars through a swing.")]
     [SerializeField] private GameObject coatedFlames;
+    [Tooltip("Light along the blade through a weapon art, from its wind-up to its blow (ArtBladeView), in the art's colour: a looping " +
+             "effect with an exposed Color and Radius (Art/Effects/Skills/Prefabs/Art Blade Glow, made by SkillFxPrefabs).")]
+    [SerializeField] private GameObject artBladeGlow;
     [Tooltip("Flames a second at rest, and through a swing.")]
     [SerializeField, Min(0f)] private float coatedFlamesAtRest = 14f;
     [SerializeField, Min(0f)] private float coatedFlamesSwinging = 90f;
@@ -435,6 +438,7 @@ public sealed class CombatFeelSettings : ScriptableObject
     public float OpeningWidth => openingWidth;
     public GameObject ReelingEffect => reelingEffect;
     public GameObject CoatedFlames => coatedFlames;
+    public GameObject ArtBladeGlow => artBladeGlow;
     public float CoatedFlamesAtRest => coatedFlamesAtRest;
     public float CoatedFlamesSwinging => coatedFlamesSwinging;
     public float ReelingSway => reelingSway;

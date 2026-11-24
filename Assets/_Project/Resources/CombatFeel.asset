@@ -72,6 +72,7 @@ MonoBehaviour:
   furyEffect: {fileID: 5697260504565289270, guid: ea417f5788ec80b4c9b4b074524ffb57, type: 3}
   huntersMarkColor: {r: 0.55, g: 1, b: 0.75, a: 0.55}
   coatedFlames: {fileID: 856958082518358719, guid: befce660dfda34f48929f23ce911599f, type: 3}
+  artBladeGlow: {fileID: 3201141532367567821, guid: 8406039acf8ffa5458959e2a6f527056, type: 3}
   coatedFlamesAtRest: 14
   coatedFlamesSwinging: 90
   dodgeTrailColor:

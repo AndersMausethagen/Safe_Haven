@@ -217,6 +217,17 @@ public sealed class SkillLookTests
     }
 
     [Test]
+    public void AWeaponArt_LightsTheBlade_InItsOwnColour()
+    {
+        GameObject glow = CombatFeelSettings.Current.ArtBladeGlow;
+        Assert.IsNotNull(glow, "an art lights the blade (ArtBladeView)");
+        var visual = glow.GetComponentInChildren<UnityEngine.VFX.VisualEffect>();
+        Assert.IsNotNull(visual);
+        Assert.IsTrue(visual.HasVector3("Color"), "coloured as the art");
+        Assert.IsTrue(visual.HasFloat("Radius"), "and spread along the blade");
+    }
+
+    [Test]
     public void EveryAbility_PlaysAMoveOfItsOwn_ThatTheBodyHas()
     {
         var controller = AssetDatabase.LoadAssetAtPath<UnityEditor.Animations.AnimatorController>("Assets/_Project/Animation/Controllers/PlayerAnimator.controller");

@@ -3327,7 +3327,10 @@ sample textures and flames are in `Art/Effects/VFX Graph/Additions` (Unity Compa
   `Rime Patch` (Frostbite on whoever stands in them, 6 s; so its next lance freezes them). Both live with the monsters' hazards
   (Prefabs/Enemies/Hazards) and meet fire and frost as theirs do. `GroundHazard` now plays its effect's own look (VfxValues) and draws
   the player's side's patches as a plain soft disc: the hatching means "stay out", which a player's own ground is not.
-- Not yet: effects for the weapon arts themselves.
+- **The blade lights through an art** (research 6, "a hand or weapon glow"): `ArtBladeView` (on the player, as `CoatedBladeView`,
+  fitted to the weapon's mesh the same way) shows `CombatFeelSettings.ArtBladeGlow` (Art Blade Glow: sparks of light along the blade,
+  Radius = the blade's half length) in the art's colour (its look's light, else its slash colour) with a small light, from the art's
+  wind-up while `PlayerCombat.ArtBlowPending`, then fades over 0.3 s.
 
 ## Loot on bodies (2026-11-24)
 
