@@ -37,6 +37,11 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     [SerializeField, Range(0f, 1f)] private float flinchShare = 0.04f;
     [Tooltip("For a body with one stride clip: the speed in m/s its feet keep up with at normal playback. Faster or slower plays it faster or slower, so the feet don't slide. Used when the controller has a StrideRate parameter.")]
     [SerializeField, Min(0.1f)] private float strideSpeed = 2f;
+    [Tooltip("For a beast whose Locomotion tree walks and gallops (Docs/QualityLevers_2026-11-24.md §3): its walk clip's feet speed in " +
+             "m/s, with Stride Speed its fastest clip's. The tree's thresholds are then those clips' feet speeds, so up to Stride Speed the " +
+             "blend keeps up at playback 1, and faster plays the fastest clip faster. 0: one stride clip, as before. Set by Safe Haven › " +
+             "Tools › Fit Beast Strides (BeastStrides), which measures the clips.")]
+    [SerializeField, Min(0f)] private float walkStrideSpeed;
     [Tooltip("Swings as the player does (the Lost Ones, once settlers): a strike fitted to a player's clip (CombatClipKit.FitAttack) builds up at its " +
              "Animation Speed, strikes at Strike Speed for the Strike Lead before the blow, and plays out at Follow Through Speed. Off: one speed throughout.")]
     [SerializeField] private bool swingsLikeThePlayer;
@@ -235,7 +240,7 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
 
         if (hasStride && ai.enabled)
         {
-            animator.SetFloat(StrideRateHash, speed > 0.2f ? Mathf.Clamp(speed / strideSpeed, 0.5f, 2.5f) : 1f);
+            animator.SetFloat(StrideRateHash, StrideRate(speed, strideSpeed, walkStrideSpeed));
         }
 
         if (hasResting)
@@ -352,6 +357,26 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     // Locomotion blends idle, walk (at WalkThreshold) and run (at RunThreshold): the feet cover what the blended clips do, scaled by
     // this rate, so it is the speed over what they cover. Below the walk, idle and walk share the stride, so the walk clip's own speed
     // against its threshold is the rate; past the run, the run is played faster.
+    /// <summary>The stride's playback rate for a beast moving at <paramref name="speed"/>. One clip (no walk speed): as fast as it keeps up
+    /// with the ground, 0.5-2.5. Walk and gallop fitted to their feet (BeastStrides): 1 while the blend keeps up by itself, faster past the
+    /// fastest clip, to <see cref="FastestBeastStride"/> (a fox's gallop covers 2.2 m/s and it chases at 6.2).</summary>
+    public static float StrideRate(float speed, float strideSpeed, float walkStrideSpeed)
+    {
+        if (speed <= 0.2f)
+        {
+            return 1f;
+        }
+
+        if (walkStrideSpeed <= 0f)
+        {
+            return Mathf.Clamp(speed / strideSpeed, 0.5f, 2.5f);
+        }
+
+        return Mathf.Clamp(speed / Mathf.Max(0.1f, strideSpeed), 1f, FastestBeastStride);
+    }
+
+    public const float FastestBeastStride = 3f;
+
     private float LocomotionRate(float speed)
     {
         if (speed <= WalkThreshold)

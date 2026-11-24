@@ -210,7 +210,12 @@ MonoBehaviour:
   staggerParameter: Stagger
   speedDampTime: 0.1
   flinchShare: 0.04
-  strideSpeed: 7
+  strideSpeed: 5.84
+  walkStrideSpeed: 1.19
+  swingsLikeThePlayer: 0
+  strikeClips: []
+  walkClipSpeed: 1.86
+  runClipSpeed: 4.08
 --- !u!114 &6512853728236817246
 MonoBehaviour:
   m_ObjectHideFlags: 0
