@@ -221,6 +221,32 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
         return buildings;
     }
 
+    /// <summary>
+    /// Buildings the player knows that aren't open yet at home (a building they need doesn't stand, the Haven's rank, no room for
+    /// another): the build menu shows them locked, with what they wait for. Hidden, a plan read for one seemed to teach nothing (the
+    /// user, 2026-11-25: Barrels and Crates, which needs a Workshop, "didn't unlock"). Only in the Haven.
+    /// </summary>
+    public List<BuildingDefinition> KnownNotOpen()
+    {
+        var buildings = new List<BuildingDefinition>();
+        var crafting = GetComponent<PlayerCrafting>();
+        if (!HasBuildArea || !(Area is HomePortal) || crafting == null)
+        {
+            return buildings;
+        }
+
+        foreach (BuildingDefinition building in crafting.Buildings)
+        {
+            if (building != null && building.Prefab != null && building.ShowInBuildMenu && crafting.IsKnown(building) && !BuildingUnlocks.IsOpen(building))
+            {
+                buildings.Add(building);
+            }
+        }
+
+        buildings.Sort(RecipeBook.CompareForDisplay);
+        return buildings;
+    }
+
     /// <summary>Starts placing <paramref name="building"/>: a ghost follows the pointer until it is built or cancelled.</summary>
     public void Place(BuildingDefinition building)
     {

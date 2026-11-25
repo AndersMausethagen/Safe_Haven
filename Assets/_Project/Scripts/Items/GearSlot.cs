@@ -327,6 +327,7 @@ public static class StatNames
             case StatType.StabResistance: return "Stab Resistance";
             case StatType.MeleeFireDamage: return "Fire on Swings";
             case StatType.MeleeIgniteChance: return "Chance to Ignite";
+            case StatType.HealthRegen: return "Health every 5 s out of combat";
             default: return stat.ToString();
         }
     }

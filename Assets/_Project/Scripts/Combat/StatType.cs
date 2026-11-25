@@ -125,4 +125,7 @@ public enum StatType
     MeleeFireDamage = 59,
     /// <summary>Chance from 0 to 1 that a weapon swing that lands sets what it strikes alight (Burning).</summary>
     MeleeIgniteChance = 60,
+    /// <summary>Share of most health regained every PlayerRestingHeal.IntervalSeconds (5 s) while out of combat: 0.01 is 1%
+    /// (Stewed Berries; the user, 2026-11-25). Hearty.</summary>
+    HealthRegen = 61,
 }

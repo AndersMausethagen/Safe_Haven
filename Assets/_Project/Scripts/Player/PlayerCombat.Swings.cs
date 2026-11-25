@@ -1094,6 +1094,22 @@ public sealed partial class PlayerCombat
         }
     }
 
+    /// <summary>Whether a skill may start now over the swing going: where the swing gives way to the guard, a normal strike at once and
+    /// a heavy once its blow has landed (the user, 2026-11-25: "normal strikes should automatically stop", for a parry and for War Cry).</summary>
+    public bool GivesWayToSkill => activeKind == SwingKind.None || CancelsNow(SwingCancels.Guard);
+
+    /// <summary>A skill is cast: the swing going ends where it gives way to it (GivesWayToSkill), its blow not struck.</summary>
+    public void GiveWayToSkill()
+    {
+        if (activeKind != SwingKind.None && CancelsNow(SwingCancels.Guard))
+        {
+            EndSwing();
+            queuedKind = SwingKind.None;
+            pressTime = -1f;
+            heavyAfterLight = false;
+        }
+    }
+
     /// <summary>Uses up a ready counter without a swing (a bow's instant shot after a perfect dodge).</summary>
     public void SpendCounter()
     {

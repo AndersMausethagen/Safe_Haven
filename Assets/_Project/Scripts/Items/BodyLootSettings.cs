@@ -17,6 +17,9 @@ public sealed class BodyLootSettings : GameSettings<BodyLootSettings>
     [SerializeField, Min(0f)] private float lootableSeconds;
     [Tooltip("How close the player must be to loot it, in metres, measured to its loot point.")]
     [SerializeField, Min(0.5f)] private float reach = 2.2f;
+    [Tooltip("Take all also empties every other body with loot within this many metres of the looter (the user, 2026-11-25: with a lot " +
+             "of lootable bodies close, loot them all at once). 0: only the body opened.")]
+    [SerializeField, Min(0f)] private float takeAllRadius = 6f;
     [Tooltip("At most this many bodies wait with loot at once; past it the oldest fades first (each is a ragdoll, an outline and glitter). " +
              "0: no limit, every body waits to be looted.")]
     [SerializeField, Min(0)] private int mostLootBodies;
@@ -45,6 +48,7 @@ public sealed class BodyLootSettings : GameSettings<BodyLootSettings>
     public bool LootFromBodies => lootFromBodies;
     public float LootableSeconds => lootableSeconds;
     public float Reach => reach;
+    public float TakeAllRadius => takeAllRadius;
     public float WindowReach => windowReach;
     public int MostLootBodies => mostLootBodies;
     public float HandOverBeyond => handOverBeyond;

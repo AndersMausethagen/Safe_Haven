@@ -44,6 +44,24 @@ public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteract
     /// <summary>Every body with loot in the scene.</summary>
     public static IReadOnlyList<LootableRemains> All => all;
 
+    /// <summary>The other bodies with loot within <paramref name="radius"/> of <paramref name="position"/> (not <paramref name="besides"/>),
+    /// into <paramref name="into"/> (cleared first): what Take all empties as well. How many.</summary>
+    public static int Near(LootableRemains besides, Vector3 position, float radius, List<LootableRemains> into)
+    {
+        into.Clear();
+        float most = radius * radius;
+        foreach (LootableRemains remains in all)
+        {
+            if (remains != null && remains != besides && !remains.finished && !remains.IsEmpty
+                && (remains.transform.position - position).sqrMagnitude <= most)
+            {
+                into.Add(remains);
+            }
+        }
+
+        return into.Count;
+    }
+
     /// <summary>The items it holds, as the window shows them.</summary>
     public ItemContainer Items { get; private set; }
 
@@ -364,7 +382,10 @@ public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteract
     }
 
     /// <summary>Takes everything that fits. Returns how many item stacks and resource kinds stayed for want of room.</summary>
-    public int TakeAll(GameObject looter)
+    public int TakeAll(GameObject looter) => TakeAll(looter, true);
+
+    /// <summary>The same; <paramref name="tell"/> false leaves the "no room" word to the caller (Take all over several bodies says it once).</summary>
+    public int TakeAll(GameObject looter, bool tell)
     {
         FindOnOpening(looter);
         for (int i = 0; i < Items.SlotCount; i++)
@@ -381,7 +402,7 @@ public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteract
         }
 
         int stayed = StacksLeft() + resources.Count;
-        if (stayed > 0)
+        if (stayed > 0 && tell)
         {
             GameMessages.Post("No room for the rest: it stays on the body.", MessageKind.Warning);
         }

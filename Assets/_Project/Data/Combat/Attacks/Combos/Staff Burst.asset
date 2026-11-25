@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Staff Burst
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Staff Burst
+  description: 
   damageType: 0
   strike: 0
   baseDamage: 0
@@ -58,7 +59,7 @@ MonoBehaviour:
   moveAt: -1
   lungeShare: -1
   ownCancels: 1
-  windupCancels: 1
+  windupCancels: 3
   recoveryCancels: 3
   motion: 0
   motionDistance: 3.5

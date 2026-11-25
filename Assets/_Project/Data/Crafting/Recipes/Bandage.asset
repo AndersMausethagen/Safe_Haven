@@ -21,7 +21,7 @@ MonoBehaviour:
   itemCost:
   - item: {fileID: 11400000, guid: 3790e5e25892e2a49adf1a7cb473a699, type: 2}
     amount: 4
-  station: 1
+  station: 0
   craftSeconds: 9
   knownFromStart: 1
   minimumStationTier: 0

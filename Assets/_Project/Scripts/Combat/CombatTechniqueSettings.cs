@@ -36,12 +36,13 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [Tooltip("On: a dodge can cut a swing short while it winds up (it then deals no damage; its stamina is spent). Off: " +
              "a swing can only be dodged out of once it has landed, so every swing is a commitment.")]
     [SerializeField] private bool dodgeCancelsWindup = true;
-    [Tooltip("What breaks a light swing off before its blow, for attacks that don't set their own (AttackDefinition › Cancels). A guard " +
-             "pressed in its wind-up raises at once (God of War: block and roll cancel a quick blow before it lands).")]
+    [Tooltip("What breaks a normal strike (a light swing, a rush, a guard counter, a shield bash) off before its blow, for attacks that " +
+             "don't set their own (AttackDefinition › Cancels). A guard pressed in its wind-up raises at once (God of War: block and roll " +
+             "cancel a quick blow before it lands; the user, 2026-11-25: every strike but a heavy stops for a parry).")]
     [SerializeField] private SwingCancels lightWindupCancels = SwingCancels.Dodge | SwingCancels.Guard;
     [Tooltip("The same for a heavy swing: a roll gets out, a block doesn't (a heavy still held breaks off into the guard either way).")]
     [SerializeField] private SwingCancels heavyWindupCancels = SwingCancels.Dodge;
-    [Tooltip("The same for the rest: arts, rushes, shield bashes and counters out of the guard.")]
+    [Tooltip("The same for weapon arts (paid for with Focus: a roll gets out, a block doesn't).")]
     [SerializeField] private SwingCancels otherWindupCancels = SwingCancels.Dodge;
     [Tooltip("What cuts a swing's follow-through short once its blow has landed, for attacks that don't set their own.")]
     [SerializeField] private SwingCancels recoveryCancels = SwingCancels.Dodge | SwingCancels.Guard;
@@ -239,7 +240,7 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [SerializeField, Range(1f, 4f)] private float guardPointLetThrough = 1.6f;
     [Tooltip("A hit within this many seconds of raising the guard is parried.")]
     [SerializeField, Range(0f, 0.5f)] private float parryWindow = 0.15f;
-    [Tooltip("After lowering the guard it can't go up again for this long, so tapping it isn't a free parry.")]
+    [Tooltip("A guard raised again this soon after it was lowered blocks but doesn't parry, so tapping it isn't a free parry. It still goes up at once.")]
     [SerializeField, Range(0f, 1f)] private float guardRelock = 0.3f;
     [Tooltip("Stamina a blocked hit costs per point of damage it would have done.")]
     [SerializeField, Min(0f)] private float blockStaminaPerDamage = 0.8f;
@@ -260,8 +261,8 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [Tooltip("Seconds a parried attacker that doesn't stagger reels: its strike and what would follow are broken off, but it isn't open " +
              "to a backstab and takes no extra damage.")]
     [SerializeField, Min(0f)] private float parryRecoilSeconds = 0.45f;
-    [Tooltip("A guard raised and lowered again within this many seconds with no blow caught on it is a missed parry: it can't go up " +
-             "again for Whiff Relock instead of Guard Relock. Tapping the guard to fish for parries costs, holding it doesn't.")]
+    [Tooltip("A guard raised and lowered again within this many seconds with no blow caught on it is a missed parry: a raise within " +
+             "Whiff Relock of it (instead of Guard Relock) doesn't parry. Tapping the guard to fish for parries costs, holding it doesn't.")]
     [SerializeField, Min(0f)] private float whiffTapSeconds = 0.5f;
     [SerializeField, Range(0f, 2f)] private float whiffRelock = 0.6f;
     [Tooltip("Seconds after a blow is blocked in which attacking out of the guard is the weapon's guard counter (Elden Ring): a hard, " +

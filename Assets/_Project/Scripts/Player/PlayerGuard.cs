@@ -31,6 +31,8 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
     private float stunnedUntil = float.NegativeInfinity;
     // A missed parry (the guard tapped with nothing caught on it) keeps it down longer (Whiff Relock).
     private float relockFor;
+    // Raised again within the relock after being lowered: it blocks, but it is no parry (a tapped guard is no free parry).
+    private bool parryLocked;
     private bool caughtSinceRaised;
     private float blockedAt = float.NegativeInfinity;
 
@@ -124,8 +126,9 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
     {
         bool stunned = IsStunned;
         bool canRaise = !stunned && stateMachine.CanMove && (dodge == null || !dodge.IsDodging) && (movement == null || !movement.IsDashing)
-                        && (combat == null || combat.CanGuardFrom(heldSince)) && (eating == null || !eating.IsEating)
-                        && Time.time - loweredAt >= relockFor;
+                        && (combat == null || combat.CanGuardFrom(heldSince)) && (eating == null || !eating.IsEating);
+        // The guard goes up the moment it is pressed, always (the user, 2026-11-25: "it should happen the instant we press it"). The
+        // relock that kept a tapped guard down for 0.3-0.6 s, and so raised it late, now only takes the parry out of a raise that soon.
         if (held && !IsGuarding && canRaise)
         {
             if (combat != null)
@@ -160,6 +163,7 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
         {
             raisedAt = Time.time;
             caughtSinceRaised = false;
+            parryLocked = Time.time - loweredAt < relockFor;
         }
         else
         {
@@ -214,7 +218,7 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
         }
 
         GuardOutcome outcome = GuardRules.Resolve(IsGuarding, Time.time - raisedAt, transform.forward, damage.Direction,
-            Rules.BlockArc, Rules.ParryWindow * GameOptions.TimingShare, stamina != null ? stamina.Current : float.PositiveInfinity,
+            Rules.BlockArc, parryLocked ? float.NegativeInfinity : Rules.ParryWindow * GameOptions.TimingShare, stamina != null ? stamina.Current : float.PositiveInfinity,
             stamina != null ? stamina.Scaled(cost) : cost);
         if (outcome != GuardOutcome.None)
         {

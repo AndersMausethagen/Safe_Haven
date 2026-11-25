@@ -642,10 +642,12 @@ public sealed class ItemTooltipView : MonoBehaviour
             if (item.HasBoon)
             {
                 builder.Append($"\n<color={UIStyle.Current.AccentHex}>{(item.IsCoating ? "Coating" : item.IsTonic ? "Tonic" : "Meal")}: {DescribeBonuses(item.BoonBonuses)} for {RaidStats.FormatTime(item.BoonSeconds)}.</color>");
+                // Its family on a line of its own, in its colour, with what that means (the user, 2026-11-25: show it more clearly).
                 string family = MealFamily(item.BoonBonuses);
                 if (family.Length > 0)
                 {
-                    builder.Append($"  <color={UIStyle.Current.MutedHex}>{family}</color>");
+                    builder.Append($"\n<color=#{ColorUtility.ToHtmlStringRGB(BoonFamily.ColorOf(family))}><b>{family}</b></color>")
+                        .Append($" <color={UIStyle.Current.MutedHex}>{BoonFamily.Explain(family)}</color>");
                 }
             }
 

@@ -307,7 +307,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         if (bufferedSlot >= 0)
         {
             int slot = bufferedSlot;
-            // Kept as long as a swing's wind-up lasts (however early in it, or however long a heavy is held charging), then as long again.
+            // Kept as long as a heavy's wind-up lasts (however early in it, or however long it is held charging), then as long again.
             if (combat != null && combat.IsWindingUp)
             {
                 bufferedUntil = Mathf.Max(bufferedUntil, Time.time + BufferSeconds);
@@ -316,6 +316,11 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             if (Time.time > bufferedUntil || !health.IsAlive)
             {
                 bufferedSlot = -1;
+                // Never lost without a word: the bar shows it was refused as busy.
+                if (health.IsAlive)
+                {
+                    CastRefused?.Invoke(slot, SkillCastResult.Busy);
+                }
             }
             else if (CheckCast(loadout.Get(slot)) != SkillCastResult.Busy)
             {
@@ -595,9 +600,10 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             || (TryGetComponent(out PlayerEating eating) && eating.IsEating)
             // Rocked back, floored, stunned by a broken guard or locked in a finishing blow: no more a skill than a swing.
             || (combat != null && (combat.IsFlinching || combat.IsFinishing))
-            // A swing's blow still on its way: the skill waits for it (kept, and cast once it lands), it is not cast on top of it with
-            // both blows landing (SkillsImprovementResearch_2026-11-24 fix 2; bug hunt, 2026-11-25).
-            || (combat != null && combat.IsWindingUp)
+            // A heavy's blow still on its way: the skill waits for it (kept, and cast once it lands). A normal strike gives way to it
+            // instead (Perform ends it), never both blows landing. Waiting on every wind-up, War Cry pressed while attacking waited on
+            // swing after swing and was lost (the user, 2026-11-25: "often when pressing War Cry it doesnt activate").
+            || (combat != null && !combat.GivesWayToSkill)
             || (guard != null && guard.IsStunned)
             || Time.time < busyUntil)
         {
@@ -621,6 +627,11 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             cooldowns.Start(skill, now, CooldownOf(skill));
         }
         busyUntil = now + skill.CastTime;
+        // A normal strike under way gives way to the skill (CheckCast let it through only where it does).
+        if (combat != null)
+        {
+            combat.GiveWayToSkill();
+        }
 
         // Like the weapon swing, the direction is locked in toward the cursor as the cast begins.
         Vector3 direction = movement.AimDirection;

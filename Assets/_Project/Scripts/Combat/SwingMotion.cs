@@ -46,9 +46,15 @@ public static class SwingMotion
     public static SwingCancels WindupCancels(AttackDefinition attack, SwingKind kind, CombatTechniqueSettings rules)
     {
         SwingCancels cancels = (attack != null ? attack.OwnWindupCancels : null)
-            ?? (kind == SwingKind.Light ? rules.LightWindupCancels : kind == SwingKind.Heavy ? rules.HeavyWindupCancels : rules.OtherWindupCancels);
+            ?? (IsNormalStrike(kind) ? rules.LightWindupCancels : kind == SwingKind.Heavy ? rules.HeavyWindupCancels : rules.OtherWindupCancels);
         return rules.DodgeCancelsWindup ? cancels : cancels & ~SwingCancels.Dodge;
     }
+
+    /// <summary>A normal strike: a light swing, a rush, a guard counter, a shield bash. Its wind-up gives way as a light swing's does (to
+    /// the guard and to a skill: the user, 2026-11-25, "normal strikes should automatically stop for a parry ... except ... a heavy
+    /// strike"). A heavy and a weapon art (paid for with Focus) keep their own rules.</summary>
+    public static bool IsNormalStrike(SwingKind kind) =>
+        kind == SwingKind.Light || kind == SwingKind.Rush || kind == SwingKind.GuardCounter || kind == SwingKind.ShieldBash;
 
     /// <summary>What cuts the swing's follow-through short once its blow has landed.</summary>
     public static SwingCancels RecoveryCancels(AttackDefinition attack, CombatTechniqueSettings rules) =>

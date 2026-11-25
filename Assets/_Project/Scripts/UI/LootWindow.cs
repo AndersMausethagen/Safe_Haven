@@ -145,6 +145,7 @@ public sealed class LootWindow : MonoBehaviour
     private LootableRemains shown;
     private GameObject looter;
     private int drawnVersion = -1;
+    private int shownOthers = -1;
     private float drawnWeight = -1f;
 
     public static LootWindow Current { get; private set; }
@@ -212,6 +213,7 @@ public sealed class LootWindow : MonoBehaviour
         grid.Show(remains.Items);
         drawnVersion = -1;
         drawnWeight = -1f;
+        shownOthers = -1;
         Describe(ItemStack.Empty);
         window.Open();
         openedFrame = Time.frameCount;
@@ -285,11 +287,38 @@ public sealed class LootWindow : MonoBehaviour
         }
     }
 
+    // Every body with loot near the looter is emptied with the one shown (BodyLootSettings › Take All Radius; the user, 2026-11-25: with
+    // a lot of lootable bodies close, loot them all). The one shown first, then the rest while there is room.
+    private readonly List<LootableRemains> nearby = new List<LootableRemains>();
+    private readonly List<LootableRemains> emptying = new List<LootableRemains>();
+
+    private int NearbyCount() => shown != null && looter != null
+        ? LootableRemains.Near(shown, looter.transform.position, BodyLootSettings.Current.TakeAllRadius, nearby) : 0;
+
     private void TakeAll()
     {
-        if (shown != null)
+        if (shown == null)
         {
-            shown.TakeAll(looter);
+            return;
+        }
+
+        NearbyCount();
+        emptying.Clear();
+        emptying.AddRange(nearby);
+        int stayed = shown.TakeAll(looter, false);
+        foreach (LootableRemains other in emptying)
+        {
+            if (other != null && !other.IsEmpty)
+            {
+                stayed += other.TakeAll(looter, false);
+            }
+        }
+
+        bool several = emptying.Count > 0;
+        emptying.Clear();
+        if (stayed > 0)
+        {
+            GameMessages.Post(several ? "No room for the rest: it stays on the bodies." : "No room for the rest: it stays on the body.", MessageKind.Warning);
         }
     }
 
@@ -299,6 +328,15 @@ public sealed class LootWindow : MonoBehaviour
         if (shown == null)
         {
             return;
+        }
+
+        // The button says when it takes from more than this body.
+        int others = NearbyCount();
+        if (takeAllLabel != null && others != shownOthers)
+        {
+            shownOthers = others;
+            string what = others > 0 ? $"Take all ×{others + 1}" : "Take all";
+            takeAllLabel.text = InputDevices.UsingGamepad ? what : $"{what} ({GameInput.KeyLabel(GameInput.Interact)})";
         }
 
         // Redrawn only when something changed: what the body holds (its Version), or the bag's weight.

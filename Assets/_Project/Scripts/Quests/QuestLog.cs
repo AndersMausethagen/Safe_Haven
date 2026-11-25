@@ -152,6 +152,35 @@ public sealed class QuestLog
     /// <summary>Raised when a quest under way lapses because the story moved on.</summary>
     public event Action<QuestDefinition> Lapsed;
 
+    /// <summary>True when a quest under way still asks for <paramref name="building"/> to be built (an open Build Structure step): the
+    /// build menu lights its icon (the user, 2026-11-25).</summary>
+    public bool WantsBuilt(BuildingDefinition building)
+    {
+        if (building == null)
+        {
+            return false;
+        }
+
+        foreach (Entry entry in entries.Values)
+        {
+            if (entry.Status != QuestStatus.Active)
+            {
+                continue;
+            }
+
+            for (int i = 0; i < entry.Counts.Length; i++)
+            {
+                QuestObjective objective = entry.Quest.Objectives[i];
+                if (objective.Type == ObjectiveType.BuildStructure && objective.Building == building && entry.IsObjectiveOpen(i))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public QuestStatus StatusOf(QuestDefinition quest)
     {
         return quest != null && entries.TryGetValue(quest, out Entry entry) ? entry.Status : QuestStatus.NotStarted;

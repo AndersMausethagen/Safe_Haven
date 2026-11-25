@@ -307,6 +307,61 @@ public sealed partial class RecipeBrowser : MonoBehaviour
 
     // ----- The selected recipe -----
 
+    // The family of the meal or tonic it makes, named in its colour beside where it is made; hovering the line says what that means
+    // (the user, 2026-11-25: "show the food or buff family the recipe is a part of more clearly, and explain what that means when
+    // hovering the word").
+    private string shownFamily = "";
+    private UIHover familyHover;
+    private ItemTooltipView familyTip;
+
+    private string FamilyTag(RecipeDefinition recipe)
+    {
+        ItemDefinition made = recipe.Output as ItemDefinition;
+        shownFamily = made != null && made.HasBoon && !made.IsCoating ? BoonFamily.Of(made.BoonBonuses) : "";
+        if (familyHover == null)
+        {
+            infoLabel.raycastTarget = true;
+            familyHover = infoLabel.gameObject.AddComponent<UIHover>();
+            familyHover.Entered = ShowFamily;
+            familyHover.Exited = HideFamily;
+        }
+
+        return shownFamily.Length == 0 ? ""
+            : $"  ·  <color=#{ColorUtility.ToHtmlStringRGB(BoonFamily.ColorOf(shownFamily))}><b>{shownFamily}</b> {(made.IsTonic ? "tonic" : "meal")}</color>";
+    }
+
+    private void ShowFamily()
+    {
+        if (shownFamily.Length == 0)
+        {
+            return;
+        }
+
+        // The window's own tooltip: the nearest one up the hierarchy (the station window's, the bag's).
+        for (Transform parent = transform; familyTip == null && parent != null; parent = parent.parent)
+        {
+            familyTip = parent.GetComponentInChildren<ItemTooltipView>(true);
+        }
+
+        if (familyTip != null)
+        {
+            familyTip.Show(shownFamily, BoonFamily.ColorOf(shownFamily), BoonFamily.Explain(shownFamily));
+            familyTipShown = true;
+        }
+    }
+
+    // Hidden by whoever showed it, even if the recipe changed under the pointer meanwhile.
+    private bool familyTipShown;
+
+    private void HideFamily()
+    {
+        if (familyTip != null && familyTipShown)
+        {
+            familyTip.Hide();
+            familyTipShown = false;
+        }
+    }
+
     private void RefreshSelected()
     {
         selectedPanel.SetActive(selected != null);
@@ -324,7 +379,8 @@ public sealed partial class RecipeBrowser : MonoBehaviour
             nameLabel.text = selected.OutputAmount > 1 ? $"{selected.DisplayName} ×{selected.OutputAmount}" : selected.DisplayName;
             nameLabel.color = selected.Output != null ? Rarity.ColorOf(selected.Output.Rarity) : UIStyle.Current.Accent;
             float seconds = elsewhere.Contains(selected) ? selected.CraftSeconds : maker.Seconds(selected);
-            infoLabel.text = selected.IsHandcrafted ? "By hand" : $"{selected.Station.DisplayName()}  ·  {ItemTooltipView.FormatSeconds(seconds)}";
+            infoLabel.text = (selected.IsHandcrafted ? "By hand" : $"{selected.Station.DisplayName()}  ·  {ItemTooltipView.FormatSeconds(seconds)}")
+                + FamilyTag(selected);
             descriptionLabel.text = ItemTooltipView.DescribeOutput(selected);
             descriptionLabel.rectTransform.anchoredPosition = Vector2.zero;
         }

@@ -67,6 +67,10 @@ public sealed class BuildMenuWindow : MonoBehaviour
         public TMP_Text Cost;
         public bool Affordable = true;
         public string Missing;
+        /// <summary>Known, but not open yet: what it waits for ("Needs a Workshop."). Null when it can be built.</summary>
+        public string Locked;
+        /// <summary>A quest under way asks for it to be built: its icon glows (QuestLog.WantsBuilt).</summary>
+        public Outline Glow;
     }
 
     private UIWindow window;
@@ -176,6 +180,17 @@ public sealed class BuildMenuWindow : MonoBehaviour
             return;
         }
 
+        // What a quest asks to be built glows, breathing (the user, 2026-11-25: "mark that building with a glowing outline on the icon").
+        Color glow = UIStyle.Current.AccentBright;
+        glow.a = 0.55f + 0.45f * Mathf.Sin(Time.unscaledTime * 4f);
+        foreach (Card card in cards)
+        {
+            if (card.Glow != null && card.Glow.enabled)
+            {
+                card.Glow.effectColor = glow;
+            }
+        }
+
         float shownShare = Mathf.Clamp01((Time.unscaledTime - openedAt) / RiseSeconds);
         panel.anchoredPosition = new Vector2(0f, BottomGap - (1f - shownShare) * (1f - shownShare) * RiseUnits);
         if (Time.unscaledTime >= nextRead)
@@ -244,6 +259,14 @@ public sealed class BuildMenuWindow : MonoBehaviour
             }
         }
 
+        foreach (BuildingDefinition building in builder.KnownNotOpen())
+        {
+            if (BuildCategories.Of(building) == category)
+            {
+                count++;
+            }
+        }
+
         return count;
     }
 
@@ -273,6 +296,15 @@ public sealed class BuildMenuWindow : MonoBehaviour
                 if (BuildCategories.Of(building) == category)
                 {
                     AddCard(new Card { Building = building, Title = building.DisplayName });
+                }
+            }
+
+            // Known but waiting (a building it needs, the rank): after what can be built, locked, saying what for.
+            foreach (BuildingDefinition building in builder.KnownNotOpen())
+            {
+                if (BuildCategories.Of(building) == category)
+                {
+                    AddCard(new Card { Building = building, Title = building.DisplayName, Locked = BuildingUnlocks.Missing(building) });
                 }
             }
         }
@@ -346,6 +378,8 @@ public sealed class BuildMenuWindow : MonoBehaviour
         text.enableAutoSizing = true;
     }
 
+    private static QuestLog QuestsHere() => QuestManager.Current != null ? QuestManager.Current.Log : GameSession.Quests;
+
     private static string Initials(string title) => string.IsNullOrEmpty(title) ? "?" : title.Substring(0, 1).ToUpperInvariant();
 
     // Affordability changes as the player gathers, so cards and details are re-read while open.
@@ -370,9 +404,33 @@ public sealed class BuildMenuWindow : MonoBehaviour
         for (int i = 0; i < cards.Count; i++)
         {
             Card card = cards[i];
-            if (card.Building != null && pool != null)
+            if (card.Locked != null && card.Building != null)
+            {
+                // A Workshop finished while the menu is open: the card opens.
+                card.Locked = BuildingUnlocks.IsOpen(card.Building) ? null : BuildingUnlocks.Missing(card.Building);
+            }
+
+            if (card.Locked != null)
+            {
+                card.Affordable = false;
+                card.Missing = card.Locked;
+            }
+            else if (card.Building != null && pool != null)
             {
                 card.Affordable = pool.CanAfford(card.Building.ConstructionCost, card.Building.ConstructionItems, out card.Missing);
+            }
+
+            bool wanted = card.Building != null && QuestsHere() != null && QuestsHere().WantsBuilt(card.Building);
+            if (card.Icon != null && (wanted || card.Glow != null))
+            {
+                if (card.Glow == null)
+                {
+                    card.Glow = card.Icon.gameObject.AddComponent<Outline>();
+                    card.Glow.effectDistance = new Vector2(3f, -3f);
+                    card.Glow.useGraphicAlpha = false;
+                }
+
+                card.Glow.enabled = wanted;
             }
 
             if (card.Icon != null)
@@ -384,8 +442,8 @@ public sealed class BuildMenuWindow : MonoBehaviour
 
             // What can't be built yet goes grey; what it is short of in red under it.
             card.Name.color = card.Affordable ? style.Text : style.Inactive;
-            card.Cost.text = card.Building == null ? "" : card.Affordable ? "Can build" : Short(card.Building, pool);
-            card.Cost.color = card.Affordable ? style.Good : style.Danger;
+            card.Cost.text = card.Building == null ? "" : card.Locked != null ? "Locked" : card.Affordable ? "Can build" : Short(card.Building, pool);
+            card.Cost.color = card.Locked != null ? style.Warning : card.Affordable ? style.Good : style.Danger;
             Paint(card, i == selected);
         }
 
@@ -467,6 +525,14 @@ public sealed class BuildMenuWindow : MonoBehaviour
         detailText.text = (string.IsNullOrWhiteSpace(building.Description) ? "" : building.Description) + MadeAt(building, pool, style);
         costHeading.text = building.PlaceInLines ? "COST, EACH PIECE" : "COST";
         ShowCosts(building, pool);
+        if (card.Locked != null)
+        {
+            detailText.text += $"\n\n<color={style.WarningHex}>{card.Locked}</color>";
+            buildButton.interactable = false;
+            buildLabel.text = "Locked";
+            return;
+        }
+
         // Short of it, a building that takes work can still be laid out as a plan, to be paid when its materials are home.
         bool plan = !card.Affordable && BuildPlacer.CanPlan(building);
         buildButton.interactable = card.Affordable || plan;
@@ -696,6 +762,13 @@ public sealed class BuildMenuWindow : MonoBehaviour
                 builder.PickBuilding(card.ToUpgrade);
             }
 
+            return;
+        }
+
+        if (card.Locked != null)
+        {
+            Select(index);
+            GameMessages.Post($"The {card.Building.DisplayName} isn't open yet. {card.Locked}", MessageKind.Warning);
             return;
         }
 
