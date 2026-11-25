@@ -133,7 +133,7 @@ public sealed class CastBarView : MonoBehaviour
     private void Show(float elapsed, float length)
     {
         float share = length > 0f ? Mathf.Clamp01(elapsed / length) : 1f;
-        fill.anchorMax = new Vector2(share, 1f);
+        KitBar.Drive(fill, share, steady: true); // as every bar moves (the kit bar's shader); steady, as it moves every frame
         // To a tenth of a second, so the label is rebuilt ten times a second at most.
         elapsed = Mathf.Min(Mathf.Floor(elapsed * 10f) / 10f, length);
         if (!Mathf.Approximately(elapsed, shownElapsed) || !Mathf.Approximately(length, shownLength))
