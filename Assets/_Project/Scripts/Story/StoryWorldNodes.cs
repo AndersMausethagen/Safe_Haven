@@ -189,7 +189,8 @@ public sealed class MoveObjectNode : StoryNode
     public bool waitUntilArrived;
     [Tooltip("Keeps it on the ground over hills and hollows (a creature walking). Off: a straight line between the two points (something flying).")]
     public bool followGround;
-    [Tooltip("A horse (its Animator's Gait, 0 to 1: 0.53 canters, 0.71 gallops) while it moves. Below 0: not a horse; Speed is set.")]
+    [Tooltip("Old setting, no longer used: a horse (an Animator with a Gait float) always takes the gait its speed calls for, walk to " +
+             "sprint, its clips played at the rate that matches the ground covered (HorseMotion.DefaultGaitSpeeds), so it doesn't glide.")]
     public float gait = -1f;
 
     private static readonly int Speed = Animator.StringToHash("Speed");
@@ -226,18 +227,22 @@ public sealed class MoveObjectNode : StoryNode
         }
 
         Animator animator = mover.GetComponentInChildren<Animator>();
-        bool gaits = gait >= 0f && animator != null && HasParameter(animator, Gait);
+        // A horse is any Animator with a Gait float: its gait and stride rate follow its speed, whatever the node says (the user,
+        // 2026-11-25: the prologue's horses glided on the old 0-1 gait meant for the boars they replaced).
+        bool gaits = animator != null && HasParameter(animator, Gait);
         bool walks = !gaits && animator != null && HasSpeed(animator);
         float previousSpeed = animator != null ? animator.speed : 1f;
         float speed = seconds > 0f ? Vector3.Distance(from, to) / seconds : 0f;
+        int horseGait = gaits ? HorseMotion.GaitFor(speed, HorseMotion.DefaultGaitSpeeds) : 0;
         try
         {
             if (walks) animator.speed = previousSpeed * animationSpeed;
+            if (gaits && horseGait > 0) animator.speed = Mathf.Clamp(speed / HorseMotion.DefaultGaitSpeeds[horseGait - 1], 0.35f, 1.5f);
             for (float t = 0f; t < seconds && mover != null; t += Time.deltaTime)
             {
                 mover.position = OnGround(Vector3.Lerp(from, to, t / seconds), followGround);
                 if (walks) animator.SetFloat(Speed, speed);
-                if (gaits) animator.SetFloat(Gait, gait);
+                if (gaits) animator.SetFloat(Gait, horseGait);
 
                 yield return null;
             }
@@ -254,6 +259,7 @@ public sealed class MoveObjectNode : StoryNode
             if (gaits && animator != null)
             {
                 animator.SetFloat(Gait, 0f);
+                animator.speed = previousSpeed;
             }
         }
     }

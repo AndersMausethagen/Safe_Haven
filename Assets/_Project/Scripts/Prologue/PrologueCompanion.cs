@@ -155,12 +155,16 @@ public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics, IQue
         {
             if (asked.Contains(topic) || string.IsNullOrWhiteSpace(topic.question) || !topic.OfferedNow()) continue;
             CompanionTopic chosen = topic;
+            // A topic that ends the step it belongs to (it raises the story's event, offered only while that quest runs) says so
+            // on the choice, as a quest hand-in does: "? Hands in: A Moment of Warmth" (the user, 2026-11-25: nothing in the
+            // dialogue said this option moves the story on).
+            bool endsStep = chosen.raises != null && chosen.onlyDuring != null;
             page.Add(new MenuAction(chosen.question, null, true, () =>
             {
                 asked.Add(chosen);
                 if (chosen.raises != null) GameEvents.Raise(chosen.raises);
                 DialogueBox.Current.Say(speaker, chosen.answer, afterAnswer);
-            }));
+            }, false, endsStep ? chosen.onlyDuring : null, endsStep ? QuestAnswer.HandsIn : QuestAnswer.None));
         }
     }
 }

@@ -69,6 +69,10 @@ public sealed class HorseMotion : MonoBehaviour
 
     [Tooltip("Metres a second each gait's clip shows at the body's size, walk to sprint (measured from the clips' root motion by BuildHorses).")]
     [SerializeField] private float[] gaitSpeeds = { 1.42f, 3.35f, 5.18f, 7.83f, 10.94f };
+
+    /// <summary>The ground speed (m/s) each gait's clip covers at playback 1, walk to sprint: for a horse moved by something else
+    /// (a cinematic's Move Object), which picks its gait and stride rate from these.</summary>
+    public static readonly float[] DefaultGaitSpeeds = { 1.42f, 3.35f, 5.18f, 7.83f, 10.94f };
     [Tooltip("Metres creatures in a raid hear each hoofbeat at, walk to sprint: a walk about a sneaking step, a trot a run, a gallop a cart.")]
     [SerializeField] private float[] hoofNoise = { 2.5f, 6f, 8f, 11f, 13f };
     [Tooltip("Degrees a second its turn on the spot shows (measured from the pack's H_Turn clips by BuildHorses).")]

@@ -27985,7 +27985,7 @@ Terrain:
   m_ScaleInLightmap: 0.10451156
   m_LightmapParameters: {fileID: 15203, guid: 0000000000000000f000000000000000, type: 0}
   m_GroupingID: 0
-  m_RenderingLayerMask: 1
+  m_RenderingLayerMask: 257
   m_AllowAutoConnect: 1
   m_EnableHeightmapRayTracing: 1
   m_EnableTreesAndDetailsRayTracing: 0
@@ -55721,7 +55721,7 @@ MonoBehaviour:
     answer: Eirik sees a great deal for a man who pretends not to. Yes. I have seen stones like these before, and I know what they do. Ask me again when you have to touch one.
     raises: {fileID: 11400000, guid: 82ba4d914072adf478d4fa857f205026, type: 2}
     onlyDuring: {fileID: 0}
-  - question: I'm rested. Do we go on?
+  - question: I'm ready to go on.
     answer: Not in this dark. Ingrid's party went in on a night like this and did not come out. We sleep in turns, and at first light we... Quiet. Listen.
     raises: {fileID: 11400000, guid: 32708fa86b722be4bb9f72950ea604f6, type: 2}
     onlyDuring: {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
@@ -109067,7 +109067,7 @@ Terrain:
   m_ScaleInLightmap: 1
   m_LightmapParameters: {fileID: 15203, guid: 0000000000000000f000000000000000, type: 0}
   m_GroupingID: 0
-  m_RenderingLayerMask: 1
+  m_RenderingLayerMask: 257
   m_AllowAutoConnect: 1
   m_EnableHeightmapRayTracing: 1
   m_EnableTreesAndDetailsRayTracing: 0

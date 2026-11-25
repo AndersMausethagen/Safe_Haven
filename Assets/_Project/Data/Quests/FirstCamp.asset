@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: firstcamp
   displayName: A Light in the Wood
-  description: The forest cannot forget a hearth that someone tends. An ember from the shelter's fire came through the catch with you, still alive. Set it in the cold hearth in front of the portal, inside its ward. Your people will see it through the mist.
+  description: 'The forest cannot forget a hearth that someone tends. The old hearth in front of the portal, inside its ward, has fallen apart: gather eight sticks and twelve small rocks in the clearing and rebuild it. The ember from the shelter''s fire that came through the catch with you will light it, and your people will see it through the mist.'
   chain: The Hearth and the Door
   journalNotes: 'This is the old bargain, though you are only starting to understand it. A fire inside the ward feeds the ward. It also shows, a long way off, to anyone who is looking for it.
 
@@ -55,6 +55,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   closedBy: {fileID: 0}
   startDelay: 0
   startsInAFight: 0
@@ -63,7 +65,7 @@ MonoBehaviour:
   objectivesInOrder: 0
   objectives:
   - type: 7
-    description: Set the shelter's ember in the cold hearth by the portal ({key:Interact})
+    description: Gather 8 Sticks and 12 Small Rocks, then repair the cold hearth by the portal ({key:Interact})
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}
@@ -86,6 +88,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
   unlocksBuildings: []
   unlocksModules: []
   turnInToGiver: 0
@@ -93,9 +97,13 @@ MonoBehaviour:
   rewardItems: []
   rewardResources: []
   rewardRecipes: []
+  rewardSkills: []
+  teachesAtStart: []
   rewardEnchantments: []
   rewardWorkFor: {fileID: 0}
   rewardWork: 0
+  rewardPassion: 0
+  rewardMark: {fileID: 0}
   experience: 0
   completionEvent: {fileID: 0}
   onCompleted: []
