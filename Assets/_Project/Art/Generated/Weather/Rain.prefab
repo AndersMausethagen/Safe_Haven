@@ -5334,7 +5334,7 @@ ParticleSystem:
     enabled: 1
     x:
       serializedVersion: 3
-      minMaxState: 0
+      minMaxState: 3
       scalar: 0
       minScalar: 0
       maxCurve:
@@ -5368,7 +5368,7 @@ ParticleSystem:
         m_RotationOrder: 4
     z:
       serializedVersion: 3
-      minMaxState: 0
+      minMaxState: 3
       scalar: 0
       minScalar: 0
       maxCurve:
@@ -6950,3 +6950,8 @@ MonoBehaviour:
   splashesPerSecond: 500
   height: 12
   windSlant: 3
+  nearShare: 0.5
+  nearReach: 6
+  sheetPerSecond: 220
+  sheetDistance: 5
+  sheetSize: {x: 9, y: 6, z: 5}

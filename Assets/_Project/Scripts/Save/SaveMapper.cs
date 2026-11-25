@@ -555,6 +555,8 @@ public static class SaveMapper
                 restored.Inspiration = System.Enum.IsDefined(typeof(Inspiration), entry.inspiration) ? (Inspiration)entry.inspiration : Inspiration.None;
                 restored.InspiredOn = entry.inspiredOn;
                 restored.Bond = entry.bond >= 0f ? entry.bond : entry.raidsAlong;
+                // Ranks already held owe their picks (after the deeds above, which say which were paid).
+                PeopleBond.OweReachedRanks(restored);
                 restored.KitWeapon = KitFrom(entry.kitWeapon, content, missing);
                 restored.KitBody = KitFrom(entry.kitBody, content, missing);
             }

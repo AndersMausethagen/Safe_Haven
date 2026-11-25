@@ -281,7 +281,12 @@ public static class Forays
         home.SetForay(null);
         foreach (ResidentRecord record in party)
         {
-            record.Bruised = !won;
+            // Only ever bruises: a foray gone well is no cure for a bruise from a breach the same day (dawn heals those).
+            if (!won)
+            {
+                record.Bruised = true;
+            }
+
             // A foray gone wrong may leave its mark (Lost in the Mire, for the marsh).
             if (!won)
             {

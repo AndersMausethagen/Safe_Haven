@@ -118,7 +118,7 @@ public sealed class PlayerFootLock : MonoBehaviour
     // On the ground and on its own feet: off them (a dodge, a fall, a seat, a saddle, the water, death) the feet go at once.
     private bool OnItsFeet =>
         (movement == null || (movement.IsGrounded && !movement.IsSeated && !movement.IsFloating))
-        && (dodge == null || !dodge.IsDodging) && (swimming == null || !swimming.IsSwimming) && (riding == null || !riding.IsRiding)
+        && (dodge == null || !dodge.IsDodging) && (movement == null || !movement.IsDashing) && (swimming == null || !swimming.IsSwimming) && (riding == null || !riding.IsRiding)
         && (health == null || health.IsAlive);
 
     private void LateUpdate()

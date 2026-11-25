@@ -491,6 +491,19 @@ public static class Territory
         List<(LandPartyKind kind, string region, ResidentRecord who)> parties = atDawn
             ? new List<(LandPartyKind, string, ResidentRecord)>()
             : LandParties.Going(settlement, raidSeconds, report != null ? report.Companion : null, Settings);
+        // Outposts are judged on the lands as the raid found them, as parties are (above): the turn below can push a land out of
+        // Secure or bring a push due, and judged after it a keeper out all raid sent nothing, or one kept home also sent a haul.
+        List<(string region, ResidentRecord keeper)> outposts = atDawn
+            ? new List<(string, ResidentRecord)>()
+            : Outposts.Working(settlement, raidSeconds, report != null ? report.Companion : null, Settings);
+        if (!atDawn)
+        {
+            var wereOut = new List<ResidentRecord>();
+            foreach ((LandPartyKind _, string _, ResidentRecord who) in parties) wereOut.Add(who);
+            foreach ((string _, ResidentRecord keeper) in outposts) wereOut.Add(keeper);
+            Homecoming.NoteOut(wereOut); // the homecoming's gift is not from them (AwayGifts)
+        }
+
         var tended = new HashSet<string>();
         var scouted = new HashSet<string>();
         foreach ((LandPartyKind kind, string region, ResidentRecord _) in parties)
@@ -506,7 +519,7 @@ public static class Territory
         news.AddRange(PartiesHome(parties, share));
         if (!atDawn)
         {
-            news.AddRange(OutpostsHome(settlement, raidSeconds, report != null ? report.Companion : null, share));
+            news.AddRange(OutpostsHome(settlement, outposts, share));
         }
 
         if (share < 0.999f && news.Count > before)
@@ -592,10 +605,10 @@ public static class Territory
     }
 
     // What the outposts send home for a raid, into the chests (Outposts); in words, one line an outpost.
-    private static List<string> OutpostsHome(SettlementState settlement, float raidSeconds, ResidentDefinition along, float share)
+    private static List<string> OutpostsHome(SettlementState settlement, List<(string region, ResidentRecord keeper)> working, float share)
     {
         var told = new List<string>();
-        foreach ((string region, ResidentRecord keeper) in Outposts.Working(settlement, raidSeconds, along, Settings))
+        foreach ((string region, ResidentRecord keeper) in working)
         {
             var sent = new List<string>();
             foreach (ItemAmount brought in Outposts.Roll(region, Settings, (least, most) => UnityEngine.Random.Range(least, most + 1)))

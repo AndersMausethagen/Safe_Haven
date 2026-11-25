@@ -194,7 +194,9 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         }
 
         nextLeaseLook = Time.unscaledTime + 5f;
-        foreach (string leak in leases.Look(Time.unscaledTime))
+        // Measured in game time: a pause (or a cinematic that holds the game still) is not a hold running long. In unscaled time every
+        // pause during a dodge's moment of grace, and the prologue's ending, read as Stuck rows (the user's build, 2026-11-25).
+        foreach (string leak in leases.Look(Time.time))
         {
             Debug.LogWarning("[LeaseWatch] " + leak);
             if (logging)

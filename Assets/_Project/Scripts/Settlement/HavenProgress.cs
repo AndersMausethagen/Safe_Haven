@@ -145,7 +145,7 @@ public sealed class HavenProgress : MonoBehaviour
         // In a friend's Haven (co-op) what stands there is noted too, into the copy: its tiers and beds count for the guest
         // there and on the raids they follow from it (SettlementState.TakeOn keeps them).
         GameSession.HereItself.NoteBuildings(System.Linq.Enumerable.Where(BuildingObject.Active, IsStanding));
-        GameSession.HereItself.NoteScaffolds(ResidentBuilders.AnyScaffold());
+        GameSession.HereItself.NoteScaffolds(ResidentBuilders.AnyScaffold(), ResidentBuilders.ScaffoldWorkLeft());
         // The friend's stations are theirs to run: their queues are made in their game.
         if (HavenVisit.IsVisiting)
         {

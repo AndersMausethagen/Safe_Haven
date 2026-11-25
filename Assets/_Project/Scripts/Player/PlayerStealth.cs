@@ -29,7 +29,7 @@ public sealed class PlayerStealth : MonoBehaviour
 
     /// <summary>True while the player sneaks (held, and not dodging). Never in the saddle: the stick click that gallops a horse is the
     /// sneak's on a controller, and a galloping rider was seen as one sneaking, near-invisible.</summary>
-    public bool IsSneaking => sneakRequested && (dodge == null || !dodge.IsDodging) && (state == null || !state.IsAboard);
+    public bool IsSneaking => sneakRequested && (dodge == null || !dodge.IsDodging) && (movement == null || !movement.IsDashing) && (state == null || !state.IsAboard);
 
     private float cover = 1f;
     private float coverReadAt = -1f;

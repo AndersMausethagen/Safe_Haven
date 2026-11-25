@@ -594,9 +594,11 @@ public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteract
         ParticleSystem.VelocityOverLifetimeModule rise = sparkles.velocityOverLifetime;
         rise.enabled = true;
         rise.space = ParticleSystemSimulationSpace.World;
-        rise.x = new ParticleSystem.MinMaxCurve(0f);
+        // All three in one mode (two constants): mixed modes made Unity warn every frame each glittering body was in view,
+        // ~40 000 lines in one evening's play (the user's build, 2026-11-25).
+        rise.x = new ParticleSystem.MinMaxCurve(0f, 0f);
         rise.y = new ParticleSystem.MinMaxCurve(settings.SparkleRise * 0.6f, settings.SparkleRise);
-        rise.z = new ParticleSystem.MinMaxCurve(0f);
+        rise.z = new ParticleSystem.MinMaxCurve(0f, 0f);
         // A glint: in quickly, out softly.
         ParticleSystem.ColorOverLifetimeModule fade = sparkles.colorOverLifetime;
         fade.enabled = true;

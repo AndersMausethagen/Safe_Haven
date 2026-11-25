@@ -125,8 +125,8 @@ public sealed class ResidentBuilders : MonoBehaviour
             {
                 // A practised builder's hands count for more (their Construction: ResidentTalents), and practise as they work.
                 PeopleSettings people = PeopleSettings.Current;
-                hands += share * ResidentTalents.SpeedAt(record, people.BuildingSkill);
-                if (settlement.ScaffoldsWaiting && seconds > 0f && record.Resident != null)
+                hands += share * ResidentLife.WorkPace(record, people.BuildingSkill);
+                if (settlement.ScaffoldsWantHands && seconds > 0f && record.Resident != null)
                 {
                     float since = (hammered.TryGetValue(record.Resident, out float had) ? had : 0f) + seconds * share;
                     if (since >= 1f)
@@ -155,6 +155,21 @@ public sealed class ResidentBuilders : MonoBehaviour
     }
 
     /// <summary>True when a paid-for scaffold stands at home (work waiting for builders).</summary>
+    /// <summary>The hammering every paid scaffold at home still needs (Construction work), noted for the time away.</summary>
+    public static float ScaffoldWorkLeft()
+    {
+        float left = 0f;
+        foreach (BuildingObject building in BuildingObject.Active)
+        {
+            if (building.TryGetComponent(out Construction construction) && construction.IsBuilding && construction.Paid)
+            {
+                left += Mathf.Max(0f, construction.WorkNeeded - construction.Work);
+            }
+        }
+
+        return left;
+    }
+
     public static bool AnyScaffold()
     {
         foreach (BuildingObject building in BuildingObject.Active)

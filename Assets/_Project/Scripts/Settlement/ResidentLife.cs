@@ -2016,8 +2016,17 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
 
     /// <summary>The same for work done with <paramref name="skill"/>: Woodcutting in a felling ring, Mining in a quarry.</summary>
     public static float WorkRate(ResidentRecord record, ProficiencyDefinition skill) =>
-        HomeLifeSettings.Current.BuilderWorkPerSecond * (1f + (record != null ? HomeLife.WorkBonus(record, skill) + SmallScenes.CheerOf(record.Resident) : 0f))
-        * (record != null ? ResidentTalents.SpeedAt(record, skill) : 1f);
+        HomeLifeSettings.Current.BuilderWorkPerSecond * WorkPace(record, skill);
+
+    /// <summary>
+    /// How quick their hands are at work with <paramref name="skill"/>, 1 being plain: what they are like that day (HomeLife.WorkBonus:
+    /// home, meals, bruises, traits, marks, spirits), a cheering word, and their practice (ResidentTalents). The one rule for building
+    /// and felling at home and away (bug hunt, 2026-11-25: away they went by practice alone, so a hungry or bruised Haven worked at full
+    /// pace whenever the player was on a raid). Away, the home's own part reads 0: no house is loaded to look at (HomeLife.HomeBonus).
+    /// </summary>
+    public static float WorkPace(ResidentRecord record, ProficiencyDefinition skill) =>
+        record == null ? 1f
+            : Mathf.Max(0f, 1f + HomeLife.WorkBonus(record, skill) + SmallScenes.CheerOf(record.Resident)) * ResidentTalents.SpeedAt(record, skill);
 
     /// <summary>
     /// A knock at the door of the house they are asleep in (HouseDoor): they come out to the door and stand there a while for

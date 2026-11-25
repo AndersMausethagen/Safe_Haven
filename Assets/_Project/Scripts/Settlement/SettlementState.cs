@@ -739,6 +739,18 @@ public sealed class SettlementState : IHavenView
     [field: NotSaved("what this game sees standing, from the scaffolds at home")]
     public bool ScaffoldsWaiting { get; private set; }
 
+    /// <summary>The hammering those scaffolds still needed when home was last seen (Construction work; 0: not known).</summary>
+    [field: NotSaved("what this game sees standing, from the scaffolds at home")]
+    public float ScaffoldWorkLeft { get; private set; }
+
+    /// <summary>
+    /// Away: the scaffolds still want their builders, as long as the builder-seconds put in since (ResidentBuilders.WorkAway) don't
+    /// already cover the work they needed. At home a builder goes back to their bench once the scaffold stands; away, with no end to
+    /// the waiting, a scaffold of a few seconds kept the Carpenter from their bench for the whole raid (review, 2026-11-25).
+    /// </summary>
+    public bool ScaffoldsWantHands => ScaffoldsWaiting
+        && (ScaffoldWorkLeft <= 0f || BuilderSeconds * HomeLifeSettings.Current.BuilderWorkPerSecond < ScaffoldWorkLeft);
+
     private readonly List<RingOrder> rings = new List<RingOrder>();
 
     /// <summary>Rings drawn in the Keeper's view for the woodcutters to clear (RingWork), oldest first.</summary>
@@ -907,7 +919,11 @@ public sealed class SettlementState : IHavenView
     }
 
     /// <summary>Notes whether paid-for scaffolds stand at home (HavenProgress, with NoteBuildings).</summary>
-    public void NoteScaffolds(bool waiting) => ScaffoldsWaiting = waiting;
+    public void NoteScaffolds(bool waiting, float workLeft = 0f)
+    {
+        ScaffoldsWaiting = waiting;
+        ScaffoldWorkLeft = waiting ? Math.Max(0f, workLeft) : 0f;
+    }
 
     /// <summary>Remembers what stands at home, since a raid can't look. Read again by HavenProgress; not saved, as loading a game lands at home.</summary>
     public void NoteBuildings(IEnumerable<BuildingObject> standing)
@@ -1024,7 +1040,7 @@ public sealed class SettlementState : IHavenView
     // and rumours all read 0).
     private static readonly string[] SeenHere =
     {
-        nameof(builtTiers), nameof(builtCounts), "<Beds>k__BackingField", "<ScaffoldsWaiting>k__BackingField",
+        nameof(builtTiers), nameof(builtCounts), "<Beds>k__BackingField", "<ScaffoldsWaiting>k__BackingField", "<ScaffoldWorkLeft>k__BackingField",
     };
 
     public void TakeOn(SettlementState other)

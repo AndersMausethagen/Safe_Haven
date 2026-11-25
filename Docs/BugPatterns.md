@@ -319,3 +319,58 @@ Left: `CliCommandTests.HealthRunsEveryPage` (needs Health to return a count), `J
 stops copying materials), `CoopWireTests`' fingerprint (hashes field names: a rename turns it red, a reorder of NetworkSerialize's calls,
 which does break the wire, doesn't), the "made in code" rule's file-wide `Destroy(` (one Destroy anywhere clears every made thing in the
 file), and "a friend's copy doesn't tick its status", now untested (no public path to it).
+
+## Seventh round: the build's own log, then three hunters (2026-11-25)
+
+The user's request: "do a bug hunt in the games systems. fix the cause, not the symptom". Evidence first: `Player.log` from the user's build evening
+(2.3 MB) and its playtest CSV, then three read-only hunters over the newest unplayed systems (skills and combat; settlement, keeper and
+territory; people, save, crafting and farming). Every finding was checked in the code before it was fixed.
+
+**From the log.**
+- An empty skill key threw. `TryCast` read the missing skill's cost before it looked at the refusal it already had, and none of the 2,000
+  tests ever pressed an empty key (now `SkillAimTests.AnEmptySlotsKey_IsRefusedAsEmpty`, through both ways a key casts).
+- About 40,000 "Particle (Orbital) Velocity curves must all be in the same mode" lines. Unity accepts mixed curve modes without a word,
+  then warns on every frame the system simulates. The sources were the loot glitter and snow (both made in code) and the portal motes
+  (a prefab). `ParticleCurveModeTests` scans every prefab of the game's own.
+- Three LeaseWatch "Stuck" rows were all false. The watch measured in unscaled time, so a pause during a dodge and the prologue's
+  ending (a cinematic that holds the game still) read as leaks. It now measures in game time, and an in-game cinematic's hold is a
+  lasting hold.
+
+**The patterns behind the hunters' 14 findings.**
+1. **A rule kept in two places.** Away and home each had their own copy, and one copy was missing a part:
+   - work pace away left out meals, bruises, traits and spirits (now `ResidentLife.WorkPace`, used by both);
+   - builders away also ran their bench;
+   - a Farmer away waters every plot (open: plot positions are not known away).
+   Two clocks inside one rule were the same kind: outposts were judged after the territory turn and parties before it. Before adding a
+   rule for away, search for the home rule and call it.
+2. **"Now" asked after it has passed.** The homecoming gift asked the live raid who had been out, but the raid was gone once home.
+   The worker-made tally counted crafts made at home in "while you were gone". Take the answer where the thing is settled, not when it
+   is told: the territory's turn hands over the parties and outposts it settles (`Homecoming.NoteOut`). My first fix took it at
+   RaidFinished, and the review found the turn had already run by then. Listeners to one event run in an order nobody chose.
+3. **An event that only fires on a crossing.** A bond rank's passion pick was owed only on crossing into the rank. A save loaded at its
+   rank never crosses, and a jump over two ranks crossed only one. Owe what is held, guarded by the deed (`PeopleBond.OweReachedRanks`),
+   on growth and on load alike.
+4. **Cleanup on interruption, again (guard 6).**
+   - Aiming a skill registered no cleanup: Esc cast the skill as the paused keys came up, and a cinematic left the marker on the ground.
+   - A cancelled cast left its busy time locking swings, and its lunge sliding on.
+   - `IsDodging` read any dash, so a skill's lunge counted as a dodge.
+   - A skill pressed in a swing's wind-up was cast on top of it.
+   The fix is one `CancelCast`, one `LetGoOfKeys`, and `EndsOn` covering pause and windows (which only let go of the keys).
+5. **Assign where only setting was meant.** `record.Bruised = !won` healed a breach bruise.
+
+**The review of my own fixes found 5 of the 20 wrong or incomplete** (the fifth round found 3 of mine). These were:
+- the homecoming list taken too late;
+- builders away kept from their bench for a whole raid (a scaffold's waiting had no end away: now `ScaffoldsWantHands`, which stops
+  once the banked hammering covers the work noted at home);
+- a skill pressed during a held heavy charge expired;
+- a stagger dropped the aim;
+- the particle test never built the glitter it was written for.
+
+Narrowing `IsDodging` to the dodge also showed that half its readers meant "the body is dashing" (the feet, the guard, the bow,
+sneaking). Those now ask `PlayerMovement.IsDashing`. **When a name is narrowed, read every reader.**
+
+Open:
+- A Farmer away waters every plot, at home only those in reach.
+- "Failed to create agent because there is no valid NavMesh" at three scene loads (all agents in the scenes as saved stand on a mesh
+  for their own type, so the cause is something spawned at load).
+- Stations away keep the worker speed set at home.

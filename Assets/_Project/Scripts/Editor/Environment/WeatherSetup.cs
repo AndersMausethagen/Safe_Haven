@@ -142,9 +142,10 @@ public static class WeatherSetup
         ParticleSystem.VelocityOverLifetimeModule fall = system.velocityOverLifetime;
         fall.enabled = true;
         fall.space = ParticleSystemSimulationSpace.World;
-        fall.x = 0f;
+        // One mode on all three axes (two constants), or Unity warns every frame the snow falls.
+        fall.x = new ParticleSystem.MinMaxCurve(0f, 0f);
         fall.y = new ParticleSystem.MinMaxCurve(-1.6f, -1.1f);
-        fall.z = 0f;
+        fall.z = new ParticleSystem.MinMaxCurve(0f, 0f);
         ParticleSystem.NoiseModule flutter = system.noise;
         flutter.enabled = true;
         flutter.strength = 0.45f;

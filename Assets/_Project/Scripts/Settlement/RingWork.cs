@@ -526,14 +526,14 @@ public static class RingWork
 
             // Their own bench first, and a scaffold waiting, as at home.
             StationQueue bench = WorkerProduction.QueueOf(home, record);
-            if ((bench != null && !bench.IsIdle && !bench.Blocked) || (home.ScaffoldsWaiting && ResidentBuilders.Builds(record, along)))
+            if ((bench != null && !bench.IsIdle && !bench.Blocked) || (home.ScaffoldsWantHands && ResidentBuilders.Builds(record, along)))
             {
                 continue;
             }
 
-            // A practised feller or quarrier counts for more (their Woodcutting or Mining: ResidentTalents).
+            // A practised feller or quarrier counts for more, and how they are that day as at home (ResidentLife.WorkPace).
             float share = kind == RingKind.Quarry ? settings.AwayQuarryShare : settings.AwayFellingShare;
-            speed += share * ResidentTalents.SpeedAt(record, SkillOf(kind));
+            speed += share * ResidentLife.WorkPace(record, SkillOf(kind));
             (awayWorkers ??= new List<ResidentRecord>()).Add(record);
         }
 

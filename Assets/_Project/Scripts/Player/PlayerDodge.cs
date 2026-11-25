@@ -38,8 +38,10 @@ public sealed class PlayerDodge : MonoBehaviour
     private float bargeAt = -1f;
     private Vector3 bargeDirection;
 
-    /// <summary>True from the start of a dodge until its dash ends.</summary>
-    public bool IsDodging => movement.IsDashing;
+    /// <summary>True from the start of a dodge until its dash ends. Only the dodge's own dash: a skill's lunge dashes too, and read
+    /// as a dodge it turned the next swing into a rush, dropped a dodge pressed during it and showed the AI a dodge (bug hunt, 2026-11-25).
+    /// What only cares that the body is dashing (the feet, the guard, the bow, sneaking) asks PlayerMovement.IsDashing.</summary>
+    public bool IsDodging => movement.IsDashing && Time.time < dashEndsAt;
     /// <summary>Seconds until the next dodge is possible; 0 when ready.</summary>
     public float CooldownRemaining => Mathf.Max(0f, readyAt - Time.time);
 

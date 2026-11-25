@@ -62,6 +62,8 @@ public sealed class HomecomingGiftTests
         home.AddResident(tor, job);
         Assert.IsNull(AwayGifts.Draw(settings, home, stash, 0.9f, 0f), "the roll past the chance: no gift");
         Assert.IsNull(AwayGifts.Draw(settings, home, stash, 0f, 0f, away: tor), "not from someone away on the raid");
+        // Bug hunt, 2026-11-25: once home the raid is gone, so who kept an outpost or led a party is taken as it ended (Homecoming).
+        Assert.IsNull(AwayGifts.Draw(settings, home, stash, 0f, 0f, wereOut: new[] { tor }), "not from someone out of the Haven as the raid ended");
 
         string line = AwayGifts.Draw(settings, home, stash, 0.1f, 0.5f);
         StringAssert.Contains(tor.DisplayName, line, "the line names who gave it");

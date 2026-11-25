@@ -123,7 +123,7 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
     private void Update()
     {
         bool stunned = IsStunned;
-        bool canRaise = !stunned && stateMachine.CanMove && (dodge == null || !dodge.IsDodging)
+        bool canRaise = !stunned && stateMachine.CanMove && (dodge == null || !dodge.IsDodging) && (movement == null || !movement.IsDashing)
                         && (combat == null || combat.CanGuardFrom(heldSince)) && (eating == null || !eating.IsEating)
                         && Time.time - loweredAt >= relockFor;
         if (held && !IsGuarding && canRaise)

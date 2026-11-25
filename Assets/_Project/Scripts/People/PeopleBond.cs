@@ -31,9 +31,36 @@ public static class PeopleBond
             return false;
         }
 
-        ResidentTalents.OwePick(record, after.name);
-        PeopleNews.Tell($"{record.Resident.DisplayName} is {after.name} with you now: there is a passion they would grow.", MessageKind.Gain);
+        bool owed = OweReachedRanks(record) > 0;
+        // The passion is promised only when a pick was owed now (found again and rising through a rank a second time owes none).
+        PeopleNews.Tell($"{record.Resident.DisplayName} is {after.name} with you now" + (owed ? ": there is a passion they would grow." : "."),
+            MessageKind.Gain);
         return true;
+    }
+
+    /// <summary>
+    /// Owes the passion pick of every bond rank the bond reaches and has not paid yet: the one just reached, one passed on the way (a
+    /// bond that jumped two ranks), and on load the ranks a save from before picks already held (bug hunt, 2026-11-25: a companion at 3
+    /// raids in an old save was Trusted for good and never owed Trusted's pick, as a pick was only owed on crossing a rank). How many.
+    /// </summary>
+    public static int OweReachedRanks(ResidentRecord record)
+    {
+        int owed = 0;
+        if (record == null || record.Resident == null)
+        {
+            return owed;
+        }
+
+        int bond = UnityEngine.Mathf.FloorToInt(record.Bond + 0.0001f);
+        foreach (CompanionBondRank rank in SettlementSettings.Current.BondRanks)
+        {
+            if (rank != null && bond >= rank.raids && ResidentTalents.OwePick(record, rank.name))
+            {
+                owed++;
+            }
+        }
+
+        return owed;
     }
 
     /// <summary>A friend of theirs (Friendly or better) was brought home from the forest by the player: their bond grows.</summary>

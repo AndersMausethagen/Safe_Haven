@@ -65,7 +65,7 @@ public static class AwayGifts
     /// <paramref name="share"/> scales the chance: a quick raid gave them less time (RaidPacingSettings.TimeAwayShare).
     /// </summary>
     public static string Draw(HomecomingSettings settings, SettlementState home, StashStorage stash, float roll, float pick, ResidentDefinition away = null,
-        float share = 1f)
+        float share = 1f, ICollection<ResidentDefinition> wereOut = null)
     {
         if (settings == null || home == null || stash == null || roll >= settings.Chance * share)
         {
@@ -76,7 +76,7 @@ public static class AwayGifts
         float total = 0f;
         foreach (HomecomingSettings.Gift gift in settings.Gifts)
         {
-            ResidentRecord who = gift != null && gift.item != null && gift.weight > 0f ? WithJob(home, gift.job, away) : null;
+            ResidentRecord who = gift != null && gift.item != null && gift.weight > 0f ? WithJob(home, gift.job, away, wereOut) : null;
             if (who != null)
             {
                 open.Add((gift, who));
@@ -107,12 +107,13 @@ public static class AwayGifts
         return null;
     }
 
-    private static ResidentRecord WithJob(SettlementState home, JobDefinition job, ResidentDefinition away)
+    private static ResidentRecord WithJob(SettlementState home, JobDefinition job, ResidentDefinition away, ICollection<ResidentDefinition> wereOut)
     {
-        // Someone who was at home and at work meanwhile (not away on a foray, out at an outpost or along).
+        // Someone who was at home and at work meanwhile (not away on a foray, out at an outpost or along). Who was out is taken as the
+        // raid ended (wereOut): once home, ResidentsOut no longer sees the parties and outposts the raid sent.
         foreach (ResidentRecord record in ResidentsOut.Working(home, away))
         {
-            if (job != null && record.Job == job)
+            if (job != null && record.Job == job && (wereOut == null || !wereOut.Contains(record.Resident)))
             {
                 return record;
             }

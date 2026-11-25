@@ -292,6 +292,13 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             SkillAreaMark.Hide();
         }
 
+        // Held by something else (a cinematic, the story, an interaction): the key's release never arrives (the input handler is off),
+        // so what was being aimed or channelled is let go here, not left drawn on the ground until the key is pressed again.
+        if ((aimingSlot >= 0 || channeling != null) && PlayerControl.HeldOn(gameObject))
+        {
+            LetGoOfKeys();
+        }
+
         if (aimingSlot >= 0)
         {
             ShowAim();
@@ -300,6 +307,12 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         if (bufferedSlot >= 0)
         {
             int slot = bufferedSlot;
+            // Kept as long as a swing's wind-up lasts (however early in it, or however long a heavy is held charging), then as long again.
+            if (combat != null && combat.IsWindingUp)
+            {
+                bufferedUntil = Mathf.Max(bufferedUntil, Time.time + BufferSeconds);
+            }
+
             if (Time.time > bufferedUntil || !health.IsAlive)
             {
                 bufferedSlot = -1;
@@ -499,24 +512,11 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             return result;
         }
 
-        PlayerFocus focus = GetComponent<PlayerFocus>();
-        int circles = skill.FocusCircles;
-        if (result == SkillCastResult.Cast && circles > 0 && focus != null && focus.Circles < circles)
+        // Only a skill that may be cast is paid for. (An empty slot came on to here and read the missing skill's cost: every
+        // press of an empty key threw, and the HUD never said the slot was empty: the user's build, 2026-11-25.)
+        if (result == SkillCastResult.Cast)
         {
-            focus.TrySpendCircles(circles); // refused: lets the HUD say so
-            result = SkillCastResult.NoFocus;
-        }
-
-        if (result == SkillCastResult.Cast && skill.StaminaCost > 0f && stamina != null && !stamina.TrySpend(SpellCost(skill)))
-        {
-            result = SkillCastResult.NoStamina;
-        }
-
-        if (result == SkillCastResult.Cast && circles > 0 && focus != null)
-        {
-            // An option that makes it cheaper (Cost under 1) gives that share of what it took back, into the circle filling.
-            float spent = focus.TrySpendCircles(circles);
-            focus.Gain(spent * Mathf.Clamp01(1f - SkillChoices.For(skill).Cost));
+            result = Pay(skill);
         }
 
         if (result != SkillCastResult.Cast)
@@ -528,6 +528,32 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         Perform(skill);
         SkillCast?.Invoke(slot, skill);
         return result;
+    }
+
+    // Focus circles, then stamina; nothing is taken unless both are there.
+    private SkillCastResult Pay(SkillDefinition skill)
+    {
+        PlayerFocus focus = GetComponent<PlayerFocus>();
+        int circles = skill.FocusCircles;
+        if (circles > 0 && focus != null && focus.Circles < circles)
+        {
+            focus.TrySpendCircles(circles); // refused: lets the HUD say so
+            return SkillCastResult.NoFocus;
+        }
+
+        if (skill.StaminaCost > 0f && stamina != null && !stamina.TrySpend(SpellCost(skill)))
+        {
+            return SkillCastResult.NoStamina;
+        }
+
+        if (circles > 0 && focus != null)
+        {
+            // An option that makes it cheaper (Cost under 1) gives that share of what it took back, into the circle filling.
+            float spent = focus.TrySpendCircles(circles);
+            focus.Gain(spent * Mathf.Clamp01(1f - SkillChoices.For(skill).Cost));
+        }
+
+        return SkillCastResult.Cast;
     }
 
     // A consumable on the bar: its key uses one from the bag (or the safe pocket), as the quickbar does. Eating and
@@ -569,6 +595,9 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             || (TryGetComponent(out PlayerEating eating) && eating.IsEating)
             // Rocked back, floored, stunned by a broken guard or locked in a finishing blow: no more a skill than a swing.
             || (combat != null && (combat.IsFlinching || combat.IsFinishing))
+            // A swing's blow still on its way: the skill waits for it (kept, and cast once it lands), it is not cast on top of it with
+            // both blows landing (SkillsImprovementResearch_2026-11-24 fix 2; bug hunt, 2026-11-25).
+            || (combat != null && combat.IsWindingUp)
             || (guard != null && guard.IsStunned)
             || Time.time < busyUntil)
         {
@@ -893,7 +922,6 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     // A dodge is the way out of trouble: like a weapon swing, a skill hit that hadn't landed yet is lost.
     private void OnDodged(Vector3 direction)
     {
-        EndChannel();
         // A dodge readies the next swing with the status of the ability cast last (V Rising's veils).
         StatusEffectDefinition school = lastCast != null && Time.time - lastCastAt <= ReadiedAfterCastSeconds ? SchoolStatusOf(lastCast) : null;
         if (school != null)
@@ -911,22 +939,37 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             }
         }
 
-        pendingCry = null; // a cry cut short never rings out
-        if (pendingHit != null)
-        {
-            SkillAreaMark.Hide();
-        }
-
-        pendingHit = null;
+        CancelCast(dodged: true);
     }
 
-    /// <summary>A blow that rocks the player (and a death) loses a skill hit not yet landed, as a weapon swing's is.</summary>
-    public PlayerInterrupt EndsOn => PlayerInterrupt.Staggered;
+    /// <summary>A blow that rocks the player (and a death) loses a skill hit not yet landed, as a weapon swing's is. A pause or a
+    /// window only lets go of the keys: what was being aimed is not cast, a channel ends (the user's build, 2026-11-25: Esc while
+    /// aiming cast the skill, as the paused keys came up).</summary>
+    public PlayerInterrupt EndsOn => PlayerInterrupt.Staggered | PlayerInterrupt.Paused | PlayerInterrupt.WindowOpened;
 
     public void Interrupt(PlayerInterrupt reason)
     {
-        pendingCry = null; // a cry cut short never rings out
         bufferedSlot = -1;
+        if (reason != PlayerInterrupt.Staggered)
+        {
+            LetGoOfKeys(); // a stagger loses the cast, not the aim: the key is still down, and its release casts as ever
+        }
+
+        if (reason == PlayerInterrupt.Paused || reason == PlayerInterrupt.WindowOpened)
+        {
+            return;
+        }
+
+        CancelCast(dodged: false);
+    }
+
+    // The cast under way is over, all of it: the blow and the cry not yet out are lost, a channel ends, and its moment no longer
+    // keeps swings and skills waiting. A lunge stops where it is (a stagger or a death no longer slides on; a dodge has already
+    // taken the dash over) and is no longer drawn as one. Before this, a dodge out of War Cry left swings queued for the rest of its
+    // 1.35 s cast, and a staggered lunge slid on in its lunge pose (bug hunt, 2026-11-25).
+    private void CancelCast(bool dodged)
+    {
+        pendingCry = null; // a cry cut short never rings out
         EndChannel();
         if (pendingHit != null)
         {
@@ -934,12 +977,34 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         }
 
         pendingHit = null;
+        busyUntil = Mathf.Min(busyUntil, Time.time);
+        if (Time.time < lungeEndsAt)
+        {
+            if (!dodged && movement != null)
+            {
+                movement.EndDash();
+            }
+
+            lungeEndsAt = float.NegativeInfinity;
+        }
     }
 
     private void OnSkillRequested(int slot)
     {
         SetHeld(slot, true);
         TryCast(slot);
+    }
+
+    // Every skill key counts as up: nothing is being aimed (its mark goes), and a channel held by its key ends on the next frame.
+    private void LetGoOfKeys()
+    {
+        if (aimingSlot >= 0)
+        {
+            aimingSlot = -1;
+            SkillAreaMark.Hide();
+        }
+
+        Array.Clear(held, 0, held.Length);
     }
 
     private void SetHeld(int slot, bool down)
@@ -985,7 +1050,8 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         aimingSlot = -1;
         SkillAreaMark.Hide();
         // Aimed, then the hands were taken (a cart's handles, the oars, deep water) or an interaction began: let go without a cast.
-        if (stateMachine == null || stateMachine.CanUseSkills)
+        // So is a release that is the game pausing or the controls being taken (the Player map switched off lets its keys up).
+        if ((stateMachine == null || stateMachine.CanUseSkills) && !GamePause.IsPaused && !PlayerControl.HeldOn(gameObject))
         {
             TryCast(slot);
         }

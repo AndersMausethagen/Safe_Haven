@@ -350,7 +350,7 @@ public sealed class PlayerArchery : MonoBehaviour
 
     private bool CanDraw()
     {
-        return stateMachine.CanMove && (health == null || health.IsAlive) && (dodge == null || !dodge.IsDodging)
+        return stateMachine.CanMove && (health == null || health.IsAlive) && (dodge == null || !dodge.IsDodging) && (movement == null || !movement.IsDashing)
                && (eating == null || !eating.IsEating) && (gathering == null || gathering.Session == null)
                && (combat == null || !combat.IsFlinching) && (guard == null || !guard.IsStunned);
     }

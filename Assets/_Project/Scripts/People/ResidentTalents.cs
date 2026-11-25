@@ -433,15 +433,18 @@ public static class ResidentTalents
     // ----- Passions the player helps grow (§3.2: at bond ranks Trusted and Sworn) -----
 
     /// <summary>A bond rank (<paramref name="rank"/>) reached: one more passion pick is owed them, once a rank (found again and
-    /// rising through it a second time pays nothing more).</summary>
-    public static void OwePick(ResidentRecord record, string rank)
+    /// rising through it a second time pays nothing more). True when one was owed now.</summary>
+    public static bool OwePick(ResidentRecord record, string rank)
     {
         string key = "pick:" + rank;
         if (record != null && PeopleSettings.Current.PicksAtBondRanks && record.DeedOf(key) == 0)
         {
             record.AddDeed(key, 1);
             record.Talents.SetPicksOwed(record.Talents.PicksOwed + 1);
+            return true;
         }
+
+        return false;
     }
 
     /// <summary>

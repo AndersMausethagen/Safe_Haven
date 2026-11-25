@@ -240,16 +240,23 @@ public static class CraftedWork
         int given = 0;
         for (int i = 0; i < amount; i++)
         {
-            ItemStack piece = Make(item, maker, stationChance, stationHelped);
-            piece = finish != null ? finish(piece) : piece;
+            ItemStack own = Make(item, maker, stationChance, stationHelped);
+            ItemStack piece = finish != null ? finish(own) : own;
             if (bag.GiveMade(piece, ArrivalCause.Crafted) <= 0)
             {
                 break;
             }
 
             given++;
-            Made?.Invoke(item, 1, piece.Quality, piece.DisplayName);
-            if (piece.Quality != ItemQuality.Plain)
+            // A worker's finer hand (ResidentTalents.Lift) is theirs, signed with their name: told as their work, and the player's own
+            // tally of fine work (ExperienceTracker) counts what the player's hands made, not the worker's (bug hunt, 2026-11-25).
+            bool theirs = piece.Quality > own.Quality;
+            Made?.Invoke(item, 1, own.Quality, piece.DisplayName);
+            if (theirs)
+            {
+                GameMessages.Post($"{piece.Maker}'s fine work: a {piece.DisplayName}!", MessageKind.Gain);
+            }
+            else if (piece.Quality != ItemQuality.Plain)
             {
                 GameMessages.Post($"You made a {piece.DisplayName}!", MessageKind.Gain);
             }

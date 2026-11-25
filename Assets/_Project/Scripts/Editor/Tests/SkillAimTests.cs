@@ -37,6 +37,45 @@ public sealed class SkillAimTests
         Assert.Greater(Mathf.Abs(facing.Value.normalized.y), 0.99f, "the ring's quad faces up or down, not along the ground: " + facing.Value);
     }
 
+    // The user's build, 2026-11-25: keys 2 and 6 pressed with nothing on them threw in TryCast (it read the missing skill's
+    // cost) and the bar never said the slot was empty. Both ways a key casts (held to aim, and straight away) are pressed.
+    [TestCase(true)]
+    [TestCase(false)]
+    public void AnEmptySlotsKey_IsRefusedAsEmpty(bool aimFirst)
+    {
+        var player = new GameObject("Empty Bar Player");
+        try
+        {
+            var state = player.AddComponent<PlayerStateMachine>();
+            var skills = player.AddComponent<PlayerSkills>();
+            Call(skills, "Awake");
+            Call(skills, "OnEnable");
+            var refusals = new System.Collections.Generic.List<SkillCastResult>();
+            skills.CastRefused += (slot, result) => refusals.Add(result);
+            const int empty = 5;
+            Assert.IsNull(skills.Loadout.Get(empty), "the slot starts empty");
+
+            if (aimFirst)
+            {
+                state.AimSkill(empty);
+            }
+            else
+            {
+                state.RequestSkill(empty);
+            }
+
+            CollectionAssert.AreEqual(new[] { SkillCastResult.EmptySlot }, refusals, "refused once, as empty");
+            Call(skills, "OnDisable");
+        }
+        finally
+        {
+            Object.DestroyImmediate(player);
+        }
+    }
+
+    private static void Call(object target, string method) =>
+        target.GetType().GetMethod(method, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)?.Invoke(target, null);
+
     // The user, 2026-11-25: "shorter jumps and lunge if the player wants it, but not longer than maximum".
     [Test]
     public void ALungeGoesAsFarAsAimed_NeverPastItsOwnDistance()

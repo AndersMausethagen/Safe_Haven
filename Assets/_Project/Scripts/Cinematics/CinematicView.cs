@@ -10,7 +10,7 @@ using UnityEngine.UI;
 /// brain glides into it and back out), black bars, the HUD faded away, the player held and safe, and a hold-to-skip hint.
 /// Made when a cinematic begins and gone after it has glided back to the game's camera; it puts back everything it took.
 /// </summary>
-public sealed class CinematicView : MonoBehaviour
+public sealed class CinematicView : MonoBehaviour, LeaseWatch.ILastingHold // holds the player as long as the cinematic plays (the forest's runs past 20 s)
 {
     private const float BarShare = 0.11f;
     private const float FadeSeconds = 0.6f;

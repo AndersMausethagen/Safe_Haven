@@ -557,6 +557,24 @@ public sealed class PeopleTests
         Assert.AreEqual(2, tor.Talents.PicksOwed);
     }
 
+    // Bug hunt, 2026-11-25: a pick was owed only on crossing into a rank, so a companion loaded at 3 raids from a save before picks
+    // was Trusted for good and never owed Trusted's pick; a bond that jumped two ranks owed only the higher one.
+    [Test]
+    public void EveryBondRankHeld_OwesItsPickOnce_HoweverItWasReached()
+    {
+        IReadOnlyList<CompanionBondRank> ranks = SettlementSettings.Current.BondRanks;
+        Assert.Greater(ranks.Count, 1, "the test needs two ranks to jump");
+        ResidentRecord tor = Home("Tor").Find(Person("Tor"));
+        tor.Bond = ranks.Max(rank => rank.raids); // as an old save loads it: every rank held, none crossed
+        Assert.AreEqual(ranks.Count, PeopleBond.OweReachedRanks(tor));
+        Assert.AreEqual(ranks.Count, tor.Talents.PicksOwed, "one for each rank held");
+        Assert.AreEqual(0, PeopleBond.OweReachedRanks(tor), "loaded again: nothing more");
+
+        ResidentRecord yrsa = Home("Yrsa").Find(Person("Yrsa"));
+        Assert.IsTrue(PeopleBond.Grow(yrsa, ranks.Max(rank => rank.raids), "one great deed"));
+        Assert.AreEqual(ranks.Count, yrsa.Talents.PicksOwed, "a jump past two ranks owes both");
+    }
+
     [Test]
     public void AnOldSavesRank_IsNeverSlowerThanItWas()
     {

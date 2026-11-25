@@ -33,7 +33,7 @@ public sealed class LeaseWatch
         switch (kind)
         {
             case Kind.Invulnerable:
-                return 20f; // dodges, hops and finishing blows last a second or two; a cinematic's hold pauses the game
+                return 20f; // dodges, hops and finishing blows last a second or two (a cinematic's hold lasts as the cinematic does)
             case Kind.SpeedChanged:
                 return 180f; // a swing, crafting by hand (a weapon takes 20 s), a status
             default:
@@ -50,7 +50,7 @@ public sealed class LeaseWatch
     /// <summary>What Judge and Look have found since the last look (LeaseWatchTests read it here, not through reflection).</summary>
     public IReadOnlyList<string> Found => found;
 
-    /// <summary>The leaks found since the last look, each told once. <paramref name="now"/> is unscaled time.</summary>
+    /// <summary>The leaks found since the last look, each told once. <paramref name="now"/> is game time (Time.time), which a pause stops.</summary>
     public IReadOnlyList<string> Look(float now)
     {
         found.Clear();

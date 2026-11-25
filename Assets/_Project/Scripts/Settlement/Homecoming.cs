@@ -21,6 +21,23 @@ public static class Homecoming
     private static RaidOutcome outcome = RaidOutcome.InProgress;
     private static int homecomings;
     private static readonly HashSet<ResidentDefinition> RaidTold = new HashSet<ResidentDefinition>();
+    // Who was out on a party or at an outpost this raid, as the territory's turn settled them (Territory.Turn, NoteOut). Asked once home,
+    // the raid was gone and an outpost's keeper or a party's leader counted as at home, and handed over a "while you were away" gift
+    // as well as their haul (bug hunt, 2026-11-25). Those on a foray are still away when home is told (ResidentsOut sees them).
+    private static readonly HashSet<ResidentDefinition> WereOut = new HashSet<ResidentDefinition>();
+
+    /// <summary>The territory's turn at a raid's end: who was out of the Haven on this raid, taken before the turn changed the lands.</summary>
+    public static void NoteOut(IEnumerable<ResidentRecord> records)
+    {
+        WereOut.Clear();
+        foreach (ResidentRecord record in records)
+        {
+            if (record != null && record.Resident != null)
+            {
+                WereOut.Add(record.Resident);
+            }
+        }
+    }
 
     /// <summary>Raids come home from since the game was loaded (a fresh pick of words each time).</summary>
     public static int Homecomings => homecomings;
@@ -54,6 +71,7 @@ public static class Homecoming
         outcome = RaidOutcome.InProgress;
         homecomings = 0;
         RaidTold.Clear();
+        WereOut.Clear();
     }
 
     private static void OnRaised(GameEvent gameEvent)
@@ -74,6 +92,9 @@ public static class Homecoming
     /// False when nothing was shown (the caller tells the workers' line itself).</summary>
     public static bool Tell()
     {
+        // This homecoming's, read once: never a later raid's.
+        var wereOut = new List<ResidentDefinition>(WereOut);
+        WereOut.Clear();
         if (!Pending)
         {
             return false;
@@ -102,7 +123,7 @@ public static class Homecoming
         HomecomingSettings gifts = HomecomingSettings.Current;
         string gift = gifts != null && awaySeconds >= gifts.MinAwaySeconds
             ? AwayGifts.Draw(gifts, GameSession.Home, GameSession.Stash, UnityEngine.Random.value, UnityEngine.Random.value, along,
-                RaidPacingSettings.Current.TimeAwayShare(awaySeconds))
+                RaidPacingSettings.Current.TimeAwayShare(awaySeconds), wereOut)
             : null;
         if (gift != null)
         {

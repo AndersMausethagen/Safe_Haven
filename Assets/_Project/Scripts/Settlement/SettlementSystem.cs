@@ -95,7 +95,7 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
         workerSeconds += Time.deltaTime;
         // Away from home, the Carpenter and Mason get on with the scaffolds left standing there (ResidentBuilders): those at
         // home, not one who went along on the raid.
-        if (HomePortal.Current == null && settlement.ScaffoldsWaiting)
+        if (HomePortal.Current == null && settlement.ScaffoldsWantHands)
         {
             ResidentBuilders.WorkAway(settlement, Time.deltaTime, GameSession.ActiveRaid?.Companion);
         }
@@ -137,7 +137,10 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
     private void NoteParties(SettlementState settlement, bool atHome, ResidentDefinition along)
     {
         HashSet<string> absent = settlement.Workshops.PartyAbsentAt;
-        if (!ResidentsOut.Any(settlement))
+        // Away, a builder with a scaffold waiting is at the scaffold (ResidentBuilders.WorkAway), not at their bench: at home they go to
+        // it first and their station waits (ResidentLife), away the Carpenter built and made planks at once (bug hunt, 2026-11-25).
+        bool building = !atHome && settlement.ScaffoldsWantHands;
+        if (!ResidentsOut.Any(settlement) && !building)
         {
             absent.Clear();
             return;
@@ -152,7 +155,7 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
         absent.Clear();
         foreach (ResidentRecord record in settlement.Residents)
         {
-            if (ResidentsOut.Now(settlement, record, along))
+            if (ResidentsOut.Now(settlement, record, along) || (building && ResidentBuilders.Builds(record, along)))
             {
                 string station = WorkerProduction.QueueOf(settlement, record)?.StationId;
                 if (station != null)
@@ -171,7 +174,9 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
         {
             station.WorkerCrafts--;
             WorkerLearned(station, recipe);
-            if (recipe.OutputDefinition is IStackDefinition made)
+            // Noted only while the player is away: the homecoming says "while you were gone your people made…", and work done
+            // while they were home counted in it too (bug hunt, 2026-11-25).
+            if (recipe.OutputDefinition is IStackDefinition made && GameSession.Home.Workshops.AwayFromHome)
             {
                 GameSession.Home.NoteMadeByWorker(made, recipe.OutputAmount);
             }
