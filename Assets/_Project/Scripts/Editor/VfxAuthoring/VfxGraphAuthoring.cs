@@ -2,6 +2,7 @@ using System.Linq;
 using System.Text;
 using UnityEditor;
 using UnityEditor.VFX;
+using UnityEngine;
 using UnityEngine.VFX;
 
 /// <summary>
@@ -12,6 +13,30 @@ using UnityEngine.VFX;
 /// </summary>
 public static class VfxGraphAuthoring
 {
+    /// <summary>The first block input of that name holding a direction, as a vector (for tests: the graph's types are internal). Null when none.</summary>
+    public static Vector3? DirectionInput(string path, string slotName)
+    {
+        VisualEffectResource resource = VisualEffectResource.GetResourceAtPath(path);
+        VFXGraph graph = resource?.GetGraph();
+        if (graph == null)
+        {
+            return null;
+        }
+
+        foreach (VFXBlock block in graph.children.OfType<VFXContext>().SelectMany(context => context.children))
+        {
+            foreach (VFXSlot slot in block.inputSlots)
+            {
+                if (slot.name == slotName && slot.value is DirectionType direction)
+                {
+                    return direction.direction;
+                }
+            }
+        }
+
+        return null;
+    }
+
     /// <summary>A graph's contexts, their blocks, and each one's settable inputs, for finding what to edit.</summary>
     public static string Describe(string path)
     {

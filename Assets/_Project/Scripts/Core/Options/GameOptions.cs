@@ -31,9 +31,10 @@ public static class GameOptions
         "Drink from your waterskin by yourself when thirst falls below 80%.", true);
 
     /// <summary>Hold a skill's key to see where it lands, let go to cast (Docs/SkillsImprovementResearch_2026-11-24.md 7: League's
-    /// quick cast with indicator). Off, the way it always was: it casts as the key goes down.</summary>
+    /// quick cast with indicator). On by default (the user, 2026-11-25: "allow us to hold and aim"); only skills that go somewhere wait
+    /// (SkillDefinition.IsAimed). Off: everything casts as the key goes down.</summary>
     public static readonly GameOption AimSkillsFirst = GameOption.Toggle("AimSkillsFirst", "Aim Skills First",
-        "Hold a skill's key to see where it will land, and let go to cast it. Off: it casts as the key is pressed.", false);
+        "Hold a skill's key to see where it will land, and let go to cast it. Skills around you still cast at once. Off: every skill casts as the key is pressed.", true);
 
     public static readonly IReadOnlyList<GameOption> Gameplay = new[] { DamageNumbers, AutoGather, AutoDrink, ToggleSneak, FocusTarget, PoiseBars, Blood, MinimapDistance, Hud, AimSkillsFirst };
 

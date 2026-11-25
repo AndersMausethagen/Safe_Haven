@@ -132,7 +132,17 @@ internal sealed class VfxBuilder
     }
 
     /// <summary>Sets an input's value.</summary>
-    public static void Set(VFXModel model, string slot, object value) => Slot(model, slot).value = value;
+    /// <summary>Sets an input slot's value. Throws when the slot ignored it (a Vector3 given to a DirectionType slot is dropped silently).</summary>
+    public static void Set(VFXModel model, string slot, object value)
+    {
+        VFXSlot target = Slot(model, slot);
+        target.value = value;
+        // Value types only: a slot keeps its own copy of a curve or gradient.
+        if (value is ValueType && !Equals(target.value, value))
+        {
+            throw new ArgumentException($"{model.GetType().Name}.{slot} kept {target.value} instead of {value}: give it a {target.property.type.Name}");
+        }
+    }
 
     /// <summary>Exposes a named parameter of <paramref name="value"/>'s type, linked to these inputs, so a VisualEffect can override it.</summary>
     public VFXParameter Expose(string name, object value, params VFXSlot[] targets)

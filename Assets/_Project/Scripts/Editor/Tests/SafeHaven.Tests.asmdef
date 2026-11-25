@@ -6,6 +6,7 @@
         "Unity.Splines",
         "SafeHaven",
         "SafeHaven.Editor",
+        "Unity.Testing.VisualEffectGraph.Editor",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "Unity.TextMeshPro",

@@ -129,9 +129,12 @@ public static class SkillVfxArchetypes
         b.Expose("Texture", Tex(Textures + "/Ring.png"), VfxBuilder.Slot(output, "mainTexture"));
         b.Expose("Size Over Life", new AnimationCurve(new Keyframe(0f, 0.2f, 0f, 3f), new Keyframe(1f, 1f)), VfxBuilder.Slot(sizeOverLife, "Size"));
         b.Expose("Fade", FadeInOut(0.08f, 0.45f), VfxBuilder.Slot(colourOverLife, "Color"));
-        // Flat on the ground: facing up, its top along the world's forward.
-        VfxBuilder.Set(orient, "AxisZ", new Vector3(0f, -1f, 0f));
-        VfxBuilder.Set(orient, "AxisY", new Vector3(0f, 0f, 1f));
+        // Flat on the ground, its top along the effect's forward (the aim). The axes are DirectionType slots: a bare Vector3 was dropped
+        // silently and left the quad standing upright (the user, 2026-11-25: "from above we mostly see a flat line"). Drawn from both
+        // sides, so which way the normal points can't hide it from the top-down camera.
+        VfxBuilder.Set(orient, "AxisZ", new DirectionType { direction = new Vector3(0f, -1f, 0f) });
+        VfxBuilder.Set(orient, "AxisY", new DirectionType { direction = new Vector3(0f, 0f, 1f) });
+        VfxBuilder.SetEnum(output, "cullMode", "Off");
         b.Save();
         return VfxGraphAuthoring.Describe(path);
     }

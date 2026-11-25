@@ -216,22 +216,46 @@ public sealed class SkillFx : MonoBehaviour
         return points;
     }
 
-    /// <summary>The ground under <paramref name="point"/>: what a downward ray meets, else the terrain.</summary>
+    // A flat mark sits this far above the ground so the terrain doesn't swallow it.
+    private const float GroundLift = 0.06f;
+    private static readonly RaycastHit[] GroundHits = new RaycastHit[16];
+
+    /// <summary>
+    /// The ground under <paramref name="point"/>: the nearest thing a downward ray meets that isn't a body (the caster, a creature, anything
+    /// that can be struck), else the terrain; lifted a little for flat marks. It used to stop on the caster's own capsule, so every mark
+    /// cast "on the ground" floated at head height (2026-11-25).
+    /// </summary>
     public static Vector3 Grounded(Vector3 point)
     {
-        if (Physics.Raycast(point + Vector3.up * 3f, Vector3.down, out RaycastHit hit, 8f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+        int count = Physics.RaycastNonAlloc(point + Vector3.up * 3f, Vector3.down, GroundHits, 8f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+        float nearest = float.MaxValue;
+        bool found = false;
+        for (int i = 0; i < count; i++)
         {
-            return hit.point;
+            RaycastHit hit = GroundHits[i];
+            if (hit.distance < nearest && !IsBody(hit.collider))
+            {
+                nearest = hit.distance;
+                point = hit.point;
+                found = true;
+            }
         }
 
         Terrain terrain = Terrain.activeTerrain;
-        if (terrain != null)
+        if (!found && terrain != null)
         {
             point.y = terrain.SampleHeight(point) + terrain.transform.position.y;
         }
 
+        point.y += GroundLift;
         return point;
     }
+
+    // Something that walks: the player, a creature, a horse, a resident (all on CharacterControllers or NavMeshAgents), or loose debris.
+    // Not every Damageable: buildings have health too, and a dock or a cottage floor is ground.
+    private static bool IsBody(Collider collider) =>
+        collider is CharacterController || collider.attachedRigidbody != null || collider.GetComponentInParent<Player>() != null
+        || collider.GetComponentInParent<UnityEngine.AI.NavMeshAgent>() != null;
 
     private static IEnumerator SoundLater(SoundDefinition sound, Vector3 at, float delay)
     {

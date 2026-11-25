@@ -127,4 +127,12 @@ public sealed class SkillDefinition : ScriptableObject
     public SkillLook Look => look;
     public WeaponArtSlot WeaponArt => weaponArt;
     public bool HasBuffs => buffs.Count > 0 && buffDuration > 0f;
+
+    /// <summary>
+    /// Held to aim, cast on release (GameOptions.AimSkillsFirst): anything with a blow that goes somewhere, a cone, a lunge, a leap or a
+    /// throw. Not a ring round the caster that goes nowhere (Whirling Steel, Trollsbane's Wrath), nothing without a blow (a blessing, a war
+    /// cry), not the weapon's art, and not a channel, which is held to keep going and follows the aim as it strikes.
+    /// </summary>
+    public bool IsAimed => attack != null && weaponArt == WeaponArtSlot.None && channelSeconds <= 0f
+        && (attack.Arc < 360f || lungeDistance > 0f || Throws);
 }

@@ -944,9 +944,8 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     {
         SetHeld(slot, true);
         SkillDefinition skill = loadout.Get(slot);
-        // Nothing to aim (a blessing, a war cry, an item, the weapon's art), or a channel (held to keep going, it follows the aim as it
-        // strikes): cast on the press, as before.
-        if (skill == null || skill.Attack == null || skill.WeaponArt != WeaponArtSlot.None || skill.ChannelSeconds > 0f)
+        // Nothing to aim (a blessing, a war cry, a ring round the player, an item, the weapon's art), or a channel: cast on the press.
+        if (skill == null || !skill.IsAimed)
         {
             TryCast(slot);
             return;
@@ -999,7 +998,15 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
         bool refused = CheckCast(skill) == SkillCastResult.CoolingDown || (aimFocus != null && aimFocus.Circles < skill.FocusCircles);
         Color colour = refused ? new Color(0.55f, 0.55f, 0.55f, 0.6f) : SkillSchools.ColorOf(skill.School);
-        SkillAreaMark.Show(lands, aim, skill.Attack.Range, skill.Attack.Arc, colour, 10f);
+        // A throw is marked along its flight, out to where it can reach, as wide as its volley spreads; a blow by its own reach and arc.
+        if (skill.Throws)
+        {
+            SkillAreaMark.Show(transform.position, aim, skill.Attack.CastRange, Mathf.Max(8f, skill.Attack.CastSpread * 2f), colour, 10f);
+        }
+        else
+        {
+            SkillAreaMark.Show(lands, aim, skill.Attack.Range, skill.Attack.Arc, colour, 10f);
+        }
     }
 
     private void EnsureInitialised()
