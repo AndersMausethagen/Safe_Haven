@@ -74,7 +74,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 256
+    maxTextureSize: 512
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
@@ -139,6 +139,6 @@ TextureImporter:
     nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
-  userData: painted:db23b5659a8e608b662a118df6dfccaa
+  userData: painted:b5b29ccba8670bb3a0f7c0f815a17b83
   assetBundleName: 
   assetBundleVariant: 

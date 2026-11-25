@@ -5,9 +5,10 @@ What each icon shows is in item_icons.json (item id -> the object). Every icon i
 with the same margin, so icons of every kind sit alike in an inventory slot. Each item gets its own file: several used
 to share one (five meals shared the stew).
 
-  test  [model [id ...]]  A few icons (or those listed) with the model named (default: z-image and qwen-image), to compare
+  test  [model [id ...]]  A few icons (or those listed) with the model named (default: chroma), to compare
                       -> Tools/LocalSpawn/ItemIcons/_test/<model>/<id>.png
-  all   --model NAME  Every item in item_icons.json that has no icon yet -> Tools/LocalSpawn/ItemIcons/<id>.png
+  all   [--model NAME]  Every item in item_icons.json that has no icon yet -> Tools/LocalSpawn/ItemIcons/<id>.png
+                      (default model chroma: the user's pick for game icons, 2026-11-25)
                       (--force paints them again; item ids are listed to paint only those)
   --set NAME          Another kind of icon (default items), each with its own list and folder (SETS below):
                       buildings, skills (combat skills), proficiencies (the 13 skills), perks, resources, conditions, boons,
@@ -52,6 +53,12 @@ ICONS = os.path.join(HERE, SETS[SET][1])
 TEST = os.path.join(ICONS, "_test")
 STYLE = "Safe Haven - Item icon"
 SIZE = 512  # LocalSpawn's "Icon 512x512"
+# Chroma1-HD: the user's pick for game icons after the 2026-11-25 skill icon comparison ("the painted style really fits").
+DEFAULT_MODEL = "chroma"
+# Sets painted whole in their own style, not cut out (the user, 2026-11-25: skill icons "should not have transparent background"):
+# set -> LocalSpawn style. Painted at the model's own square size and scaled down to SIZE.
+OWN_STYLE = {"skills": "Skill Icon dark"}
+NATIVE = {"qwen-image": 1328}
 # Of the frame, how much the object may fill at most (its longer side), so icons of every shape sit alike.
 FILL = 0.86
 TEST_ITEMS = ("copper_ingot", "ironmailhelm", "huntersstew", "wisppendant", "iron_sword", "berries")
@@ -80,6 +87,8 @@ def fit(path, target):
 
 
 def paint(item_id, prompt, model, target):
+    if SET in OWN_STYLE:
+        return paint_whole(item_id, prompt, model, target)
     scratch = os.path.join(ICONS, "_new")
     shutil.rmtree(scratch, ignore_errors=True)
     os.makedirs(scratch, exist_ok=True)
@@ -102,6 +111,29 @@ def paint(item_id, prompt, model, target):
     return time.monotonic() - started
 
 
+def paint_whole(item_id, prompt, model, target):
+    """An opaque icon in its set's own style, background and all, scaled down from the model's own size."""
+    scratch = os.path.join(ICONS, "_new")
+    shutil.rmtree(scratch, ignore_errors=True)
+    os.makedirs(scratch, exist_ok=True)
+    prompt_file = os.path.join(scratch, "prompt.txt")
+    with open(prompt_file, "w", encoding="utf-8") as stream:
+        stream.write(prompt)
+    started = time.monotonic()
+    size = NATIVE.get(model, 1024)
+    result = subprocess.run([PYTHON, "generate_image.py", "--prompt-file", prompt_file, "--style", OWN_STYLE[SET], "--model", model,
+                             "--width", str(size), "--height", str(size), "--seed", str(seed_of(item_id)),
+                             "--name", file_name(item_id)[:-4], "--out-dir", scratch, "--keep-loaded", "--timeout", "900"],
+                            cwd=AGENT, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=1800)
+    made = [f for f in os.listdir(scratch) if f.endswith(".png")]
+    if not made:
+        raise RuntimeError(f"{item_id}: no icon came back (exit {result.returncode}).\n{(result.stdout + result.stderr)[-1500:]}")
+    os.makedirs(os.path.dirname(target), exist_ok=True)
+    Image.open(os.path.join(scratch, made[0])).convert("RGBA").resize((SIZE, SIZE), Image.LANCZOS).save(target)
+    shutil.rmtree(scratch, ignore_errors=True)
+    return time.monotonic() - started
+
+
 def stop():
     subprocess.run([PYTHON, "generate_image.py", "--stop"], cwd=AGENT, capture_output=True, timeout=180)
 
@@ -113,12 +145,12 @@ def main():
     wanted = {k: v for k, v in json.load(open(WANTED, encoding="utf-8")).items() if not k.startswith("_")}
     try:
         if step == "test":
-            for model in args[1:2] or ["z-image", "qwen-image"]:
+            for model in args[1:2] or [DEFAULT_MODEL]:
                 for item_id in [i for i in args[2:] if i in wanted] or (TEST_ITEMS if SET == "items" else list(wanted)[:6]):
                     took = paint(item_id, wanted[item_id], model, os.path.join(TEST, model, file_name(item_id)))
                     print(f"{model:11s} {item_id:16s} {took:5.1f} s", flush=True)
         elif step == "all":
-            model = sys.argv[sys.argv.index("--model") + 1] if "--model" in sys.argv else "z-image"
+            model = sys.argv[sys.argv.index("--model") + 1] if "--model" in sys.argv else DEFAULT_MODEL
             chosen = [i for i in args[1:] if i in wanted] or list(wanted)
             done = 0
             for item_id in chosen:
