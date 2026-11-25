@@ -23,8 +23,8 @@ MonoBehaviour:
   range: 6
   arc: 25
   maxTargets: 4
-  hitDelay: 0.4
-  recoveryTime: 0.5
+  hitDelay: 0.48
+  recoveryTime: 0.6
   poiseDamage: 10
   impact: 1
   lunge: 0

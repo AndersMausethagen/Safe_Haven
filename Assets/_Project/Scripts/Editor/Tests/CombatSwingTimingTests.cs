@@ -3,12 +3,39 @@ using NUnit.Framework;
 
 /// <summary>
 /// Every player swing reads as a committed blow (CombatSwingTiming; the user, 2026-11-15: "like the character holds back while
-/// swinging"): its clip's swing plays at least at the clip's own speed, the blow lands on the clip's contact rather than after the weapon
-/// has passed, and the follow-through keeps the clip's momentum. The slowing that makes a blow readable stays in the anticipation.
-/// Measured on the player's rig, so a new attack or clip is held to it too.
+/// swinging"): the blow lands on the clip's contact rather than after the weapon has passed, and since 2026-11-25 every phase plays at the
+/// clip's own pace (CombatClipPace: the timing follows the clip, not damage per second). Measured on the player's rig, so a new attack or
+/// clip is held to it too.
 /// </summary>
 public sealed class CombatSwingTimingTests
 {
+    // The user, 2026-11-25: smooth, responsive animation over holding damage per second; the clips from the packs feel smoothest at their
+    // own speed. So no player attack or skill stretches its clip: the timing follows the clip (CombatClipPace), damage is tuned after.
+    [Test]
+    public void EveryPlayerAttackAndSkill_PlaysItsClipAtItsOwnPace()
+    {
+        var problems = new List<string>();
+        var attacks = CombatClipPace.PlayerAttacks();
+        Assert.Greater(attacks.Count, 60, "the player's attacks were found");
+        foreach (AttackDefinition attack in attacks)
+        {
+            if (!CombatClipPace.AtClipPace(attack))
+            {
+                problems.Add($"{attack.name}: {attack.AnimationSpeed:0.00}/{attack.StrikeSpeed:0.00}/{attack.FollowThroughSpeed:0.00}x");
+            }
+        }
+
+        foreach (SkillDefinition skill in CombatClipPace.Skills())
+        {
+            if (UnityEngine.Mathf.Abs(skill.AnimationSpeed - 1f) > 0.001f)
+            {
+                problems.Add($"{skill.name}: {skill.AnimationSpeed:0.00}x");
+            }
+        }
+
+        Assert.IsEmpty(problems, "run Safe Haven › Tools › Combat › Play Swings At Their Clips' Pace\n" + string.Join("\n", problems));
+    }
+
     [Test]
     public void EverySwing_StrikesAtItsContact_AtFullSpeed_AndFollowsThroughWithItsMomentum()
     {

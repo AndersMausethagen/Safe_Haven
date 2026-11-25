@@ -23,8 +23,8 @@ MonoBehaviour:
   range: 2.4
   arc: 120
   maxTargets: 5
-  hitDelay: 0.45
-  recoveryTime: 1
+  hitDelay: 0.283
+  recoveryTime: 0.998
   poiseDamage: 45
   impact: 1.35
   lunge: 0.8
@@ -106,10 +106,10 @@ MonoBehaviour:
   castRange: 16
   castHazard: {fileID: 0}
   animationState: Sword Counter
-  animationSpeed: 0.5217392
-  strikeSpeed: 1.25
-  strikeLead: 0.06666668
-  followThroughSpeed: 1.3
+  animationSpeed: 1
+  strikeSpeed: 1
+  strikeLead: 0.083
+  followThroughSpeed: 1
   growsFromLight: 1
   blendIn: 0
   blendInFromReady: 0.13

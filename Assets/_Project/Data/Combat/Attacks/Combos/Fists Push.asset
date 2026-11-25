@@ -23,8 +23,8 @@ MonoBehaviour:
   range: 1.8
   arc: 90
   maxTargets: 1
-  hitDelay: 0.3
-  recoveryTime: 0.6
+  hitDelay: 0.283
+  recoveryTime: 0.823
   poiseDamage: 25
   impact: 0.85
   lunge: 0.3
@@ -32,14 +32,34 @@ MonoBehaviour:
   staminaCost: -1
   appliesStatus: {fileID: 0}
   statusChance: 1
+  onRepeatStatus: {fileID: 0}
+  look:
+    showArea: 0
+    cast: []
+    release: []
+    struck: []
+    light: {r: 0, g: 0, b: 0, a: 0}
+    lightIntensity: 6
+    lightRange: 8
+    lightSeconds: 0.35
+    shake: 0
+    hitStop: 0
+    kick: 0
+    castSound: {fileID: 0}
+    releaseSound: {fileID: 0}
+    releaseSoundDelay: 0
   groundImpact: {fileID: 0}
   unblockable: 0
   pull: -1.6
+  lassoSeconds: 0
   windupMove: 0.6
   afterContactMove: 0.6
   windupTurnRate: -1
   moveAt: -1
   lungeShare: -1
+  ownCancels: 0
+  windupCancels: 1
+  recoveryCancels: 3
   motion: 0
   motionDistance: 3.5
   alwaysCritical: 0
@@ -51,13 +71,16 @@ MonoBehaviour:
   castRange: 16
   castHazard: {fileID: 0}
   animationState: KI Front Kick
-  animationSpeed: 0.7424243
-  strikeSpeed: 1.5
-  strikeLead: 0.08
-  followThroughSpeed: 1.8
+  animationSpeed: 1
+  strikeSpeed: 1
+  strikeLead: 0.12
+  followThroughSpeed: 1
   growsFromLight: 1
   blendIn: 0
   blendInFromReady: 0.1
+  fromGuardStart: 0
+  blendInFromGuard: 0
+  fromHeavyStart: 0
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.8, b: 0.45, a: 0}

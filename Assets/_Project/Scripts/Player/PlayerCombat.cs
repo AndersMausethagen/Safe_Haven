@@ -144,6 +144,8 @@ public sealed partial class PlayerCombat : MonoBehaviour
     private AttackDefinition activeAttack;
     private float activeWeaponDamage;
     private float activeStartTime;
+    // The moment the swing really began (its clock, activeStartTime, may start earlier: a head start into its wind-up).
+    private float activeBeganAt;
     private float activeSpeed = 1f;
     private bool hitPending;
     private Vector3 activeDirection;
@@ -278,6 +280,19 @@ public sealed partial class PlayerCombat : MonoBehaviour
     /// heavy one's animation takes up from there instead of starting over (PlayerAnimationController). 0 otherwise.
     /// </summary>
     public float HeavyGrownFrom { get; private set; }
+
+    /// <summary>
+    /// Asked as a swing begins, before its clock starts (PlayerAnimationController): the share of its wind-up its clip picks up from
+    /// because the pose before it is already that far in (out of the guard, a heavy chain), 0-0.8. Null or 0: from its first frame.
+    /// </summary>
+    public Func<SwingKind, AttackDefinition, float> WindupTakenUp;
+
+    /// <summary>
+    /// The share of the swing's wind-up it began past (a heavy grown from the light, out of the guard, a heavy chain): its clock starts
+    /// that far in, so the blow comes that much sooner and the clip plays on at its own pace (the user, 2026-11-25: no slowed
+    /// wind-ups to hold the timing). 0 for a swing from its first frame and for a charged release (ChargedFromHold has its own).
+    /// </summary>
+    public float WindupTaken { get; private set; }
 
     /// <summary>
     /// While a full charge hands over to the weapon's charged attack: the hold was its wind-up, so it goes straight into the strike

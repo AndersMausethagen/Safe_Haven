@@ -77,6 +77,19 @@ public sealed class PlayerConditionsView : MonoBehaviour
                     Line(icons.ForBoon(boon.Id), boon.Name, boon.SecondsLeft, BoonColor);
                 }
             }
+
+            // A skill's buff (a war cry, a blessing) for as long as it lasts, with the skill's own icon (the user, 2026-11-25).
+            if (player.Skills != null)
+            {
+                foreach (KeyValuePair<SkillDefinition, float> buff in player.Skills.ActiveBuffs)
+                {
+                    float left = buff.Value - Time.time;
+                    if (left > 0f)
+                    {
+                        Line(buff.Key.Icon, buff.Key.DisplayName, left, BoonColor);
+                    }
+                }
+            }
         }
 
         for (int i = used; i < rows.Count; i++)

@@ -23,8 +23,8 @@ MonoBehaviour:
   range: 2.6
   arc: 150
   maxTargets: 3
-  hitDelay: 0.45
-  recoveryTime: 1
+  hitDelay: 0.367
+  recoveryTime: 1.082
   poiseDamage: 45
   impact: 1.5
   lunge: 0.8
@@ -85,10 +85,10 @@ MonoBehaviour:
   castRange: 16
   castHazard: {fileID: 0}
   animationState: Throw
-  animationSpeed: 0.7723579
-  strikeSpeed: 1.25
-  strikeLead: 0.04000006
-  followThroughSpeed: 1.3
+  animationSpeed: 1
+  strikeSpeed: 1
+  strikeLead: 0.05
+  followThroughSpeed: 1
   growsFromLight: 1
   blendIn: 0
   blendInFromReady: 0.13

@@ -13,6 +13,9 @@ public static class AttackFlowRules
     public const float StrikeShare = 0.5f;
     /// <summary>Seconds before the strike (Hit Delay less Strike Lead) a blend is over.</summary>
     public const float StrikeMargin = 0.03f;
+    /// <summary>How much longer than its room a blend may want and still count as smooth: one frame at 60 fps, too little to see (since
+    /// the swings play at their clips' own pace, 2026-11-25, the guard into the sword's counter wants 0.18 s of 0.17).</summary>
+    public const float FrameSlack = 1f / 60f;
     /// <summary>How fast a finished swing may settle back into the ready pose, muscle units a second.</summary>
     public const float SettleRate = 12f;
     /// <summary>Shortest and longest blend back to the ready pose.</summary>

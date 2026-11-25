@@ -25,9 +25,8 @@ public sealed partial class PlayerAnimationController
             return;
         }
 
-        // A heavy swing grown out of a light one started part way into its wind-up clip: the rest of the wind-up plays slower by as
-        // much, so the strike frame still meets the blow.
-        float windup = attack.AnimationSpeed * (1f - grownFrom);
+        // A swing taken up part way into its wind-up (grownFrom) plays on at its own pace: its clock started as far in (PlayerCombat).
+        float windup = attack.AnimationSpeed;
         // A slow wind-up gathers itself: faster at first, slowing into the top of the backswing, the same frame at the strike (SwingWindup).
         if (windupSpan > 0f)
         {
@@ -205,7 +204,6 @@ public sealed partial class PlayerAnimationController
         int hash = string.IsNullOrEmpty(stateName) ? 0 : Animator.StringToHash(stateName);
         int layer = onTheRun && attackArmsLayer >= 0 ? MovingSwingLayer(hash) : standing;
         plantedSwing = 0;
-        bool afterPlainHeavy = lastWasPlainHeavy;
         lastWasPlainHeavy = swing.Kind == SwingKind.Heavy && (swing.Technique & HitTechnique.Charged) == 0;
         // A charged blow is already past its charge: it strikes with the whole body (it may leap).
         if (swing.Kind == SwingKind.Heavy && (swing.Technique & HitTechnique.Charged) == 0 && hash != 0 && upperBodyLayer >= 0
@@ -232,19 +230,16 @@ public sealed partial class PlayerAnimationController
         swingSpeed = swing.Speed;
         // Grown out of the light swing its press began: take up the heavy clip as far into its wind-up as the light one had got,
         // so the arms go on rising instead of dropping back to the first frame. Out of the guard (after a parry or a block) a swing
-        // picks up as far in as its Out Of Guard Start says, at the frame nearest the guard. Either way the rest of the wind-up plays
-        // slower by as much (grownFrom), so the blow lands on time.
-        // Straight out of a heavy (a heavy chain), it picks up at the frame nearest where that heavy ended (From Heavy Start).
+        // picks up as far in as its Out Of Guard Start says, at the frame nearest the guard; straight out of a heavy (a heavy chain),
+        // at the frame nearest where that heavy ended (From Heavy Start). PlayerCombat started the swing's clock as far in
+        // (WindupTaken, asked of WindupTakenUp below), so the clip starts where the clock stands and plays on at its own pace.
         bool grown = swing.Kind == SwingKind.Heavy && combat != null && combat.HeavyGrownFrom > 0f;
-        bool outOfHeavy = swing.Kind == SwingKind.Heavy && lastWasPlainHeavy && SwingShowing();
-        grownFrom = grown ? combat.HeavyGrownFrom : OutOfTheGuard() ? swing.Attack.FromGuardStart
-            : outOfHeavy ? swing.Attack.FromHeavyStart : 0f;
+        grownFrom = combat != null ? combat.WindupTaken : 0f;
 
         float start = 0f;
         if (grownFrom > 0f)
         {
-            float windupClip = Mathf.Max(0f, combat.TimeToHit - swing.Attack.StrikeLead) * swing.Attack.AnimationSpeed * swing.Speed;
-            start = windupClip * grownFrom;
+            start = Mathf.Max(0f, Time.time - combat.SwingStartTime) * swing.Attack.AnimationSpeed * swing.Speed;
         }
 
         // A full charge let go: the charged attack starts at the top of its backswing (where its wind-up ends), as the hold stood there,
@@ -260,9 +255,9 @@ public sealed partial class PlayerAnimationController
             striking = combat.TimeToHit <= charged.StrikeLead + 0.005f;
         }
 
-        // The wind-up's span, for its shape (SwingWindup), judged at the speed it really plays (a grown heavy's rest is slower); a
-        // charged release is past its wind-up.
-        float effectiveWindup = swing.Attack.AnimationSpeed * (1f - grownFrom);
+        // The wind-up's span, for its shape (SwingWindup: only a wind-up slower than its clip, none since the swings play at their
+        // clips' own pace, 2026-11-25); a charged release is past its wind-up.
+        float effectiveWindup = swing.Attack.AnimationSpeed;
         windupSpan = !fromHold && combat != null && SwingWindup.Strength(effectiveWindup) > 0f
             ? Mathf.Max(0.01f, combat.TimeToHit - swing.Attack.StrikeLead) : 0f;
         float actionSpeed = striking ? swing.Attack.StrikeSpeed * swing.Speed : effectiveWindup * swing.Speed;
@@ -286,8 +281,10 @@ public sealed partial class PlayerAnimationController
         if (!fromHold)
         {
             float speed = Mathf.Max(0.01f, swing.Speed);
-            // Never into the strike, not even the usual short blend (the fists' cross has 0.08 s).
-            float beforeStrike = AttackFlowRules.BlendRoom(swing.Attack.HitDelay, swing.Attack.StrikeLead) / speed;
+            // Never into the strike, not even the usual short blend (the fists' cross has 0.08 s). From the time really left: a swing
+            // taken up part way in (a grown heavy, out of the guard) has only the rest of its wind-up to blend over (review 2026-11-25).
+            float left = combat != null ? combat.TimeToHit : swing.Attack.HitDelay / speed;
+            float beforeStrike = Mathf.Max(0.05f, left - swing.Attack.StrikeLead / speed - AttackFlowRules.StrikeMargin);
             // The blend AttackFlow measured for the way in it is: from the chain's swing before it, or from the ready pose (a guard,
             // the exploring or walking pose). A grown heavy takes up the light swing's pose, the same motion: a heavy's short blend.
             chained = SwingShowing();
@@ -298,7 +295,7 @@ public sealed partial class PlayerAnimationController
                 measured = swing.Attack.BlendIn;
             }
 
-            float wanted = grown ? HeavyFade : measured > 0f ? measured / speed : Mathf.Min(ChainFade, 0.5f * swing.Attack.HitDelay / speed);
+            float wanted = grown ? HeavyFade : measured > 0f ? measured / speed : Mathf.Min(ChainFade, 0.5f * left);
             fade = Mathf.Min(Mathf.Max(fade, wanted), beforeStrike);
         }
 
@@ -325,6 +322,25 @@ public sealed partial class PlayerAnimationController
     }
 
     // The guard (or its parry, or a blow taken on it) is showing on the upper body: a swing now starts out of the guard.
+    // PlayerCombat.WindupTakenUp: how far into its wind-up a swing about to begin is taken up, from the pose showing now. Out of the
+    // guard, its Out Of Guard Start; a heavy straight after a plain heavy still showing (a heavy chain), its From Heavy Start. Asked
+    // before OnSwingStarted, so lastWasPlainHeavy is still the swing before (it used to be read after being set to this one, so any
+    // heavy begun over a showing swing counted as a heavy chain).
+    private float WindupTakenUp(SwingKind kind, AttackDefinition attack)
+    {
+        if (attack == null || string.IsNullOrEmpty(attack.AnimationState))
+        {
+            return 0f;
+        }
+
+        if (OutOfTheGuard())
+        {
+            return attack.FromGuardStart;
+        }
+
+        return kind == SwingKind.Heavy && lastWasPlainHeavy && SwingShowing() ? attack.FromHeavyStart : 0f;
+    }
+
     private bool OutOfTheGuard()
     {
         if (upperBodyLayer < 0)

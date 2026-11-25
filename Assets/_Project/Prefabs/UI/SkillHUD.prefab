@@ -710,6 +710,7 @@ GameObject:
   - component: {fileID: 3755303470160145283}
   - component: {fileID: 2667955261333343362}
   - component: {fileID: 2477394113847863770}
+  - component: {fileID: 7489774893593210351}
   m_Layer: 0
   m_Name: Skill Bar
   m_TagString: Untagged
@@ -835,6 +836,22 @@ MonoBehaviour:
   lit: {r: 0.85, g: 0.655, b: 0.353, a: 1}
   rim: {r: 0.08, g: 0.07, b: 0.06, a: 0.75}
   refused: {r: 0.85, g: 0.18, b: 0.12, a: 0.9}
+--- !u!114 &7489774893593210351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 826271741788284401}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4af3889fbb58d4c468bf549ef63a2d31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::CastBarView
+  width: 260
+  barHeight: 8
+  above: 46
+  fadeSeconds: 0.3
 --- !u!1 &1024005146450456602
 GameObject:
   m_ObjectHideFlags: 0

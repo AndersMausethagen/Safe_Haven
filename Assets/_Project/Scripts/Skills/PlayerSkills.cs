@@ -93,6 +93,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     // A channel under way (Skill › Channel Seconds): which, from which slot, until when, and its next strike.
     private SkillDefinition channeling;
     private int channelSlot = -1;
+    private float channelStartedAt;
     private float channelEndsAt;
     private float nextChannelTick = float.MaxValue;
 
@@ -100,6 +101,18 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     public event Action ChannelEnded;
 
     public bool IsChanneling => channeling != null;
+
+    /// <summary>The channel under way, or null (the cast bar, CastBarView).</summary>
+    public SkillDefinition Channeling => channeling;
+
+    /// <summary>Seconds the channel under way has run, from the cast.</summary>
+    public float ChannelElapsed => channeling != null ? Mathf.Max(0f, Time.time - channelStartedAt) : 0f;
+
+    /// <summary>The longest the channel under way can run, from the cast to its last strike.</summary>
+    public float ChannelLength => channeling != null ? Mathf.Max(0f, channelEndsAt - channelStartedAt) : 0f;
+
+    /// <summary>The skills' buffs on the player now (a war cry, a blessing), each with the Time.time it wears off (PlayerConditionsView).</summary>
+    public IReadOnlyDictionary<SkillDefinition, float> ActiveBuffs => activeBuffs;
 
     // Which skill keys are down (pressed through the input, let go on release): a channel lasts only while its key is held, so one
     // cast from a buffered press or after an aimed release, with the key already up, ends after its first blow.
@@ -607,6 +620,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         {
             channeling = skill;
             channelSlot = loadout.IndexOf(skill);
+            channelStartedAt = now;
             channelEndsAt = now + skill.Attack.HitDelay + skill.ChannelSeconds;
             nextChannelTick = float.MaxValue;
         }

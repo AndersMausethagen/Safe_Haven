@@ -23,8 +23,8 @@ MonoBehaviour:
   range: 3.6
   arc: 170
   maxTargets: 4
-  hitDelay: 0.41
-  recoveryTime: 1.08
+  hitDelay: 0.433
+  recoveryTime: 1.133
   poiseDamage: 45
   impact: 1.3
   lunge: 0.8
@@ -113,10 +113,10 @@ MonoBehaviour:
   castRange: 16
   castHazard: {fileID: 0}
   animationState: Pole Slam
-  animationSpeed: 1.0000005
-  strikeSpeed: 1.25
-  strikeLead: 0.09333344
-  followThroughSpeed: 1.0447841
+  animationSpeed: 1
+  strikeSpeed: 1
+  strikeLead: 0.117
+  followThroughSpeed: 1
   growsFromLight: 1
   blendIn: 0
   blendInFromReady: 0

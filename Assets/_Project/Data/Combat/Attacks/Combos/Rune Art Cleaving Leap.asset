@@ -23,8 +23,8 @@ MonoBehaviour:
   range: 3
   arc: 200
   maxTargets: 4
-  hitDelay: 0.54
-  recoveryTime: 1.3
+  hitDelay: 0.45
+  recoveryTime: 1.4
   poiseDamage: 60
   impact: 1.5
   lunge: 0.8
@@ -113,10 +113,10 @@ MonoBehaviour:
   castRange: 16
   castHazard: {fileID: 0}
   animationState: KI 2H Leap Slam
-  animationSpeed: 0.78767145
-  strikeSpeed: 1.25
-  strikeLead: 0.05333345
-  followThroughSpeed: 1.25
+  animationSpeed: 1
+  strikeSpeed: 1
+  strikeLead: 0.067
+  followThroughSpeed: 1
   growsFromLight: 1
   blendIn: 0
   blendInFromReady: 0

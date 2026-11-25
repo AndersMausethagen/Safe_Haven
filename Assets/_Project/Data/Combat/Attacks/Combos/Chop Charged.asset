@@ -23,8 +23,8 @@ MonoBehaviour:
   range: 2.6
   arc: 140
   maxTargets: 2
-  hitDelay: 0.45
-  recoveryTime: 1.1
+  hitDelay: 0.367
+  recoveryTime: 1.167
   poiseDamage: 70
   impact: 1.6
   lunge: 1
@@ -32,14 +32,34 @@ MonoBehaviour:
   staminaCost: -1
   appliesStatus: {fileID: 0}
   statusChance: 1
+  onRepeatStatus: {fileID: 0}
+  look:
+    showArea: 0
+    cast: []
+    release: []
+    struck: []
+    light: {r: 0, g: 0, b: 0, a: 0}
+    lightIntensity: 6
+    lightRange: 8
+    lightSeconds: 0.35
+    shake: 0
+    hitStop: 0
+    kick: 0
+    castSound: {fileID: 0}
+    releaseSound: {fileID: 0}
+    releaseSoundDelay: 0
   groundImpact: {fileID: 0}
   unblockable: 0
   pull: 0
+  lassoSeconds: 0
   windupMove: 0
   afterContactMove: -1
   windupTurnRate: -1
   moveAt: -1
   lungeShare: -1
+  ownCancels: 0
+  windupCancels: 1
+  recoveryCancels: 3
   motion: 0
   motionDistance: 3.5
   alwaysCritical: 0
@@ -51,13 +71,16 @@ MonoBehaviour:
   castRange: 16
   castHazard: {fileID: 0}
   animationState: KI 1H Backhand
-  animationSpeed: 0.7563027
-  strikeSpeed: 1.25
-  strikeLead: 0.0533334
-  followThroughSpeed: 1.230769
+  animationSpeed: 1
+  strikeSpeed: 1
+  strikeLead: 0.067
+  followThroughSpeed: 1
   growsFromLight: 1
   blendIn: 0
   blendInFromReady: 0.12
+  fromGuardStart: 0
+  blendInFromGuard: 0
+  fromHeavyStart: 0
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.55, b: 0.25, a: 0.95}

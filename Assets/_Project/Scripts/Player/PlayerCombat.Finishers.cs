@@ -48,7 +48,8 @@ public sealed partial class PlayerCombat
 
         CombatTechniqueSettings rules = Rules;
         Vector3 spot = StrikeRules.FinishSpot(finishing.transform.position, finishing.transform.forward, rules.FinishGap);
-        float share = Mathf.Clamp01((Time.time - activeStartTime) / rules.FinishCloseSeconds);
+        // Real time since the swing began: its clock may have a head start (PlayerCombat.WindupTaken).
+        float share = Mathf.Clamp01((Time.time - activeBeganAt) / rules.FinishCloseSeconds);
         Vector3 wanted = Vector3.Lerp(finishFrom, spot, share * share * (3f - 2f * share));
         Vector3 move = wanted - transform.position;
         move.y = 0f;

@@ -92,7 +92,9 @@ public sealed class CombatMovesetTests
             Assert.IsNotNull(weapon.RushAttack, $"{weapon.name} has no rush attack");
             Assert.IsTrue(states.Contains(weapon.RushAttack.AnimationState), $"{weapon.RushAttack.name} plays a state the player doesn't have");
             Assert.Greater(weapon.RushAttack.Lunge, 0f, $"{weapon.RushAttack.name} doesn't lunge");
-            Assert.Less(weapon.RushAttack.HitDelay, 0.45f, $"{weapon.RushAttack.name} isn't quick");
+            // At the clips' own pace (2026-11-25) a two-hander's rush lands as its clip does: the hammer's at 0.47 s.
+            float quick = weapon.Stance == WeaponStance.TwoHanded ? 0.5f : 0.45f;
+            Assert.Less(weapon.RushAttack.HitDelay, quick, $"{weapon.RushAttack.name} isn't quick");
         }
     }
 

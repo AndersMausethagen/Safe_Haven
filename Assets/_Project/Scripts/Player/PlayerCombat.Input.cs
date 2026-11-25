@@ -286,7 +286,7 @@ public sealed partial class PlayerCombat
         // Still winding up the light swing this press began (at once, or buffered behind the swing before): it becomes the
         // heavy one, paying only the difference. A counter stays a counter, and without the stamina for the difference the
         // light swing goes on.
-        bool turn = weapon != null && activeKind == SwingKind.Light && activeStartTime >= pressTime && hitPending && (activeTechnique & HitTechnique.Counter) == 0;
+        bool turn = weapon != null && activeKind == SwingKind.Light && activeBeganAt >= pressTime && hitPending && (activeTechnique & HitTechnique.Counter) == 0;
         heavyStarted = true;
         pressTime = -1f;
         if (turn && (weapon.HeavyAttack == null || !weapon.HeavyAttack.GrowsFromLight))

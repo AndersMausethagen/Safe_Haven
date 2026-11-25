@@ -131,26 +131,18 @@ public static class CombatClipKit
     }
 
     /// <summary>
-    /// Fits <paramref name="attack"/>'s animation to <paramref name="clip"/> in <paramref name="state"/>: the blow (the clip's
-    /// <paramref name="contact"/>, seconds in) lands at <paramref name="hitDelay"/> after a slower build-up and a quicker strike, the rest
-    /// plays out by <paramref name="recovery"/>, and the slash arc runs the way the hand moves at contact (mirrored for a mirrored state).
-    /// A clip that leaves the ground plays at one speed: a slowed build-up in the air is a player hanging there.
+    /// Fits <paramref name="attack"/> to <paramref name="clip"/> in <paramref name="state"/> at the clip's own pace (the user,
+    /// 2026-11-25: smooth animation first, damage tuned after; CombatClipPace): the blow lands at the clip's <paramref name="contact"/>,
+    /// seconds in, the strike covers the last <paramref name="strikeClip"/> seconds before it (a held heavy charges just before), the
+    /// next swing may start at <paramref name="recoversAt"/> seconds into the clip, and every phase plays at 1x. The slash arc runs the
+    /// way the hand moves at contact (mirrored for a mirrored state).
     /// </summary>
-    public static void FitAttack(AttackDefinition attack, string state, AnimationClip clip, float contact, float hitDelay, float recovery,
-        bool mirror = false, float strikeClip = 0.12f, float strikeSpeed = 1.5f, HumanBodyBones hand = HumanBodyBones.RightHand)
+    public static void FitAttack(AttackDefinition attack, string state, AnimationClip clip, float contact, float recoversAt,
+        bool mirror = false, float strikeClip = 0.12f, HumanBodyBones hand = HumanBodyBones.RightHand)
     {
         float length = clip.length;
         contact = Mathf.Clamp(contact, 0.05f, length);
-        recovery = Mathf.Max(recovery, hitDelay + 0.05f);
-        float followThrough = Mathf.Clamp((length - contact) / Mathf.Max(0.05f, recovery - hitDelay), 0.7f, 1.8f);
-        bool leaps = CombatAnimationSetup.Leaps(clip, out _);
-        float buildUp = StrikeRules.WindupSpeed(contact, hitDelay, strikeClip, strikeSpeed);
-        if (leaps || buildUp >= strikeSpeed)
-        {
-            buildUp = strikeSpeed = Mathf.Clamp(contact / Mathf.Max(0.01f, hitDelay), 0.25f, 3f);
-            strikeClip = 0f;
-        }
-
+        recoversAt = Mathf.Clamp(recoversAt, contact + 0.05f, Mathf.Max(contact + 0.05f, length));
         Vector3 velocity = CombatAnimationSetup.HandVelocity(clip, contact, hand);
         if (mirror)
         {
@@ -159,13 +151,13 @@ public static class CombatClipKit
 
         (SlashSweep sweep, float tilt) = CombatAnimationSetup.SlashFor(velocity);
         var data = new SerializedObject(attack);
-        data.FindProperty("hitDelay").floatValue = hitDelay;
-        data.FindProperty("recoveryTime").floatValue = recovery;
+        data.FindProperty("hitDelay").floatValue = contact;
+        data.FindProperty("recoveryTime").floatValue = recoversAt;
         data.FindProperty("animationState").stringValue = state;
-        data.FindProperty("animationSpeed").floatValue = buildUp;
-        data.FindProperty("strikeSpeed").floatValue = strikeSpeed;
-        data.FindProperty("strikeLead").floatValue = strikeSpeed > 0f ? strikeClip / strikeSpeed : 0f;
-        data.FindProperty("followThroughSpeed").floatValue = followThrough;
+        data.FindProperty("animationSpeed").floatValue = 1f;
+        data.FindProperty("strikeSpeed").floatValue = 1f;
+        data.FindProperty("strikeLead").floatValue = Mathf.Min(strikeClip, contact * 0.7f);
+        data.FindProperty("followThroughSpeed").floatValue = 1f;
         data.FindProperty("slashSweep").enumValueIndex = (int)sweep;
         data.FindProperty("slashTilt").floatValue = tilt;
         data.ApplyModifiedPropertiesWithoutUndo();

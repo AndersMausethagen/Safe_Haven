@@ -19,14 +19,14 @@ MonoBehaviour:
   cooldown: 20
   staminaCost: 15
   focusCircles: 1
-  castTime: 0.4
+  castTime: 0.44
   lungeDistance: 0
-  lungeDuration: 0.22
+  lungeDuration: 0.242
   channelSeconds: 0
   channelTick: 0.3
   foesStatus: {fileID: 0}
   foesRadius: 7
-  foesDelay: 0.5
+  foesDelay: 0.55
   options: []
   leaves: {fileID: 0}
   leavesCount: 3
@@ -39,7 +39,7 @@ MonoBehaviour:
   buffDuration: 6
   playAttackAnimation: 1
   animationState: Spell Raise
-  animationSpeed: 1.1
+  animationSpeed: 1
   look:
     showArea: 0
     cast:
@@ -54,7 +54,7 @@ MonoBehaviour:
     - prefab: {fileID: 5086883781002387737, guid: 35837e3be50e9534382b56e262e7d126, type: 3}
       place: 1
       count: 1
-      delay: 0.05
+      delay: 0.055
       stepDelay: 0
       seconds: 2
       scale: 1

@@ -40,7 +40,7 @@ public static class AttackFlow
             Room = room;
         }
 
-        public bool Smooth => Need <= Room + 0.0005f;
+        public bool Smooth => Need <= Room + AttackFlowRules.FrameSlack;
         public override string ToString() => $"{Weapon}: {From} -> {To.name} [{To.AnimationState}] pose {Pop:0.0}, blend {Need:0.00} s, room {Room:0.00} s";
     }
 
@@ -111,10 +111,13 @@ public static class AttackFlow
 
                 // Out of the guard a swing picks up part way into its wind-up (Out Of Guard Start).
                 // Out of a heavy (a heavy chain) it picks up at the frame nearest where that heavy ended (From Heavy Start).
-                float pop = Distance(pose, from == "guard" ? GuardStartPose(context, to, to.FromGuardStart)
-                    : from.EndsWith(HeavyChain) ? GuardStartPose(context, to, to.FromHeavyStart) : StartPose(context, to));
+                float share = from == "guard" ? to.FromGuardStart : from.EndsWith(HeavyChain) ? to.FromHeavyStart : 0f;
+                float pop = Distance(pose, share > 0f ? GuardStartPose(context, to, share) : StartPose(context, to));
+                // Picked up part way in, the swing's clock starts as far in (PlayerCombat.WindupTaken, 2026-11-25): only the rest of
+                // the wind-up is left to blend over.
+                float hitLeft = to.StrikeLead + (1f - share) * Mathf.Max(0f, to.HitDelay - to.StrikeLead);
                 links.Add(new Link(weapon.name, from, to, pop, AttackFlowRules.BlendNeeded(pop, WindupRate(context, to), StrikeRate(context, to)),
-                    AttackFlowRules.BlendRoom(to.HitDelay, to.StrikeLead)));
+                    AttackFlowRules.BlendRoom(hitLeft, to.StrikeLead)));
             }
 
             void Out(AttackDefinition attack)
@@ -375,13 +378,14 @@ public static class AttackFlow
         }
 
         float windupRate = WindupRate(context, attack), strikeRate = StrikeRate(context, attack);
-        float room = AttackFlowRules.BlendRoom(attack.HitDelay, attack.StrikeLead);
         float firstNeed = AttackFlowRules.BlendNeeded(Distance(from, StartPose(context, attack)), windupRate, strikeRate);
         float firstDip = Dip(from, StartPose(context, attack), ready);
         for (int step = 0; step < worst.Length; step++)
         {
             float[] start = GuardStartPose(context, attack, step / 10f);
             float need = AttackFlowRules.BlendNeeded(Distance(from, start), windupRate, strikeRate);
+            // Started that far in, the swing's clock starts as far in (PlayerCombat.WindupTaken): only the rest is left to blend over.
+            float room = AttackFlowRules.BlendRoom(attack.StrikeLead + (1f - step / 10f) * Mathf.Max(0f, attack.HitDelay - attack.StrikeLead), attack.StrikeLead);
             // Up to two frames' more blend is worth the dip it saves (the greataxe's opener: 0.20 -> 0.22 s halves it).
             bool allowed = step == 0 || (need <= room && need <= Mathf.Max(firstNeed + GuardStartSlack, 0.12f));
             worst[step] = Mathf.Max(worst[step], allowed ? Dip(from, start, ready) : firstDip + 1f);
@@ -396,7 +400,7 @@ public static class AttackFlow
             int pick = 0;
             for (int step = 1; step < entry.Value.Length; step++)
             {
-                // Only for a real gain: skipping more of the wind-up plays the rest slower.
+                // Only for a real gain: skipping more of the wind-up brings the blow sooner and leaves less to blend over.
                 if (entry.Value[step] < entry.Value[pick] - 0.15f)
                 {
                     pick = step;

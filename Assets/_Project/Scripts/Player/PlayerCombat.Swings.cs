@@ -264,7 +264,15 @@ public sealed partial class PlayerCombat
         // A full charge let go (ChargedFromHold): the hold was its wind-up, so its clock starts where only the strike is left. Set
         // here, before SwingStarted, so the animation and the whoosh time themselves from the real moment of the blow (shifting it
         // afterwards left the whoosh scheduled after the blow, so it never played).
-        activeStartTime = Time.time - (ChargedFromHold && attack != null ? ChargedWindupSkipped(attack, activeSpeed) : 0f);
+        // Taken up part way into its wind-up (a heavy grown from the light swing, out of the guard, a heavy chain): its clock starts as
+        // far in, so the clip plays on at its own pace and the blow comes sooner, instead of the rest crawling to the old moment.
+        WindupTaken = ChargedFromHold || attack == null ? 0f
+            : kind == SwingKind.Heavy && HeavyGrownFrom > 0f ? HeavyGrownFrom
+            : WindupTakenUp != null ? Mathf.Clamp(WindupTakenUp(kind, attack), 0f, 0.8f) : 0f;
+        float headStart = ChargedFromHold && attack != null ? ChargedWindupSkipped(attack, activeSpeed)
+            : WindupTaken * Mathf.Max(0f, attack != null ? (attack.HitDelay - attack.StrikeLead) / activeSpeed : 0f);
+        activeBeganAt = Time.time;
+        activeStartTime = Time.time - headStart;
         chargeHeld = 0f;
         heldPastFull = 0f;
         holdWaited = 0f;
@@ -293,16 +301,17 @@ public sealed partial class PlayerCombat
         }
 
         movement.SnapFacing(activeDirection);
+        // Seconds from now to the blow: less than the attack's Hit Delay when the swing began with a head start.
+        float hitIn = HitAt(attack, activeSpeed) - headStart;
         if (toFinish != null)
         {
             stepPending = false;
-            BeginFinish(toFinish, HitAt(attack, activeSpeed));
+            BeginFinish(toFinish, hitIn);
         }
 
         // Facing is the swing's own until a moment after the blow: early in the wind-up it may still turn toward the aim (TrackAim)
         // or the focused enemy (TrackFocus). The feet keep the attack's share of speed (SwingMotion): planted for a heavy swing or a
         // two-hander, walking for a dagger; a swing walked through plays on the arms over the legs.
-        float hitIn = HitAt(attack, activeSpeed);
         activeWindupMove = SwingMotion.WindupMove(attack, kind, Rules);
         activeLungeLead = SwingMotion.LungeLead(attack, kind, hitIn, LungeSeconds, attack != null ? Mathf.Max(attack.StrikeLead, LungeSeconds) : 0f, Rules);
         // A leap or a dash closes its whole distance over the wind-up, as a rush does; a dash goes through bodies.
@@ -337,7 +346,7 @@ public sealed partial class PlayerCombat
         else if ((kind == SwingKind.Rush || travels) && stepPending)
         {
             // A rush carries the movement it came with: the lunge runs for the whole wind-up instead of waiting for the strike.
-            StepIntoBlow(HitAt(attack, activeSpeed));
+            StepIntoBlow(hitIn);
         }
 
         EnterCombat();
@@ -603,7 +612,7 @@ public sealed partial class PlayerCombat
         // thrown and then start over (the user, 2026-11-20: "weird timing on unarmed charged"); the punch lands and the kick follows.
         waitingForHold = activeKind == SwingKind.Light && hitPending && attackHeld && pressTime >= 0f && !heavyStarted
             && weapon != null && weapon.HeavyAttack != null && weapon.HeavyAttack.GrowsFromLight
-            && activeStartTime >= pressTime && (activeTechnique & HitTechnique.Counter) == 0
+            && activeBeganAt >= pressTime && (activeTechnique & HitTechnique.Counter) == 0
             && Time.time - pressTime >= HoldTellSeconds
             && Time.time - pressTime < Rules.HeavyHoldSeconds + 0.05f
             && ActiveElapsed >= hitAt - Mathf.Max(activeAttack.StrikeLead, Mathf.Max(activeLungeLead, LungeSeconds));

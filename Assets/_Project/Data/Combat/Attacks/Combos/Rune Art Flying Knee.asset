@@ -23,8 +23,8 @@ MonoBehaviour:
   range: 1.9
   arc: 90
   maxTargets: 1
-  hitDelay: 0.3
-  recoveryTime: 0.7
+  hitDelay: 0.283
+  recoveryTime: 1
   poiseDamage: 45
   impact: 1.4
   lunge: 1
@@ -92,10 +92,10 @@ MonoBehaviour:
   castRange: 16
   castHazard: {fileID: 0}
   animationState: KI Front Kick
-  animationSpeed: 0.7424243
-  strikeSpeed: 1.5
-  strikeLead: 0.08
-  followThroughSpeed: 1.7916667
+  animationSpeed: 1
+  strikeSpeed: 1
+  strikeLead: 0.12
+  followThroughSpeed: 1
   growsFromLight: 1
   blendIn: 0
   blendInFromReady: 0

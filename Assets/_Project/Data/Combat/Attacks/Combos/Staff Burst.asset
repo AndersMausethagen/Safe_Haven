@@ -16,15 +16,15 @@ MonoBehaviour:
   damageType: 0
   strike: 0
   baseDamage: 0
-  weaponDamageRatio: 1.265
+  weaponDamageRatio: 0.87
   powerScaling: 1
   structureDamageMultiplier: 1
   canCrit: 1
   range: 3.2
   arc: 360
   maxTargets: 6
-  hitDelay: 0.42
-  recoveryTime: 1.07
+  hitDelay: 0.467
+  recoveryTime: 0.6
   poiseDamage: 30
   impact: 1.4
   lunge: 0
@@ -32,9 +32,26 @@ MonoBehaviour:
   staminaCost: -1
   appliesStatus: {fileID: 0}
   statusChance: 1
+  onRepeatStatus: {fileID: 0}
+  look:
+    showArea: 0
+    cast: []
+    release: []
+    struck: []
+    light: {r: 0, g: 0, b: 0, a: 0}
+    lightIntensity: 6
+    lightRange: 8
+    lightSeconds: 0.35
+    shake: 0
+    hitStop: 0
+    kick: 0
+    castSound: {fileID: 0}
+    releaseSound: {fileID: 0}
+    releaseSoundDelay: 0
   groundImpact: {fileID: 0}
   unblockable: 0
   pull: -1.5
+  lassoSeconds: 0
   windupMove: 0.6
   afterContactMove: -1
   windupTurnRate: -1
@@ -54,10 +71,10 @@ MonoBehaviour:
   castRange: 16
   castHazard: {fileID: 0}
   animationState: Staff Burst
-  animationSpeed: 1.0000007
-  strikeSpeed: 1.25
-  strikeLead: 0.1866668
-  followThroughSpeed: 0.20513728
+  animationSpeed: 1
+  strikeSpeed: 1
+  strikeLead: 0.233
+  followThroughSpeed: 1
   growsFromLight: 1
   blendIn: 0.1
   blendInFromReady: 0

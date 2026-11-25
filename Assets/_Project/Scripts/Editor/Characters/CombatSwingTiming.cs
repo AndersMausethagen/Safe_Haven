@@ -18,6 +18,9 @@ using UnityEngine;
 /// </list>
 /// Measured on the player's rig (the weapon hand's speed), as CombatAnimationSetup measures contacts. Used once to re-time the attack
 /// assets and by CombatSwingTimingTests to keep them so; not a builder.
+/// <para>Since 2026-11-25 the speeds are no longer fitted: every swing plays its clip at its own pace and its timing follows the clip
+/// (CombatClipPace, the user: smooth animation first, damage tuned after). The phases measured here still place the blow on the
+/// clip's contact.</para>
 /// </summary>
 public static class CombatSwingTiming
 {

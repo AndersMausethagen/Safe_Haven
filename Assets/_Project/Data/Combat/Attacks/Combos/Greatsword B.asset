@@ -23,8 +23,8 @@ MonoBehaviour:
   range: 2.7
   arc: 200
   maxTargets: 3
-  hitDelay: 0.7
-  recoveryTime: 1.42
+  hitDelay: 0.717
+  recoveryTime: 1.567
   poiseDamage: 28
   impact: 1.4
   lunge: 1.2
@@ -32,9 +32,26 @@ MonoBehaviour:
   staminaCost: -1
   appliesStatus: {fileID: 0}
   statusChance: 1
+  onRepeatStatus: {fileID: 0}
+  look:
+    showArea: 0
+    cast: []
+    release: []
+    struck: []
+    light: {r: 0, g: 0, b: 0, a: 0}
+    lightIntensity: 6
+    lightRange: 8
+    lightSeconds: 0.35
+    shake: 0
+    hitStop: 0
+    kick: 0
+    castSound: {fileID: 0}
+    releaseSound: {fileID: 0}
+    releaseSoundDelay: 0
   groundImpact: {fileID: 0}
   unblockable: 0
   pull: 0
+  lassoSeconds: 0
   windupMove: 0.45
   afterContactMove: 0.65
   windupTurnRate: -1
@@ -55,11 +72,11 @@ MonoBehaviour:
   castHazard: {fileID: 0}
   animationState: KI 2H Overhead
   animationSpeed: 1
-  strikeSpeed: 1.25
-  strikeLead: 0.0666666
-  followThroughSpeed: 1.1805557
+  strikeSpeed: 1
+  strikeLead: 0.083
+  followThroughSpeed: 1
   growsFromLight: 1
-  blendIn: 0.14
+  blendIn: 0.17
   blendInFromReady: 0
   fromGuardStart: 0
   blendInFromGuard: 0

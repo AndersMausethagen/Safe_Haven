@@ -16,15 +16,15 @@ MonoBehaviour:
   damageType: 2
   strike: 0
   baseDamage: 0
-  weaponDamageRatio: 0.8
+  weaponDamageRatio: 0.55
   powerScaling: 1
   structureDamageMultiplier: 1
   canCrit: 0
   range: 14
   arc: 8
   maxTargets: 1
-  hitDelay: 0.32
-  recoveryTime: 0.62
+  hitDelay: 0.467
+  recoveryTime: 0.6
   poiseDamage: 10
   impact: 0.8
   lunge: 0
@@ -32,14 +32,34 @@ MonoBehaviour:
   staminaCost: -1
   appliesStatus: {fileID: 11400000, guid: 32e9e33fb8f2e0748970b5e855fe720e, type: 2}
   statusChance: 1
+  onRepeatStatus: {fileID: 0}
+  look:
+    showArea: 0
+    cast: []
+    release: []
+    struck: []
+    light: {r: 0, g: 0, b: 0, a: 0}
+    lightIntensity: 6
+    lightRange: 8
+    lightSeconds: 0.35
+    shake: 0
+    hitStop: 0
+    kick: 0
+    castSound: {fileID: 0}
+    releaseSound: {fileID: 0}
+    releaseSoundDelay: 0
   groundImpact: {fileID: 0}
   unblockable: 0
   pull: 0
+  lassoSeconds: 0
   windupMove: 0.6
   afterContactMove: 0.75
   windupTurnRate: -1
   moveAt: -1
   lungeShare: -1
+  ownCancels: 0
+  windupCancels: 1
+  recoveryCancels: 3
   motion: 0
   motionDistance: 3.5
   alwaysCritical: 0
@@ -51,10 +71,10 @@ MonoBehaviour:
   castRange: 16
   castHazard: {fileID: 0}
   animationState: Staff Bolt
-  animationSpeed: 1.4
-  strikeSpeed: 1.6279094
-  strikeLead: 0.08190475
-  followThroughSpeed: 0.44446418
+  animationSpeed: 1
+  strikeSpeed: 1
+  strikeLead: 0.133
+  followThroughSpeed: 1
   growsFromLight: 1
   blendIn: 0.19
   blendInFromReady: 0.11
