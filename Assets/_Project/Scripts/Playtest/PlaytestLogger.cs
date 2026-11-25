@@ -565,6 +565,11 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         if (gameEvent.Kind == GameEventKind.Killed && gameEvent.Origin != null && Player.IsPlayer(gameEvent.Origin))
         {
             Write(PlaytestLog.PlayerDied, NameOf(gameEvent.Actor));
+            // How the last seconds went: every blow, small ones and ticks too (the Hurt rows keep only 5% or more).
+            Damageable dying = followed != null ? followed.Health : null;
+            int crowd = dying != null ? MonsterAI.CountAt(dying, dying.transform.position, 8f) : 0;
+            Write(PlaytestLog.DeathRecap, NameOf(gameEvent.Actor), Mathf.RoundToInt(recap.LostWithin(Time.time)), recap.Describe(Time.time, crowd));
+            recap.Clear();
             return;
         }
 
@@ -652,19 +657,28 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
             $"armour {totals.Armor:0} damage x{totals.DamageShare(self.Rules):0.00} toughness {totals.Toughness(self.Rules):0} boons {names}");
     }
 
-    // A blow worth noting: what struck the player, how hard, with what attack.
+    // A blow worth noting: what struck the player, how hard, with what attack, and the health it left ("health N/M", appended so old
+    // readers keep their columns). Every blow, small ones and ticks too, is kept a while for the death recap.
     private void OnPlayerHurt(DamageInfo damage, DamageResult result)
     {
         Damageable health = followed != null ? followed.Health : null;
-        if (health == null || result.Damage < health.MaxHealth * 0.05f || damage.IsOverTime)
+        if (health == null)
         {
             return;
         }
 
         string by = damage.Source != null ? (damage.Source.TryGetComponent(out MonsterAI monster) && monster.Definition != null ? monster.Definition.name : damage.Source.name) : "unknown";
+        recap.Note(Time.time, by, result.HealthLost, health.CurrentHealth + result.HealthLost, health.MaxHealth, damage.IsOverTime);
+        if (result.Damage < health.MaxHealth * 0.05f || damage.IsOverTime)
+        {
+            return;
+        }
+
         Write(PlaytestLog.Hurt, by, Mathf.RoundToInt(result.Damage), $"{(damage.Attack != null ? damage.Attack.name : "-")} {damage.Type}{(result.Blocked ? " blocked" : "")}"
-            + WhereFrom(damage, health));
+            + WhereFrom(damage, health) + $" health {health.CurrentHealth:0}/{health.MaxHealth:0}");
     }
+
+    private readonly DeathRecap recap = new DeathRecap();
 
     /// <summary>Where a blow came from (Docs/EnemyAIReview_2026-11-19.md §0), appended to the Hurt row so old readers still work: " from
     /// front|side|back" (front within the guard's 70° either side of facing, back beyond 110°), " offscreen" when the striker was out of

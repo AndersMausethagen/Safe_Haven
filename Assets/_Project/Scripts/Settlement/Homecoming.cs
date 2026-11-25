@@ -188,6 +188,19 @@ public static class Homecoming
             }
         }
 
+        // A stronger weapon of the kind in hand that the player knows how to make (the user's playtest, 2026-11-25: still on the Copper
+        // Sword at tier II, and the abilities' blows grow with the weapon now).
+        if (player.TryGetComponent(out PlayerCombat combat) && player.TryGetComponent(out PlayerCrafting crafting))
+        {
+            RecipeDefinition better = BetterWeapon(combat.Weapon, crafting.KnownRecipes, item => pool.Have(item) > 0);
+            if (better != null)
+            {
+                WeaponDefinition made = better.Output.Weapon;
+                string where = better.Station == CraftingStationType.None ? "by hand" : $"at the {better.Station.DisplayName()}";
+                lines.Add($"Stronger blade: {better.Output.DisplayName} ({made.Damage:0} vs {combat.Weapon.Damage:0}), {where}. Abilities strike by it too.");
+            }
+        }
+
         ItemInventory bag = player.GetComponent<ItemInventory>();
         foreach (HavenRequestDefinition request in HavenRequestBoard.Standing())
         {
@@ -204,6 +217,41 @@ public static class Homecoming
         }
 
         return lines;
+    }
+
+    /// <summary>Share more damage a known weapon must carry to be worth a line on the card.</summary>
+    public const float BetterBy = 1.2f;
+
+    /// <summary>
+    /// The next step up from <paramref name="held"/> among <paramref name="known"/>: a melee weapon of the same kind (stance and signature:
+    /// a sword for a sword, not a staff or an axe of the same grip) carrying at least <see cref="BetterBy"/> times its damage, the least
+    /// such (the next tier, not the last), and not one already <paramref name="owned"/>. Null when none, or nothing melee is held.
+    /// </summary>
+    public static RecipeDefinition BetterWeapon(WeaponDefinition held, IEnumerable<RecipeDefinition> known, System.Func<ItemDefinition, bool> owned = null)
+    {
+        if (held == null || held.Kind != WeaponKind.Melee || known == null)
+        {
+            return null;
+        }
+
+        RecipeDefinition best = null;
+        foreach (RecipeDefinition recipe in known)
+        {
+            WeaponDefinition weapon = recipe != null && recipe.Output != null ? recipe.Output.Weapon : null;
+            if (weapon == null || weapon == held || weapon.Kind != WeaponKind.Melee || weapon.Stance != held.Stance
+                || weapon.Signature != held.Signature || weapon.Damage < held.Damage * BetterBy
+                || (owned != null && owned(recipe.Output)))
+            {
+                continue;
+            }
+
+            if (best == null || weapon.Damage < best.Output.Weapon.Damage)
+            {
+                best = recipe;
+            }
+        }
+
+        return best;
     }
 
     private static string StationName(string stationId)

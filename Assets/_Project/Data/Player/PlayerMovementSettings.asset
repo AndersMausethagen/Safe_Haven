@@ -19,8 +19,9 @@ MonoBehaviour:
   backpedalSpeed: 0.7
   dodgeDistance: 4
   dodgeDuration: 0.5
-  dodgeInvulnerability: 0.3
+  dodgeInvulnerability: 0.35
   dodgeCooldown: 0.9
+  dodgeCooldownBuffer: 0.2
   stateModifiers:
   - state: 0
     speedMultiplier: 1

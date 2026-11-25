@@ -39,7 +39,7 @@ PRICES = {REPORT_MODEL: (2.0, 10.0), SUMMARY_MODEL: (4.0, 20.0)}
 FALLBACK_BETA = "server-side-fallback-2026-07-01"
 
 # Rows that say what happened; the rest (positions, per-minute tallies) are summarised, not listed.
-STORY_EVENTS = {"SessionStart", "SessionEnd", "SceneEntered", "PlayerDied", "QuestStarted", "QuestCompleted", "QuestFailed",
+STORY_EVENTS = {"SessionStart", "SessionEnd", "SceneEntered", "PlayerDied", "DeathRecap", "QuestStarted", "QuestCompleted", "QuestFailed",
                 "RaidTier", "RaidFinished", "RaidStarted", "Built", "Upgraded", "Cheat", "Assist", "SkillLevel", "PlaceFound",
                 "RescuedResident", "ResidentArrived", "BreachStarted", "BreachEnded", "ModuleFitted", "RaidEvent", "Kit"}
 

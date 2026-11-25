@@ -140,6 +140,7 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
     public bool IsBroken => HealthFloor > 0f && currentHealth <= HealthFloor;
 
     private IHitGuard[] guards;
+    private IBlowShaper[] shapers;
 
     /// <summary>
     /// Makes the object ignore hits until the same source removes it. Several sources can overlap (a dodge during a
@@ -233,6 +234,16 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
         }
 
         float final = exact ? damage.Amount : DamageCalculator.Mitigate(damage.Amount, damage.Type, damage.Strike, Owner.Stats, Owner.Rules) * TakenScale;
+        if (!exact && !damage.IsOverTime)
+        {
+            // Looked up on the first blow, not in Awake: the player's (PlayerBlowGrace) is added by Player.Awake, which may run after this.
+            shapers ??= GetComponents<IBlowShaper>();
+            foreach (IBlowShaper shaper in shapers)
+            {
+                final = shaper.Shape(damage, final, MaxHealth);
+            }
+        }
+
         float healthBefore = currentHealth;
         float healthLost = Mathf.Min(final, Mathf.Max(0f, currentHealth - HealthFloor));
         currentHealth -= healthLost;

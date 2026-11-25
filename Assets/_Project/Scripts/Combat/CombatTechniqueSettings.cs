@@ -179,6 +179,11 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [SerializeField, Min(1)] private int rangedAtOnce = 2;
     [Tooltip("Seconds a ranged attacker keeps its turn after it starts a shot or a throw, so a third waits for a quiet moment.")]
     [SerializeField, Min(0.1f)] private float rangedTurnSeconds = 2.5f;
+    [Tooltip("With at least this many creatures engaging the player within Crowd Radius, only Ranged At Once In A Crowd may shoot at once " +
+             "(the user's playtest, 2026-11-25: Marsh Lights shooting from behind a wolf pack ended the run).")]
+    [SerializeField, Min(1)] private int crowdedAt = 3;
+    [SerializeField, Min(1)] private int rangedAtOnceInACrowd = 1;
+    [SerializeField, Min(1f)] private float crowdRadius = 8f;
     [Tooltip("A melee attacker further than this many degrees off the camera's view is off screen: it strikes only when no " +
              "other is closing in, and after Off Screen Wait; otherwise it circles back into view (anti-overwhelm 3). Noticing " +
              "and coming is unchanged: noise still draws everything in.")]
@@ -239,7 +244,7 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [Tooltip("Times the shield's share let through a guard point lets through (a guard point is a glancing block, not a braced one).")]
     [SerializeField, Range(1f, 4f)] private float guardPointLetThrough = 1.6f;
     [Tooltip("A hit within this many seconds of raising the guard is parried.")]
-    [SerializeField, Range(0f, 0.5f)] private float parryWindow = 0.15f;
+    [SerializeField, Range(0f, 0.5f)] private float parryWindow = 0.2f;
     [Tooltip("A guard raised again this soon after it was lowered blocks but doesn't parry, so tapping it isn't a free parry. It still goes up at once.")]
     [SerializeField, Range(0f, 1f)] private float guardRelock = 0.3f;
     [Tooltip("Stamina a blocked hit costs per point of damage it would have done.")]
@@ -299,6 +304,17 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [SerializeField, Min(0f)] private float flinchTurnGrace = 0.2f;
     [Tooltip("A dodge cuts a flinch short from this far into it (not a knockdown, nor a parry thrown back).")]
     [SerializeField, Min(0f)] private float flinchDodgeAfter = 0.25f;
+
+    [Header("Blows nobody could answer (BlowShaping; the user's playtest, 2026-11-25)")]
+    [Tooltip("The most of the player's health one blow from anything but a boss can take (an Old Moss Troll's stomp took two thirds, " +
+             "from behind). 0: no cap.")]
+    [SerializeField, Range(0f, 1f)] private float heaviestBlowShare = 0.4f;
+    [Tooltip("A blow that takes at least this share of the player's health starts a grace.")]
+    [SerializeField, Range(0.01f, 1f)] private float bigBlowShare = 0.15f;
+    [Tooltip("Seconds after a big blow in which the next ones take only Grace Taken of themselves (three Heartroot eruptions landed " +
+             "inside a second). A blow in the grace doesn't make it longer. 0: no grace.")]
+    [SerializeField, Min(0f)] private float graceSeconds = 0.5f;
+    [SerializeField, Range(0f, 1f)] private float graceTaken = 0.5f;
 
     [Header("Focus (earned by fighting well, spent on skills)")]
     [Tooltip("Focus is kept in circles (the user, 2026-11-24): a full one lights above the skill bar and stays lit until spent; every " +
@@ -453,6 +469,12 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public int AttackersAtOnce => attackersAtOnce;
     public int RangedAtOnce => rangedAtOnce;
     public float RangedTurnSeconds => rangedTurnSeconds;
+    public int CrowdedAt => crowdedAt;
+    public int RangedAtOnceInACrowd => rangedAtOnceInACrowd;
+    public float CrowdRadius => crowdRadius;
+
+    /// <summary>How many may shoot at the player at once with <paramref name="crowd"/> creatures engaging them close by.</summary>
+    public int RangedAtOnceWith(int crowd) => crowd >= crowdedAt ? Mathf.Min(rangedAtOnce, rangedAtOnceInACrowd) : rangedAtOnce;
     public float OffScreenAngle => offScreenAngle;
     public float OffScreenWait => offScreenWait;
     public float AttackTurnSpacing => attackTurnSpacing;
@@ -519,6 +541,10 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float PerfectDodgeStop => perfectDodgeStop;
     public float FlinchTurnGrace => flinchTurnGrace;
     public float FlinchDodgeAfter => flinchDodgeAfter;
+    public float HeaviestBlowShare => heaviestBlowShare;
+    public float BigBlowShare => bigBlowShare;
+    public float GraceSeconds => graceSeconds;
+    public float GraceTaken => graceTaken;
     public float FocusPerCircle => focusPerCircle;
     public int FocusCircles => focusCircles;
     public float FocusMax => focusPerCircle * focusCircles;

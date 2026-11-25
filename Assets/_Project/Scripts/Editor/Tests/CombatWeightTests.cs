@@ -53,7 +53,7 @@ public sealed class CombatWeightTests
         Assert.LessOrEqual(Shove(3f, HitTechnique.WeaponArt, critical: true), most + 1e-4f);
     }
 
-    // The parry cue (Docs/CombatFeelReview_2026-11-19.md §2): nobody reacts inside a 0.15 s window, so the cue comes before it.
+    // The parry cue (Docs/CombatFeelReview_2026-11-19.md §2): nobody reacts inside a 0.2 s window, so the cue comes before it.
     [Test]
     public void TheParryCue_ComesBeforeTheWindow_ButNeverBeforeAHold()
     {

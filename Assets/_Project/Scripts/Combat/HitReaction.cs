@@ -114,14 +114,19 @@ public sealed class HitReaction : MonoBehaviour
 
         float impact = damage.Attack != null ? damage.Attack.Impact : 1f;
         HitTechnique kind = damage.Technique;
-        bool art = (kind & HitTechnique.WeaponArt) != 0;
+        // A physical ability's blow shoves as an art's does, and may carry further (Knockback Ability Most): Whirling Steel and Trollsbane's
+        // Wrath clear room round a player in a pack (the user's playtest, 2026-11-25). Not a spell's: Winter's Breath strikes eight times a
+        // breath and would blow its foes out of its own cone.
+        bool ability = (kind & HitTechnique.Ability) != 0 && (kind & HitTechnique.Melee) != 0;
+        bool art = ability || (kind & HitTechnique.WeaponArt) != 0;
         bool heavy = (kind & (HitTechnique.Heavy | HitTechnique.Finisher)) != 0;
         float technique = art ? feel.KnockbackArt : heavy ? feel.KnockbackHeavy
             : (kind & (HitTechnique.Counter | HitTechnique.GuardCounter)) != 0 ? feel.KnockbackCounter : 1f;
         float metres = feel.KnockbackDistance * Mathf.Pow(Mathf.Max(0f, impact), 1.5f) * technique * (result.IsCritical ? feel.KnockbackCritShare : 1f);
         // A heavy that isn't charged keeps the body near enough for its follow-up to reach (a chain's step closes about a metre).
         bool charged = (kind & HitTechnique.Charged) != 0;
-        float most = heavy && !art && !charged ? Mathf.Min(1f, feel.KnockbackMost) : feel.KnockbackMost;
+        float most = heavy && !art && !charged ? Mathf.Min(1f, feel.KnockbackMost)
+            : ability ? Mathf.Max(feel.KnockbackMost, feel.KnockbackAbilityMost) : feel.KnockbackMost;
         metres = Mathf.Min(metres, most);
         if (target != null && target.TryGetComponent(out MonsterAI monster) && monster.IsHeavyweight)
         {

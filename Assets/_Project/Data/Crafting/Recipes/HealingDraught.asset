@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: 
   output: {fileID: 11400000, guid: d0c7b274979b4ad46a9f3bf89b8cfa64, type: 2}
   outputResource: {fileID: 0}
-  outputAmount: 1
+  outputAmount: 2
   resourceCost:
   - resource: {fileID: 11400000, guid: 3d259ba2e9b280c4388c17af0308cc69, type: 2}
     amount: 1

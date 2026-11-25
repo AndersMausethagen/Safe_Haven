@@ -3356,6 +3356,17 @@ sample textures and flames are in `Art/Effects/VFX Graph/Additions` (Unity Compa
   its own buff (`SkillDefinition.Buffs`, `BuffName`, shown on the card via `StatBonus.Describe` and beside the health bar). Their blows
   carry `HitTechnique.Ability` (`PlayerSkills.AbilityTechnique`), so `CombatTally` writes `Skill.Cast`, `Skill.<id>`, `Skill.Hit`,
   `Skill.Damage`, `Skill.NoFocus` and `Focus.Earned` Combat rows and the boss row has a `skill` share (appended last).
+- **Combat safety round (the user's playtest, 2026-11-25; tested in `CombatSafetyTests`):** `IBlowShaper` on a Damageable reshapes a
+  blow after armour (not ticks, not exact blows; looked up on the first blow). `PlayerBlowGrace` (Player.Awake) caps a creature's blow
+  that isn't a boss's at `HeaviestBlowShare` (0.4) of max health, and after a blow of `BigBlowShare` (0.15) eases the next ones to
+  `GraceTaken` (0.5) for `GraceSeconds` (0.5), rules in `BlowShaping`. Parry window 0.2 s (was 0.15), dodge invulnerability 0.35 s (was
+  0.3); `AttackTelegraph` glints an unblockable strike at the player at the dodge's moment. `OffScreenWarnings` also marks an on-screen
+  strike from behind (past `BehindAngle`) beside the player. Ability blows shove as an art's, up to `CombatFeel.KnockbackAbilityMost`
+  (3 m); Whirling Steel impact 1.8, Trollsbane 2.4. `LowHealthHint` (Player.Awake): once a scene, under 35% in a fight, the key of the
+  healing on the bar. Healing Draught brews two. `Homecoming.BetterWeapon`: the card names the next known melee weapon of the same
+  stance (at least 1.2x). `RaidIntensity`'s breather is 30-45 s and travel ends it only after `MinRelax` (20 s). With `CrowdedAt` (3)
+  creatures engaging within `CrowdRadius`, `RangedAtOnceInACrowd` (1) may shoot. The log: Hurt rows end " health N/M"; a `DeathRecap`
+  row follows PlayerDied (every blow of the last 10 s, small ones and ticks, by source, the health it started at, the crowd).
 - **Sounds** (Docs/CombatSkillsResearch 6): `SkillLook.castSound/releaseSound/releaseSoundDelay` (SkillFx plays them; the effects builder
   keeps them when it remakes a look) and `StatusEffectDefinition.consumeSound` (Shatter). Takes for 13 sounds wait on the user's ear:
   MOSS and Stable Audio 3 (two each) and `Tools/Audio/skills.py` (two each; none for the war cry's voice) on the Skill sound picks page.

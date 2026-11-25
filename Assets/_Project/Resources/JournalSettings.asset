@@ -742,7 +742,7 @@ MonoBehaviour:
     body: 'Hold [{key:Guard}] to guard. It stops blows from the front, but part of each still gets through (a lot with bare fists, much less with a shield) and each block costs stamina. Run out and your guard breaks, and you reel for over a second. A shield knocks back what it blocks.
 
 
-      Raise the guard just before a blow lands and it is a parry: no damage, and attacking straight out of it is a sure critical counter. An ordinary creature staggers; a troll, a boss or a raid''s elite only loses part of its poise, so it takes two parries, or a parry and some blows, to floor one. A creature''s warning on the ground turns pale and the creature glints at exactly that moment.
+      Raise the guard just before a blow lands and it is a parry: no damage, and attacking straight out of it is a sure critical counter. An ordinary creature staggers; a troll, a boss or a raid''s elite only loses part of its poise, so it takes two parries, or a parry and some blows, to floor one. A creature''s warning on the ground turns pale and the creature glints at exactly that moment. A blow no guard stops (hatched on the ground) glints too, at the moment to dodge: a dodge then is a perfect one.
 
 
       Attack right after a blow is blocked for a guard counter: no critical, but it hits hard and breaks poise.

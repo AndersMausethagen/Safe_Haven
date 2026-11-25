@@ -72,6 +72,9 @@ public static class PlaytestLog
     public const string EnemyAI = "EnemyAI";
     public const string SceneEntered = "SceneEntered";
     public const string PlayerDied = "PlayerDied";
+    /// <summary>Right after PlayerDied: the last DeathRecap.Seconds before it (subject the killer, amount the health lost in them, detail the
+    /// blows, small ones and ticks among them, who dealt what, the health they started at, and the crowd at the end).</summary>
+    public const string DeathRecap = "DeathRecap";
     /// <summary>A skill reached a level: subject the skill's id, amount the level, detail "insight" when Insight raised it.</summary>
     public const string SkillLevel = "SkillLevel";
     /// <summary>Insight put into a skill: subject the skill's id, amount the Insight.</summary>

@@ -28,7 +28,7 @@ public sealed class PlayerMovementSettings : ScriptableObject
     [Tooltip("Seconds the dodge takes. Shorter is snappier.")]
     [SerializeField, Min(0.05f)] private float dodgeDuration = 0.22f;
     [Tooltip("Seconds from the start of a dodge during which hits are ignored.")]
-    [SerializeField, Min(0f)] private float dodgeInvulnerability = 0.28f;
+    [SerializeField, Min(0f)] private float dodgeInvulnerability = 0.35f;
     [Tooltip("Seconds from the start of a dodge until the next one.")]
     [SerializeField, Min(0f)] private float dodgeCooldown = 0.9f;
     [Tooltip("A dodge pressed this close to the cooldown's end is kept and goes the moment it ends; one pressed earlier is refused with " +

@@ -74,6 +74,8 @@ public sealed class AttackTelegraph : MonoBehaviour
     // When this strike's glint and ting come (its own clock, which stops while it holds), and whether it is aimed at this game's player.
     private float cueAt;
     private bool atMe;
+    // This strike's cue is a dodge's (a blow no guard stops), not a parry's.
+    private bool cuesDodge;
 
     private void Awake()
     {
@@ -222,7 +224,12 @@ public sealed class AttackTelegraph : MonoBehaviour
         bool parriable = cuesParry && !attack.Unblockable;
         bool mayHold = ai.ActiveAction != null && ai.ActiveAction.kind == MonsterAttackKind.Melee && ai.ActiveAction.holdChance > 0f
             && ai.ActiveAction.attack == attack;
-        cueAt = parriable ? ParryCueAt(attack.HitDelay, window, feel.ParryCueLead, atMe, mayHold) : -1f;
+        // A blow no guard stops still glints, at the dodge's moment instead (the user's playtest, 2026-11-25: 14 perfect dodges in 284,
+        // and the unblockable blows, which only a dodge answers, gave no cue at all). Only at this game's player.
+        bool dodgeOnly = cuesParry && attack.Unblockable && atMe;
+        cuesDodge = !parriable && dodgeOnly;
+        cueAt = parriable ? ParryCueAt(attack.HitDelay, window, feel.ParryCueLead, atMe, mayHold)
+            : dodgeOnly ? ParryCueAt(attack.HitDelay, DodgeWindow(me), feel.ParryCueLead, true, mayHold) : -1f;
         bool line = parriable && atMe && feel.ParryLineAlpha > 0f && attack.HitDelay > window + feel.ParryCueLead;
         lineFilter.gameObject.SetActive(line);
         if (!line)
@@ -240,6 +247,19 @@ public sealed class AttackTelegraph : MonoBehaviour
         lineBlock.SetColor(BaseColorId, color);
         lineBlock.SetColor(ColorId, color);
         lineRenderer.SetPropertyBlock(lineBlock);
+    }
+
+    // How long before a blow lands a dodge started then still has it land in its invulnerability: a perfect dodge. By the dodge the
+    // player's load gives them (a quickstep's is shorter, as PlayerDodge has it).
+    private static float DodgeWindow(Player me)
+    {
+        if (me == null || !me.TryGetComponent(out PlayerMovement movement) || movement.Settings == null)
+        {
+            return 0f;
+        }
+
+        float shape = me.TryGetComponent(out PlayerDodge dodge) ? movement.Settings.ShapeOf(dodge.Style).invulnerability : 1f;
+        return movement.Settings.DodgeInvulnerability * shape * GameOptions.TimingShare;
     }
 
     // A heavy strike's dark edge round its area, and the low swell under its wind-up.
@@ -323,7 +343,8 @@ public sealed class AttackTelegraph : MonoBehaviour
             PrefabPool.Spawn(feel.ParryCueEffect, transform.position + Vector3.up * 1.6f, Quaternion.identity);
         }
 
-        if (atMe && feel.ParryCueSound != null)
+        // The ting means "guard": a blow no guard stops glints without it, so the ear never raises a guard into it.
+        if (atMe && !cuesDodge && feel.ParryCueSound != null)
         {
             AudioManager.Play(feel.ParryCueSound, transform.position + Vector3.up * 1.6f);
         }

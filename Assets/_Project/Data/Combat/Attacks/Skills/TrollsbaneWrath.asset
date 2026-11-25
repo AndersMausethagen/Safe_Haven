@@ -27,7 +27,7 @@ MonoBehaviour:
   hitDelay: 0.868
   recoveryTime: 1.26
   poiseDamage: 10
-  impact: 1
+  impact: 2.4
   lunge: 0
   hop: 0
   staminaCost: -1

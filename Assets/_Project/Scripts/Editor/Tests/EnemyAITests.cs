@@ -101,7 +101,9 @@ public sealed class EnemyAITests
         Assert.AreEqual(RaidIntensity.Phase.Relax, pacing.Now, "quiet long enough: the breather");
         Assert.IsFalse(pacing.AllowsRoamers, "no roamers in the breather");
         pacing.Tick(1f, 0, new Vector3(50f, 0f, 0f), now += 1f, random);
-        Assert.AreEqual(RaidIntensity.Phase.Build, pacing.Now, "40 m of travel ends it early");
+        Assert.AreEqual(RaidIntensity.Phase.Relax, pacing.Now, "a walk right away doesn't end it (the user's run, 2026-11-25: peaks a minute and a half apart)");
+        pacing.Tick(1f, 0, new Vector3(50f, 0f, 0f), now += RaidIntensity.MinRelax, random);
+        Assert.AreEqual(RaidIntensity.Phase.Build, pacing.Now, "40 m of travel ends it early once it has lasted a while");
         Assert.IsTrue(pacing.AllowsRoamers);
     }
 

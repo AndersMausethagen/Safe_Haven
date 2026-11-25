@@ -93,6 +93,8 @@ public sealed class CombatFeelSettings : ScriptableObject
     [SerializeField, Range(0f, 1f)] private float knockbackHeavyweightShare = 0.35f;
     [Tooltip("No blow pushes further (a heavy that isn't charged at most 1 m, so its follow-up still reaches).")]
     [SerializeField, Min(0f)] private float knockbackMost = 1.6f;
+    [Tooltip("How far an ability's blow (HitTechnique.Ability) may push, beside Knockback Most: a ring skill clears room in a pack.")]
+    [SerializeField, Min(0f)] private float knockbackAbilityMost = 3f;
 
     [Header("High ground (arrows and thrown missiles, for the player and creatures alike)")]
     [Tooltip("Metres the shooter must stand above the target before a missile hits harder.")]
@@ -188,7 +190,7 @@ public sealed class CombatFeelSettings : ScriptableObject
     [Tooltip("Small glint on an attacker at the parry moment.")]
     [SerializeField] private GameObject parryCueEffect;
     [Header("A parry cue to act on (Docs/CombatFeelReview_2026-11-19.md §2)")]
-    [Tooltip("The glint and its sound come this long before the parry window opens, on a strike at the player: the window (0.15 s) is " +
+    [Tooltip("The glint and its sound come this long before the parry window opens, on a strike at the player: the window (0.2 s since 2026-11-25) is " +
              "shorter than anyone reacts to a light (180-250 ms), a little longer than to a sound. A strike that may hold never cues " +
              "before its hold point. The window itself is unchanged.")]
     [SerializeField, Range(0f, 0.3f)] private float parryCueLead = 0.12f;
@@ -405,6 +407,7 @@ public sealed class CombatFeelSettings : ScriptableObject
     public float KnockbackCounter => knockbackCounter;
     public float KnockbackHeavyweightShare => knockbackHeavyweightShare;
     public float KnockbackMost => knockbackMost;
+    public float KnockbackAbilityMost => knockbackAbilityMost;
 
     /// <summary>How much harder a missile hits from this many metres above its target: a damage multiplier, 1 or more.</summary>
     public float HighGround(float above) => 1f + Mathf.Clamp((above - highGroundFrom) * highGroundPerMetre, 0f, highGroundMost);

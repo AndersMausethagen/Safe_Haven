@@ -61,7 +61,9 @@ public sealed class Player : MonoBehaviour
         CoatedBladeView.AddTo(gameObject); // flames on the weapon while a coating's fire is on it (Ember Pitch)
         ArtBladeView.AddTo(gameObject); // light along the blade through a weapon art, in the art's colour
         NeededNearby.AddTo(gameObject); // what a quest or home needs, pointed out when it grows near
-        OffScreenWarnings.AddTo(gameObject); // a strike winding up at them from out of view, at the screen's edge
+        OffScreenWarnings.AddTo(gameObject); // a strike winding up at them from out of view (at the screen's edge) or from behind (beside them)
+        PlayerBlowGrace.AddTo(gameObject); // no one blow from a lesser foe takes most of their health, and a breath after a big one
+        LowHealthHint.AddTo(gameObject); // low in a fight, once a scene: which key heals
         if (Current != null && Current != this)
         {
             Debug.LogWarning($"A second player ({name}) appeared; the newest one is used.", this);

@@ -77,6 +77,9 @@ MonoBehaviour:
   attackersAtOnce: 2
   rangedAtOnce: 2
   rangedTurnSeconds: 2.5
+  crowdedAt: 3
+  rangedAtOnceInACrowd: 1
+  crowdRadius: 8
   offScreenAngle: 70
   offScreenWait: 0.6
   attackTurnSpacing: 0.35
@@ -103,7 +106,7 @@ MonoBehaviour:
   blockArc: 140
   shieldGuardPoints: 1
   guardPointLetThrough: 1.6
-  parryWindow: 0.15
+  parryWindow: 0.2
   guardRelock: 0.3
   blockStaminaPerDamage: 0.8
   guardMoveSpeed: 0.5
@@ -126,6 +129,10 @@ MonoBehaviour:
   perfectDodgeStop: 0.08
   flinchTurnGrace: 0.2
   flinchDodgeAfter: 0.25
+  heaviestBlowShare: 0.4
+  bigBlowShare: 0.15
+  graceSeconds: 0.5
+  graceTaken: 0.5
   focusPerCircle: 100
   focusCircles: 3
   focusPerHit: 8

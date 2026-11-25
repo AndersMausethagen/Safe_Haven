@@ -8,6 +8,11 @@ using UnityEngine.UI;
 /// the rim on its side, in the strike's tier colour (a dark rim behind it for a great blow), growing and brightening with the wind-up.
 /// It goes when the blow lands or the creature comes into view. Three at most; none while a window is open. Only during wind-ups at the
 /// player, so it is no clutter outside a fight. Added to the player by Player.Awake (AddTo); reads AttackTelegraph.AtThePlayer.
+/// <para>
+/// A strike in view but from behind the player (past BehindAngle from where they face) gets the same chevron close beside them, toward
+/// the creature (the user's playtest, 2026-11-25: three of the four blows that ended it came from behind, in a pack, with the warning on
+/// the ground at the back of the crowd).
+/// </para>
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class OffScreenWarnings : MonoBehaviour
@@ -15,6 +20,10 @@ public sealed class OffScreenWarnings : MonoBehaviour
     private const int Most = 3;
     // How far past the edge a body still counts as seen (as MonsterAI's OffScreen).
     private const float Margin = 0.02f;
+    /// <summary>Degrees from the player's facing past which a strike counts as from behind (as the Hurt rows' "back").</summary>
+    public const float BehindAngle = 110f;
+    // How far from the player, as a share of the view's height, the chevron for a strike from behind sits.
+    private const float BesideReach = 0.085f;
 
     private Player player;
     private Canvas canvas;
@@ -63,17 +72,32 @@ public sealed class OffScreenWarnings : MonoBehaviour
                 }
 
                 Vector3 point = view.WorldToViewportPoint(strike.transform.position + Vector3.up * 1.2f);
-                if (!IsOffScreen(point))
+                if (IsOffScreen(point))
                 {
+                    Build();
+                    Show(shown++, point, strike);
                     continue;
                 }
 
-                Build();
-                Show(shown++, point, strike);
+                if (IsBehind(transform.position, transform.forward, strike.transform.position))
+                {
+                    Build();
+                    ShowBeside(shown++, view, point, strike);
+                }
             }
         }
 
         HideFrom(shown);
+    }
+
+    /// <summary>True when <paramref name="striker"/> stands behind someone at <paramref name="at"/> facing <paramref name="facing"/>
+    /// (past <see cref="BehindAngle"/>), on the ground.</summary>
+    public static bool IsBehind(Vector3 at, Vector3 facing, Vector3 striker)
+    {
+        Vector3 to = striker - at;
+        to.y = 0f;
+        facing.y = 0f;
+        return to.sqrMagnitude > 0.0001f && facing.sqrMagnitude > 0.0001f && Vector3.Angle(facing, to) >= BehindAngle;
     }
 
     private void Show(int index, Vector3 point, AttackTelegraph strike)
@@ -82,7 +106,21 @@ public sealed class OffScreenWarnings : MonoBehaviour
         Vector2 toward = new Vector2(point.x - 0.5f, point.y - 0.5f) * (point.z < 0f ? -1f : 1f);
         toward = toward.sqrMagnitude > 1e-6f ? toward.normalized : Vector2.down;
         float reach = 0.46f / Mathf.Max(Mathf.Abs(toward.x), Mathf.Abs(toward.y));
-        Vector2 viewport = new Vector2(0.5f, 0.5f) + toward * Mathf.Min(reach, 0.62f);
+        Place(index, new Vector2(0.5f, 0.5f) + toward * Mathf.Min(reach, 0.62f), toward, strike);
+    }
+
+    // In view but from behind: the chevron close beside the player, pointing at the creature.
+    private void ShowBeside(int index, Camera view, Vector3 point, AttackTelegraph strike)
+    {
+        Vector3 me = view.WorldToViewportPoint(transform.position + Vector3.up * 1.2f);
+        Vector2 toward = new Vector2((point.x - me.x) * view.aspect, point.y - me.y);
+        toward = toward.sqrMagnitude > 1e-6f ? toward.normalized : Vector2.down;
+        Vector2 viewport = new Vector2(me.x + toward.x * BesideReach / Mathf.Max(0.1f, view.aspect), me.y + toward.y * BesideReach);
+        Place(index, viewport, toward, strike);
+    }
+
+    private void Place(int index, Vector2 viewport, Vector2 toward, AttackTelegraph strike)
+    {
         RectTransform arrow = arrows[index];
         arrow.anchorMin = arrow.anchorMax = viewport;
         arrow.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(toward.y, toward.x) * Mathf.Rad2Deg - 90f);

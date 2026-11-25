@@ -481,7 +481,8 @@ public sealed partial class MonsterAI
     }
 
     // At most so many shoot or throw at the player at once (each holds its turn a while after it starts); the rest keep their
-    // aim and their distance until one goes quiet. Every rank waits, elites too: the rule is about how much comes in at once.
+    // aim and their distance until one goes quiet. Every rank waits, elites too: the rule is about how much comes in at once. With a
+    // crowd already on the player, fewer (CombatTechniqueSettings.RangedAtOnceWith).
     private bool WaitsToShoot(Vector3 toTarget)
     {
         CombatTechniqueSettings rules = CombatTechniqueSettings.Current;
@@ -494,7 +495,13 @@ public sealed partial class MonsterAI
             }
         }
 
-        if (shooting < rules.RangedAtOnce)
+        int allowed = rules.RangedAtOnce;
+        if (shooting > 0 && target is Component body)
+        {
+            allowed = rules.RangedAtOnceWith(CountAt(target, body.transform.position, rules.CrowdRadius));
+        }
+
+        if (shooting < allowed)
         {
             return false;
         }
