@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: WintersBreath
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Winter's Breath
+  description: 
   damageType: 2
   strike: 0
-  baseDamage: 6
-  weaponDamageRatio: 0.25
+  baseDamage: 7.5
+  weaponDamageRatio: 0.8
   powerScaling: 1
   structureDamageMultiplier: 1
   canCrit: 1

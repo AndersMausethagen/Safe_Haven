@@ -306,13 +306,24 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [FormerlySerializedAs("focusMax"), SerializeField, Min(1f)] private float focusPerCircle = 100f;
     [Tooltip("How many circles can be kept.")]
     [SerializeField, Range(1, 5)] private int focusCircles = 3;
-    [Tooltip("Focus per target a swing hits (at most two count). Finishers count double, heavy swings 1.5 times, counters 1.5 times more.")]
+    [Tooltip("Focus per target a swing hits (at most Focus Targets Counted count). Finishers count double, heavy swings 1.5 times, counters 1.5 times more.")]
     [SerializeField, Min(0f)] private float focusPerHit = 6f;
+    [Tooltip("How many of the targets one swing strikes earn Focus (2 until 2026-11-25: cutting through a pack paid no more than two foes).")]
+    [SerializeField, Range(1, 10)] private int focusTargetsCounted = 4;
     [SerializeField, Min(0f)] private float focusOnParry = 35f;
     [SerializeField, Min(0f)] private float focusOnPerfectDodge = 25f;
-    [SerializeField, Min(0f)] private float focusOnBlock = 2f;
+    [SerializeField, Min(0f)] private float focusOnBlock = 6f;
+    [Tooltip("Focus for losing a whole health bar to blows, earned in proportion to the share of health each blow takes (the user, " +
+             "2026-11-25: \"the player should get focus from being hit\"; on the defensive, landing hits had been the only way). Blocked, " +
+             "parried and over-time damage earns none here (a block has its own).")]
+    [SerializeField, Min(0f)] private float focusWhenHurt = 200f;
+    [Tooltip("Every Focus earned is worth this share more for each creature after the player within Focus Crowd Radius beyond the " +
+             "first (the user, 2026-11-25: the more enemies engage, the faster Focus comes), up to Focus Crowd Most times as much.")]
+    [SerializeField, Min(0f)] private float focusPerExtraFoe = 0.25f;
+    [SerializeField, Min(1f)] private float focusCrowdMost = 2f;
+    [SerializeField, Min(1f)] private float focusCrowdRadius = 8f;
     [Tooltip("Seconds the circle still filling holds after the last gain, then how fast it drains away (per second). Full circles never drain.")]
-    [SerializeField, Min(0f)] private float focusHoldSeconds = 10f;
+    [SerializeField, Min(0f)] private float focusHoldSeconds = 30f;
     [SerializeField, Min(0f)] private float focusDrainPerSecond = 4f;
 
     [Header("The player's damage")]
@@ -515,6 +526,11 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float FocusOnParry => focusOnParry;
     public float FocusOnPerfectDodge => focusOnPerfectDodge;
     public float FocusOnBlock => focusOnBlock;
+    public int FocusTargetsCounted => focusTargetsCounted;
+    public float FocusWhenHurt => focusWhenHurt;
+    public float FocusPerExtraFoe => focusPerExtraFoe;
+    public float FocusCrowdMost => focusCrowdMost;
+    public float FocusCrowdRadius => focusCrowdRadius;
     public float FocusHoldSeconds => focusHoldSeconds;
     public float FocusDrainPerSecond => focusDrainPerSecond;
     public float PlayerDamage => playerDamage;

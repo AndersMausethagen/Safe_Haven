@@ -745,6 +745,9 @@ MonoBehaviour:
     - stat: 29
       op: 0
       value: 0.1
+    - stat: 50
+      op: 0
+      value: 0.1
     veins: 0
     stinger: {fileID: 11400000, guid: a1c5c2cc7d8214b43ae0dc5991300736, type: 2}
     hushSeconds: 0

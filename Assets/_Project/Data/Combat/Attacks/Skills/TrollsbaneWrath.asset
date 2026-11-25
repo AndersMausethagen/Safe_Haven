@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: TrollsbaneWrath
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Trollsbane Wrath
+  description: 
   damageType: 0
   strike: 1
-  baseDamage: 30
-  weaponDamageRatio: 2.2
+  baseDamage: 60
+  weaponDamageRatio: 4.4
   powerScaling: 1
   structureDamageMultiplier: 1.5
   canCrit: 1

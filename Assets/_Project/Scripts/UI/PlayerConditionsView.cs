@@ -86,7 +86,7 @@ public sealed class PlayerConditionsView : MonoBehaviour
                     float left = buff.Value - Time.time;
                     if (left > 0f)
                     {
-                        Line(buff.Key.Icon, buff.Key.DisplayName, left, BoonColor);
+                        Line(buff.Key.Icon, buff.Key.BuffName, left, BoonColor);
                     }
                 }
             }

@@ -17,7 +17,7 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: b429c2969f88a2a4cb4b2b065be172af, type: 3}
   school: 4
   cooldown: 20
-  staminaCost: 15
+  staminaCost: 0
   focusCircles: 1
   castTime: 0.44
   lungeDistance: 0
@@ -36,7 +36,11 @@ MonoBehaviour:
   - stat: 7
     op: 0
     value: 20
+  - stat: 16
+    op: 0
+    value: 0.15
   buffDuration: 6
+  buffName: Huldra's Grace
   playAttackAnimation: 1
   animationState: Spell Raise
   animationSpeed: 1

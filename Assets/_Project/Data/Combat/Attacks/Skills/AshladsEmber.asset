@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: AshladsEmber
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Ash Lad's Ember
+  description: 
   damageType: 1
   strike: 0
-  baseDamage: 26
-  weaponDamageRatio: 0.3
+  baseDamage: 31
+  weaponDamageRatio: 2
   powerScaling: 1
   structureDamageMultiplier: 1
   canCrit: 1

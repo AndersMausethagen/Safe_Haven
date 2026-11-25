@@ -1757,7 +1757,10 @@ The player is no super soldier: combat is about reading the enemy and committing
   which `CombatFeedback` keeps quiet); stuck arrows may be `Recoverable` (walk over them). Content:
   `AgentScripts/BuildArchery.cs`; the layer: `CombatAnimationSetup.BuildBowLayer` (part of Set Up Combat Animations).
   Tests: `ArcheryTests`.
-- **Focus** (`PlayerFocus`): earned from `SwingLanded`, parries, perfect dodges and blocks, kept in circles (the user, 2026-11-24:
+- **Focus** (`PlayerFocus`): earned from `SwingLanded` (up to `FocusTargetsCounted` targets), parries, perfect dodges, blocks and
+  blows taken (`ForHurt`: `FocusWhenHurt` per whole health bar, from `Damageable.Damaged`; not blocked, over-time or own), each gain
+  times `CrowdScale` (creatures after the player within `FocusCrowdRadius`, `MonsterAI.CountAt`); refunds and gifts use `Gain`
+  plainly, earning goes through `Earn` and raises `Earned` (2026-11-25, tested in `CombatTechniqueTests`). Kept in circles (the user, 2026-11-24:
   `CombatTechniqueSettings.FocusPerCircle` 100 × `FocusCircles` 3). A full circle never drains; only the one filling drains after a
   hold. Every ability, spell, weapon art and escape shot spends one (`TrySpendCircles`, `SkillDefinition.FocusCircles`, 0 on the art
   proxies; `SkillCastResult.NoFocus`); a cheaper option (`SkillOption.costScale`) gives its share of the circle back. The player is
@@ -3346,6 +3349,13 @@ sample textures and flames are in `Art/Effects/VFX Graph/Additions` (Unity Compa
   0.8 for 8 s): `DamageCalculator.DealtScale`/`BonusScale` multiply the attacker's own statuses in. Quest **Back Through the Door**
   (after The Door Wakes; starts on the new objective `FallInRaid` = a RaidFinished with outcome Died; Talk To the Portal; teaches War Cry);
   the portal's whisper for it is on the Haven scene's HomePortal.
+- **Abilities pay off (the user's playtest, 2026-11-25: "underwhelming ... almost no damage"; tested in `SkillPayoffTests`):** every
+  ability's blow is twice what it was at a copper sword and grows with the weapon (Frost Rune, Ember, Winter's Breath and Heartroot's
+  Grasp had fixed or near-fixed damage); abilities cost no stamina (`staminaCost` 0: Focus is the price, stamina the dodge's; Spell
+  Stamina Cost now prices the staff's casts in `PlayerCombat.CostOf`, so Runecraft, Spellsung and Mist Custard still count); each grants
+  its own buff (`SkillDefinition.Buffs`, `BuffName`, shown on the card via `StatBonus.Describe` and beside the health bar). Their blows
+  carry `HitTechnique.Ability` (`PlayerSkills.AbilityTechnique`), so `CombatTally` writes `Skill.Cast`, `Skill.<id>`, `Skill.Hit`,
+  `Skill.Damage`, `Skill.NoFocus` and `Focus.Earned` Combat rows and the boss row has a `skill` share (appended last).
 - **Sounds** (Docs/CombatSkillsResearch 6): `SkillLook.castSound/releaseSound/releaseSoundDelay` (SkillFx plays them; the effects builder
   keeps them when it remakes a look) and `StatusEffectDefinition.consumeSound` (Shatter). Takes for 13 sounds wait on the user's ear:
   MOSS and Stable Audio 3 (two each) and `Tools/Audio/skills.py` (two each; none for the war cry's voice) on the Skill sound picks page.

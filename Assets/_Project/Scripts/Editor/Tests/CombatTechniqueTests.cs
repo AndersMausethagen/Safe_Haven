@@ -122,11 +122,33 @@ public sealed class CombatTechniqueTests
         Assert.AreEqual(0f, PlayerFocus.ForSwing(light, 0, rules), "a whiff earns nothing");
         float one = PlayerFocus.ForSwing(light, 1, rules);
         Assert.Greater(one, 0f);
-        Assert.AreEqual(one * 2f, PlayerFocus.ForSwing(light, 5, rules), 1e-4f, "at most two targets count");
+        int most = rules.FocusTargetsCounted;
+        Assert.Greater(most, 2, "cutting through a pack pays for more than two (2026-11-25)");
+        Assert.AreEqual(one * 2f, PlayerFocus.ForSwing(light, 2, rules), 1e-4f, "each target counts");
+        Assert.AreEqual(one * most, PlayerFocus.ForSwing(light, most + 3, rules), 1e-4f, "up to Focus Targets Counted");
         Assert.AreEqual(one * 2f, PlayerFocus.ForSwing(finisher, 1, rules), 1e-4f);
         Assert.AreEqual(one * 1.5f, PlayerFocus.ForSwing(heavy, 1, rules), 1e-4f);
         Assert.AreEqual(one * 1.5f, PlayerFocus.ForSwing(counter, 1, rules), 1e-4f);
         Assert.Greater(rules.FocusOnParry, one * 3f, "a parry is worth more than trading hits");
+    }
+
+    // The user, 2026-11-25: "the player should get focus from being hit" and "the more enemies that are engaging ... should increase
+    // the rate". Blows earn by the share of health they take; every gain is worth more in a crowd, never less alone, and capped.
+    [Test]
+    public void Focus_ComesFromBlowsTaken_ByTheShareOfHealth_AndFasterInACrowd()
+    {
+        Assert.AreEqual(0f, PlayerFocus.ForHurt(0f, 200f, rules), "nothing taken, nothing earned");
+        float tenth = PlayerFocus.ForHurt(20f, 200f, rules);
+        Assert.Greater(tenth, 0f);
+        Assert.AreEqual(tenth * 2f, PlayerFocus.ForHurt(40f, 200f, rules), 1e-4f, "twice the share, twice the Focus");
+        Assert.AreEqual(tenth, PlayerFocus.ForHurt(40f, 400f, rules), 1e-4f, "by share of health, not the raw number");
+        Assert.AreEqual(rules.FocusWhenHurt, PlayerFocus.ForHurt(900f, 200f, rules), 1e-4f, "a blow past the whole bar counts as the bar");
+
+        Assert.AreEqual(1f, PlayerFocus.CrowdScale(0, rules), 1e-4f, "no crowd: as it was");
+        Assert.AreEqual(1f, PlayerFocus.CrowdScale(1, rules), 1e-4f, "one foe: as it was");
+        Assert.Greater(PlayerFocus.CrowdScale(3, rules), PlayerFocus.CrowdScale(2, rules), "more foes, more Focus");
+        Assert.Greater(PlayerFocus.CrowdScale(2, rules), 1f);
+        Assert.AreEqual(rules.FocusCrowdMost, PlayerFocus.CrowdScale(50, rules), 1e-4f, "capped");
     }
 
     // Focus is kept in circles (the user, 2026-11-24): full ones count, the one filling is a share, and there are at most three.

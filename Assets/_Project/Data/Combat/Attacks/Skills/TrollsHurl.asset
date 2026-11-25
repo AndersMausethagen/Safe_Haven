@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: TrollsHurl
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Troll's Hurl
+  description: 
   damageType: 0
   strike: 1
-  baseDamage: 25
-  weaponDamageRatio: 1.2
+  baseDamage: 50
+  weaponDamageRatio: 2.4
   powerScaling: 1
   structureDamageMultiplier: 1.5
   canCrit: 1

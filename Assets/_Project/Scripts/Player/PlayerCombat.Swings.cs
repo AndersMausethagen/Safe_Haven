@@ -399,9 +399,12 @@ public sealed partial class PlayerCombat
     /// burden): what the Fight card counts swings with.</summary>
     public float StaminaCostOf(SwingKind kind, AttackDefinition attack) => stamina != null ? stamina.Scaled(CostOf(kind, attack)) : 0f;
 
-    // The swing's stamina, after the Melee skill: a beginner tires sooner, a master later.
+    // The swing's stamina, after the Melee skill: a beginner tires sooner, a master later. A staff's cast is a spell (it trains
+    // Runecraft), so Spell Stamina Cost prices it instead: since abilities stopped costing stamina (2026-11-25), Runecraft, Spellsung
+    // and Mist Custard's lighter breath is felt in the staff.
     private float CostOf(SwingKind kind, AttackDefinition attack) =>
-        BaseCostOf(kind, attack) * Mathf.Max(0.1f, 1f + combatant.Stats.Get(StatType.MeleeStaminaCost));
+        BaseCostOf(kind, attack) * Mathf.Max(0.1f, 1f + combatant.Stats.Get(attack != null && attack.CastProjectile != null
+            ? StatType.SpellStaminaCost : StatType.MeleeStaminaCost));
 
     private float BaseCostOf(SwingKind kind, AttackDefinition attack)
     {

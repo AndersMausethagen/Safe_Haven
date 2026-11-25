@@ -17,7 +17,7 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 711cf7787cf498241adc6eb9e7d41ed2, type: 3}
   school: 2
   cooldown: 16
-  staminaCost: 20
+  staminaCost: 0
   focusCircles: 1
   castTime: 0.3
   lungeDistance: 0
@@ -32,8 +32,12 @@ MonoBehaviour:
   leavesCount: 3
   attack: {fileID: 11400000, guid: f66d4b3ce690d86478bd393ccbf0ba5e, type: 2}
   heal: 0
-  buffs: []
-  buffDuration: 6
+  buffs:
+  - stat: 5
+    op: 0
+    value: 0.2
+  buffDuration: 5
+  buffName: Clear Cold
   playAttackAnimation: 1
   animationState: Winter's Breath
   animationSpeed: 1

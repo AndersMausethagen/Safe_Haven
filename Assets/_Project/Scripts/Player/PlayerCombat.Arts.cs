@@ -329,7 +329,7 @@ public sealed partial class PlayerCombat
 
         if (Has(WeaponSignature.Channel) && focus != null)
         {
-            focus.Gain(Rules.FocusPerHit * weapon.SignaturePower);
+            focus.Earn(Rules.FocusPerHit * weapon.SignaturePower);
         }
 
         ArtMoved?.Invoke(ArtMotion.Throw, from, from + activeDirection * attack.CastRange);

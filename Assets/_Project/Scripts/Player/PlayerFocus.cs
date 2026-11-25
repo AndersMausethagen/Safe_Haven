@@ -2,8 +2,10 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// Focus: what fighting well earns and skills spend. Landing hits builds it (finishers and heavy swings more, counters
-/// more still), a parry or a perfect dodge builds a lot, blocking a little. It is kept in circles (the user, 2026-11-24): when one
+/// Focus: what fighting earns and skills spend. Landing hits builds it (finishers and heavy swings more, counters
+/// more still), a parry or a perfect dodge builds a lot, blocking a little, and blows taken build it by the share of health they
+/// take; every gain is worth more the more creatures are after the player (the user, 2026-11-25: on the defensive and
+/// surrounded, Focus had all but stopped coming). It is kept in circles (the user, 2026-11-24): when one
 /// fills it lights above the skill bar and stays lit, never draining, until an ability, a spell or a weapon art spends it; up to
 /// three are kept. Only the circle still filling holds for a while after the last gain and then drains away. The player is made
 /// anew with each scene, so the circles start empty on entering or leaving a raid. Rules are in
@@ -15,6 +17,7 @@ public sealed class PlayerFocus : MonoBehaviour
     private PlayerCombat combat;
     private PlayerGuard guard;
     private Combatant combatant;
+    private Damageable health;
     private float lastGain = float.NegativeInfinity;
 
     /// <summary>All the Focus held: the full circles' and the one filling.</summary>
@@ -37,6 +40,10 @@ public sealed class PlayerFocus : MonoBehaviour
     /// <summary>Raised when something asks for more Focus than there is.</summary>
     public event Action SpendRefused;
 
+    /// <summary>Raised with the Focus fighting earned (hits, parries, dodges, blocks, blows taken; after the crowd's share): not
+    /// refunds or gifts. The playtest log counts it.</summary>
+    public event Action<float> Earned;
+
     private CombatTechniqueSettings Rules => CombatTechniqueSettings.Current;
 
     private void Awake()
@@ -44,6 +51,7 @@ public sealed class PlayerFocus : MonoBehaviour
         combat = GetComponent<PlayerCombat>();
         guard = GetComponent<PlayerGuard>();
         combatant = GetComponent<Combatant>();
+        health = GetComponent<Damageable>();
     }
 
     // An arrow that strikes earns as a swing does, and a perfect release as a finisher: an archer has skills to pay for too.
@@ -52,8 +60,21 @@ public sealed class PlayerFocus : MonoBehaviour
         WeaponDefinition weapon = combat.Weapon;
         if (weapon != null && weapon.IsBow && damage.Attack == weapon.ShotAttack && result.Damage > 0f && !damage.IsOverTime)
         {
-            Gain(Rules.FocusPerHit * (result.IsCritical ? 2f : 1f));
+            Earn(Rules.FocusPerHit * (result.IsCritical ? 2f : 1f));
         }
+    }
+
+    // A blow that got through earns by the share of health it took. Not one the guard took, not burning or poison ticking, not the
+    // player's own doing (a fall, their own fire): only being struck by something.
+    private void OnHurt(DamageInfo damage, DamageResult result)
+    {
+        if (result.Damage <= 0f || result.Blocked || result.Parried || damage.IsOverTime || damage.Source == null || damage.Source == combatant)
+        {
+            return;
+        }
+
+        // Health lost, not the blow's size: one a floor held off (downed in co-op, a relic's last stand, sparring) cost nothing.
+        Earn(ForHurt(result.HealthLost, health.MaxHealth, Rules));
     }
 
     private void OnEnable()
@@ -70,6 +91,11 @@ public sealed class PlayerFocus : MonoBehaviour
             guard.Parried += OnParried;
             guard.Blocked += OnBlocked;
         }
+
+        if (health != null)
+        {
+            health.Damaged += OnHurt;
+        }
     }
 
     private void OnDisable()
@@ -85,6 +111,11 @@ public sealed class PlayerFocus : MonoBehaviour
         {
             guard.Parried -= OnParried;
             guard.Blocked -= OnBlocked;
+        }
+
+        if (health != null)
+        {
+            health.Damaged -= OnHurt;
         }
     }
 
@@ -109,7 +140,7 @@ public sealed class PlayerFocus : MonoBehaviour
         return full >= maxCircles ? 1f : perCircle > 0f ? Mathf.Clamp01((focus - full * perCircle) / perCircle) : 0f;
     }
 
-    /// <summary>Focus a swing earns: per target hit (two at most), more for finishers, heavy swings and counters.</summary>
+    /// <summary>Focus a swing earns: per target hit (up to Focus Targets Counted), more for finishers, heavy swings and counters.</summary>
     public static float ForSwing(SwingInfo swing, int hits, CombatTechniqueSettings rules)
     {
         if (hits <= 0 || swing.Kind == SwingKind.ShieldBash || swing.Kind == SwingKind.Art)
@@ -117,7 +148,7 @@ public sealed class PlayerFocus : MonoBehaviour
             return 0f;
         }
 
-        float gain = rules.FocusPerHit * Mathf.Min(hits, 2);
+        float gain = rules.FocusPerHit * Mathf.Min(hits, rules.FocusTargetsCounted);
         if (swing.IsFinisher)
         {
             gain *= 2f;
@@ -130,13 +161,39 @@ public sealed class PlayerFocus : MonoBehaviour
         return swing.IsCounter ? gain * 1.5f : gain;
     }
 
-    private void OnSwingLanded(SwingInfo swing, int hits) => Gain(ForSwing(swing, hits, Rules));
+    /// <summary>Focus a blow that took <paramref name="damage"/> of <paramref name="maxHealth"/> earns: Focus When Hurt for a whole bar.</summary>
+    public static float ForHurt(float damage, float maxHealth, CombatTechniqueSettings rules) =>
+        maxHealth > 0f && damage > 0f ? rules.FocusWhenHurt * Mathf.Clamp01(damage / maxHealth) : 0f;
 
-    private void OnParried(DamageInfo damage) => Gain(Rules.FocusOnParry);
+    /// <summary>What a crowd of <paramref name="crowd"/> creatures after the player makes each Focus gain worth: 1 for one or none,
+    /// Focus Per Extra Foe more for each beyond, at most Focus Crowd Most.</summary>
+    public static float CrowdScale(int crowd, CombatTechniqueSettings rules) =>
+        Mathf.Clamp(1f + rules.FocusPerExtraFoe * (crowd - 1), 1f, Mathf.Max(1f, rules.FocusCrowdMost));
 
-    private void OnPerfectDodge(DamageInfo damage) => Gain(Rules.FocusOnPerfectDodge);
+    /// <summary>The creatures after this player within Focus Crowd Radius now (as the Hurt rows' crowd counts them).</summary>
+    public int Crowd => health != null ? MonsterAI.CountAt(health, transform.position, Rules.FocusCrowdRadius) : 0;
 
-    private void OnBlocked(DamageInfo damage) => Gain(Rules.FocusOnBlock);
+    /// <summary>Focus fighting earned (a blow, a parry, a staff's cast): worth more in a crowd, and counted by the log. Refunds and
+    /// gifts go through <see cref="Gain"/> as they are.</summary>
+    public void Earn(float amount)
+    {
+        if (amount <= 0f)
+        {
+            return;
+        }
+
+        float earned = amount * CrowdScale(Crowd, Rules);
+        Gain(earned);
+        Earned?.Invoke(earned);
+    }
+
+    private void OnSwingLanded(SwingInfo swing, int hits) => Earn(ForSwing(swing, hits, Rules));
+
+    private void OnParried(DamageInfo damage) => Earn(Rules.FocusOnParry);
+
+    private void OnPerfectDodge(DamageInfo damage) => Earn(Rules.FocusOnPerfectDodge);
+
+    private void OnBlocked(DamageInfo damage) => Earn(Rules.FocusOnBlock);
 
     public void Gain(float amount)
     {

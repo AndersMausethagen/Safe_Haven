@@ -29,4 +29,7 @@ public enum HitTechnique
     Charged = 4096,
     /// <summary>A perfect release from a bow with Hunter's Mark: the creature it strikes is marked and takes more poise from every blow.</summary>
     Marking = 8192,
+    /// <summary>A blow of one of the player's abilities from the skill bar (Whirling Steel, Frost Rune), on top of its Melee | Heavy or
+    /// Spell: how the playtest log tells what skills dealt from swings (the user, 2026-11-25: "the skills deal almost no damage").</summary>
+    Ability = 16384,
 }

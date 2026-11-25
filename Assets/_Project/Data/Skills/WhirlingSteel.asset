@@ -17,7 +17,7 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 648489a9874051c45ab0ba4b5a663897, type: 3}
   school: 0
   cooldown: 6
-  staminaCost: 20
+  staminaCost: 0
   focusCircles: 1
   castTime: 0.5
   lungeDistance: 0
@@ -32,8 +32,12 @@ MonoBehaviour:
   leavesCount: 3
   attack: {fileID: 11400000, guid: 7e80660cdedebd144ae2a226a8f15878, type: 2}
   heal: 0
-  buffs: []
-  buffDuration: 6
+  buffs:
+  - stat: 8
+    op: 0
+    value: 0.2
+  buffDuration: 4
+  buffName: Steel Wall
   playAttackAnimation: 1
   animationState: Skill Whirlwind
   animationSpeed: 1

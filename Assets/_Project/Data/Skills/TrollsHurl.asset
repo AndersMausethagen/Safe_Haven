@@ -17,7 +17,7 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 2d4266ebae592c945a6b45a03610810c, type: 3}
   school: 0
   cooldown: 14
-  staminaCost: 25
+  staminaCost: 0
   focusCircles: 1
   castTime: 0.77
   lungeDistance: 0
@@ -32,8 +32,12 @@ MonoBehaviour:
   leavesCount: 3
   attack: {fileID: 11400000, guid: c8c0dc66059642140a6017c967f080bd, type: 2}
   heal: 0
-  buffs: []
-  buffDuration: 6
+  buffs:
+  - stat: 4
+    op: 0
+    value: 0.3
+  buffDuration: 5
+  buffName: Heavy Hands
   playAttackAnimation: 1
   animationState: Throw
   animationSpeed: 1

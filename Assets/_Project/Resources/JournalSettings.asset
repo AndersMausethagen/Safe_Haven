@@ -786,7 +786,7 @@ MonoBehaviour:
     body: 'Stamina runs everything physical and comes back quickly once you stop spending it, sooner after a swing than after a dodge or a block. Watch it: an empty bar in the middle of a fight is how most people die.
 
 
-      Focus is earned by fighting well: every blow that lands adds some, a parry or a perfect dodge about as much as two blows. It fills the circles above your skill bar one at a time; the thin gold line under your stamina shows the one filling. A full circle glows and stays lit until you spend it, up to three. The circle still filling drains away if you stop fighting, and all three start empty when you set out on a raid or come home.
+      Focus is earned by fighting: every blow that lands adds some, a parry or a perfect dodge about as much as two blows, a block a little, and a blow you take adds by how much it hurt. The more foes are on you, the faster it comes. It fills the circles above your skill bar one at a time; the thin gold line under your stamina shows the one filling. A full circle glows and stays lit until you spend it, up to three. The circle still filling drains away if you stop fighting, and all three start empty when you set out on a raid or come home.
 
 
       Every ability, spell and weapon art spends one full circle. Your weapon glows when its art is ready.
@@ -896,7 +896,7 @@ MonoBehaviour:
     body: 'Your abilities are in the skill book ({key:Skills}). Drag one onto the bar to use it, and press {key:Skill1} to {key:Skill5} to use what is in each slot.
 
 
-      An ability spends one full Focus circle (the glowing circles above your skill bar) and some stamina, and then has to cool down before it can be used again. A slot shows grey while no circle is full.
+      An ability spends one full Focus circle (the glowing circles above your skill bar), no stamina, and then has to cool down before it can be used again. Each grants you something for a few seconds after it lands, named on its card. A slot shows grey while no circle is full.
 
 
       Your weapon''s art sits on the first slot from the start and changes with what you hold. The people you bring home and the great foes you lay low teach more; each goes onto a free slot, and you can drag them anywhere. At the altar, Purified Essence deepens the ones you know, and each rank opens a choice of how it works. Use one often enough and the altar deepens it for nothing.

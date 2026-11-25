@@ -18,6 +18,11 @@ public sealed class CombatTally
     public const string BowShot = "Bow.Shot", BowPerfect = "Bow.Perfect", BowCounter = "Bow.Counter", BowHit = "Bow.Hit";
     public const string StaffCast = "Staff.Cast", StaffHit = "Staff.Hit";
     public const string Ambush = "Ambush", AmbushKill = "Ambush.Kill", SpottedBy = "Spotted.";
+    // Abilities from the bar (the user, 2026-11-25: the log had no casts at all, and their blows were counted as swings): casts in
+    // all and by skill, the blows they landed and the damage those dealt, casts refused for want of a Focus circle, and the Focus
+    // fighting earned (rounded down, the rest carried to the next).
+    public const string SkillCast = "Skill.Cast", SkillOf = "Skill.", SkillHit = "Skill.Hit", SkillDamage = "Skill.Damage",
+        SkillNoFocus = "Skill.NoFocus", FocusEarned = "Focus.Earned";
 
     private readonly Dictionary<string, int> counts = new Dictionary<string, int>();
     private PlayerCombat combat;
@@ -26,6 +31,10 @@ public sealed class CombatTally
     private Damageable health;
     private PlayerArchery archery;
     private Combatant self;
+    private PlayerSkills skills;
+    private PlayerFocus focus;
+    private float skillDamageCarry;
+    private float focusCarry;
 
     /// <summary>The weapon the player held when the last count was made (the rows' detail).</summary>
     public string Weapon { get; private set; } = "";
@@ -44,7 +53,12 @@ public sealed class CombatTally
         Weapon = combat != null && combat.Weapon != null ? combat.Weapon.name : "";
     }
 
-    public void Clear() => counts.Clear();
+    public void Clear()
+    {
+        counts.Clear();
+        skillDamageCarry = 0f;
+        focusCarry = 0f;
+    }
 
     /// <summary>Listens to this player (null stops listening).</summary>
     public void Follow(GameObject player)
@@ -61,9 +75,22 @@ public sealed class CombatTally
         health = player.GetComponent<Damageable>();
         archery = player.GetComponent<PlayerArchery>();
         self = player.GetComponent<Combatant>();
+        skills = player.GetComponent<PlayerSkills>();
+        focus = player.GetComponent<PlayerFocus>();
         if (archery != null)
         {
             archery.Shot += OnShot;
+        }
+
+        if (skills != null)
+        {
+            skills.SkillCast += OnSkillCast;
+            skills.CastRefused += OnCastRefused;
+        }
+
+        if (focus != null)
+        {
+            focus.Earned += OnFocusEarned;
         }
 
         Damageable.AnyDamaged += OnAnyDamaged;
@@ -105,10 +132,23 @@ public sealed class CombatTally
             archery.Shot -= OnShot;
         }
 
+        if (skills != null)
+        {
+            skills.SkillCast -= OnSkillCast;
+            skills.CastRefused -= OnCastRefused;
+        }
+
+        if (focus != null)
+        {
+            focus.Earned -= OnFocusEarned;
+        }
+
         Damageable.AnyDamaged -= OnAnyDamaged;
         MonsterAI.SpottedPlayer -= OnSpotted;
         archery = null;
         self = null;
+        skills = null;
+        focus = null;
         if (combat != null)
         {
             combat.SwingStarted -= OnSwingStarted;
@@ -170,7 +210,15 @@ public sealed class CombatTally
         }
 
         if ((damage.Technique & HitTechnique.Shot) != 0) Note(BowHit);
-        if ((damage.Technique & HitTechnique.Spell) != 0) Note(StaffHit);
+        if ((damage.Technique & HitTechnique.Ability) != 0)
+        {
+            Note(SkillHit);
+            skillDamageCarry += result.Damage;
+            int whole = Mathf.FloorToInt(skillDamageCarry);
+            skillDamageCarry -= whole;
+            Note(SkillDamage, whole);
+        }
+        else if ((damage.Technique & HitTechnique.Spell) != 0) Note(StaffHit);
         if (victim.TryGetComponent(out MonsterAI monster) && monster.LastHitAmbushed)
         {
             Note(result.Killed ? AmbushKill : Ambush);
@@ -178,6 +226,25 @@ public sealed class CombatTally
     }
 
     private void OnSpotted(MonsterAI monster, string how) => Note(SpottedBy + how);
+
+    private void OnSkillCast(int slot, SkillDefinition skill)
+    {
+        Note(SkillCast);
+        Note(SkillOf + skill.Id);
+    }
+
+    private void OnCastRefused(int slot, SkillCastResult why)
+    {
+        if (why == SkillCastResult.NoFocus) Note(SkillNoFocus);
+    }
+
+    private void OnFocusEarned(float amount)
+    {
+        focusCarry += amount;
+        int whole = Mathf.FloorToInt(focusCarry);
+        focusCarry -= whole;
+        Note(FocusEarned, whole);
+    }
 
     private void OnSwingStarted(SwingInfo swing)
     {

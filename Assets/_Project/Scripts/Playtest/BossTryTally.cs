@@ -10,7 +10,7 @@ using UnityEngine;
 public sealed class BossTryTally
 {
     /// <summary>The kinds of blow the player's damage is split into, in the row's order.</summary>
-    public static readonly string[] Kinds = { "light", "heavy", "charged", "counter", "art", "backstab", "heart", "fire", "arrow", "spell", "other" };
+    public static readonly string[] Kinds = { "light", "heavy", "charged", "counter", "art", "backstab", "heart", "fire", "arrow", "spell", "other", "skill" };
 
     private readonly Dictionary<string, float> damage = new Dictionary<string, float>();
     private readonly int[] topples = new int[System.Enum.GetValues(typeof(ToppleCause)).Length];
@@ -36,6 +36,13 @@ public sealed class BossTryTally
     public static string KindOf(in DamageInfo hit)
     {
         HitTechnique technique = hit.Technique;
+        // An ability from the bar, whatever it lands as (Whirling Steel's heavy blow, Ember's fire): split out of the swings and the fire
+        // since 2026-11-25, appended to the row so old readers keep their columns.
+        if ((technique & HitTechnique.Ability) != 0)
+        {
+            return "skill";
+        }
+
         if (hit.Type == DamageType.Fire)
         {
             return "fire";

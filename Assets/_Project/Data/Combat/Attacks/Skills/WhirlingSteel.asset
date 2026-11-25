@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: WhirlingSteel
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Whirling Steel
+  description: 
   damageType: 0
   strike: 2
   baseDamage: 0
-  weaponDamageRatio: 1.3
+  weaponDamageRatio: 2.6
   powerScaling: 1
   structureDamageMultiplier: 1
   canCrit: 1

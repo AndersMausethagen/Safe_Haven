@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: FrostRune
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Frost Rune
+  description: 
   damageType: 2
   strike: 0
-  baseDamage: 34
-  weaponDamageRatio: 0
+  baseDamage: 38
+  weaponDamageRatio: 2
   powerScaling: 1
   structureDamageMultiplier: 0.5
   canCrit: 1

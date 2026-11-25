@@ -347,7 +347,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             // The Runecraft skill scales every spell's damage; its hits carry the Spell technique, which trains it. A physical skill
             // (Steel, Beast) is a heavy melee blow instead: Melee trains, and a frozen foe shatters under it.
             float runecraft = skill.IsPhysical ? 1f : Mathf.Max(0f, 1f + combatant.Stats.Get(StatType.SpellDamage));
-            HitTechnique kind = skill.IsPhysical ? HitTechnique.Melee | HitTechnique.Heavy : HitTechnique.Spell;
+            HitTechnique kind = AbilityTechnique(skill);
             // What it strikes, for the effects that land on each creature hit (SkillLook.struck).
             struck.Clear();
             struckFoes.Clear();
@@ -372,6 +372,10 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             SkillFx.Release(skill, transform.position, pendingDirection, struck);
             AfterOptions(skill, struckFoes);
             LeaveGround(skill, pendingDirection);
+            if (skill.HasBuffs)
+            {
+                ApplyBuffs(skill, Time.time);
+            }
             if (skill.ChannelSeconds > 0f && channeling == skill)
             {
                 nextChannelTick = Time.time + skill.ChannelTick;
@@ -698,11 +702,17 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             health.Heal(skill.Heal * Power(skill));
         }
 
-        if (skill.HasBuffs)
+        // A skill with a blow grants its buff once the blow has landed (Release), not before: Troll's Blood drained life from the very
+        // blow that granted it, ten foes at once, and Cold Clarity sharpened its own lance (the review, 2026-11-25).
+        if (skill.HasBuffs && skill.Attack == null)
         {
             ApplyBuffs(skill, now);
         }
     }
+
+    /// <summary>How an ability's blow lands: a physical one as a heavy melee blow, a spell as a spell; either marked as an ability.</summary>
+    public static HitTechnique AbilityTechnique(SkillDefinition skill) =>
+        (skill.IsPhysical ? HitTechnique.Melee | HitTechnique.Heavy : HitTechnique.Spell) | HitTechnique.Ability;
 
     /// <summary>What deepening a skill at the altar multiplies its damage, healing and buffs by.</summary>
     public static float Power(SkillDefinition skill) => 1f + EssenceSettings.Current.PowerAt(GameSession.Progress.RankOf(skill));
@@ -791,7 +801,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         nextChannelTick += channeling.ChannelTick;
         float weaponDamage = combat != null && combat.Weapon != null ? combat.Weapon.Damage : 0f;
         float runecraft = channeling.IsPhysical ? 1f : Mathf.Max(0f, 1f + combatant.Stats.Get(StatType.SpellDamage));
-        HitTechnique kind = channeling.IsPhysical ? HitTechnique.Melee | HitTechnique.Heavy : HitTechnique.Spell;
+        HitTechnique kind = AbilityTechnique(channeling);
         Vector3 aim = movement.AimDirection;
         aim.y = 0f;
         if (aim.sqrMagnitude > 0.0001f)

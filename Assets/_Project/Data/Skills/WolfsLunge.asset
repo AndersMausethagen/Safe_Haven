@@ -17,7 +17,7 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: c59e2e1466b0a5742938e72a88fde724, type: 3}
   school: 1
   cooldown: 8
-  staminaCost: 25
+  staminaCost: 0
   focusCircles: 1
   castTime: 0.54
   lungeDistance: 5
@@ -46,7 +46,7 @@ MonoBehaviour:
     consumeInto: {fileID: 0}
   - id: wolf_light
     displayName: Light Step
-    description: Costs 40% less stamina, and 40% of its Focus circle comes back.
+    description: 40% of its Focus circle comes back as it is cast.
     rank: 1
     damageScale: 1
     cooldownScale: 1
@@ -160,8 +160,15 @@ MonoBehaviour:
   leavesCount: 3
   attack: {fileID: 11400000, guid: f1223a6650010ea41a5a2d33756ab8f2, type: 2}
   heal: 0
-  buffs: []
-  buffDuration: 6
+  buffs:
+  - stat: 16
+    op: 0
+    value: 0.2
+  - stat: 3
+    op: 0
+    value: 0.25
+  buffDuration: 4
+  buffName: Hunter's Haste
   playAttackAnimation: 1
   animationState: 1H Low Cut
   animationSpeed: 1

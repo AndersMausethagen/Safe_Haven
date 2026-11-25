@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: WolfsLunge
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Wolf's Lunge
+  description: 
   damageType: 0
   strike: 3
   baseDamage: 0
-  weaponDamageRatio: 1.6
+  weaponDamageRatio: 3.2
   powerScaling: 1
   structureDamageMultiplier: 1
   canCrit: 1

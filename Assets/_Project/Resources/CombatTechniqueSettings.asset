@@ -129,10 +129,15 @@ MonoBehaviour:
   focusPerCircle: 100
   focusCircles: 3
   focusPerHit: 8
+  focusTargetsCounted: 4
   focusOnParry: 18
   focusOnPerfectDodge: 18
-  focusOnBlock: 2
-  focusHoldSeconds: 10
+  focusOnBlock: 6
+  focusWhenHurt: 200
+  focusPerExtraFoe: 0.25
+  focusCrowdMost: 2
+  focusCrowdRadius: 8
+  focusHoldSeconds: 30
   focusDrainPerSecond: 4
   playerDamage: 0.7
   artDamage: 0.9

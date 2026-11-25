@@ -330,7 +330,7 @@ public sealed class PlayerVitalsView : MonoBehaviour
         }
 
         nextStaminaMessageAt = now + StaminaMessageInterval;
-        GameMessages.Post("No Focus circle is full. Fight well to fill one: land hits, parry, dodge at the last moment.", MessageKind.Warning);
+        GameMessages.Post("No Focus circle is full. Fight to fill one: land hits, parry, dodge at the last moment; blows taken and a crowd of foes fill it too.", MessageKind.Warning);
     }
 
     private void OnSpendRefused()

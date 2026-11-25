@@ -127,11 +127,14 @@ public static class SkillText
 
         if (skill.HasBuffs)
         {
+            // In the stats' own names and units, as gear shows them: "+20% Physical Resistance", not "+0.2 Physical resistance".
+            var gives = new System.Collections.Generic.List<string>();
             foreach (SkillStatBuff buff in skill.Buffs)
             {
-                string amount = buff.op == StatModifierOp.Percent ? $"{buff.value * 100f:+0;-0}%" : $"{buff.value:+0.##;-0.##}";
-                builder.Append($"\n<color={UIStyle.Current.GoodHex}>{amount} {Spaced(buff.stat.ToString())} for {skill.BuffDuration:0.#}s.</color>");
+                gives.Add(new StatBonus(buff.stat, buff.value, buff.op).Describe());
             }
+
+            builder.Append($"\n<color={UIStyle.Current.GoodHex}>{skill.BuffName} ({skill.BuffDuration:0.#} s): {string.Join(", ", gives)}.</color>");
         }
 
         string words = art != null && !string.IsNullOrWhiteSpace(art.Description) ? art.Description : skill.Description;
@@ -192,21 +195,5 @@ public static class SkillText
         if (status.StopsStrikes) parts.Add("strikes nothing");
         if (status.ConsumedBy != HitTechnique.None && status.ConsumeDamage > 0f) parts.Add("a heavy bursts it");
         return $"{status.DisplayName} ({status.Seconds:0.#} s){(parts.Count > 0 ? ": " + string.Join(", ", parts) : "")}";
-    }
-
-    private static string Spaced(string name)
-    {
-        var builder = new StringBuilder(name.Length + 4);
-        for (int i = 0; i < name.Length; i++)
-        {
-            if (i > 0 && char.IsUpper(name[i]))
-            {
-                builder.Append(' ');
-            }
-
-            builder.Append(i > 0 ? char.ToLowerInvariant(name[i]) : name[i]);
-        }
-
-        return builder.ToString();
     }
 }

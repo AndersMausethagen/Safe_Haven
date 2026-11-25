@@ -534,13 +534,15 @@ public sealed partial class MonsterAI
     /// <summary>True when this game's player is its target and it stands out of their view (the camera's frame).</summary>
     public bool IsOffScreenForLocalPlayer => OffScreen(CombatTechniqueSettings.Current);
 
-    /// <summary>How many creatures are after <paramref name="who"/> within <paramref name="range"/> metres of it: a crowd, for the log.</summary>
+    /// <summary>How many creatures are engaging <paramref name="who"/> within <paramref name="range"/> metres of it: a crowd, for the log and
+    /// for the Focus a crowd is worth (PlayerFocus.CrowdScale). Engaging, not merely holding it as a target (searching, going home), and
+    /// in co-op the host's creatures after this player count too (IsEngaging: a friend's copies have no target of their own).</summary>
     public static int CountAt(IDamageable who, Vector3 at, float range)
     {
         int count = 0;
         foreach (MonsterAI monster in active)
         {
-            if (monster != null && monster.target == who && monster.CurrentState != State.Dead && (monster.transform.position - at).sqrMagnitude <= range * range)
+            if (monster != null && monster.IsEngaging(who) && (monster.transform.position - at).sqrMagnitude <= range * range)
             {
                 count++;
             }

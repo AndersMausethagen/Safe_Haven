@@ -17,7 +17,7 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 0b8fa4d989f90054696000f319f2d4e3, type: 3}
   school: 0
   cooldown: 30
-  staminaCost: 25
+  staminaCost: 0
   focusCircles: 1
   castTime: 1.35
   lungeDistance: 0
@@ -46,7 +46,7 @@ MonoBehaviour:
     consumeInto: {fileID: 0}
   - id: cry_lungs
     displayName: Steady Lungs
-    description: Costs 40% less stamina, and 40% of its Focus circle comes back.
+    description: 40% of its Focus circle comes back as it is cast.
     rank: 1
     damageScale: 1
     cooldownScale: 1
@@ -165,6 +165,7 @@ MonoBehaviour:
     op: 0
     value: 0.15
   buffDuration: 8
+  buffName: Battle Fury
   playAttackAnimation: 1
   animationState: War Cry
   animationSpeed: 1

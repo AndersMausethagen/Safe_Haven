@@ -28,11 +28,12 @@ public sealed class SkillDefinition : ScriptableObject
     [Header("Cost")]
     [Tooltip("Seconds before the skill can be cast again.")]
     [SerializeField, Min(0f)] private float cooldown = 8f;
-    [Tooltip("Stamina paid when cast. An empty stamina pool refuses the skill.")]
-    [SerializeField, Min(0f)] private float staminaCost = 20f;
+    [Tooltip("Stamina paid when cast. An empty stamina pool refuses the skill. 0 for every ability since 2026-11-25: Focus is their " +
+             "price, and stamina is kept for the dodge (SkillPayoffTests).")]
+    [SerializeField, Min(0f)] private float staminaCost;
     [Tooltip("Full Focus circles it needs and spends (the user, 2026-11-24: every ability and spell takes one). Focus is earned by " +
-             "fighting well (hits, parries, perfect dodges) and kept in circles above the skill bar. 0: none (a weapon art's own skill, " +
-             "which the art pays for).")]
+             "fighting (hits, parries, perfect dodges, blocks, blows taken; faster in a crowd) and kept in circles above the skill bar. " +
+             "0: none (a weapon art's own skill, which the art pays for).")]
     [SerializeField, Range(0, 3)] private int focusCircles = 1;
     [Tooltip("Seconds after casting before another skill can be cast.")]
     [SerializeField, Min(0f)] private float castTime = 0.45f;
@@ -72,9 +73,13 @@ public sealed class SkillDefinition : ScriptableObject
     [Header("Support")]
     [Tooltip("Health restored when cast.")]
     [SerializeField, Min(0f)] private float heal;
+    [Tooltip("What casting it grants the caster for Buff Duration: each ability its own (the user, 2026-11-25: \"a secondary beneficial " +
+             "effect for a short duration that's unique to the skill\").")]
     [SerializeField] private List<SkillStatBuff> buffs = new List<SkillStatBuff>();
     [Tooltip("Seconds the buffs last.")]
     [SerializeField, Min(0f)] private float buffDuration = 6f;
+    [Tooltip("The buff's own name, on the card and beside the health bar while it lasts (Steel Wall). Empty: the skill's name.")]
+    [SerializeField] private string buffName;
 
     [Header("Presentation")]
     [SerializeField] private bool playAttackAnimation = true;
@@ -121,6 +126,7 @@ public sealed class SkillDefinition : ScriptableObject
     public float Heal => heal;
     public IReadOnlyList<SkillStatBuff> Buffs => buffs;
     public float BuffDuration => buffDuration;
+    public string BuffName => string.IsNullOrWhiteSpace(buffName) ? DisplayName : buffName;
     public bool PlayAttackAnimation => playAttackAnimation;
     public string AnimationState => animationState;
     public float AnimationSpeed => animationSpeed;
