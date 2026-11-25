@@ -109,6 +109,16 @@ public sealed class CheatTests
     }
 
     [Test]
+    public void LearnEverySkill_ReachesEverySkillInTheGame()
+    {
+        var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+        foreach (SkillDefinition skill in All<SkillDefinition>())
+        {
+            Assert.IsTrue(content.Skills.Contains(skill), skill.name + " is missing from the content list, so the cheat can't teach it");
+        }
+    }
+
+    [Test]
     public void GivenWithoutAPlayer_ThingsGoToTheStash()
     {
         var item = ScriptableObject.CreateInstance<ItemDefinition>();

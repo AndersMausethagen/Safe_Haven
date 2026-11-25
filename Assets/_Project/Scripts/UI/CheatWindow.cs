@@ -13,7 +13,7 @@ using static CodeUI;
 public sealed class CheatWindow : MonoBehaviour
 {
     private const float Width = 1180f;
-    private const float Height = 780f;
+    private const float Height = 840f;
     private const float Margin = 36f;
     private const float TabHeight = 56f;
     private const float PageTop = 72f;
@@ -271,6 +271,7 @@ public sealed class CheatWindow : MonoBehaviour
         Switch(page, "No hunger or thirst", right, y, wide, () => Cheats.NoNeeds, Cheats.SetNoNeeds);
         y += RowStep;
         Switch(page, "Move fast", Margin, y, wide, () => Cheats.Fast, Cheats.SetFast);
+        Switch(page, "Endless Focus", right, y, wide, () => Cheats.EndlessFocus, Cheats.SetEndlessFocus);
         y += RowStep;
         Switch(page, "Free building and crafting", Margin, y, wide, () => Cheats.FreeCosts, Cheats.SetFreeCosts);
         Switch(page, "No building or tier requirements", right, y, wide, () => Cheats.NoRequirements, Cheats.SetNoRequirements);
@@ -289,6 +290,8 @@ public sealed class CheatWindow : MonoBehaviour
         y += RowStep;
         Action(page, "The bog's toxic horse nearby", Margin, y, wide, Cheats.ToxicHorse);
         Action(page, "Your horses: full bond", right, y, wide, Cheats.BondHorses);
+        y += RowStep;
+        Action(page, "Learn every skill", Margin, y, wide, Cheats.LearnAllSkills);
         y += RowStep + 8f;
 
         Title("99 of every material, to the stash", page, y, style);

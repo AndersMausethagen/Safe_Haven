@@ -25,6 +25,8 @@ public static class Cheats
     public static bool OneHitKills { get; private set; }
     public static bool Fast { get; private set; }
     public static bool EndlessStamina { get; private set; }
+    /// <summary>All Focus circles stay full, so every skill can be cast whenever its cooldown allows.</summary>
+    public static bool EndlessFocus { get; private set; }
     public static bool NoNeeds { get; private set; }
     /// <summary>Building and crafting cost nothing (MaterialPool).</summary>
     public static bool FreeCosts { get; private set; }
@@ -34,7 +36,7 @@ public static class Cheats
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession()
     {
-        Invincible = OneHitKills = Fast = EndlessStamina = NoNeeds = FreeCosts = NoRequirements = false;
+        Invincible = OneHitKills = Fast = EndlessStamina = EndlessFocus = NoNeeds = FreeCosts = NoRequirements = false;
         Used = null;
     }
 
@@ -47,6 +49,8 @@ public static class Cheats
     public static void SetFast(bool on) => Set(() => Fast = on, "Fast", on);
 
     public static void SetEndlessStamina(bool on) => Set(() => EndlessStamina = on, "Endless stamina", on);
+
+    public static void SetEndlessFocus(bool on) => Set(() => EndlessFocus = on, "Endless Focus", on);
 
     public static void SetNoNeeds(bool on) => Set(() => NoNeeds = on, "No hunger or thirst", on);
 
@@ -100,7 +104,7 @@ public static class Cheats
     /// <summary>What the switches keep doing while they are on. Called every frame by CheatSystem.</summary>
     public static void Tick()
     {
-        if ((!EndlessStamina && !NoNeeds) || Player.Current == null)
+        if ((!EndlessStamina && !EndlessFocus && !NoNeeds) || Player.Current == null)
         {
             return;
         }
@@ -108,6 +112,12 @@ public static class Cheats
         if (EndlessStamina && Player.Current.TryGetComponent(out PlayerStamina stamina))
         {
             stamina.Restore(stamina.Max);
+        }
+
+        // Topped up after spending, every frame: a cast's circles are back before the next one is asked for.
+        if (EndlessFocus && Player.Current.TryGetComponent(out PlayerFocus focus) && focus.Current < focus.Max)
+        {
+            focus.Gain(focus.Max - focus.Current);
         }
 
         if (NoNeeds && Player.Current.TryGetComponent(out PlayerNeeds needs))
@@ -314,6 +324,28 @@ public static class Cheats
         int recipes = crafting.Unlock(crafting.Recipes, false);
         int buildings = crafting.UnlockBuildings(crafting.Buildings, false);
         return Did("Unlock", $"Learned {recipes} recipes and {buildings} buildings.");
+    }
+
+    /// <summary>Teaches every skill in the game. Quiet per skill (no flood of messages, the bar is left as it is): put them on from the skill book.</summary>
+    public static string LearnAllSkills()
+    {
+        Player player = Player.Current;
+        var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+        if (player == null || player.Skills == null || content == null)
+        {
+            return NoPlayer;
+        }
+
+        int learned = 0;
+        foreach (SkillDefinition skill in content.Skills)
+        {
+            if (player.Skills.Learn(skill, false))
+            {
+                learned++;
+            }
+        }
+
+        return Did("Learn skills", learned > 0 ? $"Learned {learned} skills. Put them on the bar from the skill book." : "Every skill is already known.");
     }
 
     public static string GoTo(Vector3 position, string name)

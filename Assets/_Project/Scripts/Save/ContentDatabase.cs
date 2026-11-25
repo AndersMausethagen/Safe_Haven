@@ -45,6 +45,7 @@ public sealed class ContentDatabase : ScriptableObject, IContentLookup, IContent
     public IReadOnlyList<ItemDefinition> Items => items;
     public IReadOnlyList<GatheringNodeDefinition> GatheringNodes => gatheringNodes;
     public IReadOnlyList<QuestDefinition> Quests => quests;
+    public IReadOnlyList<SkillDefinition> Skills => skills;
     public IReadOnlyList<BuildingModuleDefinition> Modules => modules;
 
     public BuildingModuleDefinition FindModule(string id) =>
