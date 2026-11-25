@@ -35,8 +35,9 @@ public sealed class SkillFx : MonoBehaviour
         }
     }
 
-    /// <summary>The cast: its cues round the caster, and its area while it winds up.</summary>
-    public static void Cast(SkillDefinition skill, Transform caster, Vector3 aim, float windUp)
+    /// <summary>The cast: its cues round the caster, and its area while it winds up. <paramref name="lunge"/>: how far a lunge or a
+    /// leap carries the caster first (negative: its whole Lunge Distance).</summary>
+    public static void Cast(SkillDefinition skill, Transform caster, Vector3 aim, float windUp, float lunge = -1f)
     {
         if (skill == null || skill.Look == null)
         {
@@ -48,7 +49,7 @@ public sealed class SkillFx : MonoBehaviour
         {
             // Where it will land: past the lunge for a skill that carries the caster there first (Mountain Leap, Wolf's Lunge).
             Vector3 flat = new Vector3(aim.x, 0f, aim.z);
-            Vector3 lands = caster.position + (flat.sqrMagnitude > 0.0001f ? flat.normalized : Vector3.zero) * skill.LungeDistance;
+            Vector3 lands = caster.position + (flat.sqrMagnitude > 0.0001f ? flat.normalized : Vector3.zero) * (lunge >= 0f ? lunge : skill.LungeDistance);
             SkillAreaMark.Show(lands, aim, skill.Attack.Range, skill.Attack.Arc, SkillSchools.ColorOf(skill.School), windUp);
         }
 

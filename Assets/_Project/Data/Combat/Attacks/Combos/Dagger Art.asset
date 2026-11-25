@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Dagger Art
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Dagger Art
+  description: Slip behind the foe you watch and drive the fang in where they cannot see it coming.
   damageType: 0
   strike: 3
   baseDamage: 0

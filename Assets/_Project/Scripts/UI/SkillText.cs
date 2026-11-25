@@ -4,10 +4,60 @@ using UnityEngine;
 /// <summary>How a skill is described to the player, shared by the skill window's tooltip and anything else that names one.</summary>
 public static class SkillText
 {
+    /// <summary>
+    /// The art a Weapon's Art or Rune Art card stands for right now (the user, 2026-11-25: "weapon art should change description based
+    /// on which weapon we are holding"): the held weapon's own art, or the art of the rune attuned to its kind. Null for any other
+    /// skill, with nothing in hand, or with no rune attuned; <paramref name="weapon"/> is what is held.
+    /// </summary>
+    public static AttackDefinition HeldArt(SkillDefinition skill, out WeaponDefinition weapon)
+    {
+        weapon = null;
+        if (skill == null || skill.WeaponArt == WeaponArtSlot.None || Player.Current == null
+            || !Player.Current.TryGetComponent(out PlayerCombat combat))
+        {
+            return null;
+        }
+
+        weapon = combat.Weapon;
+        if (weapon == null)
+        {
+            return null;
+        }
+
+        if (skill.WeaponArt == WeaponArtSlot.Own)
+        {
+            return weapon.WeaponArt;
+        }
+
+        ItemDefinition rune = ArtRunes.For(weapon);
+        return rune != null ? rune.RuneArt : null;
+    }
+
+    /// <summary>The card's title: an art card takes the name of the art it stands for now.</summary>
+    public static string Name(SkillDefinition skill)
+    {
+        AttackDefinition art = HeldArt(skill, out _);
+        return art != null ? art.DisplayName : skill.DisplayName;
+    }
+
     public static string Describe(SkillDefinition skill, int equippedSlot)
     {
         var builder = new StringBuilder();
         builder.Append(SkillSchools.Rich(skill.School)).Append($"  <color={UIStyle.Current.MutedHex}>{Costs(skill)}</color>");
+        AttackDefinition art = HeldArt(skill, out WeaponDefinition held);
+        if (skill.WeaponArt != WeaponArtSlot.None)
+        {
+            string whose = held == null ? "Take a weapon in hand to see its art."
+                : art != null ? $"The art of your {held.DisplayName}."
+                : skill.WeaponArt == WeaponArtSlot.Rune ? $"No art rune is attuned to weapons like your {held.DisplayName}."
+                : $"Your {held.DisplayName} has no art.";
+            builder.Append($"\n<color={UIStyle.Current.TextHex}>{whose}</color>");
+            string motion = art != null ? MotionText(art) : null;
+            if (motion != null)
+            {
+                builder.Append($"\n<color={UIStyle.Current.AccentHex}>{motion}</color>");
+            }
+        }
         int rank = GameSession.Progress.RankOf(skill);
         if (rank > 0)
         {
@@ -21,10 +71,10 @@ public static class SkillText
 
         if (skill.LungeDistance > 0f)
         {
-            builder.Append($"\n<color={UIStyle.Current.AccentHex}>Lunges {skill.LungeDistance:0.#} m toward the cursor.</color>");
+            builder.Append($"\n<color={UIStyle.Current.AccentHex}>Lunges toward the cursor, as far as you aim: up to {skill.LungeDistance:0.#} m.</color>");
         }
 
-        AttackDefinition attack = skill.Attack;
+        AttackDefinition attack = skill.Attack != null ? skill.Attack : art;
         if (attack != null)
         {
             builder.Append($"\n<color={UIStyle.Current.DangerHex}>Deals ");
@@ -39,7 +89,9 @@ public static class SkillText
                 builder.Append(hasBase ? " + " : "").Append($"{attack.WeaponDamageRatio * 100f:0}% weapon");
             }
 
-            string area = attack.Arc >= 359f ? $"all around you within {attack.Range:0.#} m" : $"in a {attack.Arc:0}° arc, {attack.Range:0.#} m ahead";
+            string area = attack.Motion == ArtMotion.Throw ? "to all it meets in its flight"
+                : attack.CastProjectile != null ? "where it strikes"
+                : attack.Arc >= 359f ? $"all around you within {attack.Range:0.#} m" : $"in a {attack.Arc:0}° arc, {attack.Range:0.#} m ahead";
             builder.Append($" damage {area}.</color>");
         }
 
@@ -82,15 +134,36 @@ public static class SkillText
             }
         }
 
-        if (!string.IsNullOrWhiteSpace(skill.Description))
+        string words = art != null && !string.IsNullOrWhiteSpace(art.Description) ? art.Description : skill.Description;
+        if (!string.IsNullOrWhiteSpace(words))
         {
-            builder.Append("\n\n").Append(skill.Description);
+            builder.Append("\n\n").Append(words);
         }
 
         builder.Append(equippedSlot >= 0
             ? $"\n\n<color={UIStyle.Current.AccentHex}>On the skill bar: {PlayerInputHandler.SkillKeyLabel(equippedSlot)}</color>"
             : $"\n\n<color={UIStyle.Current.MutedHex}>Drag onto the skill bar, or right-click to slot it.</color>");
         return builder.ToString();
+    }
+
+    // How a weapon art moves the player, in its own numbers. Null for one that stands still.
+    private static string MotionText(AttackDefinition art)
+    {
+        float distance = art.MotionDistance;
+        switch (art.Motion)
+        {
+            case ArtMotion.DashThrough: return $"Dashes {distance:0.#} m through foes, striking all it passes.";
+            case ArtMotion.BlinkBehind: return $"Steps behind the foe in focus, up to {distance:0.#} m away, then strikes.";
+            case ArtMotion.LeapTo: return $"Leaps up to {distance:0.#} m onto the foe in focus.";
+            case ArtMotion.Throw: return $"Thrown up to {distance:0.#} m, it comes back to the hand.";
+        }
+
+        if (art.CastProjectile != null)
+        {
+            return art.CastHazard != null ? $"Cast out to {art.CastRange:0.#} m; the ground holds where it lands." : $"Cast out to {art.CastRange:0.#} m.";
+        }
+
+        return null;
     }
 
     // What it takes to cast: its cooldown (an art's is the arts' own), its stamina, and the Focus circles it spends.

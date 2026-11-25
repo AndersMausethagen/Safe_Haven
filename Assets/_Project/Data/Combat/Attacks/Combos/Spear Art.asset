@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Spear Art
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Spear Art
+  description: Throw the spear as a hunter throws a javelin. It runs through all it meets and flies back to your grip.
   damageType: 0
   strike: 3
   baseDamage: 0

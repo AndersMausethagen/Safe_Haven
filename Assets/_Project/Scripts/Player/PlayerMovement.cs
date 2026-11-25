@@ -75,6 +75,8 @@ public sealed class PlayerMovement : MonoBehaviour
     /// <summary>Analog magnitude (0-1) of the requested movement, before any gating.</summary>
     public float InputMagnitude => movementInput.magnitude;
 
+    private float aimReach = float.PositiveInfinity;
+
     /// <summary>The way the cursor or crosshair points, whatever the focus says; the way the character faces when there is none.</summary>
     public Vector3 RawAimDirection => hasAimDirection ? aimDirection : FacingDirection;
 
@@ -308,19 +310,28 @@ public sealed class PlayerMovement : MonoBehaviour
         }
     }
 
-    /// <summary>Sets the horizontal direction toward the aim point (e.g. the cursor). Used only in states that face the cursor.</summary>
-    public void SetAimDirection(Vector3 direction)
+    /// <summary>Sets the horizontal direction toward the aim point (e.g. the cursor). Used only in states that face the cursor.
+    /// <paramref name="reach"/>: how far away the point is on the ground, when there is one (the mouse's); a stick has none.</summary>
+    public void SetAimDirection(Vector3 direction, float reach = float.PositiveInfinity)
     {
         direction.y = 0f;
         hasAimDirection = direction.sqrMagnitude > 0.0001f;
         aimDirection = hasAimDirection ? direction.normalized : Vector3.zero;
+        aimReach = hasAimDirection ? reach : float.PositiveInfinity;
     }
 
-    public void ClearAimDirection()
+    /// <summary>No aim direction: the character acts the way it faces. <paramref name="reach"/>: the cursor is that close at the
+    /// feet (too close to point anywhere), so a lunge is as short as it goes; infinity when there is no point at all.</summary>
+    public void ClearAimDirection(float reach = float.PositiveInfinity)
     {
         hasAimDirection = false;
         aimDirection = Vector3.zero;
+        aimReach = reach;
     }
+
+    /// <summary>How far away on the ground the point aimed at lies (the cursor's), or infinity without one (a stick, no cursor):
+    /// a lunge or a leap goes that far, up to its own distance (PlayerSkills). A cursor at the feet: as short as it goes.</summary>
+    public float AimReach => aimReach;
 
     /// <summary>Faces and acts toward an enemy rather than the cursor, until cleared (PlayerFocusTarget).</summary>
     public void SetFocusDirection(Vector3 direction)

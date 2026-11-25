@@ -25,6 +25,9 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [SerializeField, Range(0f, 0.5f)] private float rhythmDamagePerStack = 0.05f;
     [Tooltip("Faster swings per rhythm stack. 0 keeps every swing deliberate, however well timed.")]
     [SerializeField, Range(0f, 0.3f)] private float rhythmSpeedPerStack;
+    [Tooltip("Pace of the light chain's swings: 1.15 plays their clips 15% faster, the blow and the recovery coming as much sooner, so " +
+             "the hit still lands on the clip's own contact frame (the user, 2026-11-25). Heavies, arts, counters and rushes keep 1.")]
+    [SerializeField, Range(0.5f, 2f)] private float lightSwingPace = 1.15f;
     [Tooltip("Mashing: a press before a swing has even landed fumbles the chain, so the next swing starts it over. Off, " +
              "an early press is buffered and the chain goes on; it only loses the rhythm bonus.")]
     [SerializeField] private bool earlyPressFumbles;
@@ -380,6 +383,7 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public int MaxRhythm => maxRhythm;
     public float RhythmDamagePerStack => rhythmDamagePerStack;
     public float RhythmSpeedPerStack => rhythmSpeedPerStack;
+    public float LightSwingPace => lightSwingPace;
     public bool EarlyPressFumbles => earlyPressFumbles;
     public bool DodgeCancelsWindup => dodgeCancelsWindup;
     public SwingCancels LightWindupCancels => lightWindupCancels;

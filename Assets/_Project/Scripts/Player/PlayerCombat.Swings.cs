@@ -191,7 +191,9 @@ public sealed partial class PlayerCombat
         activeKind = kind;
         activeAttack = attack;
         activeWeaponDamage = kind == SwingKind.ShieldBash || weapon == null ? 0f : weapon.Damage;
-        activeSpeed = ComboRules.SpeedMultiplier(rhythm, Rules);
+        // The light chain plays faster than its clips' own pace (CombatTechniqueSettings › Light Swing Pace): its blow and recovery
+        // come as much sooner, so the clip still meets the blow on its contact frame.
+        activeSpeed = ComboRules.SpeedMultiplier(rhythm, Rules) * (kind == SwingKind.Light ? Rules.LightSwingPace : 1f);
         activeDamageMultiplier = ComboRules.DamageMultiplier(rhythm, Rules);
         activePoiseMultiplier = 1f;
         // A practised hand's Weapon Art has its weapon's flourish: a one-handed art cuts deeper, a two-handed one sunders.

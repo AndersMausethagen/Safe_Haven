@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Greatsword Art
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Greatsword Art
+  description: Leap at the foe you watch and bring the greatsword down on them with all your weight.
   damageType: 0
   strike: 2
   baseDamage: 0

@@ -208,7 +208,7 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
             return;
         }
 
-        tooltip.Show(skill.DisplayName, SkillSchools.ColorOf(skill.School), SkillText.Describe(skill, skills.Loadout.IndexOf(skill)));
+        tooltip.Show(SkillText.Name(skill), SkillSchools.ColorOf(skill.School), SkillText.Describe(skill, skills.Loadout.IndexOf(skill)));
     }
 
     private void CancelDrag()

@@ -218,11 +218,12 @@ public sealed class PlayerInputHandler : MonoBehaviour
         toCursor.y = 0f;
         if (toCursor.sqrMagnitude < MinAimDistance * MinAimDistance)
         {
-            movement.ClearAimDirection();
+            // At the feet: no way to point, but a lunge aimed here is as short as it goes (review 2026-11-25).
+            movement.ClearAimDirection(toCursor.magnitude);
             return;
         }
 
-        movement.SetAimDirection(toCursor);
+        movement.SetAimDirection(toCursor, toCursor.magnitude);
     }
 
     // The right stick's lean, turned into the world the way the camera faces, while it aims (PlayerCameraController.StickAims).

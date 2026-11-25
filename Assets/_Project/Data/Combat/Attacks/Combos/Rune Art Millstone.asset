@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Rune Art Millstone
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Millstone
+  description: Turn like a millstone with the weapon held out, grinding everything around you.
   damageType: 0
   strike: 1
   baseDamage: 0

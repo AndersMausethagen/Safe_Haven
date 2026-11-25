@@ -19,6 +19,7 @@ MonoBehaviour:
   maxRhythm: 2
   rhythmDamagePerStack: 0.05
   rhythmSpeedPerStack: 0
+  lightSwingPace: 1.15
   earlyPressFumbles: 0
   dodgeCancelsWindup: 1
   lightWindupCancels: 3

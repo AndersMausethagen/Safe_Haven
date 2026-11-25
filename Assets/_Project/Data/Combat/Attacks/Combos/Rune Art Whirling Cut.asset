@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Rune Art Whirling Cut
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Whirling Cut
+  description: A whirling cut that sweeps a broad arc in front of you.
   damageType: 0
   strike: 2
   baseDamage: 0

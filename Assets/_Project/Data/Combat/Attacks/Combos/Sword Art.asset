@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Sword Art
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Sword Art
+  description: Cut through the enemy line in one dash and come out behind them, where a backstab waits.
   damageType: 0
   strike: 2
   baseDamage: 0

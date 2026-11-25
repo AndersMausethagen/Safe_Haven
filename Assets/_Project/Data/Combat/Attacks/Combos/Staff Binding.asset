@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Staff Binding
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Staff Binding
+  description: Loose a wisp of rune light down a long line. Where it lands the ground grips like a web, holding and chilling what walks in.
   damageType: 2
   strike: 0
   baseDamage: 0

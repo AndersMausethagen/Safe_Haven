@@ -597,7 +597,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         Vector3 direction = movement.AimDirection;
         // How it looks as it is cast, and its area on the ground until it lands (a skill without a blow still shows its cast).
         float windUp = skill.Attack != null ? (skill.LungeDistance > 0f ? skill.LungeDuration : 0f) + skill.Attack.HitDelay : 0f;
-        SkillFx.Cast(skill, transform, direction, windUp);
+        SkillFx.Cast(skill, transform, direction, windUp, skill.LungeDistance > 0f ? LungeReach(skill) : -1f);
         if (skill.Attack == null)
         {
             SkillFx.Release(skill, transform.position, direction, null);
@@ -612,7 +612,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         float hitAfter = 0f;
         if (skill.LungeDistance > 0f)
         {
-            movement.Dash(direction * (skill.LungeDistance / skill.LungeDuration), skill.LungeDuration);
+            movement.Dash(direction * (LungeReach(skill) / skill.LungeDuration), skill.LungeDuration);
             hitAfter = skill.LungeDuration;
         }
 
@@ -1003,7 +1003,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
         Vector3 aim = movement.AimDirection;
         Vector3 flat = new Vector3(aim.x, 0f, aim.z);
-        Vector3 lands = transform.position + (flat.sqrMagnitude > 0.0001f ? flat.normalized : Vector3.zero) * skill.LungeDistance;
+        Vector3 lands = transform.position + (flat.sqrMagnitude > 0.0001f ? flat.normalized : Vector3.zero) * LungeReach(skill);
         // Grey while letting go would be refused (cooling down, no Focus circle full): it looked castable until the refusal on release.
         if (aimFocus == null)
         {
@@ -1022,6 +1022,36 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             SkillAreaMark.Show(lands, aim, skill.Attack.Range, skill.Attack.Arc, colour, 10f);
         }
     }
+
+    // A lunge or a leap goes as far as the player aims, never past its own Lunge Distance (the user, 2026-11-25: "shorter jumps and
+    // lunges if the player wants it, but not longer than maximum"): to the enemy in focus, stopping short of it, else to the cursor's
+    // point. A stick has no point on the ground: the whole distance.
+    private const float ShortestLunge = 1f;
+    private const float FocusStandOff = 1.2f;
+    private PlayerFocusTarget focusTarget;
+
+    private float LungeReach(SkillDefinition skill)
+    {
+        float most = skill.LungeDistance;
+        float wanted = movement != null ? movement.AimReach : most;
+        if (focusTarget == null)
+        {
+            focusTarget = GetComponent<PlayerFocusTarget>();
+        }
+
+        if (focusTarget != null && focusTarget.HasFocus && focusTarget.Target != null)
+        {
+            Vector3 to = focusTarget.Target.transform.position - transform.position;
+            to.y = 0f;
+            wanted = to.magnitude - FocusStandOff;
+        }
+
+        return LungeReach(most, wanted);
+    }
+
+    /// <summary>How far a lunge of <paramref name="most"/> metres goes when the player aims <paramref name="wanted"/> metres away: as far
+    /// as aimed, at least a step, never past its own distance (infinity, no point aimed at: all of it).</summary>
+    public static float LungeReach(float most, float wanted) => Mathf.Clamp(wanted, Mathf.Min(ShortestLunge, most), most);
 
     private void EnsureInitialised()
     {

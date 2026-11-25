@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Rune Art Reaping Cut
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Reaping Cut
+  description: One long reaping cut that sweeps a wide arc in front of you.
   damageType: 0
   strike: 2
   baseDamage: 0

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Hammer Art
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Hammer Art
+  description: 'Leap onto your foe and slam the hammer into the ground: all around is struck and thrown back.'
   damageType: 0
   strike: 1
   baseDamage: 0

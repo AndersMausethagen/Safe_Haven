@@ -13,6 +13,8 @@ using UnityEngine;
 public sealed class AttackDefinition : ScriptableObject
 {
     [SerializeField] private string displayName;
+    [Tooltip("A weapon art's own words: the skill window's Weapon's Art / Rune Art card shows them while its weapon is held.")]
+    [SerializeField, TextArea(2, 4)] private string description;
 
     [Header("Damage")]
     [SerializeField] private DamageType damageType = DamageType.Physical;
@@ -188,6 +190,7 @@ public sealed class AttackDefinition : ScriptableObject
     [SerializeField, Range(-80f, 80f)] private float slashTilt;
 
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
+    public string Description => description;
     public DamageType DamageType => damageType;
     public StrikeKind Strike => damageType.IsPhysical() ? strike : StrikeKind.None;
     public float BaseDamage => baseDamage;

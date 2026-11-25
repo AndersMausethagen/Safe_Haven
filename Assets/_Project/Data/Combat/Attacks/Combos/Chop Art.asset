@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Chop Art
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Chop Art
+  description: Hurl the axe end over end at what you aim at. It bites into everything in its flight and comes back to your hand.
   damageType: 0
   strike: 2
   baseDamage: 0

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Fists Art
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Fists Art
+  description: Close the gap in one bound and land a straight punch with the whole body behind it.
   damageType: 0
   strike: 1
   baseDamage: 0

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Axe Art
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Axe Art
+  description: Swing the great axe round in a full circle, cutting everything that stands too close.
   damageType: 0
   strike: 2
   baseDamage: 0

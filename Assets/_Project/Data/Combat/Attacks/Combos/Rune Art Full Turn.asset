@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Rune Art Full Turn
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Full Turn
+  description: A single full turn with the weapon out, striking all around you.
   damageType: 0
   strike: 2
   baseDamage: 0
