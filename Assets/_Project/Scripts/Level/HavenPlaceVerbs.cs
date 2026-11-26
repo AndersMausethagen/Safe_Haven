@@ -109,6 +109,9 @@ public sealed class HavenPlaceVerbs : ScriptableObject
                  "comes into view, and far off only from a lookout's wider view.")]
         [Min(0f)] public float smokeRise;
         public Vector3 smokeAt = new Vector3(0f, 1.2f, 0f);
+        [Tooltip("The mist stands back from it: this share of the mist that would lie there is held back round it (KeptPlace), for a " +
+                 "place in low ground by water, where the mist pools thick even over remembered land and would hide the scene.")]
+        [Range(0f, 1f)] public float clearsMist;
         [Tooltip("The earlier stages' dressing goes when this one shows.")]
         public bool hidesEarlier;
     }

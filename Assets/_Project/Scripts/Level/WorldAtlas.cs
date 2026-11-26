@@ -33,6 +33,9 @@ public sealed class WorldAtlas : ScriptableObject
         public Vector2 at;
         [Tooltip("Metres from it at which it counts as found.")]
         public float radius = 25f;
+        [Tooltip("A place written by hand: metres of open ground kept round it, no terrain tree inside (HavenAuthoredClearings, and " +
+                 "the world generator's Finish). The plan's places have their own clearing.")]
+        public float clearing;
     }
 
     [Tooltip("The ground it covers, world x and z: the scene's terrain.")]

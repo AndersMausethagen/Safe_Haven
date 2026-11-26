@@ -121,3 +121,7 @@ AgentScripts/discord.local.json
 /Assets/Starter Assets.meta
 /Assets/AmplifyShaderEditor/
 /Assets/AmplifyShaderEditor.meta
+# Medieval Village Megapack (Meshingun Studio), 2026-11-26: only the parts the Haven's ruins use (models, textures, their .meta),
+# copied out of the package by Tools; the materials and prefabs made from them are the project's own (Art/World/Ruins).
+/Assets/MeshingunStudio/
+/Assets/MeshingunStudio.meta

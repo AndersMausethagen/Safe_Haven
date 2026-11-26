@@ -91,6 +91,32 @@ public sealed class HavenPlaceScenesTests
     }
 
     [Test]
+    public void EveryPlaceWrittenByHand_IsDressed_AndItsClearingHoldsItsScene()
+    {
+        HavenPlaceVerbs verbs = Verbs;
+        Assert.GreaterOrEqual(Atlas.Authored.Count, 5, "step 4: new places in the map's empty wedges");
+        foreach (WorldAtlas.Place place in Atlas.Authored)
+        {
+            HavenPlaceVerbs.PlaceScene scene = verbs.SceneOf(place.id);
+            Assert.IsNotNull(scene, $"{place.name}: a scene");
+            HavenPlaceVerbs.Stage always = scene.stages.FirstOrDefault(s => s.gate == HavenPlaceVerbs.Gate.Always && s.dressing != null);
+            Assert.IsNotNull(always, $"{place.name}: dressed from the start");
+            Assert.IsNotNull(verbs.KindOf(place.kind), $"{place.name}: its kind ({place.kind}) has thoughts");
+            Assert.Greater(place.clearing, 0f, $"{place.name}: open ground kept round it");
+            float reach = 0f;
+            foreach (Transform prop in always.dressing.transform)
+            {
+                if (prop.GetComponentInChildren<Collider>(true) != null)
+                {
+                    reach = Mathf.Max(reach, new Vector2(prop.localPosition.x, prop.localPosition.z).magnitude);
+                }
+            }
+
+            Assert.LessOrEqual(reach, place.clearing + 3f, $"{place.name}: a solid prop stands {reach:0} m out, where trees still grow");
+        }
+    }
+
+    [Test]
     public void AGate_WithNoQuest_NeverOpens_AndAlwaysDoes()
     {
         Assert.IsTrue(HavenPlaceVerbs.Passes(HavenPlaceVerbs.Gate.Always, null, "The Grey Pines"));

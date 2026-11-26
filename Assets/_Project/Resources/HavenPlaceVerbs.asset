@@ -133,6 +133,54 @@ MonoBehaviour:
     sound: {fileID: 0}
     soundWhen: 0
     soundEvery: {x: 12, y: 25}
+  - kind: Grave in the Pines
+    thoughts:
+    - A cairn, a small one, with a stone at its head. Somebody put a hurdle round it to keep the animals off.
+    - Whoever ran from the burning farm stopped here long enough to bury one of their own.
+    lookout: 0
+    sound: {fileID: 0}
+    soundWhen: 0
+    soundEvery: {x: 12, y: 25}
+  - kind: Old Steading
+    thoughts:
+    - A house's footing, a well, a yard fence half fallen. Nobody has drawn water here in a long time.
+    - The old village reached further out than I thought. These were the hearth-keepers' farms.
+    lookout: 0
+    sound: {fileID: 0}
+    soundWhen: 0
+    soundEvery: {x: 12, y: 25}
+  - kind: Empty Hall
+    thoughts:
+    - A long hall's walls, knee-high now, and the long hearth down the middle. This is where they all sat at night.
+    - An anvil by the door, the smith's logs still stacked. They didn't mean to come back.
+    lookout: 0
+    sound: {fileID: 0}
+    soundWhen: 0
+    soundEvery: {x: 12, y: 25}
+  - kind: Alder Spring
+    thoughts:
+    - A spring house of fieldstone and a step down to the water. The water has gone back into the ground.
+    - Herbs were dried on that rack. Somebody here knew what grows by alders, and what it is good for.
+    lookout: 0
+    sound: {fileID: 0}
+    soundWhen: 0
+    soundEvery: {x: 12, y: 25}
+  - kind: Tarn Shrine
+    thoughts:
+    - Three stones above the tarn and a cairn behind them. The wind up here doesn't sound like wind.
+    - Things were left here once, for the tarn. Whatever they asked of it, nobody remembers the answer.
+    lookout: 0
+    sound: {fileID: 0}
+    soundWhen: 0
+    soundEvery: {x: 12, y: 25}
+  - kind: Sunken Causeway
+    thoughts:
+    - Boards laid across the fen, sinking one by one. Somebody tried to leave by the bog.
+    - The causeway runs out into the mist and stops. So did whoever was walking it.
+    lookout: 0
+    sound: {fileID: 0}
+    soundWhen: 0
+    soundEvery: {x: 12, y: 25}
   finds:
   - placeId: haven.old_quarry.0
     name: Cut stone
@@ -211,6 +259,105 @@ MonoBehaviour:
       - The clamp breathes again. From the meadows the smoke must look as if somebody lives out here.
       smokeRise: 16
       smokeAt: {x: 0, y: 1.4, z: 0}
+      clearsMist: 0
+      hidesEarlier: 0
+  - placeId: haven.burnt_farmstead.0
+    thoughts: []
+    stages:
+    - note: 'The farm that burned the night the hearth went out: the hearth kept outside, scorch, the fence line leading off toward the grave.'
+      gate: 0
+      quest: {fileID: 0}
+      dressing: {fileID: 2876405071782775659, guid: 1bae29f47455a5b41b7f69c373b57ee0, type: 3}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0, z: 0}
+      clearsMist: 0
+      hidesEarlier: 0
+  - placeId: haven.authored.familys_grave
+    thoughts: []
+    stages:
+    - note: The family's grave in the pines, where the burnt fence line leads.
+      gate: 0
+      quest: {fileID: 0}
+      dressing: {fileID: 7413560167342517927, guid: 73a55ba9245b85d4297517f80ee615ce, type: 3}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0, z: 0}
+      clearsMist: 0
+      hidesEarlier: 0
+  - placeId: haven.authored.old_steading
+    thoughts: []
+    stages:
+    - note: A farm of the old village, overgrown.
+      gate: 0
+      quest: {fileID: 0}
+      dressing: {fileID: 4073617472049984758, guid: 8633879639030fe418b7f8b30e8604df, type: 3}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0, z: 0}
+      clearsMist: 0
+      hidesEarlier: 0
+  - placeId: haven.authored.empty_hall
+    thoughts: []
+    stages:
+    - note: 'The hearth-keepers'' hall: footing, long hearth, the smith''s corner.'
+      gate: 0
+      quest: {fileID: 0}
+      dressing: {fileID: 1594542500666516875, guid: 36d47d9ecb638974088cbc2e934ea73b, type: 3}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0, z: 0}
+      clearsMist: 0
+      hidesEarlier: 0
+  - placeId: haven.authored.alder_spring
+    thoughts: []
+    stages:
+    - note: The healer's spring, gone dry.
+      gate: 0
+      quest: {fileID: 0}
+      dressing: {fileID: 3723677936824139894, guid: c7122e4b5094e6044ac144802ce1cc90, type: 3}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0, z: 0}
+      clearsMist: 0.85
+      hidesEarlier: 0
+  - placeId: haven.authored.tarn_shrine
+    thoughts: []
+    stages:
+    - note: Three stones and a cairn above the high tarn.
+      gate: 0
+      quest: {fileID: 0}
+      dressing: {fileID: 2090388240772336518, guid: 797b57c63437dc9468237ba383ffef1d, type: 3}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0, z: 0}
+      clearsMist: 0.85
+      hidesEarlier: 0
+  - placeId: haven.authored.sunken_causeway
+    thoughts: []
+    stages:
+    - note: 'The drowned road: boards sinking into the fen.'
+      gate: 0
+      quest: {fileID: 0}
+      dressing: {fileID: 2589852322515540126, guid: b80644cf4ec75c8468814dfb8c7613b8, type: 3}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0, z: 0}
+      clearsMist: 0
       hidesEarlier: 0
   smoke: {fileID: 2100000, guid: e0dc5fdfe4f83b44294848291dbc9ed2, type: 2}
   lookoutReveal: 110

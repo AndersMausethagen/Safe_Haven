@@ -1233,6 +1233,8 @@ public static class HavenWorldGenerator
         int along = PlaceAlongTheWay(plan, terrain, content, Ground, footprints);
         int herds = recipe.sceneryHerds ? PlaceWildlife(plan, content, Ground) : 0;
         int cleared = ClearTreesUnder(terrain, footprints);
+        // The places written by hand into the atlas keep their open ground (they stand where the plan put no place).
+        cleared += HavenAuthoredClearings.Clear(terrain, WorldAtlas.For("SafeHaven"));
 
         // Felled trees in the woods are kept in the save (TerrainTreeMemory), on the terrain's own saveable entity.
         if (!terrain.TryGetComponent(out SaveableEntity entity))

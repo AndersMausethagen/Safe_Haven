@@ -75,133 +75,197 @@ MonoBehaviour:
     kind: Wayfarer's Stones
     at: {x: 325.9293, y: 289.59644}
     radius: 20
+    clearing: 0
   - id: haven.wayfarer_s_stones.1
     name: Pilgrim's Stones
     kind: Wayfarer's Stones
     at: {x: -325.9293, y: -289.5964}
     radius: 20
+    clearing: 0
   - id: haven.wayfarer_s_stones.2
     name: Wanderer's Stones
     kind: Wayfarer's Stones
     at: {x: -413.7625, y: 137.46484}
     radius: 20
+    clearing: 0
   - id: haven.wayfarer_s_stones.3
     name: Farewell Stones
     kind: Wayfarer's Stones
     at: {x: -263.1805, y: 347.609}
     radius: 20
+    clearing: 0
   - id: haven.island_stones.0
     name: Island Stones
     kind: Island Stones
     at: {x: 306.82773, y: -41.069077}
     radius: 18
+    clearing: 0
   - id: haven.drowned_stones.0
     name: Drowned Stones
     kind: Drowned Stones
     at: {x: -117.76796, y: -339.69067}
     radius: 20
+    clearing: 0
   - id: haven.fisher_s_rest.0
     name: Fisher's Rest
     kind: Fisher's Rest
     at: {x: 237.89368, y: 30.90689}
     radius: 18
+    clearing: 0
   - id: haven.fisher_s_rest.1
     name: Netmender's Rest
     kind: Fisher's Rest
     at: {x: 201.03607, y: -91.43742}
     radius: 18
+    clearing: 0
   - id: haven.mother_maple.0
     name: Mother Maple
     kind: Mother Maple
     at: {x: 112.57057, y: 38.20382}
     radius: 20
+    clearing: 0
   - id: haven.shepherd_s_fold.0
     name: Shepherd's Fold
     kind: Shepherd's Fold
     at: {x: -115.09177, y: 88.36484}
     radius: 18
+    clearing: 0
   - id: haven.shepherd_s_fold.1
     name: Ewe Fold
     kind: Shepherd's Fold
     at: {x: -64.91977, y: 98.97369}
     radius: 18
+    clearing: 0
   - id: haven.ruined_watchtower.0
     name: Ruined Watchtower
     kind: Ruined Watchtower
     at: {x: -282.8047, y: -356.97913}
     radius: 22
+    clearing: 0
   - id: haven.ruined_watchtower.1
     name: Broken Tower
     kind: Ruined Watchtower
     at: {x: -371.70706, y: -336.04715}
     radius: 22
+    clearing: 0
   - id: haven.standing_stones.0
     name: Standing Stones
     kind: Standing Stones
     at: {x: 288.5702, y: 186.46103}
     radius: 22
+    clearing: 0
   - id: haven.lookout_cairn.0
     name: Lookout Cairn
     kind: Lookout Cairn
     at: {x: -379.0923, y: -263.67755}
     radius: 18
+    clearing: 0
   - id: haven.lookout_cairn.1
     name: Raven Cairn
     kind: Lookout Cairn
     at: {x: -387.62042, y: -197.41476}
     radius: 18
+    clearing: 0
   - id: haven.lookout_cairn.2
     name: Windy Cairn
     kind: Lookout Cairn
     at: {x: -427.9775, y: 196.26381}
     radius: 18
+    clearing: 0
   - id: haven.old_barrow.0
     name: Old Barrow
     kind: Old Barrow
     at: {x: -377.20694, y: -396.52054}
     radius: 22
+    clearing: 0
   - id: haven.burnt_farmstead.0
     name: Burnt Farmstead
     kind: Burnt Farmstead
     at: {x: -2.8314013, y: -266.67294}
     radius: 24
+    clearing: 0
   - id: haven.wolf_den.0
     name: Wolf Den
     kind: Wolf Den
     at: {x: -224.5768, y: -309.75815}
     radius: 22
+    clearing: 0
   - id: haven.old_quarry.0
     name: Old Quarry
     kind: Old Quarry
     at: {x: 28.033806, y: 288.74243}
     radius: 20
+    clearing: 0
   - id: haven.old_quarry.1
     name: Grey Quarry
     kind: Old Quarry
     at: {x: 400.1837, y: 272.3473}
     radius: 20
+    clearing: 0
   - id: haven.elder_cedar.0
     name: Elder Cedar
     kind: Elder Cedar
     at: {x: 340.0233, y: 168.5637}
     radius: 20
+    clearing: 0
   - id: haven.elder_cedar.1
     name: Grandmother Cedar
     kind: Elder Cedar
     at: {x: -428.24246, y: -384.228}
     radius: 20
+    clearing: 0
   - id: haven.woodland_camp.0
     name: Woodland Camp
     kind: Woodland Camp
     at: {x: 331.32446, y: 232.51376}
     radius: 19
+    clearing: 0
   - id: haven.woodland_camp.1
     name: Trapper's Camp
     kind: Woodland Camp
     at: {x: -164.64142, y: 104.19481}
     radius: 19
+    clearing: 0
   - id: haven.woodland_camp.2
     name: Charcoal Camp
     kind: Woodland Camp
     at: {x: -136.21404, y: 168.73196}
     radius: 19
+    clearing: 0
+  authored:
+  - id: haven.authored.familys_grave
+    name: The Family's Grave
+    kind: Grave in the Pines
+    at: {x: 167, y: -318}
+    radius: 18
+    clearing: 8
+  - id: haven.authored.old_steading
+    name: The Old Steading
+    kind: Old Steading
+    at: {x: 347, y: -344}
+    radius: 22
+    clearing: 15
+  - id: haven.authored.empty_hall
+    name: The Empty Hall
+    kind: Empty Hall
+    at: {x: 197, y: 386}
+    radius: 24
+    clearing: 16
+  - id: haven.authored.alder_spring
+    name: Alder Spring
+    kind: Alder Spring
+    at: {x: -229, y: -109}
+    radius: 18
+    clearing: 8
+  - id: haven.authored.tarn_shrine
+    name: The Tarn Shrine
+    kind: Tarn Shrine
+    at: {x: 109, y: 267}
+    radius: 18
+    clearing: 8
+  - id: haven.authored.sunken_causeway
+    name: The Sunken Causeway
+    kind: Sunken Causeway
+    at: {x: -61, y: -385}
+    radius: 20
+    clearing: 11

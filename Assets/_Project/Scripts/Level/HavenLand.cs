@@ -42,14 +42,20 @@ public sealed class HavenLand : MonoBehaviour
     private float nextRemake;
     private bool dirty;
     // Worked places in the land (a relit clamp: HavenPlaceScenes' smoking stages) keep it in mind round them, before their region is
-    // remembered: x, z and radius of each, and for each texel how much it is kept (0 to 1).
-    private readonly Dictionary<Object, Vector3> keepers = new Dictionary<Object, Vector3>();
+    // remembered; some places hold the mist back from themselves (the stones above the tarn). For each: x, z, radius, whether it
+    // keeps the land in mind, and the share of the mist it holds back; for each texel how much it is kept and how much mist is held back.
+    private readonly Dictionary<Object, (Vector3 circle, bool remembers, float clears)> keepers = new Dictionary<Object, (Vector3, bool, float)>();
     private float[] kept;
+    private float[] held;
 
     /// <summary>A worked place keeps the land round it in mind: thinner mist and some colour, out to <paramref name="radius"/> metres.</summary>
-    public void Keep(Object keeper, Vector2 at, float radius)
+    public void Keep(Object keeper, Vector2 at, float radius) => Keep(keeper, at, radius, true, 0f);
+
+    /// <summary>A place keeps the land round it in mind (<paramref name="remembers"/>), and holds back <paramref name="clears"/> of the
+    /// mist that would lie there even once remembered (low ground by water pools it thick).</summary>
+    public void Keep(Object keeper, Vector2 at, float radius, bool remembers, float clears)
     {
-        keepers[keeper] = new Vector3(at.x, at.y, Mathf.Max(1f, radius));
+        keepers[keeper] = (new Vector3(at.x, at.y, Mathf.Max(1f, radius)), remembers, Mathf.Clamp01(clears));
         RemakeKept();
     }
 
@@ -65,9 +71,11 @@ public sealed class HavenLand : MonoBehaviour
     private void RemakeKept()
     {
         kept ??= new float[MapSize * MapSize];
+        held ??= new float[MapSize * MapSize];
         System.Array.Clear(kept, 0, kept.Length);
+        System.Array.Clear(held, 0, held.Length);
         float texel = area.width / MapSize;
-        foreach (Vector3 keeper in keepers.Values)
+        foreach ((Vector3 keeper, bool remembers, float clears) in keepers.Values)
         {
             int cx = Mathf.FloorToInt((keeper.x - area.xMin) / texel), cy = Mathf.FloorToInt((keeper.y - area.yMin) / (area.height / MapSize));
             int reach = Mathf.CeilToInt(keeper.z / texel) + 1;
@@ -80,7 +88,12 @@ public sealed class HavenLand : MonoBehaviour
                     // Whole within half the radius, fading to none at it.
                     float k = 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.5f, 1f, d));
                     int i = y * MapSize + x;
-                    kept[i] = Mathf.Max(kept[i], k);
+                    if (remembers)
+                    {
+                        kept[i] = Mathf.Max(kept[i], k);
+                    }
+
+                    held[i] = Mathf.Max(held[i], k * clears);
                 }
             }
         }
@@ -333,6 +346,11 @@ public sealed class HavenLand : MonoBehaviour
                 density = a;
                 filter = Vector3.one;
                 tint = Vector3.one;
+            }
+
+            if (held != null)
+            {
+                density *= 1f - held[i];
             }
 
             lookPixels[i] = new Color32(Byte(filter.x * 0.5f), Byte(filter.y * 0.5f), Byte(filter.z * 0.5f), Byte(forgotten));

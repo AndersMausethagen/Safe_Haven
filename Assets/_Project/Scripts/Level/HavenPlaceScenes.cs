@@ -165,9 +165,13 @@ public sealed class HavenPlaceScenes : MonoBehaviour
         {
             // Drawn while the camera is within a lookout's wider view of it; nearer than that it is on screen.
             holder.AddComponent<HearthSmoke>().ConfigureColumn(stage.smokeAt, stage.smokeRise, 2.6f, 180f, verbs.Smoke);
-            // Someone works here: the land round it is kept in mind, so the smoke and the work show through the forgetting (the mist
-            // is drawn over transparent things, and thick mist would hide the column).
-            holder.AddComponent<KeptPlace>();
+        }
+
+        // Someone works here: the land round it is kept in mind, so the smoke and the work show through the forgetting (the mist is
+        // drawn over transparent things, and thick mist would hide the column). A place may also hold the mist back from itself.
+        if (stage.smokeRise > 0f || stage.clearsMist > 0f)
+        {
+            holder.AddComponent<KeptPlace>().Configure(stage.smokeRise > 0f, stage.clearsMist);
         }
 
         holder.SetActive(true);
