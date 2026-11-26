@@ -1,0 +1,95 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: PedlarsBrother
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: PedlarsBrother
+  displayName: The Pedlar's Brother
+  weight: 3
+  earliestSeconds: 40
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: Another overturned wagon on the track, and a man beside it who isn't hurt at all.
+  warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
+  sitePrefab: {fileID: 7940016432191105948, guid: bd8a1f03c8c250c41ae841b63b5f8ead, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: A big man with the pedlar's face and a cudgel, his dogs at his heels. "You took my brother's pack. You'll pay for it, one way or the other."
+  artwork: {fileID: 21300000, guid: 984e155dc09a2c44c87c1f7013418c06, type: 3}
+  stakes:
+    loot: 1
+    danger: 2
+    time: 0
+  onStart: []
+  choices:
+  - label: Pay him back
+    detail: Silver for the pack, with something on top.
+    cost:
+    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+      amount: 5
+    requires: []
+    result: He counts it twice, spits, and goes.
+    outcomes:
+    - rid: 2623126385950982152
+    - rid: 2623126385950982153
+  - label: Stand your ground
+    detail: He sets his dogs on you.
+    cost: []
+    requires: []
+    result: He whistles. The dogs come.
+    outcomes:
+    - rid: 2623126385950982154
+    - rid: 2623126385950982155
+  - label: Run for it
+    detail: 'He''s slow, but his cudgel isn''t: a tenth of your health as you go.'
+    cost: []
+    requires: []
+    result: You run. The cudgel catches you once.
+    outcomes:
+    - rid: 2623126385950982156
+    - rid: 2623126385950982157
+  needsMark: event:pedlar:robbed
+  blockedByMark: event:pedlar:brother
+  oncePerSave: 0
+  moreLikelyWhen: []
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126385950982152
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: '"We''re square. This time."'
+        kind: 0
+    - rid: 2623126385950982153
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:pedlar:brother
+    - rid: 2623126385950982154
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+        count: 2
+        radius: 6
+        hunt: 1
+    - rid: 2623126385950982155
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:pedlar:brother
+    - rid: 2623126385950982156
+      type: {class: ChangeHealthOutcome, ns: , asm: SafeHaven}
+      data:
+        share: -0.1
+    - rid: 2623126385950982157
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:pedlar:brother

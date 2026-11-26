@@ -3,16 +3,16 @@
  "looks": {
   "Sunken Tower A": {
    "source": 9967,
-   "view": 4853,
-   "triangles": 4853,
+   "view": 9000,
+   "triangles": 9000,
    "shape_limited": false,
-   "check": "(deviation 0.1%, silhouette 0.997)",
+   "check": "(deviation 0.0%, silhouette 1.000)",
    "holes_generated": 1,
    "holes_filled": 0,
    "holes": 1,
    "largest_hole": 0.033,
    "non_manifold_edges": 6,
-   "unwrap": "regions"
+   "unwrap": "smart"
   }
  }
 }

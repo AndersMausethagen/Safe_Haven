@@ -1,0 +1,151 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: LindormSleeps
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: LindormSleeps
+  displayName: The Lindorm Sleeps
+  weight: 0.15
+  earliestSeconds: 120
+  latestSecondsLeft: 150
+  minimumStage: 0
+  warning: The ground ahead rises and falls, slow as breathing.
+  warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
+  sitePrefab: {fileID: 7940016432191105948, guid: d036618c37fe2194eb629bf220831bef, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: The lindorm's back, arch after arch of it, out of the black water. Beyond, on an islet, something glints. It's asleep.
+  artwork: {fileID: 21300000, guid: 461dc144cac014a4faa54dd9134aff8b, type: 3}
+  stakes:
+    loot: 2
+    danger: 2
+    time: 2
+  onStart: []
+  choices:
+  - label: Walk its back to the islet
+    detail: Costs 45 seconds. Don't wake it.
+    cost: []
+    requires: []
+    result: You step from coil to coil.
+    outcomes:
+    - rid: 2623126385950982196
+    - rid: 2623126385950982197
+  - label: Take a shed scale
+    detail: One lies loose in the moss.
+    cost: []
+    requires: []
+    result: It's as big as a shield and lighter than it looks.
+    outcomes:
+    - rid: 2623126385950982204
+  - label: Leave it sleeping
+    detail: Some things are best not woken.
+    cost: []
+    requires: []
+    result: You go round, a long way round.
+    outcomes:
+    - rid: 2623126385950982205
+  needsMark: 
+  blockedByMark: 
+  oncePerSave: 1
+  moreLikelyWhen: []
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126385950982196
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -45
+    - rid: 2623126385950982197
+      type: {class: ChanceOutcome, ns: , asm: SafeHaven}
+      data:
+        chance: 0.7
+        ifLucky:
+        - rid: 2623126385950982198
+        - rid: 2623126385950982199
+        - rid: 2623126385950982200
+        ifNot:
+        - rid: 2623126385950982201
+        - rid: 2623126385950982202
+        - rid: 2623126385950982203
+    - rid: 2623126385950982198
+      type: {class: GiveRelicOutcome, ns: , asm: SafeHaven}
+      data: 
+    - rid: 2623126385950982199
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 15
+            maxQuantity: 30
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 96459a8d9566ae74cb04ee74d08a597b, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 3
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126385950982200
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: You come back the way you went, and it never stirs.
+        kind: 1
+    - rid: 2623126385950982201
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: It stirs. You run.
+        kind: 2
+    - rid: 2623126385950982202
+      type: {class: ChangeHealthOutcome, ns: , asm: SafeHaven}
+      data:
+        share: -0.3
+    - rid: 2623126385950982203
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 5
+            maxQuantity: 10
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126385950982204
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 6e9e4593f2cc6c143a0c206f6c4b783a, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126385950982205
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: Behind you, the breathing goes on.
+        kind: 0

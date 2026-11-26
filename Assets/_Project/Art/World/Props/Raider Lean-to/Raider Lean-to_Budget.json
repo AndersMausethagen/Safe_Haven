@@ -3,10 +3,10 @@
  "looks": {
   "Raider Lean-to A": {
    "source": 9996,
-   "view": 5419,
-   "triangles": 5419,
+   "view": 9000,
+   "triangles": 9000,
    "shape_limited": false,
-   "check": "(deviation 0.1%, silhouette 0.988)",
+   "check": "(deviation 0.0%, silhouette 0.998)",
    "holes_generated": 0,
    "holes_filled": 0,
    "holes": 0,

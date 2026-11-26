@@ -14,19 +14,27 @@ What other games do is described from general knowledge of them, not from new so
 
 ## Status (2026-11-26, the user: "enig med dine anbefalinger. kjør på")
 
-Steps 1-3 are built. Step 1 measures whether 4-6 are needed. The §6 answers are as recommended: consequences may show at home, a carried thing takes the hands, and legends are unique. None of it has been played by hand.
+Steps 1-6 are built. Steps 4-6 were built straight after 1-3 (the user: "fortsett"), before step 1's log could say whether they were needed. The §6 answers are as recommended: consequences may show at home, a carried thing takes the hands, and legends are unique. None of it has been played by hand.
 
 | Step | As built |
 |---|---|
 | 1 (E1) | `RaidEventDefinition` › Stakes (loot, danger, time, 0-2) on every event, told in the open-site alert as words ("rich · risky · takes time"). Every site with choices has one anyone can take that costs no time (test). Log rows `EventReached` (first within 10 m) and `EventSkipped` (still open as the raid ends: reached or not, when it began, how far) |
 | 2 (E2) | `RaidEventChoice` › Requires (`ChoiceRequirement`: Skill At Least, Carries Item, Companion Along, Hour Is, Knows Mark). An unmet choice shows greyed with "Needs Woodcutting 20". New choices on the existing events: Cries from the Ditch (Woodcutting 20), Three Wishes (Runecraft 20), Overturned Wagon (Construction 20), Toll Troll (a moss troll's tusk), Living Path (Runecraft 15), Open Barrow (Runecraft 20), Blighted Tree (Alchemy 20) |
 | 3 (E3) | `DefendOutcome`/`DefendTask` (hold the site's lit ring while waves come; the count waits outside it; paid once) and `CarryOutcome`/`CarriedBurden` (in the hands: slows, is heard, set down to fight, picked up again, pays in an open exit's circle). Task lines on the HUD under the companions. The Old Beacon: "Light it and hold it". New: **The Elder's Bell** (Woods: hold the oak, or climb up quietly with Sneaking 20), **The Stone Head** (Valley: carry it out, or break it with a pickaxe; Trollstone only from tier IV), **The Sunken Bell Tower** (Marsh: hold the belfry while the drowned come, or dive the stair after dark). LocalSpawn models: Bell Oak, Stone Head, Sunken Tower; paintings. Pools 12/11/9 |
+| 4 (E4) | Choices leave marks in the save (`SetMarkOutcome`, the journal's noticed flags). An event can need a mark and be blocked by another (`needsMark`, `blockedByMark`), and every choice of a follow-up sets its blocker, so it comes once. The needed mark is checked against the save as the raid began, so a follow-up comes in a later raid. The Watch Post's forecast obeys the same marks. Follow-ups: **The Pedlar's Brother** (after the wagon: freed or robbed), **The Pedlar's Thanks**, **The Stranger Collects** (a debt), **The Bog Remembers** (after a kindness at the bog body). `CalmForestOutcome` lowers the forest's anger |
+| 5 (E5) | Player state weighs the pick (`moreLikelyWhen`): bag at least 70% full, forest angry or worse, died last raid, night. New: **Followed** (bag full, ×10), **The Forest's Warning** (angry, ×40), **Where You Fell** (died last raid, ×40). Each raid has two kinds of day (`RaidEventSettings.conditions`), one rolled from the run's seed at most, which make a few events likelier. It is told on the preparation briefing as a "Today" card, rolled from the same seed |
+| 6 (E6) | One legend a raid, once in a save (`oncePerSave`, noted once the player reaches its site, so one never found comes again), each with a relic: **The White Hart** (Woods), **The Troll Wedding** (Valley, the striding troll rock), **The Lindorm Sleeps** (Marsh). Pools are now 19/17/16 |
 
 **Checked live:**
 - **Troll Valley:** the stone head was lifted (the site's own head hidden), its line read "Carry the stone head out: 75 m to …", it was set down and taken again, and it paid when carried into an open exit.
 - **Misty Woods:** the Elder's Bell showed the Sneaking choice greyed with its reason, and choosing it did nothing. The hold counted down from 0:40, Rootlings came in waves, and it paid once at 40 s.
 
-Tests: `RaidEventsPlanTests1126`.
+Tests: `RaidEventsPlanTests1126`, `RaidEventsMemoryTests1126`, `PropMaterialTests`.
+
+**Models (the user: "vær litt mer forsiktig med reduseringen av polycount"):**
+- The 15 new LocalSpawn props were re-ingested at 5,000-9,000 triangles at LOD0, up from 1,000-2,500. `props_manifest.json` now sets `lod0_floor`, `view_scale` and tighter `shape_deviation`/`shape_silhouette`, which `ingest_generated.py` reads.
+- All 15 had drawn with the FBX's plain Lit material and a normal map imported as colour, which left them nearly black in patches (Stone Head, White Hart). Each now has its own Layered Lit `.mat`, and `PropMapImport` imports Art/World/Props maps correctly.
+- The Stone Head's albedo had a baked black patch, now lifted to the stone's colour.
 
 **Watch in a playtest:**
 - the `EventReached` and `EventSkipped` rows: is the share of begun events acted on now over half?

@@ -1,0 +1,95 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: StrangerCollects
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: StrangerCollects
+  displayName: The Stranger Collects
+  weight: 3
+  earliestSeconds: 60
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: At a crossing ahead stands someone you've met before.
+  warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
+  sitePrefab: {fileID: 5231722663379009252, guid: eb150ca2a9fe8dd42a5b3278c781c95d, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: The hooded stranger, not looking up. "You took a wish. I always collect."
+  artwork: {fileID: 21300000, guid: 828dc97ffe5729549bdcaec9221e6eb7, type: 3}
+  stakes:
+    loot: 0
+    danger: 2
+    time: 0
+  onStart: []
+  choices:
+  - label: Pay in blood
+    detail: A fifth of your health, and you're square.
+    cost: []
+    requires: []
+    result: Cold fingers on your wrist. Then nothing.
+    outcomes:
+    - rid: 2623126385950982162
+    - rid: 2623126385950982163
+  - label: Pay in silver
+    detail: Eight pennies, and you're square.
+    cost:
+    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+      amount: 8
+    requires: []
+    result: The coins vanish into the grey sleeve.
+    outcomes:
+    - rid: 2623126385950982164
+    - rid: 2623126385950982165
+  - label: Refuse
+    detail: The stranger lets the hounds decide.
+    cost: []
+    requires: []
+    result: '"Then the hounds will collect."'
+    outcomes:
+    - rid: 2623126385950982166
+    - rid: 2623126385950982167
+  needsMark: event:stranger:owed
+  blockedByMark: event:stranger:paid
+  oncePerSave: 0
+  moreLikelyWhen: []
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126385950982162
+      type: {class: ChangeHealthOutcome, ns: , asm: SafeHaven}
+      data:
+        share: -0.2
+    - rid: 2623126385950982163
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:stranger:paid
+    - rid: 2623126385950982164
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: '"Fair." And the crossing is empty.'
+        kind: 0
+    - rid: 2623126385950982165
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:stranger:paid
+    - rid: 2623126385950982166
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 4584692032328657812, guid: 64cf9de042e1bc142907212054f70f50, type: 3}
+        count: 1
+        radius: 14
+        hunt: 1
+    - rid: 2623126385950982167
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:stranger:paid

@@ -38,6 +38,7 @@ MonoBehaviour:
     outcomes:
     - rid: 287758281410609257
     - rid: 287758281410609258
+    - rid: 2623126385950982147
   - label: Ask for riches
     detail: A troll's idol, worth a great deal. Everything nearby will know you have it.
     cost: []
@@ -47,6 +48,7 @@ MonoBehaviour:
     - rid: 287758281410609259
     - rid: 287758281410609260
     - rid: 287758281410609261
+    - rid: 2623126385950982148
   - label: Ask for time
     detail: +2 minutes on the clock. -25 health until it's paid back.
     cost: []
@@ -55,6 +57,7 @@ MonoBehaviour:
     outcomes:
     - rid: 287758281410609262
     - rid: 287758281410609263
+    - rid: 2623126385950982149
   - label: Haggle in the old tongue
     detail: +25% damage for 3 minutes for a tenth of your health, not a quarter.
     cost: []
@@ -64,6 +67,11 @@ MonoBehaviour:
     outcomes:
     - rid: 2623126383268724770
     - rid: 2623126383268724771
+    - rid: 2623126385950982150
+  needsMark: 
+  blockedByMark: 
+  oncePerSave: 0
+  moreLikelyWhen: []
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2
@@ -142,3 +150,19 @@ MonoBehaviour:
           op: 0
           value: 0.25
         seconds: 180
+    - rid: 2623126385950982147
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:stranger:owed
+    - rid: 2623126385950982148
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:stranger:owed
+    - rid: 2623126385950982149
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:stranger:owed
+    - rid: 2623126385950982150
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:stranger:owed

@@ -1,0 +1,93 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: BogRemembers
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: BogRemembers
+  displayName: The Bog Remembers
+  weight: 3
+  earliestSeconds: 40
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: A voice from the black water, saying your name.
+  warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
+  sitePrefab: {fileID: 7940016432191105948, guid: 7205d1f5181860f459166d85ef72d918, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: The water by the bank is very still, and under it a pale face you laid to rest once. "You were kind. Listen."
+  artwork: {fileID: 21300000, guid: 35a7591efe75d1b43a067f41e98a0534, type: 3}
+  stakes:
+    loot: 2
+    danger: 0
+    time: 0
+  onStart: []
+  choices:
+  - label: Listen to the water
+    detail: It tells where the deep peat holds iron.
+    cost: []
+    requires: []
+    result: Where the bog keeps its iron, and the ways through.
+    outcomes:
+    - rid: 2623126385950982168
+    - rid: 2623126385950982169
+    - rid: 2623126385950982170
+  - label: Thank them
+    detail: Nothing asked.
+    cost: []
+    requires: []
+    result: The face smiles, and sinks.
+    outcomes:
+    - rid: 2623126385950982171
+    - rid: 2623126385950982172
+  needsMark: event:bog:kind
+  blockedByMark: event:bog:answered
+  oncePerSave: 0
+  moreLikelyWhen: []
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126385950982168
+      type: {class: RevealMapOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 100
+        showExits: 1
+    - rid: 2623126385950982169
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 3
+            maxQuantity: 5
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126385950982170
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:bog:answered
+    - rid: 2623126385950982171
+      type: {class: GiveBoonOutcome, ns: , asm: SafeHaven}
+      data:
+        name: The Bog's Peace
+        bonuses:
+        - stat: 7
+          op: 0
+          value: 10
+        seconds: 240
+    - rid: 2623126385950982172
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:bog:answered

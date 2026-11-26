@@ -71,6 +71,10 @@ MonoBehaviour:
     result: He looks at the tusk a long while, then at you, and waves you through.
     outcomes:
     - rid: 2623126383268724776
+  needsMark: 
+  blockedByMark: 
+  oncePerSave: 0
+  moreLikelyWhen: []
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2

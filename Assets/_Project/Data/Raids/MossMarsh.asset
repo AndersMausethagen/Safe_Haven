@@ -963,11 +963,34 @@ MonoBehaviour:
           - {fileID: 11400000, guid: a6e4e2258b6e47947a4f021faf7f72c6, type: 2}
           - {fileID: 11400000, guid: 22ab06155b93f724fb4994d59d02dbc5, type: 2}
           - {fileID: 11400000, guid: 0bf6173a2dad65d4b95705cfd803da75, type: 2}
+          - {fileID: 11400000, guid: d176d09d6ff0ae84fafec2f8385fde80, type: 2}
+          - {fileID: 11400000, guid: 6def460b1e63fe34b9a348854cd79da8, type: 2}
+          - {fileID: 11400000, guid: d4f99225e257b5147956a1dda428fa0a, type: 2}
+          - {fileID: 11400000, guid: 0e80131760e7a4745b441cf5c2943695, type: 2}
+          - {fileID: 11400000, guid: b7977d02ffc4a1c4fa44cce60ed4086b, type: 2}
+          - {fileID: 11400000, guid: d77c1c9fb8e54c7408f70e7335be21a4, type: 2}
+          - {fileID: 11400000, guid: 22896ee66dd596a41a67a75551c5576f, type: 2}
           firstDelay: 45
           interval: 110
           intervalSpread: 35
           maxPerRaid: 4
           maxOpenSites: 2
+          conditions:
+          - name: Fog night on the fen
+            briefing: Lights on the water and bells under it. The drowned are restless.
+            chance: 0.3
+            events:
+            - {fileID: 11400000, guid: a6e4e2258b6e47947a4f021faf7f72c6, type: 2}
+            - {fileID: 11400000, guid: 0bf6173a2dad65d4b95705cfd803da75, type: 2}
+            - {fileID: 11400000, guid: af0df18316e8d234db83d6f5d0c5eaad, type: 2}
+            times: 3
+          - name: Peat-cutting time
+            briefing: The peat cutters are out. Their huts are warm, and their paths are marked.
+            chance: 0.2
+            events:
+            - {fileID: 11400000, guid: 22ab06155b93f724fb4994d59d02dbc5, type: 2}
+            - {fileID: 11400000, guid: 0e80131760e7a4745b441cf5c2943695, type: 2}
+            times: 3
     - rid: 287758281410609374
       type: {class: RaidRumoursSystem, ns: , asm: SafeHaven}
       data:

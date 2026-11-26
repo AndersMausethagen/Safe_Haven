@@ -894,6 +894,18 @@ a pool of `RaidEventDefinition`s, first delay, interval, a budget per raid and a
 - **What is at stake (2026-11-26, Docs/RaidEventsPlan_2026-11-26.md):** `RaidEventDefinition` › Stakes (loot, danger, time) is told in words with the open site's alert. `EventReached` and `EventSkipped` playtest rows say whether players went and chose.
 - **Choices that need something:** `RaidEventChoice` › Requires (`ChoiceRequirements.cs`: Skill At Least, Carries Item, Companion Along, Hour Is, Knows Mark; kind menu in the Content Editor). An unmet choice shows greyed with its reason and can't be taken.
 - **Tasks at the site:** `DefendOutcome` puts a `DefendTask` on the site (hold its ring for N seconds; Each Wave's outcomes at the start and every Wave Every held; On Held's once). `CarryOutcome` puts a `CarriedBurden` prefab in the player's hands (slower, heard, set down by attack, dodge, bash, skill, guard, swimming or death, picked up with Use; On Delivered's outcomes in an open exit's circle). Both are `RaidEventTask`s and show a line on the raid HUD under the companions. `RaidEventContext.Site` is the event's site.
+- **Memory across raids:**
+  - `SetMarkOutcome` writes a mark into the save, as a journal noticed flag.
+  - `RaidEventDefinition` › Needs Mark / Blocked By Mark make follow-ups. Every choice of a follow-up sets its blocker.
+  - The needed mark is checked against the save as the raid began (`RaidEventDirector.TakeStock`), so a follow-up comes in a later raid.
+  - Once Per Save makes legends. `RaidEventSite` notes `OnceMark` when the player reaches the site.
+  - `RaidEventPicker` and `RaidForecast` skip what `AllowedBy` refuses; the forecast is checked with `RaidEventDirector.SaveHasMark`.
+  - `CalmForestOutcome` calls `ForestAnnoyance.Calm`.
+- **State and the kind of day:**
+  - `RaidEventDefinition` › More Likely When (`RaidEventState`: bag mostly full, forest angry, fell last raid, night) multiplies the weight. `RaidEventDirector.StatesNow` reads them.
+  - `RaidEventSettings` › Conditions (`RaidEventCondition`) roll at most one kind of day from the seed (`ConditionFor`). It boosts a few events and shows as the "Today" card in the preparation briefing, from the same seed.
+  - Tests: `RaidEventsMemoryTests1126`.
+- **Site models:** generated props in `Art/World/Props/<name>` each have their own Layered Lit `<name>.mat`, and the prefabs use it, not the FBX's material. `PropMapImport` imports their normal and data maps (`PropMaterialTests`).
 Content: `AgentScripts/BuildRaidEvents.cs` (sites are placeholder shapes in `Prefabs/Raids/Events/Sites`). The older prefabs
 in `Prefabs/Raids/Events` are static scenery for the Event Sites spawn list; they are not raid events.
 

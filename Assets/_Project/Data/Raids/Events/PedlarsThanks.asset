@@ -1,0 +1,101 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: PedlarsThanks
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: PedlarsThanks
+  displayName: The Pedlar's Thanks
+  weight: 3
+  earliestSeconds: 40
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: Someone is waiting at a crossing up ahead, and waving.
+  warningSound: {fileID: 11400000, guid: 53fe372285257d84faf9ea69968a9b0f, type: 2}
+  sitePrefab: {fileID: 5231722663379009252, guid: eb150ca2a9fe8dd42a5b3278c781c95d, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: The pedlar you pulled out of the ditch, his leg strapped up. "I hoped you'd come this way. I owe you."
+  artwork: {fileID: 21300000, guid: 80c5c967415a02c43bbc2ab167d72f70, type: 3}
+  stakes:
+    loot: 2
+    danger: 0
+    time: 0
+  onStart: []
+  choices:
+  - label: Take his gift
+    detail: He presses a wrapped bundle into your hands.
+    cost: []
+    requires: []
+    result: 'Draughts, silver, a carved stone: a pedlar''s best.'
+    outcomes:
+    - rid: 2623126385950982158
+    - rid: 2623126385950982159
+  - label: Ask him the safe way
+    detail: Pedlars know every path.
+    cost: []
+    requires: []
+    result: He draws the land in the dirt with a stick, and the ways out.
+    outcomes:
+    - rid: 2623126385950982160
+    - rid: 2623126385950982161
+  needsMark: event:pedlar:freed
+  blockedByMark: event:pedlar:thanked
+  oncePerSave: 0
+  moreLikelyWhen: []
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126385950982158
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: d0c7b274979b4ad46a9f3bf89b8cfa64, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 2
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: cbe9df10f8fa88f47be2f012ec678577, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 0.6
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 4
+            maxQuantity: 8
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126385950982159
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:pedlar:thanked
+    - rid: 2623126385950982160
+      type: {class: RevealMapOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 100
+        showExits: 1
+    - rid: 2623126385950982161
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:pedlar:thanked

@@ -55,6 +55,10 @@ MonoBehaviour:
     result: You leave the coins by the kettle. The smoke seems to bend toward you.
     outcomes:
     - rid: 2623126381840826407
+  needsMark: 
+  blockedByMark: 
+  oncePerSave: 0
+  moreLikelyWhen: []
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2

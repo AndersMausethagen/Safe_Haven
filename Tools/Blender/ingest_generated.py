@@ -462,7 +462,15 @@ def view_triangles(obj):
     x, y, z = (co.max(axis=0) - co.min(axis=0)).tolist()
     across, deep = max(x, y), min(x, y)
     area = FILL * PIXELS_PER_METRE ** 2 * across * (z * math.cos(PITCH) + deep * math.sin(PITCH))
-    return int(max(SILHOUETTE_FLOOR, min(LOD0_TRIANGLES, area / (PIXELS_PER_TRIANGLE * 0.5))))
+    return int(max(LOD0_FLOOR, min(LOD0_TRIANGLES, VIEW_SCALE * area / (PIXELS_PER_TRIANGLE * 0.5))))
+
+
+# The user (2026-11-26): "vær litt mer forsiktig med reduseringen av polycount ... vi kan godt øke budsjettet litt på objekter av den
+# størrelsen": a look's manifest may ask for more than the screen budget (view_scale, 1 by default) and a stricter shape check
+# (shape_deviation, shape_silhouette), as the 1-5 m props now do. Defaults leave the nodes as they were.
+VIEW_SCALE = float(manifest_value("view_scale") or 1.0)
+# The least LOD0 a look gets (lod0_floor): a small prop the screen budget sizes at 600 still wants its shape whole close up.
+LOD0_FLOOR = int(manifest_value("lod0_floor") or SILHOUETTE_FLOOR)
 
 
 def budget(high):
@@ -510,7 +518,8 @@ def budget(high):
 # silhouette from the game's 48-degree camera at least 95% the same. Measured in a fraction of a second, no bake: a
 # fixed budget shredded some generated meshes (mushroom patch at 1,341: 11% off, silhouette 0.73; small rocks at 948:
 # 24% off) and wasted triangles on others.
-SHAPE_DEVIATION, SHAPE_SILHOUETTE = 0.02, 0.95
+SHAPE_DEVIATION = float(manifest_value("shape_deviation") or 0.02)
+SHAPE_SILHOUETTE = float(manifest_value("shape_silhouette") or 0.95)
 BUDGETS = {}  # look -> its budget and why, written beside the textures (<Asset>_Budget.json) for ModelBudgetTests
 
 

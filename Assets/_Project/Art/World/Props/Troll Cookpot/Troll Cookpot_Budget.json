@@ -3,10 +3,10 @@
  "looks": {
   "Troll Cookpot A": {
    "source": 9990,
-   "view": 2453,
-   "triangles": 2453,
+   "view": 7361,
+   "triangles": 7361,
    "shape_limited": false,
-   "check": "(deviation 0.3%, silhouette 0.993)",
+   "check": "(deviation 0.1%, silhouette 0.999)",
    "holes_generated": 0,
    "holes_filled": 0,
    "holes": 0,

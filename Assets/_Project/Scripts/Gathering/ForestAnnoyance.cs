@@ -149,6 +149,18 @@ public sealed class ForestAnnoyance
         UpdateLevel();
     }
 
+    /// <summary>Takes annoyance away at once (a raid event's offering, Docs/RaidEventsPlan_2026-11-26.md E5), never below calm.</summary>
+    public void Calm(float amount)
+    {
+        if (amount <= 0f)
+        {
+            return;
+        }
+
+        Value = Mathf.Max(0f, Value - amount);
+        UpdateLevel();
+    }
+
     public void Tick(float deltaTime)
     {
         if (deltaTime <= 0f || Value <= 0f)

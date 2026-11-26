@@ -53,6 +53,10 @@ MonoBehaviour:
     result: The fire takes. Far off, things turn toward the light.
     outcomes:
     - rid: 2623126383268724777
+  needsMark: 
+  blockedByMark: 
+  oncePerSave: 0
+  moreLikelyWhen: []
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2

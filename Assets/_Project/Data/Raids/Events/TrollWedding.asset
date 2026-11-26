@@ -1,0 +1,164 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: TrollWedding
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: TrollWedding
+  displayName: The Troll Wedding
+  weight: 0.15
+  earliestSeconds: 120
+  latestSecondsLeft: 150
+  minimumStage: 0
+  warning: Drums at dusk from the stones up the valley, and singing, if you can call it that.
+  warningSound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
+  sitePrefab: {fileID: 7940016432191105948, guid: 11ffd51ad4390f1449181f5337bd653a, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: Two clans of trolls at the ring of stones, and a bride in a crown of rough trollstone. Nobody has seen you yet.
+  artwork: {fileID: 21300000, guid: ea7a080aae9929e408f5fba0825b33b0, type: 3}
+  stakes:
+    loot: 2
+    danger: 2
+    time: 1
+  onStart: []
+  choices:
+  - label: Watch unseen
+    detail: Slip close and take a wedding gift from the pile.
+    cost: []
+    requires:
+    - rid: 2623126385950982186
+    result: Nobody sees you come or go.
+    outcomes:
+    - rid: 2623126385950982187
+    - rid: 2623126385950982188
+  - label: Crash the wedding
+    detail: Hold the stones for 45 seconds while the guests come for you.
+    cost: []
+    requires: []
+    result: You walk into the ring. The drums stop.
+    outcomes:
+    - rid: 2623126385950982189
+  - label: Leave them to it
+    detail: A cup of wedding ale left by the path is yours.
+    cost: []
+    requires: []
+    result: You drink to the couple from a safe distance.
+    outcomes:
+    - rid: 2623126385950982195
+  needsMark: 
+  blockedByMark: 
+  oncePerSave: 1
+  moreLikelyWhen: []
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126385950982186
+      type: {class: SkillAtLeast, ns: , asm: SafeHaven}
+      data:
+        skill: {fileID: 11400000, guid: cada299a42945b04b8c891d31b0c5351, type: 2}
+        level: 25
+    - rid: 2623126385950982187
+      type: {class: GiveRelicOutcome, ns: , asm: SafeHaven}
+      data: 
+    - rid: 2623126385950982188
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 6a6c76b4e635d9e48be91d875f758c4a, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126385950982189
+      type: {class: DefendOutcome, ns: , asm: SafeHaven}
+      data:
+        label: Hold the wedding stones
+        radius: 7
+        seconds: 45
+        waveEvery: 15
+        eachWave:
+        - rid: 2623126385950982190
+        - rid: 2623126385950982191
+        onHeld:
+        - rid: 2623126385950982192
+        - rid: 2623126385950982193
+        - rid: 2623126385950982194
+    - rid: 2623126385950982190
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 6267209934607442583, guid: 3c524ee8a21d0aa48b70eb5f371bba06, type: 3}
+        count: 2
+        radius: 10
+        hunt: 1
+    - rid: 2623126385950982191
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
+        count: 1
+        radius: 12
+        hunt: 1
+    - rid: 2623126385950982192
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: The guests scatter, and the bride's crown lies in the grass.
+        kind: 1
+    - rid: 2623126385950982193
+      type: {class: GiveRelicOutcome, ns: , asm: SafeHaven}
+      data: 
+    - rid: 2623126385950982194
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 3
+            probability: 1
+            fromTier: 4
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 3
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 10
+            maxQuantity: 20
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126385950982195
+      type: {class: GiveBoonOutcome, ns: , asm: SafeHaven}
+      data:
+        name: Wedding Ale
+        bonuses:
+        - stat: 15
+          op: 0
+          value: 20
+        seconds: 300

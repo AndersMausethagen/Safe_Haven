@@ -66,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 5958470185364273947, guid: db6f813aa80a5ff49a117c084238800b, type: 3}
+  - {fileID: 2100000, guid: ba2a7e7cea1e3c1448c8e72ed023bc16, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -156,7 +156,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 5958470185364273947, guid: db6f813aa80a5ff49a117c084238800b, type: 3}
+  - {fileID: 2100000, guid: ba2a7e7cea1e3c1448c8e72ed023bc16, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -223,21 +223,21 @@ LODGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2437294362062464854}
   serializedVersion: 3
-  m_LocalReferencePoint: {x: -0.004485041, y: 0.37458006, z: -0.0040232986}
-  m_Size: 0.85188526
+  m_LocalReferencePoint: {x: 0.00039693713, y: 0.38645083, z: 0.00028169155}
+  m_Size: 0.8275094
   m_FadeMode: 0
   m_AnimateCrossFading: 0
   m_LastLODIsBillboard: 0
   m_LODs:
-  - screenRelativeHeight: 0.04244418
+  - screenRelativeHeight: 0.042378493
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 8942232905155443400}
-  - screenRelativeHeight: 0.02959923
+  - screenRelativeHeight: 0.029553425
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 6564203706043066778}
-  - screenRelativeHeight: 0.016754283
+  - screenRelativeHeight: 0.016728355
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 1282258665942428407}
@@ -309,7 +309,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 5958470185364273947, guid: db6f813aa80a5ff49a117c084238800b, type: 3}
+  - {fileID: 2100000, guid: ba2a7e7cea1e3c1448c8e72ed023bc16, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -385,6 +385,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Camp Stash
       objectReference: {fileID: 0}
+    - target: {fileID: 5213537489708761099, guid: ba6f34ca967a1d043bcee3331d85f1a1, type: 3}
+      propertyPath: m_Size
+      value: 1.2962124
+      objectReference: {fileID: 0}
     - target: {fileID: 5287415512132190355, guid: ba6f34ca967a1d043bcee3331d85f1a1, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -424,6 +428,14 @@ PrefabInstance:
     - target: {fileID: 8122532720689725294, guid: ba6f34ca967a1d043bcee3331d85f1a1, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8821558649193206115, guid: ba6f34ca967a1d043bcee3331d85f1a1, type: 3}
+      propertyPath: m_Size
+      value: 1.2962124
+      objectReference: {fileID: 0}
+    - target: {fileID: 8821558649193206115, guid: ba6f34ca967a1d043bcee3331d85f1a1, type: 3}
+      propertyPath: m_LocalReferencePoint.y
+      value: 0.07285701
       objectReference: {fileID: 0}
     - target: {fileID: 8887537238950138363, guid: ba6f34ca967a1d043bcee3331d85f1a1, type: 3}
       propertyPath: m_IsActive

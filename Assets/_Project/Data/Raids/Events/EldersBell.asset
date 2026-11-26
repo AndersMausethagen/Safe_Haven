@@ -52,6 +52,10 @@ MonoBehaviour:
     result: You stand a moment with your palm on the old wood.
     outcomes:
     - rid: 2623126383268724743
+  needsMark: 
+  blockedByMark: 
+  oncePerSave: 0
+  moreLikelyWhen: []
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2

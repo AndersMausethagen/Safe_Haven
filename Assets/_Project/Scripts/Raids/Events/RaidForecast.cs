@@ -7,8 +7,12 @@ using UnityEngine;
 /// </summary>
 public static class RaidForecast
 {
-    /// <summary>Up to this many events from the raid's pool, or none on a raid without events.</summary>
-    public static List<RaidEventDefinition> For(RaidDefinition raid, int seed, int count)
+    /// <summary>
+    /// Up to this many events from the raid's pool, or none on a raid without events. Only those the save's marks allow
+    /// (<paramref name="hasMark"/>, <see cref="RaidEventDirector.SaveHasMark"/> in the game): never a legend already met, a follow-up
+    /// once its mark is held. The briefing and the launch read the same save, so they agree.
+    /// </summary>
+    public static List<RaidEventDefinition> For(RaidDefinition raid, int seed, int count, System.Func<string, bool> hasMark = null)
     {
         var foretold = new List<RaidEventDefinition>();
         RaidEventsSystem system = raid != null ? raid.GetSystem<RaidEventsSystem>() : null;
@@ -22,7 +26,7 @@ public static class RaidForecast
         var weights = new List<float>();
         foreach (RaidEventDefinition candidate in settings.pool)
         {
-            if (candidate != null && candidate.Weight > 0f)
+            if (candidate != null && candidate.Weight > 0f && candidate.AllowedBy(hasMark))
             {
                 candidates.Add(candidate);
                 weights.Add(candidate.Weight);

@@ -39,6 +39,7 @@ MonoBehaviour:
     - rid: 287758281410609252
     - rid: 287758281410609253
     - rid: 287758281410609254
+    - rid: 2623126385950982144
   - label: Take his pack and go
     detail: Quick. You'll carry it with you for a while.
     cost: []
@@ -47,6 +48,7 @@ MonoBehaviour:
     outcomes:
     - rid: 287758281410609255
     - rid: 287758281410609256
+    - rid: 2623126385950982146
   - label: Lever the log off
     detail: 'A woodsman knows where to push: 15 seconds, and quiet.'
     cost: []
@@ -56,6 +58,11 @@ MonoBehaviour:
     outcomes:
     - rid: 2623126383268724767
     - rid: 2623126383268724768
+    - rid: 2623126385950982145
+  needsMark: 
+  blockedByMark: 
+  oncePerSave: 0
+  moreLikelyWhen: []
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2
@@ -191,3 +198,15 @@ MonoBehaviour:
             toTier: 0
             fixedAmount: 0
             onlyInRaid: {fileID: 0}
+    - rid: 2623126385950982144
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:pedlar:freed
+    - rid: 2623126385950982145
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:pedlar:freed
+    - rid: 2623126385950982146
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:pedlar:robbed

@@ -115,6 +115,7 @@ public sealed class RaidEventDirector : MonoBehaviour
         if (nextEventAt < 0f)
         {
             nextEventAt = settings.firstDelay;
+            TakeStock(session);
         }
 
         open.RemoveAll(site => site == null || site.IsResolved);
@@ -129,16 +130,20 @@ public sealed class RaidEventDirector : MonoBehaviour
         int owed = 0;
         foreach (RaidEventDefinition foretold in session.Foretold)
         {
-            if (foretold != null && !used.Contains(foretold) && foretold.CanStillHappen(session.TimeRemaining))
+            if (foretold != null && !used.Contains(foretold) && foretold.CanStillHappen(session.TimeRemaining) && foretold.AllowedBy(SaveHasMarkCall, hadAtStartCall))
             {
                 owed++;
             }
         }
 
-        RaidEventDefinition next = RaidEventPicker.Pick(session.Foretold, random, session.Elapsed, session.TimeRemaining, director.StageIndex, used);
+        RaidEventDefinition next = RaidEventPicker.Pick(session.Foretold, random, session.Elapsed, session.TimeRemaining, director.StageIndex, used,
+            SaveHasMarkCall, null, null, hadAtStartCall);
         if (next == null && randomEvents + owed < settings.maxPerRaid)
         {
-            next = RaidEventPicker.Pick(settings.pool, random, session.Elapsed, session.TimeRemaining, director.StageIndex, used);
+            // What the save remembers (follow-ups, legends met), how the player stands and what kind of day it is
+            // (Docs/RaidEventsPlan_2026-11-26.md E4-E6).
+            next = RaidEventPicker.Pick(settings.pool, random, session.Elapsed, session.TimeRemaining, director.StageIndex, used,
+                SaveHasMarkCall, StatesNow(), condition, hadAtStartCall);
         }
         // A failed placement tries again on the next think, with the player somewhere else.
         if (next != null && Begin(next))
@@ -147,6 +152,90 @@ public sealed class RaidEventDirector : MonoBehaviour
             float spread = ((float)random.NextDouble() * 2f - 1f) * settings.intervalSpread;
             nextEventAt = session.Elapsed + Mathf.Max(5f, settings.interval + spread);
         }
+    }
+
+    /// <summary>Whether the save holds this event mark now (<see cref="SetMarkOutcome"/>, a legend met): the journal's noticed flags.</summary>
+    public static bool SaveHasMark(string mark) => !string.IsNullOrEmpty(mark) && GameSession.Progress.Journal.HasNoticed(mark);
+
+    private static readonly System.Func<string, bool> SaveHasMarkCall = SaveHasMark;
+    // The follow-ups' needed marks the save held as the raid began: a choice made this raid brings its follow-up in a later one.
+    private readonly HashSet<string> marksAtStart = new HashSet<string>();
+    private System.Func<string, bool> hadAtStartCall;
+    // The run's kind of day, rolled once from its seed (the briefing rolls the same).
+    private RaidEventCondition condition;
+    private ForestAnnoyanceDriver forest;
+
+    private bool HadAtStart(string mark) => marksAtStart.Contains(mark);
+
+    private void TakeStock(RaidSession session)
+    {
+        hadAtStartCall ??= HadAtStart;
+        marksAtStart.Clear();
+        foreach (IReadOnlyList<RaidEventDefinition> list in new IReadOnlyList<RaidEventDefinition>[] { settings.pool, session.Foretold })
+        {
+            if (list == null)
+            {
+                continue;
+            }
+
+            foreach (RaidEventDefinition definition in list)
+            {
+                if (definition != null && SaveHasMark(definition.NeedsMark))
+                {
+                    marksAtStart.Add(definition.NeedsMark);
+                }
+            }
+        }
+
+        condition = settings.ConditionFor(session.Seed);
+        forest = FindAnyObjectByType<ForestAnnoyanceDriver>();
+    }
+
+    // A bag this full (its slots) counts as mostly full.
+    private const float FullBagShare = 0.7f;
+    private readonly HashSet<RaidEventState> states = new HashSet<RaidEventState>();
+
+    /// <summary>The states that hold now: the bag, the forest, the last raid, the hour (Docs/RaidEventsPlan_2026-11-26.md E5).</summary>
+    private HashSet<RaidEventState> StatesNow()
+    {
+        states.Clear();
+        GameObject player = director.Player;
+        if (player != null && player.TryGetComponent(out ItemInventory bag) && bag.Container.SlotCount > 0)
+        {
+            int filled = 0;
+            for (int i = 0; i < bag.Container.SlotCount; i++)
+            {
+                filled += bag.Container.GetSlot(i).IsEmpty ? 0 : 1;
+            }
+
+            if (filled >= bag.Container.SlotCount * FullBagShare)
+            {
+                states.Add(RaidEventState.BagMostlyFull);
+            }
+        }
+
+        // Looked for again while missing: the forest's driver may come up after the raid's first look.
+        if (forest == null)
+        {
+            forest = FindAnyObjectByType<ForestAnnoyanceDriver>();
+        }
+
+        if (forest != null && forest.Annoyance != null && forest.Annoyance.Level >= AnnoyanceLevel.Angry)
+        {
+            states.Add(RaidEventState.ForestAngry);
+        }
+
+        if (Homecoming.LastOutcome == RaidOutcome.Died)
+        {
+            states.Add(RaidEventState.FellLastRaid);
+        }
+
+        if (director.Session.TimeOfDay != null && director.Session.TimeOfDay.IsDark)
+        {
+            states.Add(RaidEventState.Night);
+        }
+
+        return states;
     }
 
     /// <summary>Starts an event now, whatever the clock says. False when there is no place for its site.</summary>
@@ -230,6 +319,12 @@ public sealed class RaidEventDirector : MonoBehaviour
     {
         RaidEventContext context = ContextAt(position);
         used.Add(definition);
+        // A legend comes once in a save: met once the player reaches its site (RaidEventSite), so one placed and never found comes
+        // again in a later raid; one without a site is met as it begins.
+        if (definition.OncePerSave && definition.SitePrefab == null)
+        {
+            GameSession.Progress.Journal.NoteNoticed(definition.OnceMark);
+        }
         if (definition.SitePrefab != null)
         {
             RaidEventSite site = Spawn(definition, context, Quaternion.Euler(0f, (float)random.NextDouble() * 360f, 0f));

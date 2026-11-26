@@ -50,6 +50,15 @@ public sealed class RaidEventDefinition : ScriptableObject, IDisplayName
     [SerializeReference] private List<RaidEventOutcome> onStart = new List<RaidEventOutcome>();
     [Tooltip("What the player can do at the site. None: walking there is all there is (what is there rewards it).")]
     [SerializeField] private List<RaidEventChoice> choices = new List<RaidEventChoice>();
+    [Header("What it remembers (Docs/RaidEventsPlan_2026-11-26.md E4-E6)")]
+    [Tooltip("Comes only once the journal holds this mark (a choice made before, Set Mark): a follow-up. Empty: always.")]
+    [SerializeField] private string needsMark = "";
+    [Tooltip("Never comes once the journal holds this mark (the follow-up already met).")]
+    [SerializeField] private string blockedByMark = "";
+    [Tooltip("Once in a save, ever: a legend. Marked in the journal as it begins.")]
+    [SerializeField] private bool oncePerSave;
+    [Tooltip("More likely while the player is in these states: a full bag, an angry forest, a fall last raid, the night.")]
+    [SerializeField] private List<EventStateWeight> moreLikelyWhen = new List<EventStateWeight>();
     [Tooltip("A Story Event raised when any choice is taken here: how a quest counts what was done at the site, whichever way it went " +
              "(Act II's set pieces: the door in the snow, the wrong door at the Black Pool). Empty: none.")]
     [RaisedByGame, SerializeField] private GameEventDefinition raisesWhenChosen;
@@ -67,6 +76,46 @@ public sealed class RaidEventDefinition : ScriptableObject, IDisplayName
     public IReadOnlyList<RaidEventOutcome> OnStart => onStart;
     public IReadOnlyList<RaidEventChoice> Choices => choices;
     public GameEventDefinition RaisesWhenChosen => raisesWhenChosen;
+    public bool OncePerSave => oncePerSave;
+    public string NeedsMark => needsMark;
+
+    /// <summary>The journal mark a legend leaves once the player reaches it.</summary>
+    public string OnceMark => "event:once:" + Id;
+
+    /// <summary>
+    /// True when what the save remembers lets it come: its needed mark held, its blocking one not, a legend not yet met. The needed
+    /// mark is asked of <paramref name="hadAtStart"/> when given (the save as the raid began), so a follow-up comes raids later, not
+    /// minutes after the choice that set its mark; the blocking and once marks are asked of <paramref name="hasMark"/> (the save now).
+    /// </summary>
+    public bool AllowedBy(System.Func<string, bool> hasMark, System.Func<string, bool> hadAtStart = null)
+    {
+        if (hasMark == null)
+        {
+            return string.IsNullOrEmpty(needsMark);
+        }
+
+        return (string.IsNullOrEmpty(needsMark) || (hadAtStart ?? hasMark)(needsMark))
+            && (string.IsNullOrEmpty(blockedByMark) || !hasMark(blockedByMark))
+            && (!oncePerSave || !hasMark(OnceMark));
+    }
+
+    /// <summary>Its weight times every state's that holds now (1 when none).</summary>
+    public float WeightIn(ICollection<RaidEventState> states)
+    {
+        float scale = 1f;
+        if (states != null)
+        {
+            foreach (EventStateWeight rule in moreLikelyWhen)
+            {
+                if (rule != null && states.Contains(rule.state))
+                {
+                    scale *= Mathf.Max(0f, rule.times);
+                }
+            }
+        }
+
+        return weight * scale;
+    }
 
     /// <summary>Whether it may begin now.</summary>
     public bool CanHappen(float elapsed, float secondsLeft, int stage)
@@ -88,6 +137,23 @@ public sealed class RaidEventDefinition : ScriptableObject, IDisplayName
         minimumStage = stage;
     }
 #endif
+}
+
+/// <summary>A state of the player or the run an event can answer (Docs/RaidEventsPlan_2026-11-26.md E5).</summary>
+public enum RaidEventState
+{
+    BagMostlyFull = 0,
+    ForestAngry = 1,
+    FellLastRaid = 2,
+    Night = 3,
+}
+
+/// <summary>How many times likelier an event is while a state holds.</summary>
+[Serializable]
+public sealed class EventStateWeight
+{
+    public RaidEventState state;
+    [Min(0f)] public float times = 3f;
 }
 
 /// <summary>What an event puts at stake, each 0 (none) to 2 (much): told with its warning, in words.</summary>

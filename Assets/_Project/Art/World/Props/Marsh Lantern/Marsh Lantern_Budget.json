@@ -3,16 +3,16 @@
  "looks": {
   "Marsh Lantern A": {
    "source": 9918,
-   "view": 796,
-   "triangles": 4000,
+   "view": 5000,
+   "triangles": 6750,
    "shape_limited": true,
-   "check": "(deviation 0.7%, silhouette 0.958)",
+   "check": "(deviation 0.2%, silhouette 0.990)",
    "holes_generated": 0,
    "holes_filled": 0,
    "holes": 0,
    "largest_hole": 0.0,
    "non_manifold_edges": 34,
-   "unwrap": "regions"
+   "unwrap": "smart"
   }
  }
 }

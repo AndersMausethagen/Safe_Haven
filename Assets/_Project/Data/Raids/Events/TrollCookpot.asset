@@ -45,6 +45,10 @@ MonoBehaviour:
     result: You hold your nose and drink.
     outcomes:
     - rid: 2623126381840826377
+  needsMark: 
+  blockedByMark: 
+  oncePerSave: 0
+  moreLikelyWhen: []
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2

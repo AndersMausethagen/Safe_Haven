@@ -222,13 +222,25 @@ public sealed partial class RaidPreparationWindow
             });
         }
 
-        foreach (RaidEventDefinition foretold in RaidForecast.For(raid, plan.Seed, HavenReadiness.ForetoldEvents))
+        foreach (RaidEventDefinition foretold in RaidForecast.For(raid, plan.Seed, HavenReadiness.ForetoldEvents, RaidEventDirector.SaveHasMark))
         {
             string warning = string.IsNullOrWhiteSpace(foretold.Warning) ? "" : "\n\n" + foretold.Warning;
             eventFaces.Add(new CardFace
             {
                 Name = foretold.DisplayName, Painting = foretold.Artwork, Icon = "Eye", Badge = "Seen",
                 TipTitle = foretold.DisplayName, TipColour = style.Accent, TipBody = "Seen from the Watch Post." + warning,
+            });
+        }
+
+        // What kind of day it is out there (Docs/RaidEventsPlan_2026-11-26.md E5), from the same seed the raid rolls it with.
+        RaidEventCondition condition = RaidEventSettings.Of(raid)?.ConditionFor(plan.Seed);
+        if (condition != null)
+        {
+            RaidEventDefinition shown = condition.events != null ? condition.events.Find(e => e != null && e.Artwork != null) : null;
+            eventFaces.Add(new CardFace
+            {
+                Name = condition.name, Painting = shown != null ? shown.Artwork : null, Icon = "Eye", Badge = "Today",
+                TipTitle = condition.name, TipColour = style.Accent, TipBody = condition.briefing,
             });
         }
 

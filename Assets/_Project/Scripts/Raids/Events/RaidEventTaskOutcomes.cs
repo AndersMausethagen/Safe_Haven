@@ -36,6 +36,49 @@ public sealed class DefendOutcome : RaidEventOutcome
 }
 
 /// <summary>
+/// The save remembers a choice (Docs/RaidEventsPlan_2026-11-26.md E4): a mark in the journal that a follow-up event needs (Needs Mark) or
+/// that keeps one away (Blocked By Mark). "event:pedlar:freed", "event:stranger:owed".
+/// </summary>
+[Serializable]
+public sealed class SetMarkOutcome : RaidEventOutcome
+{
+    [SerializeField] private string mark = "";
+
+    public SetMarkOutcome() { }
+
+    public SetMarkOutcome(string mark) => this.mark = mark;
+
+    public string Mark => mark;
+    public override string DisplayName => "Set Mark (remembered)";
+
+    public override void Apply(RaidEventContext context)
+    {
+        if (!string.IsNullOrEmpty(mark))
+        {
+            GameSession.Progress.Journal.NoteNoticed(mark);
+        }
+    }
+}
+
+/// <summary>The forest calms by this much at once (an offering at its warning, Docs/RaidEventsPlan_2026-11-26.md E5).</summary>
+[Serializable]
+public sealed class CalmForestOutcome : RaidEventOutcome
+{
+    [SerializeField, Min(0f)] private float amount = 40f;
+
+    public override string DisplayName => "Calm the Forest";
+
+    public override void Apply(RaidEventContext context)
+    {
+        ForestAnnoyanceDriver forest = Object.FindAnyObjectByType<ForestAnnoyanceDriver>();
+        if (forest != null && forest.Annoyance != null)
+        {
+            forest.Annoyance.Calm(amount);
+        }
+    }
+}
+
+/// <summary>
 /// Something heavy to carry to a way out (Docs/RaidEventsPlan_2026-11-26.md E3): the burden's prefab (with CarriedBurden) stands at the
 /// site and goes straight into the player's hands; On Delivered's outcomes come when it is carried into an open exit's circle.
 /// </summary>

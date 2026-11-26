@@ -11,7 +11,8 @@
     "2026-11-17, the user: 'Create props and aditional monsters you need with LocalSpawn' for Troll Valley (the Brukam bridge troll boss, his bridge, club, hoard and bones, a ruined seter, a petrified troll) and the Moss Marsh after it (the corrupted Nøkk of the Black Pool, the deildegast, the lindorm's head and coils, boardwalk, peat, bloomery, rowboat, fiddle, boundary stone). Docs/TrollValleyPlan.md, Docs/NextRaidResearch_2026-11-17.md.",
     "2026-11-17, boss encounters (Docs/BossEncounterResearch_2026-11-17.md, the user: \"go for option C\"): Brukam's Bridge arena needs a long straight bridge whose segments fall: Bridge Span (one segment of deck, square broken ends, laid end to end on piers), Bridge Pier, and the Toll Post its gate stands at.",
     "2026-11-26, the user: 'Bruk gjerne localspawn for å generere nye assets ... lag gjerne flere, spennende og unike events': camp dressing (Raider Lean-to, Drying Rack, Camp Stash) and the new raid events' sites (Scree Slide, Troll Cookpot, Herder's Lur, Bog Body, Marsh Lantern, Peat Hut, Charcoal Clamp). Docs/RaidLayoutAnalysis_2026-11-26.md.",
-    "2026-11-26, the user: 'enig med dine anbefalinger. kjør på' (Docs/RaidEventsPlan_2026-11-26.md E3): sites for the Elder's Bell (Bell Oak), the Stone Head (also its carried burden) and the Sunken Bell Tower (Sunken Tower)."
+    "2026-11-26, the user: 'enig med dine anbefalinger. kjør på' (Docs/RaidEventsPlan_2026-11-26.md E3): sites for the Elder's Bell (Bell Oak), the Stone Head (also its carried burden) and the Sunken Bell Tower (Sunken Tower).",
+    "2026-11-26, Docs/RaidEventsPlan_2026-11-26.md E6 legends: the White Hart (Misty Woods) and the Lindorm's back (Moss Marsh)."
   ],
   "art": "Assets/_Project/Art/World/Props",
   "common": "Three-quarter view from slightly above, whole object visible and centred, isolated on a plain light grey background. Matte, softly lit, no glow, no light rays, no fog.",
@@ -522,7 +523,11 @@
       "width": 2.8,
       "max_height": 1.8,
       "texture_size": 2048,
-      "lod0_triangles": 6000,
+      "lod0_triangles": 9000,
+      "view_scale": 3,
+      "lod0_floor": 5000,
+      "shape_deviation": 0.008,
+      "shape_silhouette": 0.98,
       "looks": [
         {
           "key": "A",
@@ -536,7 +541,11 @@
       "width": 2.2,
       "max_height": 1.8,
       "texture_size": 2048,
-      "lod0_triangles": 5000,
+      "lod0_triangles": 9000,
+      "view_scale": 3,
+      "lod0_floor": 5000,
+      "shape_deviation": 0.008,
+      "shape_silhouette": 0.98,
       "looks": [
         {
           "key": "A",
@@ -550,7 +559,11 @@
       "width": 1.2,
       "max_height": 0.8,
       "texture_size": 2048,
-      "lod0_triangles": 4000,
+      "lod0_triangles": 9000,
+      "view_scale": 3,
+      "lod0_floor": 5000,
+      "shape_deviation": 0.008,
+      "shape_silhouette": 0.98,
       "looks": [
         {
           "key": "A",
@@ -564,7 +577,11 @@
       "width": 5.0,
       "max_height": 1.6,
       "texture_size": 2048,
-      "lod0_triangles": 7000,
+      "lod0_triangles": 9000,
+      "view_scale": 3,
+      "lod0_floor": 5000,
+      "shape_deviation": 0.008,
+      "shape_silhouette": 0.98,
       "looks": [
         {
           "key": "A",
@@ -578,7 +595,11 @@
       "width": 2.6,
       "max_height": 1.9,
       "texture_size": 2048,
-      "lod0_triangles": 6000,
+      "lod0_triangles": 9000,
+      "view_scale": 3,
+      "lod0_floor": 5000,
+      "shape_deviation": 0.008,
+      "shape_silhouette": 0.98,
       "looks": [
         {
           "key": "A",
@@ -592,7 +613,11 @@
       "width": 1.8,
       "max_height": 2.0,
       "texture_size": 2048,
-      "lod0_triangles": 5000,
+      "lod0_triangles": 9000,
+      "view_scale": 3,
+      "lod0_floor": 5000,
+      "shape_deviation": 0.008,
+      "shape_silhouette": 0.98,
       "looks": [
         {
           "key": "A",
@@ -606,7 +631,11 @@
       "width": 2.0,
       "max_height": 0.5,
       "texture_size": 2048,
-      "lod0_triangles": 5000,
+      "lod0_triangles": 9000,
+      "view_scale": 3,
+      "lod0_floor": 5000,
+      "shape_deviation": 0.008,
+      "shape_silhouette": 0.98,
       "looks": [
         {
           "key": "A",
@@ -620,7 +649,11 @@
       "width": 0.9,
       "max_height": 2.0,
       "texture_size": 2048,
-      "lod0_triangles": 4000,
+      "lod0_triangles": 9000,
+      "view_scale": 3,
+      "lod0_floor": 5000,
+      "shape_deviation": 0.008,
+      "shape_silhouette": 0.98,
       "looks": [
         {
           "key": "A",
@@ -634,7 +667,11 @@
       "width": 4.5,
       "max_height": 3.0,
       "texture_size": 2048,
-      "lod0_triangles": 8000,
+      "lod0_triangles": 9000,
+      "view_scale": 3,
+      "lod0_floor": 5000,
+      "shape_deviation": 0.008,
+      "shape_silhouette": 0.98,
       "looks": [
         {
           "key": "A",
@@ -648,7 +685,11 @@
       "width": 4.0,
       "max_height": 1.6,
       "texture_size": 2048,
-      "lod0_triangles": 7000,
+      "lod0_triangles": 9000,
+      "view_scale": 3,
+      "lod0_floor": 5000,
+      "shape_deviation": 0.008,
+      "shape_silhouette": 0.98,
       "looks": [
         {
           "key": "A",
@@ -662,7 +703,11 @@
       "width": 4.0,
       "max_height": 4.5,
       "texture_size": 2048,
-      "lod0_triangles": 8000,
+      "lod0_triangles": 9000,
+      "view_scale": 3,
+      "lod0_floor": 5000,
+      "shape_deviation": 0.008,
+      "shape_silhouette": 0.98,
       "looks": [
         {
           "key": "A",
@@ -676,7 +721,11 @@
       "width": 1.2,
       "max_height": 1.0,
       "texture_size": 2048,
-      "lod0_triangles": 5000,
+      "lod0_triangles": 9000,
+      "view_scale": 3,
+      "lod0_floor": 5000,
+      "shape_deviation": 0.008,
+      "shape_silhouette": 0.98,
       "looks": [
         {
           "key": "A",
@@ -690,12 +739,52 @@
       "width": 4.0,
       "max_height": 4.0,
       "texture_size": 2048,
-      "lod0_triangles": 8000,
+      "lod0_triangles": 9000,
+      "view_scale": 3,
+      "lod0_floor": 5000,
+      "shape_deviation": 0.008,
+      "shape_silhouette": 0.98,
       "looks": [
         {
           "key": "A",
           "seed": 7463,
           "prompt": "Only the very top of an old Norse wooden bell tower sticking out of flat black bog mud and leaning badly: a small open belfry under a steep dark shingled pyramid roof with a carved dragon head at one corner, a dark bronze bell visible inside; the mud comes right up to the bottom of the belfry, no walls, no doors, no lower roofs, no cross; moss and reeds around where it sinks in, the timbers grey and rotting. Everything grown together into one solid piece, nothing loose or floating."
+        }
+      ]
+    },
+    {
+      "asset": "White Hart",
+      "width": 2.2,
+      "max_height": 2.4,
+      "texture_size": 2048,
+      "lod0_triangles": 9000,
+      "view_scale": 3,
+      "lod0_floor": 5000,
+      "shape_deviation": 0.008,
+      "shape_silhouette": 0.98,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7471,
+          "prompt": "A pure white stag standing still on a mossy forest rock, head raised and turned, huge pale antlers like bare winter branches, its coat snow white and soft-looking, slender legs, standing on a low flat mossy stone base. Matte, softly lit, no glow. Everything grown together into one solid piece, nothing loose or floating."
+        }
+      ]
+    },
+    {
+      "asset": "Lindorm Coils",
+      "width": 6.0,
+      "max_height": 2.2,
+      "texture_size": 2048,
+      "lod0_triangles": 9000,
+      "view_scale": 3,
+      "lod0_floor": 5000,
+      "shape_deviation": 0.008,
+      "shape_silhouette": 0.98,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7482,
+          "prompt": "The back of a huge sleeping lindorm, a Norse serpent dragon, rising out of black bog mud in three great scaly coils like a row of low arches, dark green-black scales with a pale ridge of spines along its spine, moss and reeds growing on the coils, no head visible, the ends of the coils sinking into the mud. Everything grown together into one solid piece, nothing loose or floating."
         }
       ]
     }

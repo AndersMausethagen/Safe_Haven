@@ -3,10 +3,10 @@
  "looks": {
   "Drying Rack A": {
    "source": 9994,
-   "view": 2312,
-   "triangles": 2312,
+   "view": 6936,
+   "triangles": 6936,
    "shape_limited": false,
-   "check": "(deviation 0.3%, silhouette 0.957)",
+   "check": "(deviation 0.1%, silhouette 0.992)",
    "holes_generated": 0,
    "holes_filled": 0,
    "holes": 0,

@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: ForestsWarning
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: ForestsWarning
+  displayName: The Forest's Warning
+  weight: 0.05
+  earliestSeconds: 60
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: Roots break the ground ahead, curled round a stump like fingers.
+  warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
+  sitePrefab: {fileID: 3587139044830951848, guid: 4b5befddc72dfe940a9f019b42bedab8, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: A ring of roots round a felled tree, closed like a fist. The forest is telling you something.
+  artwork: {fileID: 21300000, guid: 7a2c5ba44b99bd64d8b4ee0c94c4c19a, type: 3}
+  stakes:
+    loot: 0
+    danger: 1
+    time: 0
+  onStart: []
+  choices:
+  - label: Leave wood at the roots
+    detail: Give back five of what you took. The forest calms.
+    cost:
+    - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+      amount: 5
+    requires: []
+    result: The roots ease open and sink back. The forest breathes out.
+    outcomes:
+    - rid: 2623126385950982174
+  - label: Walk on
+    detail: It is only roots.
+    cost: []
+    requires: []
+    result: The roots creak behind you a long way.
+    outcomes:
+    - rid: 2623126385950982175
+  needsMark: 
+  blockedByMark: 
+  oncePerSave: 0
+  moreLikelyWhen:
+  - state: 1
+    times: 40
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126385950982174
+      type: {class: CalmForestOutcome, ns: , asm: SafeHaven}
+      data:
+        amount: 60
+    - rid: 2623126385950982175
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: You feel the forest watching you go.
+        kind: 2

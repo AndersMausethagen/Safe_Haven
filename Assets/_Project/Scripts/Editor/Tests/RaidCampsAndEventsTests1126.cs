@@ -60,7 +60,8 @@ public sealed class RaidCampsAndEventsTests1126
                 Assert.IsNotNull(definition.SitePrefab.GetComponent<RaidEventSite>(), $"{definition.name}: its site");
                 foreach (CuriousPlace place in definition.SitePrefab.GetComponentsInChildren<CuriousPlace>(true))
                 {
-                    bool borrowed = place.InteractionName == "Overturned Wagon" && definition.name != "TradersWagon";
+                    // A copy of the wagon's site that kept its name; the wagon's own site, used again on purpose (the pedlar's brother), is not.
+                    bool borrowed = place.InteractionName == "Overturned Wagon" && definition.SitePrefab.name != "Overturned Wagon";
                     Assert.IsFalse(borrowed, $"{definition.name}: its site is named for itself, not the wagon it was copied from");
                 }
                 if (definition.Choices.Count > 0)

@@ -3,16 +3,16 @@
  "looks": {
   "Scree Slide A": {
    "source": 9984,
-   "view": 7000,
-   "triangles": 7000,
+   "view": 9000,
+   "triangles": 9000,
    "shape_limited": false,
-   "check": "(deviation 0.1%, silhouette 0.996)",
+   "check": "(deviation 0.0%, silhouette 1.000)",
    "holes_generated": 0,
    "holes_filled": 0,
    "holes": 0,
    "largest_hole": 0.0,
    "non_manifold_edges": 11,
-   "unwrap": "smart"
+   "unwrap": "regions"
   }
  }
 }

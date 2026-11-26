@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: Followed
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: Followed
+  displayName: Followed
+  weight: 0.1
+  earliestSeconds: 90
+  latestSecondsLeft: 60
+  minimumStage: 0
+  warning: Footsteps behind you stop when you stop. Something wants what you carry.
+  warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
+  sitePrefab: {fileID: 0}
+  siteDistance: {x: 35, y: 70}
+  siteText: 
+  artwork: {fileID: 21300000, guid: 32fcb6ca3a0007f4fb329b97fdedf997, type: 3}
+  stakes:
+    loot: 0
+    danger: 2
+    time: 0
+  onStart:
+  - rid: 2623126385950982173
+  choices: []
+  needsMark: 
+  blockedByMark: 
+  oncePerSave: 0
+  moreLikelyWhen:
+  - state: 0
+    times: 10
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126385950982173
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+        count: 2
+        radius: 20
+        hunt: 1

@@ -1062,11 +1062,35 @@ MonoBehaviour:
           - {fileID: 11400000, guid: a3cb2529bab49724cb72ddb15212b062, type: 2}
           - {fileID: 11400000, guid: 36720da6d95662645a9d4ceb621bf077, type: 2}
           - {fileID: 11400000, guid: 4696a519ca8985740ab44bb8be17d53b, type: 2}
+          - {fileID: 11400000, guid: d176d09d6ff0ae84fafec2f8385fde80, type: 2}
+          - {fileID: 11400000, guid: 6def460b1e63fe34b9a348854cd79da8, type: 2}
+          - {fileID: 11400000, guid: d4f99225e257b5147956a1dda428fa0a, type: 2}
+          - {fileID: 11400000, guid: b7977d02ffc4a1c4fa44cce60ed4086b, type: 2}
+          - {fileID: 11400000, guid: 00d826dea0556844a9155bf1740b0d05, type: 2}
+          - {fileID: 11400000, guid: d77c1c9fb8e54c7408f70e7335be21a4, type: 2}
+          - {fileID: 11400000, guid: 5fed4c6f5cd2697468727f9ee728ea25, type: 2}
           firstDelay: 45
           interval: 110
           intervalSpread: 35
           maxPerRaid: 4
           maxOpenSites: 2
+          conditions:
+          - name: The forest is restless
+            briefing: The woodfolk say the old trees are awake. Strange things grow likelier out there.
+            chance: 0.2
+            events:
+            - {fileID: 11400000, guid: a3cb2529bab49724cb72ddb15212b062, type: 2}
+            - {fileID: 11400000, guid: 00d826dea0556844a9155bf1740b0d05, type: 2}
+            - {fileID: 11400000, guid: 4696a519ca8985740ab44bb8be17d53b, type: 2}
+            times: 3
+          - name: Charcoal smoke on the wind
+            briefing: Burners and traders have been on the old tracks. Their camps and wagons lie about.
+            chance: 0.2
+            events:
+            - {fileID: 11400000, guid: 36720da6d95662645a9d4ceb621bf077, type: 2}
+            - {fileID: 11400000, guid: eac64687f931d7c4784a86ae8f83b987, type: 2}
+            - {fileID: 11400000, guid: c741611bae9900b4da4b5f0226efdfe1, type: 2}
+            times: 3
     - rid: 287758281410609374
       type: {class: RaidRumoursSystem, ns: , asm: SafeHaven}
       data:

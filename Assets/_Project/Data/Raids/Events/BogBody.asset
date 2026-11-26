@@ -47,6 +47,11 @@ MonoBehaviour:
     - rid: 2623126381840826390
     - rid: 2623126381840826391
     - rid: 2623126381840826392
+    - rid: 2623126385950982151
+  needsMark: 
+  blockedByMark: 
+  oncePerSave: 0
+  moreLikelyWhen: []
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2
@@ -131,3 +136,7 @@ MonoBehaviour:
             toTier: 0
             fixedAmount: 0
             onlyInRaid: {fileID: 0}
+    - rid: 2623126385950982151
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:bog:kind

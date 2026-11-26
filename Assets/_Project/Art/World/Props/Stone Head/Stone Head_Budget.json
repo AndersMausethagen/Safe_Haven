@@ -3,10 +3,10 @@
  "looks": {
   "Stone Head A": {
    "source": 9996,
-   "view": 1078,
-   "triangles": 1078,
+   "view": 5000,
+   "triangles": 5000,
    "shape_limited": false,
-   "check": "(deviation 0.4%, silhouette 0.994)",
+   "check": "(deviation 0.1%, silhouette 0.999)",
    "holes_generated": 0,
    "holes_filled": 0,
    "holes": 0,

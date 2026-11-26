@@ -1016,11 +1016,32 @@ MonoBehaviour:
           - {fileID: 11400000, guid: 35bab3a6fe61b304f906bd5372d5c97e, type: 2}
           - {fileID: 11400000, guid: cb40a0d8b29c84f46aff939cfd487cb1, type: 2}
           - {fileID: 11400000, guid: 658e42e87a9843d42a0d6948a960b485, type: 2}
+          - {fileID: 11400000, guid: d176d09d6ff0ae84fafec2f8385fde80, type: 2}
+          - {fileID: 11400000, guid: 6def460b1e63fe34b9a348854cd79da8, type: 2}
+          - {fileID: 11400000, guid: d4f99225e257b5147956a1dda428fa0a, type: 2}
+          - {fileID: 11400000, guid: b7977d02ffc4a1c4fa44cce60ed4086b, type: 2}
+          - {fileID: 11400000, guid: d77c1c9fb8e54c7408f70e7335be21a4, type: 2}
+          - {fileID: 11400000, guid: 1d7870d052b1fbb4184d4b855a9335d9, type: 2}
           firstDelay: 45
           interval: 110
           intervalSpread: 35
           maxPerRaid: 4
           maxOpenSites: 2
+          conditions:
+          - name: The trolls are cooking today
+            briefing: Smoke from the troll fires up and down the valley. Where trolls cook, trolls eat, and leave things lying.
+            chance: 0.3
+            events:
+            - {fileID: 11400000, guid: 35bab3a6fe61b304f906bd5372d5c97e, type: 2}
+            - {fileID: 11400000, guid: 658e42e87a9843d42a0d6948a960b485, type: 2}
+            times: 3
+          - name: The herders' summer
+            briefing: The seters stood full once, this time of year. What the herders left is still up there.
+            chance: 0.2
+            events:
+            - {fileID: 11400000, guid: cb40a0d8b29c84f46aff939cfd487cb1, type: 2}
+            - {fileID: 11400000, guid: 428e578c1b65c6f4fbb00bc4f94c7311, type: 2}
+            times: 3
     - rid: 287758281410609374
       type: {class: RaidRumoursSystem, ns: , asm: SafeHaven}
       data:

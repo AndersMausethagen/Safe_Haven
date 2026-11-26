@@ -325,7 +325,7 @@ public static class RaidLauncher
         {
             Companion = companion,
             IsLarge = large,
-            Foretold = RaidForecast.For(raid, runSeed, foretoldEvents),
+            Foretold = RaidForecast.For(raid, runSeed, foretoldEvents, RaidEventDirector.SaveHasMark),
             ExtraRumours = HavenReadiness.ExtraRumours,
             QuestsUnderWay = questsUnderWay,
         };

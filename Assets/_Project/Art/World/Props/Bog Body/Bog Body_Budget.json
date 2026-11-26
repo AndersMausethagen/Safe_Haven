@@ -3,10 +3,10 @@
  "looks": {
   "Bog Body A": {
    "source": 9992,
-   "view": 1554,
-   "triangles": 2097,
-   "shape_limited": true,
-   "check": "(deviation 1.1%, silhouette 0.960)",
+   "view": 5000,
+   "triangles": 5000,
+   "shape_limited": false,
+   "check": "(deviation 0.3%, silhouette 0.987)",
    "holes_generated": 0,
    "holes_filled": 0,
    "holes": 0,

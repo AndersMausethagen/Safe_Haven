@@ -3,10 +3,10 @@
  "looks": {
   "Camp Stash A": {
    "source": 9980,
-   "view": 600,
-   "triangles": 1991,
-   "shape_limited": true,
-   "check": "(deviation 1.4%, silhouette 0.975)",
+   "view": 5000,
+   "triangles": 5000,
+   "shape_limited": false,
+   "check": "(deviation 0.2%, silhouette 0.996)",
    "holes_generated": 2,
    "holes_filled": 0,
    "holes": 2,

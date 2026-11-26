@@ -121,6 +121,11 @@ public sealed class RaidEventSite : MonoBehaviour, IInteractionName, IInteractio
         {
             WasReached = true;
             PlaytestLogger.Note(PlaytestLog.EventReached, definition.name, Mathf.RoundToInt(context.Session != null ? context.Session.Elapsed : 0f));
+            // A legend is met once the player has found it (Docs/RaidEventsPlan_2026-11-26.md E6): one placed and never found comes again.
+            if (definition.OncePerSave)
+            {
+                GameSession.Progress.Journal.NoteNoticed(definition.OnceMark);
+            }
         }
     }
 

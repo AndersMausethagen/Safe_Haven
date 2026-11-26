@@ -55,6 +55,10 @@ MonoBehaviour:
     outcomes:
     - rid: 2623126268168110237
     - rid: 2623126268168110238
+  needsMark: 
+  blockedByMark: 
+  oncePerSave: 0
+  moreLikelyWhen: []
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2

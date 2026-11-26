@@ -54,6 +54,10 @@ MonoBehaviour:
     result: You leave it on the scree.
     outcomes:
     - rid: 2623126383268724753
+  needsMark: 
+  blockedByMark: 
+  oncePerSave: 0
+  moreLikelyWhen: []
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2
