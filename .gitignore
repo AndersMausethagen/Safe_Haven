@@ -103,3 +103,21 @@ Tools/Playtest/Results/
 
 # Discord webhooks for the playtest server (Docs/PlaytestDiscord.md): secrets, never committed.
 AgentScripts/discord.local.json
+
+# Asset Store packs (2026-11-26): kept in Unity Version Control (Plastic), not in git. They were bought, are big (about 10 GB),
+# and have been changed in places (converted materials, import settings): restore them from Plastic, not from the Asset Store.
+# A git clone alone is not a complete project. Each folder and its .meta go together: a .meta without its folder is deleted by Unity.
+/Assets/SeedMesh/
+/Assets/SeedMesh.meta
+/Assets/StylizedCharacter/
+/Assets/StylizedCharacter.meta
+/Assets/VIVID_Arts/
+/Assets/VIVID_Arts.meta
+/Assets/Kevin Iglesias/
+/Assets/Kevin Iglesias.meta
+/Assets/Malbers Animations/
+/Assets/Malbers Animations.meta
+/Assets/Starter Assets/
+/Assets/Starter Assets.meta
+/Assets/AmplifyShaderEditor/
+/Assets/AmplifyShaderEditor.meta
