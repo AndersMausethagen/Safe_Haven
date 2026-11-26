@@ -106,6 +106,12 @@ public sealed class MonsterAttacks
     /// <summary>True after a charge, while it stands open to a counter.</summary>
     public bool IsExposed => exposedAt >= 0f;
 
+    /// <summary>Seconds the charge under way should take to meet a target that stands still, at its Charge Speed (0 for anything
+    /// else): what a beast's leap is timed to.</summary>
+    public float ChargeSeconds => action != null && action.kind == MonsterAttackKind.Charge && action.chargeSpeed > 0f
+        ? chargeMeets / action.chargeSpeed : 0f;
+    private float chargeMeets;
+
     /// <summary>When its last shot or throw started (Time.time), for the ranged turns at the player.</summary>
     public float RangedStartedAt { get; private set; } = float.NegativeInfinity;
 
@@ -381,6 +387,9 @@ public sealed class MonsterAttacks
         hazardTravelled = 0f;
         trailTravelled = 0f;
         chargeLength = action != null ? Mathf.Min(action.chargeDistance, toTarget.magnitude + 0.7f) : 0f;
+        // Where it should meet a target that stands: its blow reaches from Range short of it (a leap timed to the whole run landed
+        // after the bite, probe 2026-11-26).
+        chargeMeets = Mathf.Clamp(toTarget.magnitude - (Attack != null ? Attack.Range : 0f), 0f, chargeLength);
         exposedAt = -1f;
         chargeHit = false;
         Blow = 0;

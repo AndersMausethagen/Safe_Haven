@@ -13,7 +13,7 @@ The user: "i agree with most, but keep skills costing focus, increase heavy swin
 | 2. The wolf waits | **Built.** Monster Attack › Break Away Delay 0.3 s on the wolf's bite; the opening ring runs on through it. Probed live: four bites, each 0.30 s standing still, then the 3.5 m run. |
 | 3. Pressure budget | Not built, as recommended: wait for a playtest of the safety round. |
 | 4. Skills cooldown only | **Not built: the user keeps the Focus cost.** |
-| 5. Wolf animation | In progress (see the commit after this one). |
+| 5. Wolf animation | **Built.** The pounce plays the wolf's own Jump_ToIdle in three phases (crouch over the wind-up, leap over the run, landing as it strikes); a blow on a standing wolf plays Idle_HitReact_Left or Right by the side struck. Probed live and seen in the game view. Gallop_Jump wasn't needed. The gallop was already fitted on 11-24. |
 | 6. Exaggeration pass | In progress. |
 | 7. Reach assist | **Built** (0.6 m, not 0.8: the step gets only the end of the wind-up). Probed live: a target 2.94 m off, 0.8 m step and a miss without it, 1.4 m and a hit with it; 4.36 m off still misses. |
 | 8. Log the moveset | **Built:** `Move.*` and `Whiffed.*` rows. |

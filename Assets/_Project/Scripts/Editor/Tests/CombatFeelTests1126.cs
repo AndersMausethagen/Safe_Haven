@@ -57,6 +57,75 @@ public sealed class CombatFeelTests1126
         Assert.IsTrue(progress.Journal.HasNoticed(ReelingHint.ShowKey(0)), "kept in the journal's noticed set, which the save keeps");
     }
 
+    /// <summary>
+    /// The wolf's own unused clips (§3.5): the pounce is one jump (Jump_ToIdle) whose crouch plays over the wind-up and whose leap plays
+    /// over the run, so the driver's take-off and landing marks must sit where the body leaves and meets the ground; and a flinch each way.
+    /// </summary>
+    [Test]
+    public void TheWolfPouncesWithItsOwnLeap_AndFlinchesBothWays()
+    {
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Enemies/ForestBittenWolf.prefab");
+        var animator = prefab.GetComponentInChildren<Animator>();
+        var controller = (UnityEditor.Animations.AnimatorController)animator.runtimeAnimatorController;
+        var motions = new System.Collections.Generic.Dictionary<string, Motion>();
+        foreach (var child in controller.layers[0].stateMachine.states)
+        {
+            motions[child.state.name] = child.state.motion;
+        }
+
+        foreach (string state in new[] { "Pounce", "Hit Left", "Hit Right", "Attack" })
+        {
+            Assert.IsTrue(motions.ContainsKey(state) && motions[state] != null, $"the wolf has a {state} clip");
+        }
+
+        Assert.AreNotSame(motions["Attack"], motions["Pounce"], "the pounce isn't the bite");
+        Assert.AreNotSame(motions["Hit Left"], motions["Hit Right"], "a flinch each way");
+
+        var driver = new SerializedObject(prefab.GetComponentInChildren<MonsterAnimationDriver>());
+        float launch = driver.FindProperty("pounceLaunchAt").floatValue, land = driver.FindProperty("pounceLandAt").floatValue;
+        var clip = (AnimationClip)motions["Pounce"];
+        Assert.Less(launch, land);
+        Assert.Less(land, clip.length, "it lands before its clip ends, and settles after");
+
+        GameObject model = Object.Instantiate(animator.gameObject);
+        try
+        {
+            Transform body = FindBone(model.transform, "Body");
+            Assert.IsNotNull(body, "the wolf's Body bone");
+            float HeightAt(float t)
+            {
+                clip.SampleAnimation(model, t);
+                return model.transform.InverseTransformPoint(body.position).y;
+            }
+
+            float atLaunch = HeightAt(launch), atLand = HeightAt(land), midLeap = HeightAt((launch + land) * 0.5f);
+            Assert.Greater(midLeap - Mathf.Max(atLaunch, atLand), 0.4f, "airborne between the marks, near the ground at them");
+        }
+        finally
+        {
+            Object.DestroyImmediate(model);
+        }
+    }
+
+    private static Transform FindBone(Transform at, string name)
+    {
+        if (at.name == name)
+        {
+            return at;
+        }
+
+        foreach (Transform child in at)
+        {
+            Transform found = FindBone(child, name);
+            if (found != null)
+            {
+                return found;
+            }
+        }
+
+        return null;
+    }
+
     [Test]
     public void TheWolfStandsOpenAfterItsBite_BeforeItRunsOff()
     {

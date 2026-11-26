@@ -417,6 +417,12 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     /// one rule the telegraph's colour shows and OnDamaged keeps (with Break Through for blows heavy enough to break any).</summary>
     public bool AnyBlowBreaksStrike => CurrentState == State.Attacking && !IsUnyielding && attacks.Action != null && attacks.Action.interruptible;
     public bool IsExposed => CurrentState == State.Attacking && attacks.IsExposed;
+
+    /// <summary>True while the strike under way still winds up, before its blow (or a charge's run).</summary>
+    public bool IsWindingUp => CurrentState == State.Attacking && attacks.IsWindingUp;
+
+    /// <summary>Seconds the charge under way runs for (0 when not charging).</summary>
+    public float ChargeSeconds => CurrentState == State.Attacking ? attacks.ChargeSeconds : 0f;
     public bool IsHowler => pack != null && pack.IsLeader(this);
 
     /// <summary>The direction the current attack was aimed when it started; it doesn't follow the target.</summary>

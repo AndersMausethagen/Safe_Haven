@@ -3374,6 +3374,11 @@ sample textures and flames are in `Art/Effects/VFX Graph/Additions` (Unity Compa
   (`SwingMotion.StepDistance`, the search reach in `StepIntoBlow` grows by it). `CombatTally.MoveName`/`WhiffName`: `Move.*` and
   `Whiffed.*` rows. `ReelingHint` (Player.Awake): the first `MostShows` (3) times in a save the focused creature reels, "Heavy [key]" on
   its own overlay canvas over it; counted in the journal's noticed set as `hint:reeling:N`, so the save format is unchanged.
+  Beasts (`MonsterAnimationDriver`): a Charge on a controller with a "Pounce" state plays it instead of the Attack trigger, its clip
+  driven in phases through ActionSpeed (crouch to `pounceLaunchAt` over the wind-up, leap to `pounceLandAt` over
+  `MonsterAI.ChargeSeconds`, the time to meet a standing target, then the settle; a leap cut short falls the rest in 0.1 s). "Hit Left"/
+  "Hit Right" states: `TryBeastFlinch` on a standing (or spent) beast, the strike tail hands it back to the legs when it moves. Wolf.controller
+  has all three (Jump_ToIdle, Idle_HitReact_Left/Right).
 - **Sounds** (Docs/CombatSkillsResearch 6): `SkillLook.castSound/releaseSound/releaseSoundDelay` (SkillFx plays them; the effects builder
   keeps them when it remakes a look) and `StatusEffectDefinition.consumeSound` (Shatter). Takes for 13 sounds wait on the user's ear:
   MOSS and Stable Audio 3 (two each) and `Tools/Audio/skills.py` (two each; none for the war cry's voice) on the Skill sound picks page.

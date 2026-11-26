@@ -184,7 +184,9 @@ you, until their next try (0.8 to 1.6 s). Ranged attacks, howls and summons don'
 
 A hit-and-run creature (Monster Attack › Break Away: wolves, Rootlings, Troll Runts) runs off after its strike. The wolf first stands where it
 bit for 0.3 s (Break Away Delay), its pale green opening ring shrinking on through the wait, so an answer on reflex lands before it goes
-(2026-11-26).
+(2026-11-26). The wolf's pounce is a leap of its own (its model's Jump_ToIdle: a crouch over the wind-up, airborne over the run, landing
+as it strikes), not its bite, and a blow on a standing wolf turns its head away from the side struck (Idle_HitReact_Left/Right). Running,
+it only recoils, as a standing flinch would glide.
 
 Some melee strikes go on into a follow-up, aimed anew with its own wind-up and warning, or hold the wind-up for 0.45 s while tracking you, its warning
 stopped part-filled, so a roll on reflex comes too soon. Draug and Barrow Shieldbearer chain a cleave into a backswing, and hold a cleave 30% of the time;

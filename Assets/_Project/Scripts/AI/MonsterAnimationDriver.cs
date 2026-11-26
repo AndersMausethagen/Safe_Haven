@@ -57,6 +57,12 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
              "override plays other clips (a zombie's shamble, a treant's stride) says what they cover, so the feet keep up with the ground.")]
     [SerializeField, Min(0.1f)] private float walkClipSpeed = WalkThreshold;
     [SerializeField, Min(0.1f)] private float runClipSpeed = RunThreshold;
+    [Tooltip("Beasts whose controller has a Pounce state (Docs/CombatFeelAnalysis_2026-11-26.md §3.5): seconds into its clip where it " +
+             "leaves the ground. The crouch before plays over the charge's wind-up. The wolf's Jump_ToIdle: 0.44.")]
+    [SerializeField, Min(0f)] private float pounceLaunchAt = 0.44f;
+    [Tooltip("Seconds into the Pounce clip where it lands. The leap between plays over the charge's run, the settle after at its own pace. " +
+             "The wolf's Jump_ToIdle: 0.89.")]
+    [SerializeField, Min(0f)] private float pounceLandAt = 0.89f;
 
     /// <summary>The bool a controller has when it has a clip for grazing and sleeping.</summary>
     public const string RestingParameter = "Resting";
@@ -231,6 +237,7 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         // Story movement owns locomotion while the AI is disabled.
         float speed = MovedSpeed();
         UpdateStrikeTail(speed);
+        UpdatePounce();
         // Walking and galloping beasts step round as they turn on the spot, and a bigger one takes longer strides (review 2026-11-24: a
         // pack leader at 1.2 over-ran the ground by a fifth).
         if (walkStrideSpeed > 0f)
@@ -538,6 +545,18 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
             return;
         }
 
+        // A beast's charge with a Pounce of its own: the crouch over the wind-up, then UpdatePounce times the leap and the landing.
+        if (animator != null && !animator.isHuman && calling != null && calling.kind == MonsterAttackKind.Charge
+            && animator.HasState(0, PounceStateHash))
+        {
+            float windup = attack != null ? Mathf.Max(0.05f, attack.HitDelay) : 0.4f;
+            animator.SetFloat(ActionSpeedHash, pounceLaunchAt / windup);
+            animator.CrossFadeInFixedTime(PounceStateHash, PounceFade, 0, 0f);
+            strikeStateHash = PounceStateHash;
+            pouncePhase = PouncePhase.Crouch;
+            return;
+        }
+
         if (hasAttack)
         {
             animator.SetFloat(ActionSpeedHash, 1f);
@@ -547,6 +566,107 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     }
 
     private static readonly int AttackStateHash = Animator.StringToHash("Attack");
+
+    // ---- Beasts (Docs/CombatFeelAnalysis_2026-11-26.md §3.5: the wolf, fought most, had one clip for the bite and the pounce and no
+    // flinch). A Pounce state is one jump: crouch, leap, settle. A blow on one standing turns its head away from the side struck.
+    private static readonly int PounceStateHash = Animator.StringToHash("Pounce");
+    private static readonly int HitLeftStateHash = Animator.StringToHash("Hit Left");
+    private static readonly int HitRightStateHash = Animator.StringToHash("Hit Right");
+    private const float PounceFade = 0.08f;
+    // A leap cut short falls the rest of the way in this long.
+    private const float PounceLandCatchUp = 0.1f;
+    // The shortest leap it is timed to: a charge cut short at once still shows a hop, not a blink.
+    private const float ShortestLeap = 0.15f;
+    // Faster than this a beast is running, and a standing flinch would glide: the recoil (MonsterPose) shows the blow alone.
+    private const float BeastFlinchMostSpeed = 1f;
+
+    private enum PouncePhase { None, Crouch, Leap, Land }
+    private PouncePhase pouncePhase;
+
+    private void UpdatePounce()
+    {
+        if (pouncePhase == PouncePhase.None || animator == null || !animator.enabled)
+        {
+            return;
+        }
+
+        if (ai.CurrentState != MonsterAI.State.Attacking)
+        {
+            // Done, broken off or staggered: the strike tail (HandStrikeTailToLegs) or the stagger takes it from here.
+            pouncePhase = PouncePhase.None;
+            animator.SetFloat(ActionSpeedHash, 1f);
+            return;
+        }
+
+        if (pouncePhase == PouncePhase.Crouch && !ai.IsWindingUp)
+        {
+            pouncePhase = PouncePhase.Leap;
+            animator.SetFloat(ActionSpeedHash, (pounceLandAt - pounceLaunchAt) / Mathf.Max(ShortestLeap, ai.ChargeSeconds));
+        }
+
+        if (pouncePhase == PouncePhase.Leap && ai.IsExposed)
+        {
+            pouncePhase = PouncePhase.Land;
+        }
+
+        // Landed sooner than the leap was timed for (it struck, or met a wall): the rest of the fall goes by quickly instead of in a jump
+        // (a cut to the landing dropped the body a metre in a frame, probe 2026-11-26); then the settle at its own pace.
+        if (pouncePhase == PouncePhase.Land)
+        {
+            float left = TryPounceClipTime(out float clipTime) ? pounceLandAt - clipTime : 0f;
+            animator.SetFloat(ActionSpeedHash, left > 0f ? Mathf.Max(1f, left / PounceLandCatchUp) : 1f);
+        }
+    }
+
+    // Seconds into the Pounce clip itself. AnimatorStateInfo.length already counts the speed multiplier, so it is undone here.
+    private bool TryPounceClipTime(out float seconds)
+    {
+        AnimatorStateInfo now = animator.GetCurrentAnimatorStateInfo(0);
+        float clipLength = now.length * Mathf.Abs(now.speed * now.speedMultiplier);
+        seconds = now.normalizedTime * clipLength;
+        return now.shortNameHash == PounceStateHash && clipLength > 0f;
+    }
+
+    // A beast with Hit Left / Hit Right states, standing (or spent after its strike), flinches from a blow that tells: the clip whose
+    // head swings away from the side struck (Idle_HitReact_Left swings it left, so it answers a blow from the right).
+    private bool TryBeastFlinch(DamageInfo damage, DamageResult result, bool weighty)
+    {
+        if (animator == null || animator.isHuman || !animator.enabled || result.Damage <= 0f || result.Killed || result.Blocked
+            || damage.IsOverTime || !(result.Damage >= health.MaxHealth * flinchShare || weighty))
+        {
+            return false;
+        }
+
+        MonsterAI.State state = ai.CurrentState;
+        bool open = state == MonsterAI.State.Chasing || state == MonsterAI.State.Idle || state == MonsterAI.State.Investigating
+            || (state == MonsterAI.State.Attacking && ai.TryGetOpening(out _, out _));
+        if (!open || MovedSpeed() > BeastFlinchMostSpeed)
+        {
+            return false;
+        }
+
+        Vector3 cameFrom = -damage.Direction;
+        cameFrom.y = 0f;
+        int flinch = Vector3.Dot(transform.right, cameFrom) > 0f ? HitLeftStateHash : HitRightStateHash;
+        if (!animator.HasState(0, flinch))
+        {
+            return false;
+        }
+
+        animator.SetFloat(ActionSpeedHash, 1f);
+        animator.CrossFadeInFixedTime(flinch, FlinchFade, 0, 0f);
+        // It runs off as the clip plays out: the legs take over (UpdateStrikeTail), as after a strike.
+        if (state == MonsterAI.State.Attacking)
+        {
+            strikeStateHash = flinch;
+        }
+        else
+        {
+            tailStrikeHash = flinch;
+        }
+
+        return true;
+    }
 
     // A strike left before its blow (cut off, broken, called away) doesn't keep the raise's or the hang's slow pace for the rest of
     // its clip (review 2026-11-20: a hang plays at 0.05-0.2): it plays out at its follow-through's.
@@ -710,6 +830,11 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
 
         // An Unyielding elite doesn't flinch; a raised weapon guard shows its own jolt; a strike just broken off shows its reel.
         if (ai.IsUnyielding || ai.IsWeaponGuarding || interruptedFrame == Time.frameCount)
+        {
+            return;
+        }
+
+        if (TryBeastFlinch(damage, result, weighty))
         {
             return;
         }
