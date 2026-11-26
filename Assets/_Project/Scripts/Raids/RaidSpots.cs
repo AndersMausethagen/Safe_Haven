@@ -82,6 +82,64 @@ public static class RaidSpots
     }
 
     /// <summary>
+    /// The map's event rooms (Docs/RaidLayoutAnalysis_2026-11-26.md R3) between the two distances from <paramref name="from"/>, flat,
+    /// and not yet taken: indices into <paramref name="places"/>, nearest first. Pure, for tests.
+    /// </summary>
+    public static System.Collections.Generic.List<int> RoomsWithin(System.Collections.Generic.IReadOnlyList<RaidPlace> places, Vector3 from,
+        float minDistance, float maxDistance, System.Collections.Generic.ICollection<int> taken)
+    {
+        var rooms = new System.Collections.Generic.List<int>();
+        for (int i = 0; i < places.Count; i++)
+        {
+            Vector3 flat = places[i].Position - from;
+            flat.y = 0f;
+            float distance = flat.magnitude;
+            if (places[i].Kind == RaidSiteKind.EventSite && !taken.Contains(i) && distance >= minDistance && distance <= maxDistance)
+            {
+                rooms.Add(i);
+            }
+        }
+
+        rooms.Sort((a, b) => (places[a].Position - from).sqrMagnitude.CompareTo((places[b].Position - from).sqrMagnitude));
+        return rooms;
+    }
+
+    /// <summary>
+    /// An event room of the generated map for an event to stand in: one of <see cref="RoomsWithin"/> picked at random, out of sight, dry
+    /// and with a complete path back to <paramref name="from"/>. False when none will do (a painted map has none), and the caller looks
+    /// for any spot instead.
+    /// </summary>
+    public static bool TryTakeRoom(System.Collections.Generic.IReadOnlyList<RaidPlace> places, Vector3 from, float minDistance, float maxDistance,
+        System.Collections.Generic.ICollection<int> taken, System.Random random, NavMeshPath path, out Vector3 spot)
+    {
+        spot = from;
+        if (places == null || places.Count == 0 || !NavMesh.SamplePosition(from, out NavMeshHit start, NavMeshSnap, NavMesh.AllAreas))
+        {
+            return false;
+        }
+
+        System.Collections.Generic.List<int> rooms = RoomsWithin(places, from, minDistance, maxDistance, taken);
+        while (rooms.Count > 0)
+        {
+            int pick = random.Next(rooms.Count);
+            int index = rooms[pick];
+            rooms.RemoveAt(pick);
+            if (!NavMesh.SamplePosition(Grounded(places[index].Position), out NavMeshHit hit, NavMeshSnap, NavMesh.AllAreas)
+                || !IsDryEnough(hit.position) || IsVisible(hit.position)
+                || !NavMesh.CalculatePath(hit.position, start.position, NavMesh.AllAreas, path) || path.status != NavMeshPathStatus.PathComplete)
+            {
+                continue;
+            }
+
+            taken.Add(index);
+            spot = hit.position;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// A walkable spot between the two distances from <paramref name="from"/>, out of the water (<see cref="IsDryEnough"/>), out of
     /// sight and with a complete path back to it. False when none turned up in <paramref name="attempts"/> tries.
     /// </summary>

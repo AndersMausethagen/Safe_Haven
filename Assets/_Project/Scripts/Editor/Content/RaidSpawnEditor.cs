@@ -93,11 +93,17 @@ internal sealed class RaidSceneContext
             sites += quota != null && quota.kind == kind ? quota.count : 0;
         }
 
-        // Whole sites go to the groups of a kind in turn, by name, as RaidMapGenerator.PlaceGroups gives them out.
+        // A group at every site takes one point at each.
+        if (group.EverySite)
+        {
+            return sites;
+        }
+
+        // Whole sites go to the groups of a kind by their Site Share, by name, as RaidMapGenerator.PlaceGroups gives them out.
         var sharing = new List<string>();
         foreach (KeyValuePair<string, SpawnGroup> other in Groups)
         {
-            if (KindOf(rules, other.Value) == kind)
+            if (KindOf(rules, other.Value) == kind && !other.Value.EverySite)
             {
                 sharing.Add(other.Key);
             }
@@ -106,7 +112,8 @@ internal sealed class RaidSceneContext
         sharing.Sort(string.CompareOrdinal);
         int own = sharing.IndexOf(groupName);
         int owned = 0;
-        foreach (int owner in RaidMapMarkers.ShareOut(sites, sharing.Count))
+        var distances = new List<float>(new float[sites]);
+        foreach (int owner in RaidMapMarkers.ShareOut(distances, sharing.ConvertAll(name => Groups[name].SiteShare), sharing.ConvertAll(_ => false)))
         {
             owned += owner == own ? 1 : 0;
         }

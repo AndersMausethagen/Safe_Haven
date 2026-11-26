@@ -234,12 +234,43 @@ public sealed class RaidGenerator : MonoBehaviour, ISceneSetup
         var random = new System.Random(RaidLayout.SeedFor(Seed, "List:" + list.name));
         // At a raid without a session (a scene played on its own) every entry can appear.
         IReadOnlyList<SpawnTable.Entry> entries = GameSession.ActiveRaid != null ? list.EntriesFor(GameSession.ActiveRaid.Tier) : list.entries;
-        foreach ((int index, GameObject prefab) in SpawnGroup.Plan(random, list.CountFor(Rules), transforms, list.separation, entries))
+        List<(int point, GameObject prefab)> plan = SpawnGroup.Plan(random, list.CountFor(Rules), transforms, list.separation, entries);
+        List<Vector3> positions = list.PlacesPacks ? transforms.ConvertAll(point => point.position) : null;
+        Vector2Int pack = positions != null ? list.PackFor(Rules) : Vector2Int.one;
+        foreach ((int index, GameObject prefab) in plan)
+        {
+            Place(index, prefab);
+            // A pack: others of the same kind on the site's other points (Docs/RaidLayoutAnalysis_2026-11-26.md R4). Rolled only for lists
+            // that place packs, so every other list draws exactly as before.
+            if (positions == null)
+            {
+                continue;
+            }
+
+            int size = RaidLayout.RollCount(random, pack.x, pack.y, int.MaxValue);
+            if (AloneIn(entries, prefab))
+            {
+                continue;
+            }
+
+            foreach (int other in RaidSpawnList.PackPoints(positions, index, size - 1))
+            {
+                Place(other, prefab);
+            }
+        }
+
+        void Place(int index, GameObject prefab)
         {
             GameObject made = points[index].group.PlaceAt(points[index].point, prefab, random);
-            if (made != null)
+            if (made == null)
             {
-                placed.Add(made);
+                return;
+            }
+
+            placed.Add(made);
+            if (list.walksTheTrails)
+            {
+                WalkTheTrails(made);
             }
         }
 
@@ -249,6 +280,97 @@ public sealed class RaidGenerator : MonoBehaviour, ISceneSetup
         }
 
         return placed;
+    }
+
+    private static bool AloneIn(IReadOnlyList<SpawnTable.Entry> entries, GameObject prefab)
+    {
+        foreach (SpawnTable.Entry entry in entries)
+        {
+            if (entry.prefab == prefab)
+            {
+                return entry.alone;
+            }
+        }
+
+        return false;
+    }
+
+    // How many of the map's camps and patrol spots a walker's round takes, and the least metres to the first.
+    private const int RoundStops = 3;
+    private const float RoundFirstStop = 15f;
+
+    /// <summary>
+    /// A creature that walks the trails (Raid Spawn List › Walks The Trails, Docs/RaidLayoutAnalysis_2026-11-26.md R10): a round from where
+    /// it stands through the nearest camps and patrol spots of the generated map, each next stop the nearest left. Nothing on a painted map.
+    /// </summary>
+    private static void WalkTheTrails(GameObject made)
+    {
+        RaidMap map = FindAnyObjectByType<RaidMap>();
+        if (map == null || map.Places.Count == 0)
+        {
+            return;
+        }
+
+        List<Vector3> stops = RoundFrom(made.transform.position, map.Places);
+        if (stops.Count < 2)
+        {
+            return;
+        }
+
+        // Under the map, not the spawn group: a group's children are its spawn points.
+        var route = new GameObject(made.name + " Round").transform;
+        route.SetParent(map.transform, false);
+        foreach (Vector3 stop in stops)
+        {
+            var waypoint = new GameObject("Stop").transform;
+            waypoint.SetParent(route, false);
+            waypoint.position = stop;
+        }
+
+        foreach (MonsterAI monster in made.GetComponentsInChildren<MonsterAI>(true))
+        {
+            if (!monster.TryGetComponent(out MonsterPatrol patrol))
+            {
+                patrol = monster.gameObject.AddComponent<MonsterPatrol>();
+            }
+
+            patrol.SetRoute(route);
+        }
+    }
+
+    /// <summary>A round from <paramref name="from"/> through the nearest camps and patrol spots, each next stop the nearest left. Pure, for tests.</summary>
+    public static List<Vector3> RoundFrom(Vector3 from, IReadOnlyList<RaidPlace> places)
+    {
+        var left = new List<Vector3>();
+        foreach (RaidPlace place in places)
+        {
+            Vector3 flat = place.Position - from;
+            flat.y = 0f;
+            if ((place.Kind == RaidSiteKind.EnemyCamp || place.Kind == RaidSiteKind.Patrol) && flat.magnitude >= RoundFirstStop)
+            {
+                left.Add(place.Position);
+            }
+        }
+
+        var round = new List<Vector3> { from };
+        Vector3 at = from;
+        for (int i = 0; i < RoundStops && left.Count > 0; i++)
+        {
+            int nearest = 0;
+            for (int k = 1; k < left.Count; k++)
+            {
+                if ((left[k] - at).sqrMagnitude < (left[nearest] - at).sqrMagnitude)
+                {
+                    nearest = k;
+                }
+            }
+
+            at = left[nearest];
+            round.Add(at);
+            left.RemoveAt(nearest);
+        }
+
+        return round;
     }
 
     private RaidDefinition Definition => RaidDirector.Current != null ? RaidDirector.Current.Session.Definition

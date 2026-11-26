@@ -37,6 +37,7 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
     [SerializeField, Range(-1, 3)] private int fixedQuarterTurns = -1;
 
     private readonly List<Vector3> rumourSpots = new List<Vector3>();
+    private readonly List<RaidPlace> places = new List<RaidPlace>();
     private readonly List<Mesh> pondMeshes = new List<Mesh>();
     private RaidLayoutRules generatedBy;
     // This run's own copies (a large raid's), destroyed with the map.
@@ -80,6 +81,9 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
 
     /// <summary>Where this run's rumours are to be found on a generated map; empty on a painted one.</summary>
     public IReadOnlyList<Vector3> RumourSpots => rumourSpots;
+
+    /// <summary>Every site of this run's generated map, where it stands and what took it; empty on a painted one.</summary>
+    public IReadOnlyList<RaidPlace> Places => places;
 
     // Before RaidGenerator (0): spawn points must already be where the turned map put them.
     public int SetupOrder => -100;
@@ -268,7 +272,8 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             step.Restart();
             RebuildTrunks();
             rumourSpots.Clear();
-            rumourSpots.AddRange(RaidMapGenerator.PlaceContent(this, Layout, rules));
+            places.Clear();
+            rumourSpots.AddRange(RaidMapGenerator.PlaceContent(this, Layout, rules, places));
             RaidMapGenerator.PlaceDressing(this, Layout, rules, heroes);
             RaidMapGenerator.PlaceBarriers(this, Layout, barrierLogs);
             times.Append($"content {step.ElapsedMilliseconds} ms, ");

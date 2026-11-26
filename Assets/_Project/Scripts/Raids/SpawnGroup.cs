@@ -49,6 +49,14 @@ public sealed class SpawnGroup : MonoBehaviour
     [Tooltip("Baking the raid map also gives this group the candidate points of the painted spawn zone of this name " +
              "(RaidMapDefinition › Zones); groups sharing a zone take turns. Empty uses no zone.")]
     [SerializeField] private string zone = "";
+    [Tooltip("Generated maps: this group's share of the sites of its kind against the other groups of the kind (1 each: turn and " +
+             "turn about). A timber stand at 1.4 gets more sites than an ore vein at 0.6.")]
+    [SerializeField, Min(0f)] private float siteShare = 1f;
+    [Tooltip("Generated maps: takes the sites of its kind farthest from the start (ore lies farther out).")]
+    [SerializeField] private bool farthestSites;
+    [Tooltip("Generated maps: takes one point at every site of its kind instead of a share of them, beside what stands there (a camp's " +
+             "stash beside its guards). Not counted in the share of the others.")]
+    [SerializeField] private bool everySite;
 
     private readonly List<GameObject> spawned = new List<GameObject>();
 
@@ -63,6 +71,9 @@ public sealed class SpawnGroup : MonoBehaviour
     public bool HuntPlayer => List != null ? List.huntPlayer : huntPlayer;
     public RaidSiteKind Site => site;
     public string Zone => zone ?? "";
+    public float SiteShare => siteShare;
+    public bool FarthestSites => farthestSites;
+    public bool EverySite => everySite;
     /// <summary>True when baking the raid map rebuilds this group's points (it has a Site or a Zone).</summary>
     public bool IsBakedFromMap => site != RaidSiteKind.None || !string.IsNullOrEmpty(zone);
     public EntryBand Band => entryBand;
@@ -299,6 +310,15 @@ public sealed class SpawnGroup : MonoBehaviour
     }
 
 #if UNITY_EDITOR
+    /// <summary>For builders and tests: how this group takes the sites of its kind on a generated map.</summary>
+    public void ConfigureSites(RaidSiteKind kind, float share, bool farthest, bool every)
+    {
+        site = kind;
+        siteShare = share;
+        farthestSites = farthest;
+        everySite = every;
+    }
+
     private void OnDrawGizmos()
     {
         Gizmos.color = new Color(1f, 0.75f, 0.2f, 0.8f);

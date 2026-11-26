@@ -23,6 +23,9 @@ public sealed class SpawnTable : ScriptableObject
         [Range(0, Tiers.Max)] public int fromTier;
         [Tooltip("The highest raid tier this can appear at. 0: any.")]
         [Range(0, Tiers.Max)] public int toTier;
+        [Tooltip("Stands alone where it is placed, even when the list places a pack at each site (Raid Spawn List › Pack Size): a pack " +
+                 "prefab or a great creature.")]
+        public bool alone;
 
         /// <summary>Whether this can appear at a raid tier.</summary>
         public bool AppearsAt(int tier) => (fromTier <= 0 || tier >= fromTier) && (toTier <= 0 || tier <= toTier);

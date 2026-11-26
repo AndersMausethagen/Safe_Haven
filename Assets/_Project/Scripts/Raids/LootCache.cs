@@ -28,6 +28,9 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
     [SerializeField] private GameObject fullVisual;
     [Tooltip("Shown once the cache is empty, such as an open lid. Optional.")]
     [SerializeField] private GameObject emptyVisual;
+    [Tooltip("A small find in a pocket off the trail (a dropped sack, an offering, a wanderer's remains): only its own table, no regional " +
+             "loot and no chance of a relic or an inscription (Docs/RaidLayoutAnalysis_2026-11-26.md R2).")]
+    [SerializeField] private bool smallFind;
 
     private const int MostEarlyTier = 2;
 
@@ -47,6 +50,7 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
     public float ExtraLoot { get; set; } = 1f;
     public bool IsEmpty => rolled && contents.Count == 0 && resourceContents.Count == 0;
     public int LockPins => lockPins;
+    public bool SmallFind => smallFind;
 
     /// <summary>True until its lock has been opened. Nothing is ever locked without pins.</summary>
     public bool IsLocked => lockPins > 0 && !unlocked;
@@ -180,10 +184,10 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
             JournalNotices.RollForFind();
         }
 
-        holdsRelic = RaidDirector.Current != null && Random.value < RelicSettings.Current.CacheChance * multiplier;
-        holdsInscription = RaidDirector.Current != null && Random.value < EssenceSettings.Current.CacheInscriptionChance * multiplier;
+        holdsRelic = !smallFind && RaidDirector.Current != null && Random.value < RelicSettings.Current.CacheChance * multiplier;
+        holdsInscription = !smallFind && RaidDirector.Current != null && Random.value < EssenceSettings.Current.CacheInscriptionChance * multiplier;
         int tier = RaidDirector.Current != null ? RaidDirector.Current.Session.Tier : 0;
-        LootTable regional = RaidDirector.Current != null ? RaidDirector.Current.Session.Definition.RegionalLoot : null;
+        LootTable regional = RaidDirector.Current != null && !smallFind ? RaidDirector.Current.Session.Definition.RegionalLoot : null;
         var items = Drops.Roll(tier, multiplier);
         if (regional != null)
         {

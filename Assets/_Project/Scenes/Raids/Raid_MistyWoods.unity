@@ -559,6 +559,9 @@ MonoBehaviour:
   huntPlayer: 0
   site: 4
   zone: 
+  siteShare: 1.09
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &54355309
 GameObject:
   m_ObjectHideFlags: 0
@@ -1486,6 +1489,9 @@ MonoBehaviour:
   huntPlayer: 0
   site: 5
   zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &206922232
 GameObject:
   m_ObjectHideFlags: 0
@@ -2942,6 +2948,9 @@ MonoBehaviour:
   huntPlayer: 1
   site: 0
   zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &418074918
 GameObject:
   m_ObjectHideFlags: 0
@@ -3157,6 +3166,9 @@ MonoBehaviour:
   huntPlayer: 0
   site: 4
   zone: 
+  siteShare: 1.37
+  farthestSites: 0
+  everySite: 0
 --- !u!1001 &457076108
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3555,6 +3567,13 @@ MonoBehaviour:
   poolingDepth: 2
   waterBoost: 1.2
   edgeFade: 5
+  clumps: 1
+  clumpSize: 4.5
+  clumpHeight: 1.5
+  underShade: 0.5
+  creep: 0.1
+  billowDensity: 12
+  veil: 0.45
   baseAmount: 0
   weatherAmount: 1
   goldenHourAmount: 1
@@ -4072,6 +4091,9 @@ MonoBehaviour:
   huntPlayer: 1
   site: 7
   zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &545020515
 GameObject:
   m_ObjectHideFlags: 0
@@ -4142,6 +4164,9 @@ MonoBehaviour:
   huntPlayer: 0
   site: 3
   zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &548246109
 GameObject:
   m_ObjectHideFlags: 0
@@ -4233,6 +4258,9 @@ MonoBehaviour:
   huntPlayer: 0
   site: 0
   zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &578855634
 GameObject:
   m_ObjectHideFlags: 0
@@ -5613,6 +5641,9 @@ MonoBehaviour:
   huntPlayer: 0
   site: 4
   zone: 
+  siteShare: 0.67
+  farthestSites: 1
+  everySite: 0
 --- !u!1 &792927704
 GameObject:
   m_ObjectHideFlags: 0
@@ -5814,6 +5845,9 @@ MonoBehaviour:
   huntPlayer: 0
   site: 3
   zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -6266,6 +6300,64 @@ Transform:
   m_Children: []
   m_Father: {fileID: 948190256}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &908788149
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 908788150}
+  - component: {fileID: 908788151}
+  m_Layer: 0
+  m_Name: Trail Walkers
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &908788150
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 908788149}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1081887844}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &908788151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 908788149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f296d9fc3fea74341bf3a08bb71ab38f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SpawnGroup
+  table: {fileID: 0}
+  count: {x: 2, y: 3}
+  scatterRadius: 1.5
+  randomFacing: 1
+  minimumSpawnSeparation: 0
+  entryBand: 0
+  trigger: 0
+  stage: 1
+  huntPlayer: 0
+  site: 7
+  zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &920984702
 GameObject:
   m_ObjectHideFlags: 0
@@ -6661,6 +6753,9 @@ MonoBehaviour:
   huntPlayer: 1
   site: 7
   zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &950448047
 GameObject:
   m_ObjectHideFlags: 0
@@ -7817,6 +7912,8 @@ Transform:
   - {fileID: 818032595}
   - {fileID: 545020516}
   - {fileID: 198965126}
+  - {fileID: 908788150}
+  - {fileID: 1684872453}
   - {fileID: 792661541}
   - {fileID: 446796337}
   - {fileID: 50421373}
@@ -8363,6 +8460,9 @@ MonoBehaviour:
   huntPlayer: 0
   site: 6
   zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &1175908233
 GameObject:
   m_ObjectHideFlags: 0
@@ -9817,6 +9917,9 @@ MonoBehaviour:
   huntPlayer: 0
   site: 7
   zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &1353272684
 GameObject:
   m_ObjectHideFlags: 0
@@ -11023,6 +11126,9 @@ MonoBehaviour:
   huntPlayer: 0
   site: 0
   zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &1546706480
 GameObject:
   m_ObjectHideFlags: 0
@@ -11188,6 +11294,9 @@ MonoBehaviour:
   huntPlayer: 0
   site: 4
   zone: 
+  siteShare: 0.87
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &1551466491
 GameObject:
   m_ObjectHideFlags: 0
@@ -12176,6 +12285,64 @@ Transform:
   m_Children: []
   m_Father: {fileID: 792661541}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1684872452
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1684872453}
+  - component: {fileID: 1684872454}
+  m_Layer: 0
+  m_Name: Camp Stashes
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1684872453
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1684872452}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1081887844}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1684872454
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1684872452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f296d9fc3fea74341bf3a08bb71ab38f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SpawnGroup
+  table: {fileID: 0}
+  count: {x: 2, y: 3}
+  scatterRadius: 0
+  randomFacing: 1
+  minimumSpawnSeparation: 0
+  entryBand: 0
+  trigger: 0
+  stage: 1
+  huntPlayer: 0
+  site: 3
+  zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 1
 --- !u!1 &1691537312
 GameObject:
   m_ObjectHideFlags: 0

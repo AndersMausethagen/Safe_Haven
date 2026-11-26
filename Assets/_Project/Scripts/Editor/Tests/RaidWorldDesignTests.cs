@@ -69,6 +69,13 @@ public sealed class RaidWorldDesignTests
         copy.ConfigureNodeLandmarks(new Vector2Int(3, 5));
         copy.Valley.maxCrossings = 0;
         copy.ConfigureBarriers(new RaidBarrierRule(), 0f);
+        // And the site counts the Woods had before the places round of 2026-11-26 (fewer caches and camps, Docs/RaidLayoutAnalysis_2026-11-26.md
+        // R2, R4): a count is data, not a world-design step, so the pins before still say whether those steps change anything at their defaults.
+        foreach (RaidSiteQuota quota in copy.Sites)
+        {
+            quota.count = quota.kind == RaidSiteKind.SupplyCache ? 12 : quota.kind == RaidSiteKind.EnemyCamp ? 9 : quota.count;
+        }
+
         return copy;
     }
 

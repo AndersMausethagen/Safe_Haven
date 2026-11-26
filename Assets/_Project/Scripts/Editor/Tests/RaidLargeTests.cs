@@ -65,7 +65,8 @@ public sealed class RaidLargeTests
         var rules = new SpawnRules(1f, null, 60f, 110f, 4f);
         RaidSpawnList creatures = Misty.SpawnLists.First(list => list.name == "Creatures");
         RaidSpawnList hunters = Misty.SpawnLists.First(list => list.name == "Hunters");
-        RaidSpawnList resources = Misty.SpawnLists.First(list => list.name == "Resources");
+        // One list per kind of resource site since 2026-11-26 (Docs/RaidLayoutAnalysis_2026-11-26.md R1).
+        RaidSpawnList resources = Misty.SpawnLists.First(list => list.name == "Timber");
         Assert.AreEqual(creatures.MaxCount * 4, creatures.CountFor(rules).y);
         Assert.AreEqual(resources.MaxCount * 4, resources.CountFor(rules).y);
         Assert.AreEqual(hunters.MaxCount, hunters.CountFor(rules).y, "They come where the player is");

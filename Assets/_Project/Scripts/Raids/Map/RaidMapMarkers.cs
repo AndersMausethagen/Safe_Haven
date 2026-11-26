@@ -36,6 +36,25 @@ public readonly struct RaidSite
 }
 
 /// <summary>
+/// A site of a generated map where it stands in the world, and what it is: its kind and, where groups share the kind, the group that
+/// took it ("Ore Veins"). RaidMap keeps them for what asks where the map's places are: raid events taking an event room, the playtest
+/// log's "came upon" rows (Docs/RaidLayoutAnalysis_2026-11-26.md R3, R9).
+/// </summary>
+public readonly struct RaidPlace
+{
+    public readonly RaidSiteKind Kind;
+    public readonly string Label;
+    public readonly Vector3 Position;
+
+    public RaidPlace(RaidSiteKind kind, string label, Vector3 position)
+    {
+        Kind = kind;
+        Label = string.IsNullOrEmpty(label) ? kind.ToString() : label;
+        Position = position;
+    }
+}
+
+/// <summary>
 /// The colours of raid map markers (the painter's handles use them) and the reader of the older marker images: dots of
 /// pure colour on black mark where the player starts, the exits, enemy camps, resource sites, supply caches, events and
 /// patrol spots. Each connected blob of one colour is one site, at the blob's centre. Colours that aren't in the legend
@@ -177,5 +196,127 @@ public static class RaidMapMarkers
         }
 
         return owners;
+    }
+
+    /// <summary>
+    /// Shares sites among groups as <see cref="ShareOut(int,int)"/> does, but by weight and, for a group that asks, from the far end
+    /// (Docs/RaidLayoutAnalysis_2026-11-26.md R1: ore veins lie farther out, timber stands are commoner). How many sites each group gets is
+    /// its weight's share, rounded by largest remainder (ties to the earlier group). Groups that take the farthest go first, in order,
+    /// each taking the farthest sites left (by <paramref name="distances"/>, the metres from the start); the others take the rest in
+    /// turn, as the plain share does. With equal weights and none taking the farthest it gives exactly the plain share.
+    /// </summary>
+    public static int[] ShareOut(IReadOnlyList<float> distances, IReadOnlyList<float> weights, IReadOnlyList<bool> farthest)
+    {
+        int siteCount = distances.Count;
+        int groupCount = weights.Count;
+        var owners = new int[siteCount];
+        for (int i = 0; i < siteCount; i++)
+        {
+            owners[i] = -1;
+        }
+
+        if (groupCount == 0)
+        {
+            return owners;
+        }
+
+        int[] wanted = Apportion(siteCount, weights);
+        var order = new List<int>(siteCount);
+        for (int i = 0; i < siteCount; i++)
+        {
+            order.Add(i);
+        }
+
+        // Farthest first; ties keep the plan's order.
+        order.Sort((a, b) => distances[b] != distances[a] ? distances[b].CompareTo(distances[a]) : a.CompareTo(b));
+        int next = 0;
+        for (int group = 0; group < groupCount; group++)
+        {
+            if (!farthest[group])
+            {
+                continue;
+            }
+
+            for (int taken = 0; taken < wanted[group] && next < order.Count; taken++)
+            {
+                owners[order[next++]] = group;
+            }
+
+            wanted[group] = 0;
+        }
+
+        // The rest in turn, in the plan's order, skipping a group once it has its share.
+        int turn = 0;
+        for (int site = 0; site < siteCount; site++)
+        {
+            if (owners[site] >= 0)
+            {
+                continue;
+            }
+
+            for (int tries = 0; tries < groupCount; tries++)
+            {
+                int group = (turn + tries) % groupCount;
+                if (wanted[group] > 0)
+                {
+                    owners[site] = group;
+                    wanted[group]--;
+                    turn = group + 1;
+                    break;
+                }
+            }
+        }
+
+        return owners;
+    }
+
+    // Whole sites per group by weight: floors, then the largest remainders (earlier groups first on a tie).
+    private static int[] Apportion(int total, IReadOnlyList<float> weights)
+    {
+        int count = weights.Count;
+        var shares = new int[count];
+        float sum = 0f;
+        foreach (float weight in weights)
+        {
+            sum += Mathf.Max(0f, weight);
+        }
+
+        if (sum <= 0f)
+        {
+            for (int i = 0; i < total; i++)
+            {
+                shares[i % count]++;
+            }
+
+            return shares;
+        }
+
+        var remainders = new float[count];
+        int given = 0;
+        for (int i = 0; i < count; i++)
+        {
+            float exact = total * Mathf.Max(0f, weights[i]) / sum;
+            shares[i] = Mathf.FloorToInt(exact + 1e-4f);
+            remainders[i] = exact - shares[i];
+            given += shares[i];
+        }
+
+        while (given < total)
+        {
+            int best = 0;
+            for (int i = 1; i < count; i++)
+            {
+                if (remainders[i] > remainders[best] + 1e-4f)
+                {
+                    best = i;
+                }
+            }
+
+            shares[best]++;
+            remainders[best] = -1f;
+            given++;
+        }
+
+        return shares;
     }
 }

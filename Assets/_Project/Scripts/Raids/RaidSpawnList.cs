@@ -38,11 +38,57 @@ public sealed class RaidSpawnList
     [Min(1)] public int stage = 1;
     [Tooltip("Creatures from this list head straight for the player and never give up the chase.")]
     public bool huntPlayer;
+    [Tooltip("How many of each pick stand together, least and most: the first on its point, the rest on the other points of the same " +
+             "site (within Pack Reach). Enemy density scales it, so a night camp holds more. An entry marked Alone stays one. 1-1: " +
+             "one per point, as before.")]
+    public Vector2Int packSize = Vector2Int.one;
+    [Tooltip("Each creature placed walks a round between the nearest camps and patrol spots of the map, instead of standing at its point.")]
+    public bool walksTheTrails;
     [Tooltip("What can spawn. Weight is the % share of each pick; min guarantees some, max caps them per raid.")]
     public List<SpawnTable.Entry> entries = new List<SpawnTable.Entry>();
 
+    /// <summary>Metres within which a point counts as the same site as a pack's first (a site's points lie within twice its spread).</summary>
+    public const float PackReach = 10f;
+
     public int MinCount => Mathf.Max(0, Mathf.Min(count.x, count.y));
     public int MaxCount => Mathf.Max(count.x, count.y);
+
+    /// <summary>True when a pick may bring others of its kind with it.</summary>
+    public bool PlacesPacks => Mathf.Max(packSize.x, packSize.y) > 1;
+
+    /// <summary>The pack size range after the raid's enemy density (creature lists only), at least one.</summary>
+    public Vector2Int PackFor(SpawnRules rules)
+    {
+        int least = Mathf.Max(1, Mathf.Min(packSize.x, packSize.y));
+        int most = Mathf.Max(least, Mathf.Max(packSize.x, packSize.y));
+        return SpawnsEnemies ? new Vector2Int(Mathf.Max(1, rules.Scale(least)), Mathf.Max(1, rules.Scale(most))) : new Vector2Int(least, most);
+    }
+
+    /// <summary>
+    /// The points a pack's others stand on: the other points within <see cref="PackReach"/> of its first, nearest first, round again
+    /// (scattered by their group) when the pack is bigger than the site. Pure, for tests.
+    /// </summary>
+    public static List<int> PackPoints(IReadOnlyList<Vector3> points, int first, int others)
+    {
+        var near = new List<int>();
+        for (int i = 0; i < points.Count; i++)
+        {
+            if (i != first && (points[i] - points[first]).sqrMagnitude <= PackReach * PackReach)
+            {
+                near.Add(i);
+            }
+        }
+
+        near.Sort((a, b) => (points[a] - points[first]).sqrMagnitude.CompareTo((points[b] - points[first]).sqrMagnitude));
+        near.Add(first);
+        var chosen = new List<int>(others);
+        for (int i = 0; i < others; i++)
+        {
+            chosen.Add(near[i % near.Count]);
+        }
+
+        return chosen;
+    }
 
     /// <summary>True when everything the list can place is a creature, so enemy density scales its count.</summary>
     public bool SpawnsEnemies => SpawnTable.AllCreatures(entries);

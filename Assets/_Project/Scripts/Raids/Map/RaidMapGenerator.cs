@@ -98,8 +98,9 @@ public static partial class RaidMapGenerator
         return $"heights {heights} ms, paint {paint - heights} ms, scatter {clock.ElapsedMilliseconds - paint} ms";
     }
 
-    /// <summary>Moves what stands on the map to the plan's places. Returns where the rumours' sites go.</summary>
-    public static List<Vector3> PlaceContent(RaidMap map, RaidLayoutPlan plan, RaidLayoutRules rules)
+    /// <summary>Moves what stands on the map to the plan's places. Returns where the rumours' sites go; <paramref name="places"/>, when
+    /// given, gets every site with where it stands and what took it.</summary>
+    public static List<Vector3> PlaceContent(RaidMap map, RaidLayoutPlan plan, RaidLayoutRules rules, List<RaidPlace> places = null)
     {
         Terrain terrain = map.Terrain;
         Vector3 origin = terrain.transform.position;
@@ -107,7 +108,7 @@ public static partial class RaidMapGenerator
 
         PlaceStart(map, plan, World);
         PlaceExits(map, plan, terrain, World);
-        PlaceGroups(map, plan, rules, terrain, World);
+        PlaceGroups(map, plan, rules, terrain, World, places);
         PlaceAnchors(plan, terrain, World);
         PlaceFog(map, plan, World);
         RaidMapSurface.SnapToGround(map.Content, terrain);

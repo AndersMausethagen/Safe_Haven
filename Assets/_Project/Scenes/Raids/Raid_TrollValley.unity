@@ -559,6 +559,9 @@ MonoBehaviour:
   huntPlayer: 0
   site: 4
   zone: 
+  siteShare: 1.04
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &54355309
 GameObject:
   m_ObjectHideFlags: 0
@@ -1432,6 +1435,9 @@ MonoBehaviour:
   huntPlayer: 0
   site: 5
   zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &206922232
 GameObject:
   m_ObjectHideFlags: 0
@@ -1609,6 +1615,64 @@ MonoBehaviour:
   - 10
   returnDelay: 4
   resultsScene: RaidResults
+--- !u!1 &274856235
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 274856236}
+  - component: {fileID: 274856237}
+  m_Layer: 0
+  m_Name: Trail Walkers
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &274856236
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 274856235}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1081887844}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &274856237
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 274856235}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f296d9fc3fea74341bf3a08bb71ab38f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SpawnGroup
+  table: {fileID: 0}
+  count: {x: 2, y: 3}
+  scatterRadius: 1.5
+  randomFacing: 1
+  minimumSpawnSeparation: 0
+  entryBand: 0
+  trigger: 0
+  stage: 1
+  huntPlayer: 0
+  site: 7
+  zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &277394622
 GameObject:
   m_ObjectHideFlags: 0
@@ -1938,6 +2002,64 @@ Transform:
   m_Children: []
   m_Father: {fileID: 198965126}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &313663301
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 313663302}
+  - component: {fileID: 313663303}
+  m_Layer: 0
+  m_Name: Camp Stashes
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &313663302
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 313663301}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1081887844}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &313663303
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 313663301}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f296d9fc3fea74341bf3a08bb71ab38f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SpawnGroup
+  table: {fileID: 0}
+  count: {x: 2, y: 3}
+  scatterRadius: 0
+  randomFacing: 1
+  minimumSpawnSeparation: 0
+  entryBand: 0
+  trigger: 0
+  stage: 1
+  huntPlayer: 0
+  site: 3
+  zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 1
 --- !u!1 &325582580
 GameObject:
   m_ObjectHideFlags: 0
@@ -2688,6 +2810,9 @@ MonoBehaviour:
   huntPlayer: 1
   site: 0
   zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &418074918
 GameObject:
   m_ObjectHideFlags: 0
@@ -2903,6 +3028,9 @@ MonoBehaviour:
   huntPlayer: 0
   site: 4
   zone: 
+  siteShare: 1.04
+  farthestSites: 0
+  everySite: 0
 --- !u!1001 &457076108
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3301,6 +3429,13 @@ MonoBehaviour:
   poolingDepth: 2
   waterBoost: 2
   edgeFade: 5
+  clumps: 1
+  clumpSize: 4.5
+  clumpHeight: 1.5
+  underShade: 0.5
+  creep: 0.1
+  billowDensity: 12
+  veil: 0.45
   baseAmount: 0.25
   weatherAmount: 1
   goldenHourAmount: 1
@@ -3818,6 +3953,9 @@ MonoBehaviour:
   huntPlayer: 1
   site: 7
   zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &545020515
 GameObject:
   m_ObjectHideFlags: 0
@@ -3888,6 +4026,9 @@ MonoBehaviour:
   huntPlayer: 0
   site: 3
   zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &548246109
 GameObject:
   m_ObjectHideFlags: 0
@@ -3979,6 +4120,9 @@ MonoBehaviour:
   huntPlayer: 0
   site: 0
   zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &578855634
 GameObject:
   m_ObjectHideFlags: 0
@@ -5317,6 +5461,9 @@ MonoBehaviour:
   huntPlayer: 0
   site: 4
   zone: 
+  siteShare: 0.89
+  farthestSites: 1
+  everySite: 0
 --- !u!1 &792927704
 GameObject:
   m_ObjectHideFlags: 0
@@ -5516,6 +5663,9 @@ MonoBehaviour:
   huntPlayer: 0
   site: 3
   zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -6417,6 +6567,9 @@ MonoBehaviour:
   huntPlayer: 1
   site: 7
   zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &950448047
 GameObject:
   m_ObjectHideFlags: 0
@@ -7484,6 +7637,8 @@ Transform:
   - {fileID: 818032595}
   - {fileID: 545020516}
   - {fileID: 198965126}
+  - {fileID: 274856236}
+  - {fileID: 313663302}
   - {fileID: 792661541}
   - {fileID: 446796337}
   - {fileID: 50421373}
@@ -7928,6 +8083,9 @@ MonoBehaviour:
   huntPlayer: 0
   site: 6
   zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &1175908233
 GameObject:
   m_ObjectHideFlags: 0
@@ -9127,6 +9285,9 @@ MonoBehaviour:
   huntPlayer: 0
   site: 7
   zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 0
 --- !u!1001 &1371719739
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10408,6 +10569,9 @@ MonoBehaviour:
   huntPlayer: 0
   site: 0
   zone: 
+  siteShare: 1
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &1546706480
 GameObject:
   m_ObjectHideFlags: 0
@@ -10573,6 +10737,9 @@ MonoBehaviour:
   huntPlayer: 0
   site: 4
   zone: 
+  siteShare: 1.03
+  farthestSites: 0
+  everySite: 0
 --- !u!1 &1551466491
 GameObject:
   m_ObjectHideFlags: 0
@@ -12263,6 +12430,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1004316743}
     m_Modifications:
+    - target: {fileID: 122925947729143532, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 1515336047843890794, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
@@ -12279,6 +12450,10 @@ PrefabInstance:
       propertyPath: m_TextStyleHashCode
       value: -1183493901
       objectReference: {fileID: 0}
+    - target: {fileID: 2613896693989446942, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 3064912245817638084, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
@@ -12291,6 +12466,26 @@ PrefabInstance:
       propertyPath: m_TextStyleHashCode
       value: -1183493901
       objectReference: {fileID: 0}
+    - target: {fileID: 3921524447659352161, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 4037763264150570909, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 4073572021666667867, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 4154759021515096755, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 4410167708660342641, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 5021624148766679122, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
@@ -12299,7 +12494,15 @@ PrefabInstance:
       propertyPath: m_TextStyleHashCode
       value: -1183493901
       objectReference: {fileID: 0}
+    - target: {fileID: 5527482339574167621, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 5856674489412910907, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 6020488024583323401, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
       objectReference: {fileID: 0}
@@ -12387,6 +12590,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6879164003379396746, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 6885907144287303402, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
@@ -12400,6 +12607,14 @@ PrefabInstance:
       value: -1183493901
       objectReference: {fileID: 0}
     - target: {fileID: 7133733821410538048, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391514708111042076, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 7558323350804465574, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
       objectReference: {fileID: 0}

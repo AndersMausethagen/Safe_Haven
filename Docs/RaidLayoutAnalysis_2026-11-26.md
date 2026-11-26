@@ -19,6 +19,32 @@ What came before:
 This document is about what stands **on** the map: places, nodes and creatures, and whether the player can read them. It does not
 repeat those two.
 
+## Status (2026-11-26, the user: "gjør alle dine anbefalinger")
+
+Built as recommended, including the recommended answers to §5: every pocket holds something (Q1), and the Woods' Marsh Lights go down
+while the widows stay (Q2). R7 and R8 wait for a playtest (Q3, and the order in §4). Nothing here has been played by hand.
+
+| # | As built |
+|---|---|
+| R1 | Four resource lists, one per group (Ore Veins, Timber, Herbs and Fibres, Life Wells), each filling all of its group's points. `SpawnGroup` › Site Share gives each group its share of the sites by what its kinds weighed in the old list at tier I, so totals hold (Woods 0.67 / 1.37 / 1.09 / 0.87). Ore Veins › Farthest Sites takes the far sites (`RaidMapMarkers.ShareOut(distances, weights, farthest)`). Spirit Spring joins the Life Wells and Ore Collapse the Ore Veins (one each at most) |
+| R2 | Caches: 5 pockets in the Woods (was 12), 4 in the Valley and Marsh (was 8). The Supply Caches list fills every pocket: real caches about 2 in 5 (Woods) or 1 in 2, and the rest **small finds**: Dropped Sack, Old Offering, Wanderer's Remains (`Prefabs/Raids/Caches`, about half a cache's table, `LootCache` › Small Find: no lock, regional loot, relic or inscription), plus the Abandoned Camp at most once. The Valley and the Marsh have the Woods' crates and barrels about their sites |
+| R3 | `RaidEventDirector.Begin` takes a free event room at the event's distance, then up to 1.6 × its far distance, then any spot out of sight (`RaidSpots.TryTakeRoom`). The Event Sites list is empty; its Wolf Den went to the Creatures list |
+| R4 | Camps: 7 in the Woods (was 9). Creatures lists place a pack of 1-2 at each camp, scaled by density (2-3 at day density 1.5, more at night); great creatures and pack prefabs are `SpawnTable.Entry` › Alone. A **Camp Stash** stands beside every camp (`SpawnGroup` › Every Site, the Camp Stashes list), locked to search until the creatures that stood round it are dead (`GuardedCache`) |
+| R5 | Troll Valley: pockets 4-8 m off the trail with 60% of the open ground, 8 resource sites. All three raids' plans meet at least 90% of every quota (test) |
+| R6 | Every node landmark has a sound (crows, raven, woodpecker, howl, bittern). Lookouts already scale with a large map's area |
+| R9 | `CameUpon` playtest rows (`RaidPlacesSeen`): kind and group, seconds into the raid, metres from the start |
+| R10 | A Trail Walkers list (1-2, from patrol spots) whose creatures walk a round through the nearest camps and patrol spots (`RaidSpawnList` › Walks The Trails, `MonsterPatrol`) |
+| Review | A stash with nobody at its camp stays open: only a friend's copy looks for guards again, and a creature walking a round never guards. `CameUpon` reads the places once the raid runs. A walker's round hangs under the map, not its spawn group, whose children are points. The wider room search starts past the event's own reach. A capped entry in a pack list must stand alone (test) |
+| Q2 | Woods Creatures: Marsh Light 12 → 3 (3% of the list); Small Moss Troll 16 → 22 and Black Widow 12 → 15 keep tier I from being mostly wolves |
+
+**Checked live** (Misty Woods, Play mode, three seeds): the log reads Creatures 13 of 21 points (7 camps), Herbs 48, Life Wells 36, Ore 24,
+Timber 60 (168 nodes, as before), Supply Caches 5 of 5, Camp Stashes 7 of 7, Trail Walkers 2. Every stash said "Guarded: N of the camp
+still stand". The walkers moved between camps. An event stood 0 m from an event room (before the stretch, one landed 40 m off: the rooms
+lay 80-134 m from the start). An Old Offering read from the game camera with its name and glint. `CameUpon` rows were written.
+
+**Tune after a playtest:** camp stash loot (`Data/Loot/Caches/Camp Stash`, 0.6 × a Hunter's Cache, 7 a map); pack size; small-find
+tables. Golden layouts re-pinned (5 caches, 7 camps); `RaidWorldDesignTests` keeps its old pins by restoring the old counts.
+
 ---
 
 ## 0. The short answer

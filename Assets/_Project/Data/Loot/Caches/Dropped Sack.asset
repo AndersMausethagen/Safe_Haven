@@ -1,0 +1,154 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45433c01f10bce649b57ee8746e0f6b5, type: 3}
+  m_Name: Dropped Sack
+  m_EditorClassIdentifier: SafeHaven::LootTable
+  displayName: Dropped Sack
+  kind: 1
+  notes: "A small find in a pocket off the trail (Docs/RaidLayoutAnalysis_2026-11-26.md R2): about half a Traveller's Pack. No regional loot, relic or inscription (LootCache \xE2\u20AC\xBA Small Find)."
+  drops:
+    entries:
+    - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.24
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+      onlyInRaid: {fileID: 0}
+    - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.24
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+      onlyInRaid: {fileID: 0}
+    - item: {fileID: 11400000, guid: 79744f7a29634cb408f4829b51ec5918, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.18
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+      onlyInRaid: {fileID: 0}
+    - item: {fileID: 11400000, guid: 05a3b8e12c05cb548b40065962d3b860, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.18
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+      onlyInRaid: {fileID: 0}
+    - item: {fileID: 11400000, guid: d0c7b274979b4ad46a9f3bf89b8cfa64, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.21
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+      onlyInRaid: {fileID: 0}
+    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.33
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+      onlyInRaid: {fileID: 0}
+    - item: {fileID: 11400000, guid: 67c64a707cfb7bb4dbb4695008c9df54, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.07
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+      onlyInRaid: {fileID: 0}
+    - item: {fileID: 11400000, guid: a167bc765cfa5094491385117d4c09e9, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.04
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+      onlyInRaid: {fileID: 0}
+    - item: {fileID: 11400000, guid: c16c6e5687072684f98624510f9c6be6, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.03
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+      onlyInRaid: {fileID: 0}
+    - item: {fileID: 11400000, guid: c9c58cc9c8a25eb4787a64e96598e266, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.02
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+      onlyInRaid: {fileID: 0}
+    - item: {fileID: 11400000, guid: ab9557872793c7140880753d737120a3, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.02
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+      onlyInRaid: {fileID: 0}
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.18
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+      onlyInRaid: {fileID: 0}
+    - item: {fileID: 11400000, guid: ecd7be96c26c3794ea423515bcaf8585, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.05
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 1
+      onlyInRaid: {fileID: 0}
+    - item: {fileID: 11400000, guid: 9a9b05ce86e28a546ab88dbfd2f5e304, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.05
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 1
+      onlyInRaid: {fileID: 0}
+    - item: {fileID: 11400000, guid: d50ecf78aa2823b4da064d9faffa84ab, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.05
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 1
+      onlyInRaid: {fileID: 0}

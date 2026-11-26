@@ -1014,6 +1014,16 @@ do more). Openings made by `OpenWalledPockets` take the logs away but get no tra
 landmarks, roads, short flags, heroes and mids the same day (its golden layouts re-pinned; `RaidLayoutGoldenTests.BeforeWorldDesign`
 keeps the old ones for the at-defaults check).
 
+**Places (2026-11-26, Docs/RaidLayoutAnalysis_2026-11-26.md).** What stands on a generated map, so every place holds something and reads as a kind of place:
+- **Sharing sites:** `RaidMapGenerator.PlaceGroups` shares a kind's sites by `SpawnGroup` › Site Share (`RaidMapMarkers.ShareOut(distances, weights, farthest)`; equal shares give the old turn and turn about). A group with Farthest Sites takes the sites farthest from the start (Ore Veins), and one with Every Site takes one point beside every site of its kind, outside the share (Camp Stashes). Each site is recorded as a `RaidPlace` (kind, group, position) in `RaidMap.Places`.
+- **Resource sites** have one list per group (Ore Veins, Timber, Herbs and Fibres, Life Wells), each filling all its points, so a site is one kind of place. A group's Site Share is what its kinds weighed in the old single list at tier I.
+- **Pockets:** the Supply Caches list fills every cache site: real caches, and small finds (`LootCache` › Small Find: own table only, no lock, regional loot, relic or inscription).
+- **Camps:** `RaidSpawnList` › Pack Size puts more of a pick on the same site's other points (`PackPoints`, within 10 m), scaled by enemy density; `SpawnTable.Entry` › Alone keeps pack prefabs and great creatures single. Packs roll only for lists that place them. A camp's stash is `GuardedCache`: it can't be searched while the creatures within 12 m at the start live.
+- **Events** take a free event room first (`RaidSpots.TryTakeRoom`, at the event's distance, then up to 1.6 × its far distance); the Event Sites list is empty.
+- **Walkers:** a list with Walks The Trails gives each creature a `MonsterPatrol` round through the nearest camps and patrol spots (`RaidGenerator.RoundFrom`).
+- **The log:** `RaidPlacesSeen` (added by `RaidDirector`) writes `CameUpon` the first time the player comes within 14 m of a site, set piece or landmark.
+Tests: `RaidPlacesTests1126` (including that every raid's plans meet 90% of each quota).
+
 ## World rendering: light, weather on surfaces, decals
 
 Content: `AgentScripts/BuildRendering.cs`, `BuildWeatherSurfaces.cs`, `BuildDecals.cs` (textures from `Tools/Decals/decals.py`);

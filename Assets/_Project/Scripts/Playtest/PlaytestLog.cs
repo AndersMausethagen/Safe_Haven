@@ -137,6 +137,10 @@ public static class PlaytestLog
     public const string BagAtEnd = "BagAtEnd";
     /// <summary>A raid's nodes, as it ended: subject the node's id, amount how many the player gathered, detail "standing N".</summary>
     public const string NodesMined = "NodesMined";
+    /// <summary>The player came upon a place of a generated raid map for the first time (Docs/RaidLayoutAnalysis_2026-11-26.md R9):
+    /// subject the place (its kind, "Kind: Group" where groups share the kind, a set piece's or landmark's name), amount the raid's
+    /// seconds so far, detail "N m from the start".</summary>
+    public const string CameUpon = "CameUpon";
     // Boss fights (Docs/HeartrootPlaytest_2026-11-23.md P0: the first hand try left no trace of the boss's side):
     /// <summary>A boss fight ended: subject the boss's id, amount its health left in percent, detail the outcome (won, died, left), the
     /// seconds from its waking, the stage reached, topples by cause, heart strikes, interrupts, calls and bound summons killed, the

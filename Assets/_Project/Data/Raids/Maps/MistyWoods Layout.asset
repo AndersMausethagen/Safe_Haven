@@ -124,7 +124,7 @@ MonoBehaviour:
     revealRadius: 70
     knownAtStart: 0
     icon: {fileID: 0}
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: b088b17493cbde14da489f03fe9e5818, type: 2}
     soundEvery: {x: 8, y: 20}
     soundLoops: 0
   - prefab: {fileID: 753853000388544552, guid: 57caefaa61c0de94b81f7cf499a12fa9, type: 3}
@@ -137,7 +137,7 @@ MonoBehaviour:
     revealRadius: 70
     knownAtStart: 0
     icon: {fileID: 0}
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: 611523b4a6bf6fc4eb3e4337618dc359, type: 2}
     soundEvery: {x: 8, y: 20}
     soundLoops: 0
   - prefab: {fileID: 8896246634900274262, guid: e7e112141c69cef4bbacdc428bbaf5ce, type: 3}
@@ -150,7 +150,7 @@ MonoBehaviour:
     revealRadius: 70
     knownAtStart: 0
     icon: {fileID: 0}
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: ae7d1e20fc649884f98a6aeaf01cfdb0, type: 2}
     soundEvery: {x: 8, y: 20}
     soundLoops: 0
   landmarkCount: {x: 1, y: 2}
@@ -442,7 +442,7 @@ MonoBehaviour:
     overlooksRamps: 0
   - kind: 3
     placement: 0
-    count: 9
+    count: 7
     separation: 24
     fromStart: 42
     offPath: {x: 10, y: 16}
@@ -469,7 +469,7 @@ MonoBehaviour:
     overlooksRamps: 0
   - kind: 5
     placement: 2
-    count: 12
+    count: 5
     separation: 16
     fromStart: 20
     offPath: {x: 10, y: 17}

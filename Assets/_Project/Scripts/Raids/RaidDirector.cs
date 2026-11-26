@@ -193,6 +193,11 @@ public sealed class RaidDirector : MonoBehaviour
         {
             gameObject.AddComponent<StageReveal>();
         }
+
+        if (!TryGetComponent(out RaidPlacesSeen _))
+        {
+            gameObject.AddComponent<RaidPlacesSeen>();
+        }
     }
 
     private void Start()

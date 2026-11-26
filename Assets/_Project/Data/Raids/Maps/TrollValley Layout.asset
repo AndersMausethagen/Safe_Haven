@@ -37,7 +37,13 @@ MonoBehaviour:
   greatHills: {x: 0, y: 0}
   greatHillHeight: {x: 4, y: 9}
   greatHillRadius: {x: 22, y: 42}
-  siteClutter: []
+  siteClutter:
+  - {fileID: 5390177154788761150, guid: 23baff40fa0026149a5ae94c66d6bd4c, type: 3}
+  - {fileID: 5390177154788761150, guid: 23baff40fa0026149a5ae94c66d6bd4c, type: 3}
+  - {fileID: 3426992302977726391, guid: 0dc7664d74f49e74898850bf23fc6b21, type: 3}
+  - {fileID: 3426992302977726391, guid: 0dc7664d74f49e74898850bf23fc6b21, type: 3}
+  - {fileID: 3426992302977726391, guid: 0dc7664d74f49e74898850bf23fc6b21, type: 3}
+  - {fileID: 7160763822417819799, guid: b6580e4b71d5c8449ac4f63fedfc4f36, type: 3}
   clutterPerSite: {x: 2, y: 5}
   clutterReach: {x: 3.5, y: 8}
   boulderKit: {fileID: 11400000, guid: 09d68cb9a41a99f4cbf14c7093db892d, type: 2}
@@ -118,7 +124,7 @@ MonoBehaviour:
     revealRadius: 70
     knownAtStart: 0
     icon: {fileID: 0}
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: fd5c81c010255f543a1cc32216f4df89, type: 2}
     soundEvery: {x: 8, y: 20}
     soundLoops: 0
   - prefab: {fileID: 6570838499332300780, guid: b0783d50d74367140a8b80475ae901ea, type: 3}
@@ -131,7 +137,7 @@ MonoBehaviour:
     revealRadius: 70
     knownAtStart: 0
     icon: {fileID: 0}
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: 1b4cec7844cd53e49b13d1268609b301, type: 2}
     soundEvery: {x: 8, y: 20}
     soundLoops: 0
   - prefab: {fileID: 3962568519174778497, guid: 00a2eedf4d471cd4292c182b7baeebf6, type: 3}
@@ -144,7 +150,7 @@ MonoBehaviour:
     revealRadius: 70
     knownAtStart: 0
     icon: {fileID: 0}
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: b088b17493cbde14da489f03fe9e5818, type: 2}
     soundEvery: {x: 8, y: 20}
     soundLoops: 0
   landmarkCount: {x: 1, y: 2}
@@ -341,8 +347,8 @@ MonoBehaviour:
     count: 2
     separation: 45
     fromStart: 65
-    offPath: {x: 12, y: 20}
-    clearing: 8
+    offPath: {x: 4, y: 8}
+    clearing: 4.8
     prefersHeight: 1
     overlooksRamps: 0
   - kind: 8
@@ -350,8 +356,8 @@ MonoBehaviour:
     count: 3
     separation: 28
     fromStart: 35
-    offPath: {x: 11, y: 18}
-    clearing: 6
+    offPath: {x: 4, y: 8}
+    clearing: 3.6000001
     prefersHeight: 0
     overlooksRamps: 0
   - kind: 3
@@ -359,8 +365,8 @@ MonoBehaviour:
     count: 6
     separation: 24
     fromStart: 42
-    offPath: {x: 10, y: 16}
-    clearing: 7
+    offPath: {x: 4, y: 8}
+    clearing: 4.2000003
     prefersHeight: 0
     overlooksRamps: 1
   - kind: 6
@@ -368,26 +374,26 @@ MonoBehaviour:
     count: 4
     separation: 26
     fromStart: 30
-    offPath: {x: 8, y: 12}
-    clearing: 5
+    offPath: {x: 4, y: 8}
+    clearing: 3
     prefersHeight: 0
     overlooksRamps: 0
   - kind: 4
     placement: 2
-    count: 9
+    count: 8
     separation: 17
     fromStart: 14
-    offPath: {x: 9, y: 15}
-    clearing: 10
+    offPath: {x: 4, y: 8}
+    clearing: 6
     prefersHeight: 0
     overlooksRamps: 0
   - kind: 5
     placement: 2
-    count: 8
+    count: 4
     separation: 16
     fromStart: 20
-    offPath: {x: 10, y: 17}
-    clearing: 4
+    offPath: {x: 4, y: 8}
+    clearing: 2.4
     prefersHeight: 1
     overlooksRamps: 0
   - kind: 7
@@ -395,7 +401,7 @@ MonoBehaviour:
     count: 6
     separation: 20
     fromStart: 45
-    offPath: {x: 9, y: 16}
+    offPath: {x: 4, y: 8}
     clearing: 0
     prefersHeight: 0
     overlooksRamps: 0

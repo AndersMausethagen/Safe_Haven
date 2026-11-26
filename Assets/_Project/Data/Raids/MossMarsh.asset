@@ -174,6 +174,8 @@ MonoBehaviour:
     trigger: 0
     stage: 1
     huntPlayer: 0
+    packSize: {x: 1, y: 2}
+    walksTheTrails: 0
     entries:
     - prefab: {fileID: 3643037256157110189, guid: d94956478a8532d4bbe4d3da4f3f3bd5, type: 3}
       weight: 20
@@ -181,97 +183,199 @@ MonoBehaviour:
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 1
     - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
       weight: 12
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 1
     - prefab: {fileID: 4830014356063024607, guid: a8600aa8041d7044c9a3afddd7102a7b, type: 3}
       weight: 8
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 4999243170976522981, guid: 07a704aacccfef242886f2875ff4fcdf, type: 3}
       weight: 6
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
       weight: 6
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 4999243170976522981, guid: a4dba3031b93dc0418dd8cbc097e32a3, type: 3}
       weight: 5
       maxPerGroup: 1
       minPerGroup: 0
       fromTier: 2
       toTier: 0
+      alone: 1
     - prefab: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
       weight: 4
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 4584692032328657812, guid: 64cf9de042e1bc142907212054f70f50, type: 3}
       weight: 4
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 1
     - prefab: {fileID: 5318185529198269020, guid: d281dc652b3e50445a465365ff40b433, type: 3}
       weight: 4
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 3643037256157110189, guid: 8af413a8c10dbdc4f89f0537152651dc, type: 3}
       weight: 3
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 1
     - prefab: {fileID: 7112812444035070341, guid: e6646a32ac93d664c950e5e95fd45e0e, type: 3}
       weight: 3
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 3
       toTier: 0
+      alone: 1
     - prefab: {fileID: 9066855856663566298, guid: ff93697190dd6f94cb20e5981aed0b02, type: 3}
       weight: 2
       maxPerGroup: 1
       minPerGroup: 0
       fromTier: 3
       toTier: 0
+      alone: 1
     - prefab: {fileID: 1361258407523271697, guid: 280a30c33cf4c3444a326b93e937de36, type: 3}
       weight: 1
       maxPerGroup: 1
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 1
     - prefab: {fileID: 4999243170976522981, guid: 092ba77896b28b34c8fbe53045290d78, type: 3}
       weight: 5
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
-  - name: Resources
+      alone: 0
+  - name: Trail Walkers
+    category: 0
+    pointGroups:
+    - Trail Walkers
+    count: {x: 1, y: 2}
+    entryBand: 0
+    separation: 20
+    trigger: 0
+    stage: 1
+    huntPlayer: 0
+    packSize: {x: 1, y: 1}
+    walksTheTrails: 1
+    entries:
+    - prefab: {fileID: 4999243170976522981, guid: 07a704aacccfef242886f2875ff4fcdf, type: 3}
+      weight: 40
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+      alone: 0
+    - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      weight: 30
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+      alone: 0
+    - prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+      weight: 30
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+      alone: 0
+  - name: Herbs and Fibres
     category: 1
     pointGroups:
-    - Ore Veins
-    - Timber
     - Herbs and Fibres
-    - Life Wells
-    count: {x: 161, y: 182}
+    count: {x: 300, y: 300}
     entryBand: 0
     separation: 0
     trigger: 0
     stage: 1
     huntPlayer: 0
+    packSize: {x: 1, y: 1}
+    walksTheTrails: 0
+    entries:
+    - prefab: {fileID: 5392347885279070540, guid: bf3e16d3faa3743469e7a3d035690749, type: 3}
+      weight: 8
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+      alone: 0
+    - prefab: {fileID: 6288032578105571644, guid: dd1ab12d09fe61049b4f79441821d70a, type: 3}
+      weight: 8
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+      alone: 0
+    - prefab: {fileID: 4564521982437816396, guid: dd15144a20b00e2408502e401ea88a06, type: 3}
+      weight: 3
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+      alone: 0
+    - prefab: {fileID: 6865268627933171699, guid: 879636884ea876843960148e835a6af2, type: 3}
+      weight: 1
+      maxPerGroup: 1
+      minPerGroup: 0
+      fromTier: 3
+      toTier: 0
+      alone: 0
+    - prefab: {fileID: 8775155884352199117, guid: 13af7ac7ef84e424588ca48ed7024c4a, type: 3}
+      weight: 4
+      maxPerGroup: 1
+      minPerGroup: 0
+      fromTier: 3
+      toTier: 0
+      alone: 0
+    - prefab: {fileID: 6288032578105571644, guid: 6d34854cb1a99c9428c2bdfaff94d738, type: 3}
+      weight: 2
+      maxPerGroup: 1
+      minPerGroup: 0
+      fromTier: 3
+      toTier: 0
+      alone: 0
+  - name: Life Wells
+    category: 1
+    pointGroups:
+    - Life Wells
+    count: {x: 300, y: 300}
+    entryBand: 0
+    separation: 0
+    trigger: 0
+    stage: 1
+    huntPlayer: 0
+    packSize: {x: 1, y: 1}
+    walksTheTrails: 0
     entries:
     - prefab: {fileID: 7424242661901594498, guid: 415fc92bb3a4e3c4892211c08f38f779, type: 3}
       weight: 12
@@ -279,202 +383,261 @@ MonoBehaviour:
       minPerGroup: 0
       fromTier: 0
       toTier: 0
-    - prefab: {fileID: 297312215928108013, guid: 7b176e5facb909c44a2893050cbcc64a, type: 3}
-      weight: 8.5
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 0
-      toTier: 0
-    - prefab: {fileID: 7857519288705744795, guid: e8f5ac7427646e942aaf261bf18f6768, type: 3}
-      weight: 8
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 0
-      toTier: 0
-    - prefab: {fileID: 5392347885279070540, guid: bf3e16d3faa3743469e7a3d035690749, type: 3}
-      weight: 8
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 0
-      toTier: 0
-    - prefab: {fileID: 6288032578105571644, guid: dd1ab12d09fe61049b4f79441821d70a, type: 3}
-      weight: 8
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 0
-      toTier: 0
+      alone: 0
     - prefab: {fileID: 3616788768692720460, guid: 7bbc1b4511da00c4e81fb9d948fe6784, type: 3}
       weight: 12.8
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
-    - prefab: {fileID: 948381022197778722, guid: 15b33c21de24fb7418664d30fe242c26, type: 3}
-      weight: 4
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 0
-      toTier: 0
-    - prefab: {fileID: 9111748613750876259, guid: 4cff8733c679b964f97f5aa116eda933, type: 3}
-      weight: 4
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 0
-      toTier: 0
+      alone: 0
     - prefab: {fileID: 8775155884352199117, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
       weight: 4
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 1158895183621609222, guid: e010c7c1cd96e8a4cb11aa834ca0a563, type: 3}
       weight: 4
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
-    - prefab: {fileID: 4564521982437816396, guid: dd15144a20b00e2408502e401ea88a06, type: 3}
-      weight: 3
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 0
-      toTier: 0
+      alone: 0
     - prefab: {fileID: 5701181132641860389, guid: 5e2206bd114732e4da8f8e504471a110, type: 3}
       weight: 3
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
+    - prefab: {fileID: 4438480868590446949, guid: 692cc71abea731f41bfdced13178f974, type: 3}
+      weight: 2
+      maxPerGroup: 1
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+      alone: 0
+  - name: Ore Veins
+    category: 1
+    pointGroups:
+    - Ore Veins
+    count: {x: 300, y: 300}
+    entryBand: 0
+    separation: 0
+    trigger: 0
+    stage: 1
+    huntPlayer: 0
+    packSize: {x: 1, y: 1}
+    walksTheTrails: 0
+    entries:
+    - prefab: {fileID: 297312215928108013, guid: 7b176e5facb909c44a2893050cbcc64a, type: 3}
+      weight: 8.5
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+      alone: 0
+    - prefab: {fileID: 9111748613750876259, guid: 4cff8733c679b964f97f5aa116eda933, type: 3}
+      weight: 4
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+      alone: 0
     - prefab: {fileID: 8046387889879202812, guid: 262f869a4b8db6440b65cd5554060fce, type: 3}
       weight: 2.6
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
-    - prefab: {fileID: 2009929089532973240, guid: e4175e4dc8cc5b847b691d128a9786aa, type: 3}
-      weight: 2
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 0
-      toTier: 0
+      alone: 0
     - prefab: {fileID: 8682228126172116304, guid: 3e31e979ada082348a0ae00bacfea168, type: 3}
       weight: 2
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 4483799220086940710, guid: d30b058cde685564ca6d1e997f261196, type: 3}
       weight: 2.8
       maxPerGroup: 4
       minPerGroup: 0
       fromTier: 3
       toTier: 0
+      alone: 0
     - prefab: {fileID: 8886612018720869940, guid: 072aecd2c58a7024bb867d70e6bc410d, type: 3}
       weight: 1
       maxPerGroup: 1
       minPerGroup: 0
       fromTier: 3
       toTier: 0
-    - prefab: {fileID: 6865268627933171699, guid: 879636884ea876843960148e835a6af2, type: 3}
-      weight: 1
-      maxPerGroup: 1
-      minPerGroup: 0
-      fromTier: 3
-      toTier: 0
-    - prefab: {fileID: 8775155884352199117, guid: 13af7ac7ef84e424588ca48ed7024c4a, type: 3}
-      weight: 4
-      maxPerGroup: 1
-      minPerGroup: 0
-      fromTier: 3
-      toTier: 0
-    - prefab: {fileID: 6288032578105571644, guid: 6d34854cb1a99c9428c2bdfaff94d738, type: 3}
+      alone: 0
+    - prefab: {fileID: 3285891926514676715, guid: c4de1540097fc0849803d24d39735751, type: 3}
       weight: 2
       maxPerGroup: 1
       minPerGroup: 0
-      fromTier: 3
+      fromTier: 0
       toTier: 0
-  - name: Supply Caches
-    category: 2
+      alone: 0
+  - name: Timber
+    category: 1
     pointGroups:
-    - Supply Caches
-    count: {x: 1, y: 3}
+    - Timber
+    count: {x: 300, y: 300}
     entryBand: 0
     separation: 0
     trigger: 0
     stage: 1
     huntPlayer: 0
+    packSize: {x: 1, y: 1}
+    walksTheTrails: 0
+    entries:
+    - prefab: {fileID: 7857519288705744795, guid: e8f5ac7427646e942aaf261bf18f6768, type: 3}
+      weight: 8
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+      alone: 0
+    - prefab: {fileID: 948381022197778722, guid: 15b33c21de24fb7418664d30fe242c26, type: 3}
+      weight: 4
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+      alone: 0
+    - prefab: {fileID: 2009929089532973240, guid: e4175e4dc8cc5b847b691d128a9786aa, type: 3}
+      weight: 2
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+      alone: 0
+  - name: Supply Caches
+    category: 2
+    pointGroups:
+    - Supply Caches
+    count: {x: 12, y: 12}
+    entryBand: 0
+    separation: 0
+    trigger: 0
+    stage: 1
+    huntPlayer: 0
+    packSize: {x: 1, y: 1}
+    walksTheTrails: 0
     entries:
     - prefab: {fileID: 6640193388665154077, guid: 4fcd124e67da2194f88667a45b800dd8, type: 3}
-      weight: 30
+      weight: 15.306123
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 1952649773701618592, guid: eccbc85dd8312f441b939168579c56ec, type: 3}
-      weight: 20
+      weight: 10.204082
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 6835690799674848439, guid: 1e5c84011ee2c924eaa61231f5b9e552, type: 3}
-      weight: 15
+      weight: 7.6530614
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 5968853061259378244, guid: 0f6e101d0c9b8694dba63fbf28daa212, type: 3}
-      weight: 10
+      weight: 5.102041
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 6192970169987784497, guid: 805d5157c00e2534c83219281ae04588, type: 3}
-      weight: 10
+      weight: 5.102041
       maxPerGroup: 1
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 7806521821678079949, guid: a9e1cf99f46a88d4da4f4b4c1715d4dd, type: 3}
+      weight: 4.0816326
+      maxPerGroup: 1
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+      alone: 0
+    - prefab: {fileID: 1137623629352448773, guid: de4075a0b99e4ca41811c5b8719e9635, type: 3}
+      weight: 2.5510204
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+      alone: 0
+    - prefab: {fileID: 3813375699907591433, guid: 1035ed2e06a92dd4ca11fd557f9abc11, type: 3}
+      weight: 14
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+      alone: 0
+    - prefab: {fileID: 865107383655663400, guid: 66ace3663d375a54283364b5a995a362, type: 3}
+      weight: 14
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+      alone: 0
+    - prefab: {fileID: 637018016458654467, guid: 3b6d69bf0b058744d8b2c9dc1d2e2064, type: 3}
+      weight: 14
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+      alone: 0
+    - prefab: {fileID: 6328468425548948482, guid: f68eee4888e0624488d803cca7ceac64, type: 3}
       weight: 8
       maxPerGroup: 1
       minPerGroup: 0
       fromTier: 0
       toTier: 0
-    - prefab: {fileID: 1137623629352448773, guid: de4075a0b99e4ca41811c5b8719e9635, type: 3}
-      weight: 5
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 0
-      toTier: 0
+      alone: 0
   - name: Event Sites
     category: 2
     pointGroups:
     - Event Sites
-    count: {x: 3, y: 4}
+    count: {x: 0, y: 0}
     entryBand: 0
     separation: 0
     trigger: 0
     stage: 1
     huntPlayer: 0
+    packSize: {x: 1, y: 1}
+    walksTheTrails: 0
+    entries: []
+  - name: Camp Stashes
+    category: 2
+    pointGroups:
+    - Camp Stashes
+    count: {x: 30, y: 30}
+    entryBand: 0
+    separation: 0
+    trigger: 0
+    stage: 1
+    huntPlayer: 0
+    packSize: {x: 1, y: 1}
+    walksTheTrails: 0
     entries:
-    - prefab: {fileID: 6328468425548948482, guid: f68eee4888e0624488d803cca7ceac64, type: 3}
-      weight: 30
+    - prefab: {fileID: 5899200460825716551, guid: f4f85cb8cd5bb97408b97e32e4d7665b, type: 3}
+      weight: 100
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
-    - prefab: {fileID: 4438480868590446949, guid: 692cc71abea731f41bfdced13178f974, type: 3}
-      weight: 30
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 0
-      toTier: 0
-    - prefab: {fileID: 3285891926514676715, guid: c4de1540097fc0849803d24d39735751, type: 3}
-      weight: 15
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 0
-      toTier: 0
+      alone: 0
   - name: Stirring Prowlers
     category: 3
     pointGroups:
@@ -485,6 +648,8 @@ MonoBehaviour:
     trigger: 1
     stage: 1
     huntPlayer: 0
+    packSize: {x: 1, y: 1}
+    walksTheTrails: 0
     entries:
     - prefab: {fileID: 3643037256157110189, guid: d94956478a8532d4bbe4d3da4f3f3bd5, type: 3}
       weight: 35
@@ -492,30 +657,35 @@ MonoBehaviour:
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
       weight: 30
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 4999243170976522981, guid: 07a704aacccfef242886f2875ff4fcdf, type: 3}
       weight: 15
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
       weight: 10
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 4830014356063024607, guid: a8600aa8041d7044c9a3afddd7102a7b, type: 3}
       weight: 10
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
   - name: Hunters
     category: 3
     pointGroups:
@@ -526,6 +696,8 @@ MonoBehaviour:
     trigger: 1
     stage: 2
     huntPlayer: 1
+    packSize: {x: 1, y: 1}
+    walksTheTrails: 0
     entries:
     - prefab: {fileID: 3643037256157110189, guid: d94956478a8532d4bbe4d3da4f3f3bd5, type: 3}
       weight: 35
@@ -533,30 +705,35 @@ MonoBehaviour:
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
       weight: 30
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
       weight: 15
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 4999243170976522981, guid: a4dba3031b93dc0418dd8cbc097e32a3, type: 3}
       weight: 10
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 3
       toTier: 0
+      alone: 0
     - prefab: {fileID: 9066855856663566298, guid: ff93697190dd6f94cb20e5981aed0b02, type: 3}
       weight: 10
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 4
       toTier: 0
+      alone: 0
   - name: Collapse Hunters
     category: 3
     pointGroups:
@@ -567,6 +744,8 @@ MonoBehaviour:
     trigger: 1
     stage: 3
     huntPlayer: 1
+    packSize: {x: 1, y: 1}
+    walksTheTrails: 0
     entries:
     - prefab: {fileID: 3643037256157110189, guid: d94956478a8532d4bbe4d3da4f3f3bd5, type: 3}
       weight: 35
@@ -574,24 +753,28 @@ MonoBehaviour:
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
       weight: 35
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 4999243170976522981, guid: a4dba3031b93dc0418dd8cbc097e32a3, type: 3}
       weight: 15
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 2
       toTier: 0
+      alone: 0
     - prefab: {fileID: 9066855856663566298, guid: ff93697190dd6f94cb20e5981aed0b02, type: 3}
       weight: 12
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 3
       toTier: 0
+      alone: 0
   - name: East Beacon Alarm
     category: 3
     pointGroups:
@@ -602,6 +785,8 @@ MonoBehaviour:
     trigger: 2
     stage: 1
     huntPlayer: 1
+    packSize: {x: 1, y: 1}
+    walksTheTrails: 0
     entries:
     - prefab: {fileID: 3643037256157110189, guid: d94956478a8532d4bbe4d3da4f3f3bd5, type: 3}
       weight: 40
@@ -609,18 +794,21 @@ MonoBehaviour:
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
       weight: 35
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
     - prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
       weight: 20
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+      alone: 0
   systems:
   - rid: 287757967972106337
   - rid: 287757967972106340

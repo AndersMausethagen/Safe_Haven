@@ -34,6 +34,12 @@ public sealed class RaidEventDirector : MonoBehaviour
     private float nextEventAt = -1f;
     // The raid's own events, counted against Max Per Raid; the rumours' pinned sites are in `used` too but not counted.
     private int randomEvents;
+    // The map's event rooms already given an event (indices into RaidMap.Places).
+    private readonly HashSet<int> roomsTaken = new HashSet<int>();
+    private const float RoomStretch = 1.6f;
+    private RaidMap map;
+
+    private RaidMap Map => map != null ? map : map = FindAnyObjectByType<RaidMap>();
 
     /// <summary>Sites still waiting for the player, for the HUD.</summary>
     public IReadOnlyList<RaidEventSite> OpenSites => open;
@@ -117,8 +123,16 @@ public sealed class RaidEventDirector : MonoBehaviour
         random ??= new System.Random(director.Session.Seed ^ 0x52414944);
         Vector3 from = director.Player.transform.position;
         Vector3 position = from;
+        // An event room the map set aside first (Docs/RaidLayoutAnalysis_2026-11-26.md R3), so the event stands in a clearing made and
+        // dressed for it; any spot out of sight when none is free at its distance, or on a painted map.
+        // The rooms lie 30 m and more from the start, mostly beyond an early event's reach, so a room a little farther than the event's
+        // own distance (RoomStretch) still wins over open forest: the rooms lie inward, on the way to the exits.
+        IReadOnlyList<RaidPlace> places = Map != null ? Map.Places : null;
+        Vector2 reach = definition.SiteDistance;
         if (definition.SitePrefab != null
-            && !RaidSpots.TryFindSpot(from, definition.SiteDistance.x, definition.SiteDistance.y, random, path, out position))
+            && !RaidSpots.TryTakeRoom(places, from, reach.x, reach.y, roomsTaken, random, path, out position)
+            && !RaidSpots.TryTakeRoom(places, from, reach.y, reach.y * RoomStretch, roomsTaken, random, path, out position)
+            && !RaidSpots.TryFindSpot(from, reach.x, reach.y, random, path, out position))
         {
             return false;
         }

@@ -335,9 +335,15 @@ public static partial class RaidMapGenerator
         }
     }
 
-    private static void PlaceGroups(RaidMap map, RaidLayoutPlan plan, RaidLayoutRules rules, Terrain terrain, System.Func<Vector2, Vector3> world)
+    // An every-site group's point stands this share of the site's spread to one side, between the ring's points, so a camp's stash
+    // stands beside its guards rather than under them.
+    private const float EverySiteAside = 0.6f;
+
+    private static void PlaceGroups(RaidMap map, RaidLayoutPlan plan, RaidLayoutRules rules, Terrain terrain, System.Func<Vector2, Vector3> world,
+        List<RaidPlace> places)
     {
         var byKind = new Dictionary<RaidSiteKind, List<SpawnGroup>>();
+        var everySite = new Dictionary<RaidSiteKind, List<SpawnGroup>>();
         foreach (SpawnGroup group in map.Content.GetComponentsInChildren<SpawnGroup>(true))
         {
             RaidSiteKind kind = group.Site;
@@ -354,9 +360,10 @@ public static partial class RaidMapGenerator
                 continue;
             }
 
-            if (!byKind.TryGetValue(kind, out List<SpawnGroup> groups))
+            Dictionary<RaidSiteKind, List<SpawnGroup>> into = group.EverySite ? everySite : byKind;
+            if (!into.TryGetValue(kind, out List<SpawnGroup> groups))
             {
-                byKind[kind] = groups = new List<SpawnGroup>();
+                into[kind] = groups = new List<SpawnGroup>();
             }
 
             groups.Add(group);
@@ -368,22 +375,59 @@ public static partial class RaidMapGenerator
             }
         }
 
+        var labelled = new HashSet<RaidSiteKind>();
         foreach (KeyValuePair<RaidSiteKind, List<SpawnGroup>> pair in byKind)
         {
             List<SpawnGroup> groups = pair.Value;
             groups.Sort((a, b) => string.CompareOrdinal(a.name, b.name));
             List<RaidSite> sites = plan.SitesOf(pair.Key);
-            int[] owners = RaidMapMarkers.ShareOut(sites.Count, groups.Count);
+            int[] owners = RaidMapMarkers.ShareOut(sites.ConvertAll(site => Vector2.Distance(site.Position * plan.Size, plan.Start.Position)),
+                groups.ConvertAll(group => group.SiteShare), groups.ConvertAll(group => group.FarthestSites));
             RaidMapDefinition.SiteRule rule = map.Definition.RuleFor(pair.Key);
+            labelled.Add(pair.Key);
             for (int i = 0; i < sites.Count; i++)
             {
                 Vector3 centre = world(sites[i].Position);
+                places?.Add(new RaidPlace(pair.Key, owners[i] >= 0 ? groups[owners[i]].name : null, centre));
+                if (owners[i] < 0)
+                {
+                    continue;
+                }
+
                 for (int k = 0; k < rule.pointsPerSite; k++)
                 {
                     var point = new GameObject($"{pair.Key} {i + 1}.{k + 1}");
                     point.transform.SetParent(groups[owners[i]].transform, false);
                     point.transform.position = OntoDescentFloor(plan, terrain, RaidMapSurface.SitePoint(terrain, centre, rule, i, k));
                 }
+            }
+        }
+
+        foreach (KeyValuePair<RaidSiteKind, List<SpawnGroup>> pair in everySite)
+        {
+            List<RaidSite> sites = plan.SitesOf(pair.Key);
+            RaidMapDefinition.SiteRule rule = map.Definition.RuleFor(pair.Key);
+            foreach (SpawnGroup group in pair.Value)
+            {
+                for (int i = 0; i < sites.Count; i++)
+                {
+                    Vector3 centre = world(sites[i].Position);
+                    // Square to the ring's first point (SitePoint turns the ring by the site's index).
+                    float angle = i + Mathf.PI * 0.5f;
+                    Vector3 aside = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * (rule.spread * EverySiteAside);
+                    var point = new GameObject($"{pair.Key} {i + 1} {group.name}");
+                    point.transform.SetParent(group.transform, false);
+                    point.transform.position = OntoDescentFloor(plan, terrain, RaidMapSurface.Ground(terrain, centre + aside));
+                }
+            }
+        }
+
+        // The kinds no group takes are places too (rumours, the apex, sides, exits).
+        foreach (RaidSite site in plan.Sites)
+        {
+            if (site.Kind != RaidSiteKind.None && site.Kind != RaidSiteKind.PlayerStart && !labelled.Contains(site.Kind))
+            {
+                places?.Add(new RaidPlace(site.Kind, null, world(site.Position)));
             }
         }
     }
