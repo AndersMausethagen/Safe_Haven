@@ -1,0 +1,107 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92f4381e876a38144a7e6e3484ab098b, type: 3}
+  m_Name: HavenRegionSettings
+  m_EditorClassIdentifier: SafeHaven::HavenRegionSettings
+  regions:
+  - region: The Grey Pines
+    ring: 1
+    filter: {r: 0.97, g: 0.97, b: 1, a: 1}
+    mistTint: {r: 0.86, g: 0.86, b: 0.88, a: 1}
+    forgottenMist: 1.2
+    forgottenFloor: 0.35
+    rememberedLine: Smoke rose here once. The pines remember the warmth.
+  - region: Stillwater
+    ring: 1
+    filter: {r: 0.95, g: 1, b: 1.05, a: 1}
+    mistTint: {r: 0.82, g: 0.9, b: 0.97, a: 1}
+    forgottenMist: 1.2
+    forgottenFloor: 0.4
+    rememberedLine: The still water shows the sky again.
+  - region: The Hollow Pines
+    ring: 1
+    filter: {r: 1.05, g: 1, b: 0.91, a: 1}
+    mistTint: {r: 0.93, g: 0.9, b: 0.84, a: 1}
+    forgottenMist: 1.2
+    forgottenFloor: 0.35
+    rememberedLine: The pines stand hollow, but they stand.
+  - region: Ravenwood
+    ring: 1
+    filter: {r: 0.93, g: 0.95, b: 1.04, a: 1}
+    mistTint: {r: 0.79, g: 0.83, b: 0.91, a: 1}
+    forgottenMist: 1.2
+    forgottenFloor: 0.35
+    rememberedLine: The ravens come back to the quarry's edge.
+  - region: Alder Mere
+    ring: 1
+    filter: {r: 0.98, g: 1.05, b: 0.98, a: 1}
+    mistTint: {r: 0.85, g: 0.93, b: 0.9, a: 1}
+    forgottenMist: 1.2
+    forgottenFloor: 0.4
+    rememberedLine: The mere is clear to the bottom.
+  - region: Eastwood
+    ring: 2
+    filter: {r: 0.96, g: 1.06, b: 0.95, a: 1}
+    mistTint: {r: 0.85, g: 0.94, b: 0.86, a: 1}
+    forgottenMist: 1.3
+    forgottenFloor: 0.4
+    rememberedLine: The old cedars breathe out. The stones remember who swore by them.
+  - region: The Wolfwood
+    ring: 2
+    filter: {r: 0.9, g: 0.95, b: 1.07, a: 1}
+    mistTint: {r: 0.74, g: 0.83, b: 0.96, a: 1}
+    forgottenMist: 1.3
+    forgottenFloor: 0.45
+    rememberedLine: The wolves' road is a road again.
+  - region: Westwood
+    ring: 2
+    filter: {r: 1, g: 1, b: 0.96, a: 1}
+    mistTint: {r: 0.9, g: 0.9, b: 0.92, a: 1}
+    forgottenMist: 1.3
+    forgottenFloor: 0.4
+    rememberedLine: The cairns point the way home.
+  - region: The Drowning Fen
+    ring: 2
+    filter: {r: 0.95, g: 1.04, b: 0.89, a: 1}
+    mistTint: {r: 0.8, g: 0.9, b: 0.77, a: 1}
+    forgottenMist: 1.4
+    forgottenFloor: 0.5
+    rememberedLine: The fen's lights go quiet.
+  - region: Greyfell
+    ring: 2
+    filter: {r: 1.07, g: 1, b: 0.9, a: 1}
+    mistTint: {r: 0.96, g: 0.92, b: 0.85, a: 1}
+    forgottenMist: 1.2
+    forgottenFloor: 0.3
+    rememberedLine: The road north lies open to the eye.
+  - region: Hightarn
+    ring: 3
+    filter: {r: 0.96, g: 0.98, b: 1.06, a: 1}
+    mistTint: {r: 0.88, g: 0.9, b: 0.99, a: 1}
+    forgottenMist: 1.4
+    forgottenFloor: 0.45
+    rememberedLine: Up on the tarn, the last of the forgetting lifts.
+  openings:
+  - ring: 2
+    questStarted: {fileID: 11400000, guid: bd7dd70969be8174c8acfefd449bf963, type: 2}
+    residentHome: {fileID: 0}
+    notYet: The mist out here is the old forgetting, too deep to see through yet. Bring the Heartroot down first, and the stone may know you.
+  - ring: 3
+    questStarted: {fileID: 0}
+    residentHome: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
+    notYet: This is the oldest of the forgetting. The stone waits for the one who led you here.
+  forgottenDesaturation: 0.7
+  forgottenDarkening: 0.12
+  forgottenColor: {r: 0.78, g: 0.82, b: 0.88, a: 1}
+  rememberedMist: 0.2
+  drawBackSeconds: 10
+  borderSoftness: 18

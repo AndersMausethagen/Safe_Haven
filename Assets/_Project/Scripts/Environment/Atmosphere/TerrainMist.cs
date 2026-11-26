@@ -113,10 +113,28 @@ public sealed class TerrainMist : MonoBehaviour
 
     public float EdgeFade => Mathf.Max(0.1f, edgeFade);
     public float WeatherWindInfluence => weatherWindInfluence;
-    public Texture2D RegionMap => regionMap;
+
+    // A map made at runtime in place of the authored one (HavenLand: thick over forgotten land, thin over remembered), with each
+    // region's mist colour in its G, B and A channels when tinted.
+    private Texture2D runtimeRegionMap;
+    private bool runtimeTinted;
+
+    /// <summary>The painted map of where mist always lies (HavenLand reads it to make its own).</summary>
+    public Texture2D AuthoredRegionMap => regionMap;
+    public Texture2D RegionMap => runtimeRegionMap != null ? runtimeRegionMap : regionMap;
+    /// <summary>True when the map in use carries each place's mist colour in G, B and A (a multiplier over the tint).</summary>
+    public bool RegionTinted => runtimeRegionMap != null && runtimeTinted;
+
+    /// <summary>Uses <paramref name="map"/> in place of the authored map until called with null (HavenLand).</summary>
+    public void UseRegionMap(Texture2D map, bool tinted)
+    {
+        runtimeRegionMap = map;
+        runtimeTinted = tinted;
+    }
+
     /// <summary>Extinction per metre where the region map is white (0 without a map). Whatever the weather, and whether or not
     /// the scene's atmosphere otherwise comes from the weather alone (the Haven's does): the map is where mist always lies.</summary>
-    public float RegionDensity => regionMap != null ? density * regionAmount : 0f;
+    public float RegionDensity => RegionMap != null ? density * regionAmount : 0f;
     public float EffectiveDensity => density * Mathf.Max(EvaluateAmount(
         AtmosphereConditions.WeatherOnlyAtmosphere ? 0f : baseAmount, weatherAmount,
         AtmosphereConditions.WeatherOnlyAtmosphere ? 0f : goldenHourAmount,

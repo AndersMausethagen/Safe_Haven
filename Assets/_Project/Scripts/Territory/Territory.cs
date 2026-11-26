@@ -208,7 +208,7 @@ public static class Territory
 
         RegionStanding standing = StandingOf(region);
         string words = standing == RegionStanding.Wild
-            ? (State.Of(region).EverClaimed ? "Wild again" : "Wild")
+            ? (State.Of(region).EverClaimed ? "Forgotten again" : "Forgotten")
             : $"{standing} · hold {State.HoldOf(region):0}";
         TerritoryState.Push push = State.Incursion;
         if (push != null && push.Region == region)
@@ -247,6 +247,13 @@ public static class Territory
             return false;
         }
 
+        // The story's rings (HavenRings): the outer lands can't be remembered before their time.
+        if (!HavenRings.CanRemember(region))
+        {
+            reason = HavenRegionSettings.Current.NotYet(HavenRegionSettings.Current.RingOf(region));
+            return false;
+        }
+
         int needed = Math.Min(settings.PlacesToClaim, PlacesIn(region).Count);
         if (PlacesFound(region) < needed)
         {
@@ -278,7 +285,7 @@ public static class Territory
         }
 
         State.Claim(region, Settings);
-        GameMessages.Post($"The boundary stone of {region} burns again. {region} is the Haven's: hold it, and it will give back.", MessageKind.Gain);
+        GameMessages.Post($"The boundary stone of {region} burns again. Hold the land in mind, and it will give back.", MessageKind.Gain);
         Tell(Settings.StoneLit);
         Changed?.Invoke();
     }

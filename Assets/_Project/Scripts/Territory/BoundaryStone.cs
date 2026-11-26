@@ -143,7 +143,7 @@ public sealed class BoundaryStone : MonoBehaviour, IInteractionName
         {
             bool free = !state.ClaimNeedsRune(settings);
             bool can = Territory.CanClaim(region, user, out string why);
-            page.Add(new MenuAction("Light the boundary stone", can ? (free ? "The first stone answers to the hearth: no rune needed." : $"A Pact Rune (you have {runes}).") : why,
+            page.Add(new MenuAction("Light the stone: remember the land", can ? (free ? "The first stone answers to the hearth: no rune needed." : $"A Pact Rune (you have {runes}).") : why,
                 can, () => Territory.Claim(region, user)));
         }
         else

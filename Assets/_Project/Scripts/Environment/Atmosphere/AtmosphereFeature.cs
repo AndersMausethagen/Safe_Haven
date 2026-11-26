@@ -130,6 +130,10 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
         private static readonly int ExploreTexture = Shader.PropertyToID("_ExploreTex");
         private static readonly int ExploreRect = Shader.PropertyToID("_ExploreRect");
         private static readonly int WarGround = Shader.PropertyToID("_WarGround");
+        private static readonly int LandParams = Shader.PropertyToID("_LandParams");
+        private static readonly int LandTexture = Shader.PropertyToID("_LandTex");
+        private static readonly int LandRect = Shader.PropertyToID("_LandRect");
+        private static readonly int ForgottenColor = Shader.PropertyToID("_ForgottenColor");
         private static readonly int FogParams3 = Shader.PropertyToID("_FogParams3");
         private static readonly int GroundTexture = Shader.PropertyToID("_GroundTex");
         private static readonly int GroundRect = Shader.PropertyToID("_GroundRect");
@@ -489,6 +493,7 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
                         regionIndex = i;
                         material.SetTexture("_TerrainMistRegionTex", mist.RegionMap);
                         material.SetFloat("_TerrainMistRegionDensity", mist.RegionDensity * AtmosphereConditions.SceneFogScale);
+                        material.SetFloat("_TerrainMistRegionTinted", mist.RegionTinted ? 1f : 0f);
                     }
 
                     Vector3 origin = mist.Terrain.transform.position;
@@ -622,6 +627,17 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
                 Color veilColor = fogOfWar.veilColor.value.linear;
                 veilColor.a = fogOfWar.veilHaze.value;
                 material.SetColor(VeilColor, veilColor);
+            }
+
+            // The Haven's lands: their own colours, and forgotten land grey (HavenLand; off everywhere else).
+            HavenLand land = HavenLand.Current;
+            bool landOn = land != null && land.LookTexture != null;
+            material.SetVector(LandParams, landOn ? land.LookParams : Vector4.zero);
+            if (landOn)
+            {
+                material.SetTexture(LandTexture, land.LookTexture);
+                material.SetVector(LandRect, land.LookRect);
+                material.SetColor(ForgottenColor, land.ForgottenColor);
             }
         }
 

@@ -161,7 +161,7 @@ public static class HavenLands
                 (called ? "the portal wants a word with you about them" : "the portal will speak of them once you have been through it a few times");
         }
 
-        string summary = $"{state.ClaimedCount} of {all} regions held · {Territory.Renown} renown from them";
+        string summary = $"{state.ClaimedCount} of {all} regions remembered · {Territory.Renown} renown from them";
         if (state.Incursion != null)
         {
             int turns = System.Math.Max(0, state.Incursion.DueTurn - state.Turn);
@@ -216,9 +216,11 @@ public static class HavenLands
 
         if (standing == RegionStanding.Wild)
         {
-            entry.Details.Add(new HavenDetail("To claim it", !Territory.Unlocked
+            entry.Details.Add(new HavenDetail("To remember it", !Territory.Unlocked
                 ? "Not yet: its boundary stone is cold. The portal knows what the stones are."
-                : $"Find one of its places, then light its boundary stone{(state.ClaimNeedsRune(settings) ? " with a Pact Rune" : " (the first is free)")}."));
+                : !HavenRings.CanRemember(region)
+                    ? HavenRegionSettings.Current.NotYet(HavenRegionSettings.Current.RingOf(region))
+                    : $"Find one of its places, then light its boundary stone{(state.ClaimNeedsRune(settings) ? " with a Pact Rune" : " (the first is free)")}."));
         }
         else
         {

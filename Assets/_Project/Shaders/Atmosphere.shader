@@ -54,6 +54,7 @@ Shader "Hidden/Safe Haven/Atmosphere"
         float4 _TerrainMistBillows[MAX_TERRAIN_MISTS]; // creep (share of the drift), thickness (times density), veil (share)
         int _TerrainMistRegionIndex;                 // which mist has a region map (-1: none)
         float _TerrainMistRegionDensity;             // its density where the map is white
+        float _TerrainMistRegionTinted;              // 1: the map's G, B, A are the mist's colour there (HavenLand)
         TEXTURE2D(_TerrainMistRegionTex);            // white where its mist always lies
         #define MAX_MIST_VOLUMES 4
         int _MistVolumeCount;
@@ -92,6 +93,11 @@ Shader "Hidden/Safe Haven/Atmosphere"
         float4 _ExploreRect;                         // x min, z min, 1 / width, 1 / depth
         float _WarGround;                            // height of the ground the player stands on
         TEXTURE2D(_ExploreTex);
+        // The Haven's lands (HavenLand): each region's colour filter (RGB, half: 0.5 is as painted) and how forgotten it is (A).
+        float4 _LandParams;                          // strength, forgotten desaturation, forgotten darkening, unused
+        float4 _LandRect;                            // x min, z min, 1 / width, 1 / depth
+        float4 _ForgottenColor;
+        TEXTURE2D(_LandTex);
         TEXTURE2D(_AtmosphereFog);
         TEXTURE2D(_AtmosphereShafts);
         float _SafeHavenNight;
@@ -391,9 +397,14 @@ Shader "Hidden/Safe Haven/Atmosphere"
                         float pooled = 1.0 + pooling.x * saturate(habitat.a / max(0.1, pooling.y)) + pooling.z * habitat.b;
                         // Where this terrain's region map is white the mist lies whatever the weather.
                         float4 shape = _TerrainMistShapes[i];
+                        // A runtime map (HavenLand) carries each place's mist colour in G, B and A.
+                        float3 regionTint = float3(1.0, 1.0, 1.0);
                         if (i == _TerrainMistRegionIndex)
-                            shape.x = max(shape.x, _TerrainMistRegionDensity
-                                * SAMPLE_TEXTURE2D_LOD(_TerrainMistRegionTex, sampler_LinearClamp, saturate(local / rect.zw), 0).r);
+                        {
+                            float4 region = SAMPLE_TEXTURE2D_LOD(_TerrainMistRegionTex, sampler_LinearClamp, saturate(local / rect.zw), 0);
+                            shape.x = max(shape.x, _TerrainMistRegionDensity * region.r);
+                            regionTint = lerp(regionTint, region.gba, _TerrainMistRegionTinted);
+                        }
                         // Low over the ground the wake parts the mist and curls its pattern aside; above Reach it drifts on.
                         float low = 1.0 - smoothstep(_MistWakeParams.z * 0.4, _MistWakeParams.z, p.y - supportHeight);
                         float lit;
@@ -402,8 +413,8 @@ Shader "Hidden/Safe Haven/Atmosphere"
                         cloudDensity *= 1.0 - saturate(wake.x * _MistWakeParams.x * low);
                         density += cloudDensity;
                         // A billow's foot is in its own shade: less of the sun, and somewhat less of the sky.
-                        tintDensity += _TerrainMistTints[i].rgb * (cloudDensity * lit);
-                        skyDensity += _TerrainMistTints[i].rgb * (_TerrainMistTints[i].w * cloudDensity * lerp(lit, 1.0, 0.4));
+                        tintDensity += _TerrainMistTints[i].rgb * regionTint * (cloudDensity * lit);
+                        skyDensity += _TerrainMistTints[i].rgb * regionTint * (_TerrainMistTints[i].w * cloudDensity * lerp(lit, 1.0, 0.4));
                     }
                 }
                 for (int i = 0; i < _MistVolumeCount; i++)
@@ -639,13 +650,36 @@ Shader "Hidden/Safe Haven/Atmosphere"
                 color += beam * (1.0 - saturate(dot(color, float3(0.2126, 0.7152, 0.0722))));
                 color += fog.rgb;
 
-                if (_WarParams.x <= 0.0 && _WarParams.y <= 0.0)
+                if (_WarParams.x <= 0.0 && _WarParams.y <= 0.0 && _LandParams.x <= 0.0)
                 {
                     return float4(color, 1.0);
                 }
 
                 float rawDepth;
                 float3 positionWS = WorldPositionAt(uv, rawDepth);
+
+                // The Haven's lands: each region's own colour, and forgotten land grey under the forest's forgetting (HavenLand).
+                // At the surface seen, so a remembered wood stands in colour against the grey beyond it.
+                if (_LandParams.x > 0.0 && !IsFar(rawDepth))
+                {
+                    float2 landUV = (positionWS.xz - _LandRect.xy) * _LandRect.zw;
+                    if (all(landUV >= 0.0) && all(landUV <= 1.0))
+                    {
+                        float4 land = SAMPLE_TEXTURE2D_LOD(_LandTex, sampler_LinearClamp, landUV, 0);
+                        float3 own = color * (land.rgb * 2.0);
+                        float luminance = dot(own, float3(0.299, 0.587, 0.114));
+                        float tintLuminance = max(0.05, dot(_ForgottenColor.rgb, float3(0.299, 0.587, 0.114)));
+                        float3 grey = luminance * _ForgottenColor.rgb / tintLuminance;
+                        float3 forgotten = lerp(own, grey, _LandParams.y) * (1.0 - _LandParams.z);
+                        color = lerp(color, lerp(own, forgotten, land.a), _LandParams.x);
+                    }
+                }
+
+                if (_WarParams.x <= 0.0 && _WarParams.y <= 0.0)
+                {
+                    return float4(color, 1.0);
+                }
+
                 float3 view = positionWS - _WorldSpaceCameraPos;
                 float sceneDistance = length(view);
                 float3 direction = view / max(sceneDistance, 1e-4);

@@ -111,6 +111,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
             TutorialNoticeHud.Create();
             PlaceDiscovery.Begin(scene.name);
             TerritorySpawner.Begin(scene.name);
+            HavenLand.Begin(scene.name);
             HavenPlaceVerbs.Begin(scene.name);
             RegionTitleHud.Create(scene.name);
             JournalNotices.CheckPages();
