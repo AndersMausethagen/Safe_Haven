@@ -52,6 +52,31 @@ public sealed class WeaponIdentityTests
         Assert.Less(spear.BackstepAttack.Pull, 0f, "it shoves away");
     }
 
+    // Weapon-damage ratio a second: the light chain at its pace, a heavy over its recovery (a grown heavy's clock counts the hold), a
+    // full charge over its recovery and the charge it waited.
+    private static float ChainPerSecond(WeaponDefinition weapon) =>
+        weapon.Combo.Sum(attack => attack.WeaponDamageRatio) / weapon.Combo.Sum(attack => attack.RecoveryTime) * CombatTechniqueSettings.Current.LightSwingPace;
+
+    /// <summary>
+    /// Docs/CombatFeelAnalysis_2026-11-26.md §3.1 (the user, 2026-11-26: heavies +40%): in the 11-25 playtests 80% of swings were light,
+    /// because a one-hander's heavy paid no more a second than the chain and a full charge paid less. Standing planted for a heavy, or
+    /// still for a charge, has to pay.
+    /// </summary>
+    [Test]
+    public void HeavyAndChargedBlowsPayMoreASecondThanTheChain()
+    {
+        float charge = CombatTechniqueSettings.Current.HeavyChargeSeconds;
+        foreach ((string name, _) in Families)
+        {
+            WeaponDefinition weapon = Weapon(name);
+            float chain = ChainPerSecond(weapon);
+            float heavy = weapon.HeavyAttack.WeaponDamageRatio / weapon.HeavyAttack.RecoveryTime;
+            float charged = weapon.ChargedAttack.WeaponDamageRatio / (weapon.ChargedAttack.RecoveryTime + charge);
+            Assert.Greater(heavy, chain * 1.2f, $"{name}'s heavy pays at least a fifth more a second than its chain ({heavy:0.00} vs {chain:0.00})");
+            Assert.GreaterOrEqual(charged, chain, $"{name}'s full charge pays at least what its chain does ({charged:0.00} vs {chain:0.00})");
+        }
+    }
+
     [Test]
     public void ShieldsHaveAGuardCounter()
     {

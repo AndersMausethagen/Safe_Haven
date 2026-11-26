@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: Dagger Heavy
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Dagger Heavy
+  description: 
   damageType: 0
   strike: 3
   baseDamage: 0
-  weaponDamageRatio: 1.827
+  weaponDamageRatio: 2.558
   powerScaling: 1
   structureDamageMultiplier: 1
   canCrit: 1

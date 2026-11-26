@@ -662,6 +662,23 @@ public sealed partial class MonsterAI
     private float breakingAwayUntil = -1f;
     private Vector3 breakAwaySpot;
     private bool breakAwayArrived;
+    // Break Away Delay: it stands where it struck until then, open (TryGetOpening shows the ring), and only then runs.
+    private float breakAwayRunAt = -1f;
+    // The whole opening the ring shows: the strike's own after its blow, and the wait.
+    private float breakAwayOpening;
+
+    /// <summary>True while it stands open after a strike before breaking away, with the seconds left and in all (the strike's own
+    /// opening counted in, so the ring shrinks on through both).</summary>
+    private bool TryGetBreakAwayOpening(out float left, out float length)
+    {
+        left = breakAwayRunAt - Time.time;
+        length = breakAwayOpening;
+        return left > 0f && Time.time < breakingAwayUntil;
+    }
+
+    /// <summary>The seconds a strike's break-away waits (Break Away Delay), for the ring shown while the strike is still recovering.</summary>
+    private static float BreakAwayWaitOf(MonsterAttack action) =>
+        action != null && action.breakAway > 0f && action.kind == MonsterAttackKind.Melee ? action.breakAwayDelay : 0f;
 
     private void StartBreakAway(MonsterAttack doing)
     {
@@ -697,8 +714,11 @@ public sealed partial class MonsterAI
         breakAwaySpot = ground;
         breakAwayArrived = false;
         float least = Mathf.Min(doing.breakAwaySeconds.x, doing.breakAwaySeconds.y), most = Mathf.Max(doing.breakAwaySeconds.x, doing.breakAwaySeconds.y);
-        // The run there, then the hold.
-        breakingAwayUntil = Time.time + UnityEngine.Random.Range(least, most) + 0.6f;
+        // The open beat, the run there, then the hold.
+        float strikeOpening = doing.attack != null ? Mathf.Max(0f, doing.attack.RecoveryTime - doing.attack.HitDelay) : 0f;
+        breakAwayOpening = strikeOpening + doing.breakAwayDelay;
+        breakAwayRunAt = Time.time + doing.breakAwayDelay;
+        breakingAwayUntil = breakAwayRunAt + UnityEngine.Random.Range(least, most) + 0.6f;
     }
 
     // True while it is still running off or holding ready; a leap or a charge it now has room for may go at once.
@@ -708,6 +728,15 @@ public sealed partial class MonsterAI
         {
             breakingAwayUntil = -1f;
             return false;
+        }
+
+        // The open beat: it stands, facing its foe, and takes no new action until it runs.
+        if (TryGetBreakAwayOpening(out _, out _))
+        {
+            SetState(State.Chasing);
+            movement.Stop();
+            movement.TurnTowards(toTarget);
+            return true;
         }
 
         if (definition.Attacks.Count > 0)

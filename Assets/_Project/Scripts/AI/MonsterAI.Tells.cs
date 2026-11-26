@@ -92,7 +92,17 @@ public sealed partial class MonsterAI
     public bool TryGetOpening(out float left, out float length)
     {
         left = length = 0f;
-        return CurrentState == State.Attacking && attacks != null && attacks.TryGetOpening(out left, out length);
+        if (CurrentState == State.Attacking && attacks != null && attacks.TryGetOpening(out left, out length))
+        {
+            // A strike it breaks away from after a wait: the ring runs on through the wait, one opening to the eye.
+            float wait = BreakAwayWaitOf(attacks.Action);
+            left += wait;
+            length += wait;
+            return true;
+        }
+
+        // Struck and standing open before it breaks away (Monster Attack › Break Away Delay).
+        return CurrentState == State.Chasing && TryGetBreakAwayOpening(out left, out length);
     }
 
     private void MarkWaiting() => waitingUntil = Time.time + WaitingMarkSeconds;

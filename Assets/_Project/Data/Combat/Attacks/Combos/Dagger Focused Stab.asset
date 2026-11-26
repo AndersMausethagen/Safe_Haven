@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: Dagger Focused Stab
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Dagger Focused Stab
+  description: 
   damageType: 0
   strike: 3
   baseDamage: 0
-  weaponDamageRatio: 2.6
+  weaponDamageRatio: 3.355
   powerScaling: 1
   structureDamageMultiplier: 1
   canCrit: 1

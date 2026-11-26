@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: Hammer Charged
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Hammer Charged
+  description: 
   damageType: 0
   strike: 1
   baseDamage: 0
-  weaponDamageRatio: 3.1
+  weaponDamageRatio: 4
   powerScaling: 1
   structureDamageMultiplier: 1
   canCrit: 1

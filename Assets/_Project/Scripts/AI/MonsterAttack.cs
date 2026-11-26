@@ -109,6 +109,9 @@ public sealed class MonsterAttack
     [Tooltip("Metres it runs off from its target once this strike is over, landed or not, swung round to the side away from the others, " +
              "then holds ready: hit and run, not standing at the target's feet striking on cooldown. 0: it stays.")]
     [Min(0f)] public float breakAway;
+    [Tooltip("Seconds it stands where it struck, open, before it runs off (the opening ring shows them), so an answer on reflex can land " +
+             "(Docs/CombatFeelAnalysis_2026-11-26.md §3.2). 0: it runs at once.")]
+    [Min(0f)] public float breakAwayDelay;
     [Tooltip("Seconds it holds off after breaking away before it may start another close strike (least and most). A leap or charge it " +
              "now has room for is allowed.")]
     public Vector2 breakAwaySeconds = new Vector2(0.8f, 1.4f);

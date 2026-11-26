@@ -3367,6 +3367,13 @@ sample textures and flames are in `Art/Effects/VFX Graph/Additions` (Unity Compa
   stance (at least 1.2x). `RaidIntensity`'s breather is 30-45 s and travel ends it only after `MinRelax` (20 s). With `CrowdedAt` (3)
   creatures engaging within `CrowdRadius`, `RangedAtOnceInACrowd` (1) may shoot. The log: Hurt rows end " health N/M"; a `DeathRecap`
   row follows PlayerDied (every blow of the last 10 s, small ones and ticks, by source, the health it started at, the crowd).
+- **Combat feel round (Docs/CombatFeelAnalysis_2026-11-26.md; tested in `CombatFeelTests1126`, `WeaponIdentityTests`):** one-handers'
+  heavies +40%, every charged blow x1.29 (data). `MonsterAttack.breakAwayDelay`: the creature stands open before it breaks away
+  (`MonsterAI.TryGetBreakAwayOpening`; `TryGetOpening` adds the wait to the strike's own opening so the ring runs on as one); the wolf's
+  bite 0.3 s. `CombatTechniqueSettings.LightReachAssist` (0.6 m): a light swing at the enemy in focus may step that much past its Lunge
+  (`SwingMotion.StepDistance`, the search reach in `StepIntoBlow` grows by it). `CombatTally.MoveName`/`WhiffName`: `Move.*` and
+  `Whiffed.*` rows. `ReelingHint` (Player.Awake): the first `MostShows` (3) times in a save the focused creature reels, "Heavy [key]" on
+  its own overlay canvas over it; counted in the journal's noticed set as `hint:reeling:N`, so the save format is unchanged.
 - **Sounds** (Docs/CombatSkillsResearch 6): `SkillLook.castSound/releaseSound/releaseSoundDelay` (SkillFx plays them; the effects builder
   keeps them when it remakes a look) and `StatusEffectDefinition.consumeSound` (Shatter). Takes for 13 sounds wait on the user's ear:
   MOSS and Stable Audio 3 (two each) and `Tools/Audio/skills.py` (two each; none for the war cry's voice) on the Skill sound picks page.

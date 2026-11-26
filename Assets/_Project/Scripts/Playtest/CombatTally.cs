@@ -23,6 +23,31 @@ public sealed class CombatTally
     // fighting earned (rounded down, the rest carried to the next).
     public const string SkillCast = "Skill.Cast", SkillOf = "Skill.", SkillHit = "Skill.Hit", SkillDamage = "Skill.Damage",
         SkillNoFocus = "Skill.NoFocus", FocusEarned = "Focus.Earned";
+    // The move inside a kind (Docs/CombatFeelAnalysis_2026-11-26.md §3.8: charged blows, follow-ups and backsteps were all counted as
+    // light swings), on top of the kind's own count so Swing.Light stays comparable with older runs. And why a swing whiffed: with
+    // the focused enemy within its reach (it stepped aside, or the aim was off), out of reach, or with nothing in focus.
+    public const string ChargedMove = "Move.Charged", FollowUpMove = "Move.FollowUp", BackstepMove = "Move.Backstep", FinisherMove = "Move.Finisher";
+    public const string WhiffInReach = "Whiffed.InReach", WhiffOutOfReach = "Whiffed.OutOfReach", WhiffNoFocus = "Whiffed.NoFocus";
+
+    /// <summary>The move a swing of <paramref name="weapon"/> was, beyond its kind (null: none of them).</summary>
+    public static string MoveName(WeaponDefinition weapon, SwingInfo swing)
+    {
+        AttackDefinition attack = swing.Attack;
+        if (weapon == null || attack == null)
+        {
+            return null;
+        }
+
+        if (attack == weapon.ChargedAttack) return ChargedMove;
+        if (attack == weapon.HeavyFollowUp) return FollowUpMove;
+        if (attack == weapon.BackstepAttack) return BackstepMove;
+        return swing.Kind == SwingKind.Light && swing.IsFinisher ? FinisherMove : null;
+    }
+
+    /// <summary>Why a swing reaching <paramref name="reach"/> m found nothing, with its focused enemy <paramref name="distance"/> m off
+    /// (below 0: none in focus). A body's half width counts as within reach.</summary>
+    public static string WhiffName(float reach, float distance) =>
+        distance < 0f ? WhiffNoFocus : distance <= reach + 0.5f ? WhiffInReach : WhiffOutOfReach;
 
     private readonly Dictionary<string, int> counts = new Dictionary<string, int>();
     private PlayerCombat combat;
@@ -33,6 +58,7 @@ public sealed class CombatTally
     private Combatant self;
     private PlayerSkills skills;
     private PlayerFocus focus;
+    private PlayerFocusTarget focusTarget;
     private float skillDamageCarry;
     private float focusCarry;
 
@@ -77,6 +103,7 @@ public sealed class CombatTally
         self = player.GetComponent<Combatant>();
         skills = player.GetComponent<PlayerSkills>();
         focus = player.GetComponent<PlayerFocus>();
+        focusTarget = player.GetComponent<PlayerFocusTarget>();
         if (archery != null)
         {
             archery.Shot += OnShot;
@@ -149,6 +176,7 @@ public sealed class CombatTally
         self = null;
         skills = null;
         focus = null;
+        focusTarget = null;
         if (combat != null)
         {
             combat.SwingStarted -= OnSwingStarted;
@@ -249,6 +277,7 @@ public sealed class CombatTally
     private void OnSwingStarted(SwingInfo swing)
     {
         Note(SwingName(swing.Kind));
+        Note(MoveName(combat != null ? combat.Weapon : null, swing));
         if (swing.Attack != null && swing.Attack.CastProjectile != null)
         {
             Note(StaffCast);
@@ -267,8 +296,23 @@ public sealed class CombatTally
             return;
         }
 
-        if (hits > 0) Note(Landed, hits);
-        else Note(Whiffed);
+        if (hits > 0)
+        {
+            Note(Landed, hits);
+            return;
+        }
+
+        Note(Whiffed);
+        Damageable focused = focusTarget != null ? focusTarget.Target : null;
+        float distance = -1f;
+        if (focused != null && combat != null)
+        {
+            Vector3 apart = focused.transform.position - combat.transform.position;
+            apart.y = 0f;
+            distance = apart.magnitude;
+        }
+
+        Note(WhiffName(swing.Attack != null ? swing.Attack.Range : 0f, distance));
     }
 
     private void OnFlinched(float seconds, bool lostSwing)

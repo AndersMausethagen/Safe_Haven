@@ -3,7 +3,23 @@
 The user asked: "do an analysis in combat. what can we do to make it feel better? animations? tweaking of numbers? other things?
 research and compare our combat with how other games do it and suggest improvements".
 
-This is a read-only analysis: no code, data or scenes were changed. It builds on the four earlier combat documents
+## Status (2026-11-26): the user's answers, and what is built
+
+The user: "i agree with most, but keep skills costing focus, increase heavy swing damage with 40%. let Wolf wait a bit before running off."
+
+| Item | Status |
+|---|---|
+| 1. Heavy and charged | **Built.** One-handers' heavies +40% (Sword Heavy 1.869, Chop Heavy 2.443, Dagger Heavy 2.558); every charged blow x1.29 (Sword, Chop, Hammer 4.0; Axe 3.871; Greatsword 4.258; Spear 3.742; Dagger Focused Stab 3.355). Two-handers' and the spear's heavies were left alone: they already paid 28-53% more than their chains. |
+| 2. The wolf waits | **Built.** Monster Attack › Break Away Delay 0.3 s on the wolf's bite; the opening ring runs on through it. Probed live: four bites, each 0.30 s standing still, then the 3.5 m run. |
+| 3. Pressure budget | Not built, as recommended: wait for a playtest of the safety round. |
+| 4. Skills cooldown only | **Not built: the user keeps the Focus cost.** |
+| 5. Wolf animation | In progress (see the commit after this one). |
+| 6. Exaggeration pass | In progress. |
+| 7. Reach assist | **Built** (0.6 m, not 0.8: the step gets only the end of the wind-up). Probed live: a target 2.94 m off, 0.8 m step and a miss without it, 1.4 m and a hit with it; 4.36 m off still misses. |
+| 8. Log the moveset | **Built:** `Move.*` and `Whiffed.*` rows. |
+| 9. Reeling hint | **Built:** "Heavy [LMB]" over the focused creature, three times a save, on a screen canvas (world text sank under the mist). |
+
+This was a read-only analysis: no code, data or scenes were changed by it. It builds on the four earlier combat documents
 (`Docs/CombatResearch.md`, `Docs/EnemyCombatResearch.md`, `Docs/CombatFeelReview_2026-11-19.md`,
 `Docs/CombatSkillsResearch_2026-11-24.md`) and doesn't repeat them. Almost all of their items are built. Paths are relative to
 `Assets/_Project/` unless they start with `Docs/`.

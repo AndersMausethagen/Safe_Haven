@@ -68,6 +68,7 @@ MonoBehaviour:
     comboFromTier: 0
     holdChance: 0
     breakAway: 0
+    breakAwayDelay: 0
     breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
@@ -98,6 +99,9 @@ MonoBehaviour:
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
     lobSeconds: 1.1
     lobScatter: 2
   - attack: {fileID: 11400000, guid: dc3220cad0306084fa0ab8acc5561f48, type: 2}
@@ -129,6 +133,7 @@ MonoBehaviour:
     comboFromTier: 0
     holdChance: 0
     breakAway: 3.5
+    breakAwayDelay: 0.3
     breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
@@ -159,6 +164,9 @@ MonoBehaviour:
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
     lobSeconds: 1.1
     lobScatter: 2
   - attack: {fileID: 11400000, guid: 338b303d0c8fffe46b6611fad4aff38b, type: 2}
@@ -190,6 +198,7 @@ MonoBehaviour:
     comboFromTier: 0
     holdChance: 0
     breakAway: 0
+    breakAwayDelay: 0
     breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
@@ -220,6 +229,9 @@ MonoBehaviour:
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
     lobSeconds: 1.1
     lobScatter: 2
   movementTactic: 0
@@ -236,6 +248,7 @@ MonoBehaviour:
   idleGrazeChance: 0
   idleSleepChance: 0.3
   idleSleepAttention: 0.3
+  swims: 0
   timid: 0
   boltSeconds: 7
   thief: 0

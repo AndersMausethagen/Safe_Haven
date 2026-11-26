@@ -701,10 +701,15 @@ public sealed partial class PlayerCombat
     private void StepIntoBlow(float secondsLeft)
     {
         stepPending = false;
-        activeDirection = AimAssist(activeDirection, activeAttack, out float targetDistance);
+        // A light swing at an enemy in focus just out of reach steps further toward it (Light Reach Assist): a wolf that bit and
+        // backed off is still caught.
+        float extra = activeKind == SwingKind.Light && activeMotion == ArtMotion.None && focusTarget != null && focusTarget.Target != null
+            ? Rules.LightReachAssist : 0f;
+        activeDirection = MeleeTargeting.AimAssist(transform.position, transform.forward, activeDirection, activeAttack, aimAssistAngle,
+            aimAssistReach + extra, hitLayers, combatant.Faction, out float targetDistance);
         movement.SnapFacing(activeDirection);
         float distance = activeMotion == ArtMotion.DashThrough ? activeLunge
-            : targetDistance >= 0f ? Mathf.Clamp(targetDistance - LungeStandOff, 0f, activeLunge) : activeLunge * 0.5f;
+            : SwingMotion.StepDistance(targetDistance, activeLunge, extra, LungeStandOff);
         // Walking back or aside while swinging keeps that way: an ordinary blow doesn't drag the player forward (the user, 2026-11-15).
         // An art that moves the player (a leap, a dash: all its distance is this step) and a heavy, charged or counter blow stepping in
         // toward a target keep their step: those are the move itself, and strafing left a leap art going nowhere (review 2026-11-16).

@@ -146,6 +146,11 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [Tooltip("Degrees per second a swing still winding up turns to follow the focused enemy, until it steps into the blow. 0 aims " +
              "only as it starts.")]
     [SerializeField, Min(0f)] private float swingTracking = 240f;
+    [Tooltip("Metres a light swing may step in beyond its attack's own Lunge toward the focused enemy when it is just out of reach " +
+             "(a small version of Batman Arkham's leap to the target and Hades' dash-strike; Docs/CombatFeelAnalysis_2026-11-26.md §3.7). " +
+             "Never further than the enemy is; not when walking away. The step still takes only the end of the wind-up, so much more " +
+             "reads as a warp. 0: off.")]
+    [SerializeField, Min(0f)] private float lightReachAssist = 0.6f;
 
     [Header("Focus on an enemy")]
     [Tooltip("An enemy can be taken up as the focus within this many metres.")]
@@ -456,6 +461,7 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float FightHoldRange => fightHoldRange;
     public float SweepSeconds => sweepSeconds;
     public float SwingTracking => swingTracking;
+    public float LightReachAssist => lightReachAssist;
     public float FocusAcquireRange => focusAcquireRange;
     public float FocusAcquireCone => focusAcquireCone;
     public float FocusKeepRange => focusKeepRange;

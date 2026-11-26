@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: Spear Charged
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Spear Charged
+  description: 
   damageType: 0
   strike: 1
   baseDamage: 0
-  weaponDamageRatio: 2.9
+  weaponDamageRatio: 3.742
   powerScaling: 1
   structureDamageMultiplier: 1
   canCrit: 1

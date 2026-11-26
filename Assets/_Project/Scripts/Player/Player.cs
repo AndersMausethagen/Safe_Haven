@@ -64,6 +64,7 @@ public sealed class Player : MonoBehaviour
         OffScreenWarnings.AddTo(gameObject); // a strike winding up at them from out of view (at the screen's edge) or from behind (beside them)
         PlayerBlowGrace.AddTo(gameObject); // no one blow from a lesser foe takes most of their health, and a breath after a big one
         LowHealthHint.AddTo(gameObject); // low in a fight, once a scene: which key heals
+        ReelingHint.AddTo(gameObject); // the first few times the enemy in focus reels: the heavy's key over it
         if (Current != null && Current != this)
         {
             Debug.LogWarning($"A second player ({name}) appeared; the newest one is used.", this);

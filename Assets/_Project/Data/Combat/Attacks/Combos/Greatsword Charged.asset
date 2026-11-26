@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: Greatsword Charged
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Greatsword Charged
+  description: 
   damageType: 0
   strike: 2
   baseDamage: 0
-  weaponDamageRatio: 3.3
+  weaponDamageRatio: 4.258
   powerScaling: 1
   structureDamageMultiplier: 1
   canCrit: 1

@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: Sword Heavy
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Sword Heavy
+  description: 
   damageType: 0
   strike: 2
   baseDamage: 0
-  weaponDamageRatio: 1.335
+  weaponDamageRatio: 1.869
   powerScaling: 1
   structureDamageMultiplier: 1
   canCrit: 1

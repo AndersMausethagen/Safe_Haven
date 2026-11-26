@@ -69,6 +69,14 @@ public static class SwingMotion
     }
 
     /// <summary>
+    /// Metres the step into a blow travels: to <paramref name="standOff"/> short of a target <paramref name="targetDistance"/> m off (its
+    /// nearest point), at most the attack's <paramref name="lunge"/> plus <paramref name="extra"/> (Light Reach Assist), so the extra only
+    /// ever closes a gap and never carries past the target. With no target (below 0) half the lunge.
+    /// </summary>
+    public static float StepDistance(float targetDistance, float lunge, float extra, float standOff) =>
+        targetDistance >= 0f ? Mathf.Clamp(targetDistance - standOff, 0f, lunge + Mathf.Max(0f, extra)) : lunge * 0.5f;
+
+    /// <summary>
     /// Seconds before the blow that the step into it starts: the attack's (or the settings') share of the wind-up, at least
     /// <paramref name="shortest"/>. A rush steps all through its wind-up. A heavy swing steps only after its charge, so never before
     /// the top of its wind-up (<paramref name="chargeLead"/> before the blow).

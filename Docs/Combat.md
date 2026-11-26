@@ -103,7 +103,9 @@ by motion, sound and weight rather than on-screen text.
 - **Moving while you swing.** A light swing lets you walk at a share of your speed while it winds up, the arms swinging over walking legs:
   daggers and fists 60%, swords, axes and spears 30%, two-handed weapons 5-8%. Heavy swings, rushes and arts keep the feet planted. Early in
   the wind-up the blow turns toward where you aim (150° a second, over its first 60%), and a charging heavy can be aimed while held. The
-  step into the blow takes the last third of the wind-up: 0.8-1.0 m for chain swings, 1.2-1.5 m for finishers. A moment after it lands
+  step into the blow takes the last third of the wind-up: 0.8-1.0 m for chain swings, 1.2-1.5 m for finishers. A light swing at the
+  enemy in focus when it is just out of reach steps up to 0.6 m further toward it, never past it and not when walking away (Combat
+  Technique › Light Reach Assist, 2026-11-26: a third of the axe's swings at wolves that bit and backed off hit nothing). A moment after it lands
   (0.1 s) you walk off at half speed (two-handed weapons a quarter, heavy swings a fifth). Walking off never brings the next swing sooner.
 - **Rush attacks.** An attack pressed during a dodge or up to 0.3 s after, or while running toward where you aim, is the weapon's rush
   attack: a quick lunge that carries your movement into the blow (the sword's lands in 0.28 s). Pressed during a dodge it waits only for
@@ -179,6 +181,10 @@ is the shield's guard counter, Shield Cut.
 
 Only two can be closing in on the player with a strike at once, and those strikes start at least 0.35 s apart: the rest circle at about 3.5 m, facing
 you, until their next try (0.8 to 1.6 s). Ranged attacks, howls and summons don't wait, and neither do great beasts and elites, though they count.
+
+A hit-and-run creature (Monster Attack › Break Away: wolves, Rootlings, Troll Runts) runs off after its strike. The wolf first stands where it
+bit for 0.3 s (Break Away Delay), its pale green opening ring shrinking on through the wait, so an answer on reflex lands before it goes
+(2026-11-26).
 
 Some melee strikes go on into a follow-up, aimed anew with its own wind-up and warning, or hold the wind-up for 0.45 s while tracking you, its warning
 stopped part-filled, so a roll on reflex comes too soon. Draug and Barrow Shieldbearer chain a cleave into a backswing, and hold a cleave 30% of the time;
@@ -378,13 +384,21 @@ avatar made after that), or every pose comes out rotated; Set Up Combat Animatio
 The combat pages of the journal open one at a time, each when what it is about first comes up: Swings and Chains on the first blow,
 Guard and Parry on the first block, Dodging on the first dodge, Stamina and Focus when stamina runs out or on the first art, Poise and
 Stagger on the first stagger, Backstabs on the first parry, Getting Hit when first hurt. Pages a save has already announced stay open.
+The first three times in a save that the enemy in focus reels, the heavy's key floats over it for a moment ("Heavy [LMB]", a glyph on a
+pad; `ReelingHint`): a heavy on a reeling creature floors it.
 The pages are written from this document, so a changed rule has to be changed there too.
 
 ## Measuring it
 
 The playtest log writes **Combat** rows for each played minute, with the weapon held: swings by kind, blows landed and whiffed,
 parries, blocks, broken guards, dodges and perfect dodges, flinches and the swings they cost, counters, backstabs, interrupts and
-times hurt. They show how much of a fight is parrying, to compare one playtest with the next.
+times hurt. They show how much of a fight is parrying, to compare one playtest with the next. Since 2026-11-26 the move inside a kind
+is counted too (`Move.Charged`, `Move.FollowUp`, `Move.Backstep`, `Move.Finisher`, on top of the kind's own row), and why a swing whiffed:
+`Whiffed.InReach` (the focused enemy was within reach), `Whiffed.OutOfReach` (it had backed off) or `Whiffed.NoFocus`.
+
+**Heavy and charged pay for the commitment** (2026-11-26, the user: heavies +40%): a one-hander's heavy earns 40-55% more a second than its
+light chain (every family's at least a fifth more), and a full charge at least what the chain does, counting the 0.9 s it waited (`WeaponIdentityTests`). In the
+11-25 playtests 80% of swings were light because neither paid.
 
 ## Where to tune it
 
