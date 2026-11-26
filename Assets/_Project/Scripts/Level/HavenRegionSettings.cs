@@ -61,6 +61,11 @@ public sealed class HavenRegionSettings : GameSettings<HavenRegionSettings>
     [SerializeField, Range(0f, 1f)] private float rememberedMist = 0.2f;
     [Tooltip("Seconds the mist takes to draw back from a region as it is remembered.")]
     [SerializeField, Min(0.5f)] private float drawBackSeconds = 10f;
+    [Header("Worked places")]
+    [Tooltip("A worked place in forgotten land (a relit clamp, smoking) keeps the land round it in mind: this much remembered at its " +
+             "heart (1 as if its region were), out to Kept Radius metres, so its smoke and its work show through the forgetting.")]
+    [SerializeField, Range(0f, 1f)] private float keptRemembered = 0.7f;
+    [SerializeField, Min(5f)] private float keptRadius = 32f;
     [Tooltip("Metres over which one region's look and mist fade into the next's.")]
     [SerializeField, Min(0f)] private float borderSoftness = 18f;
 
@@ -71,6 +76,8 @@ public sealed class HavenRegionSettings : GameSettings<HavenRegionSettings>
     public Color ForgottenColor => forgottenColor;
     public float RememberedMist => rememberedMist;
     public float DrawBackSeconds => drawBackSeconds;
+    public float KeptRemembered => keptRemembered;
+    public float KeptRadius => keptRadius;
     public float BorderSoftness => borderSoftness;
 
     /// <summary>A region's look, or null when it has none (it is then left as painted and never grey).</summary>

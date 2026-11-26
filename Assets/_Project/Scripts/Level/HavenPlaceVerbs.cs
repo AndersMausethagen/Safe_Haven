@@ -19,6 +19,16 @@ public sealed class HavenPlaceVerbs : ScriptableObject
         Night,
     }
 
+    /// <summary>When a find or a stage of a place's scene shows (Docs/HavenWorldStory_2026-11-26.md steps 3-4): always, once a quest
+    /// has started or is done, or once the place's region is remembered.</summary>
+    public enum Gate
+    {
+        Always,
+        QuestStarted,
+        QuestDone,
+        Remembered,
+    }
+
     [Serializable]
     public sealed class Kind
     {
@@ -56,6 +66,51 @@ public sealed class HavenPlaceVerbs : ScriptableObject
         public float markerTurn;
         [Tooltip("Taking it counts as using this, for quests (Use Object).")]
         public QuestTargetDefinition questTarget;
+        [Tooltip("When it lies there: always, or only once Quest has started or is done (the clamp to light only on the errand to " +
+                 "light it), or once the place's region is remembered.")]
+        public Gate gate = Gate.Always;
+        public QuestDefinition quest;
+        [Tooltip("0: taken once for good. More: a work site's yield, there once in every so many days at home (the relit clamp's " +
+                 "charcoal).")]
+        [Min(0)] public int everyDays;
+    }
+
+    /// <summary>
+    /// A place's own scene (Docs/HavenWorldStory_2026-11-26.md §7.3): what the player thinks there in place of its kind's thoughts, and
+    /// the stages its story goes through, each standing its dressing (a prefab of props laid out round the place's centre) and its
+    /// thoughts once its gate opens. A later stage can take the earlier ones' dressing away (the ruin gives way to the rebuilt hut).
+    /// </summary>
+    [Serializable]
+    public sealed class PlaceScene
+    {
+        [Tooltip("The place (WorldAtlas.Place.id).")]
+        public string placeId;
+        [Tooltip("Thought here in place of its kind's (several places share a kind: the Charcoal Camp is a Woodland Camp). Empty: the kind's.")]
+        [TextArea(2, 4)] public string[] thoughts = Array.Empty<string>();
+        public List<Stage> stages = new List<Stage>();
+    }
+
+    [Serializable]
+    public sealed class Stage
+    {
+        [Tooltip("What this stage is, for whoever edits it.")]
+        public string note = "";
+        public Gate gate = Gate.Always;
+        public QuestDefinition quest;
+        [Tooltip("Props laid out round the place's centre (its own colliders kept): the scene itself.")]
+        public GameObject dressing;
+        [Tooltip("Metres from the place's centre (x, z), and degrees the dressing is turned.")]
+        public Vector2 offset;
+        public float turn;
+        [Tooltip("Thought on first coming near once this stage shows (its own, remembered as the place's are).")]
+        [TextArea(2, 4)] public string[] thoughts = Array.Empty<string>();
+        [Tooltip("More than 0: a column of smoke rises this high from Smoke At (from the stage's centre): the place is worked again, and " +
+                 "keeps the land round it in mind (KeptPlace: thinner mist, some colour). From the game's camera it shows as the place " +
+                 "comes into view, and far off only from a lookout's wider view.")]
+        [Min(0f)] public float smokeRise;
+        public Vector3 smokeAt = new Vector3(0f, 1.2f, 0f);
+        [Tooltip("The earlier stages' dressing goes when this one shows.")]
+        public bool hidesEarlier;
     }
 
     [Serializable]
@@ -70,6 +125,9 @@ public sealed class HavenPlaceVerbs : ScriptableObject
     [SerializeField] private List<Kind> kinds = new List<Kind>();
     [SerializeField] private List<Find> finds = new List<Find>();
     [SerializeField] private List<PlaceTarget> targets = new List<PlaceTarget>();
+    [SerializeField] private List<PlaceScene> scenes = new List<PlaceScene>();
+    [Tooltip("What a worked place's smoke is drawn with (a hearth's).")]
+    [SerializeField] private Material smoke;
     [Header("Lookouts")]
     [Tooltip("Metres of fog lifted round a lookout.")]
     [SerializeField, Min(10f)] private float lookoutReveal = 110f;
@@ -85,6 +143,38 @@ public sealed class HavenPlaceVerbs : ScriptableObject
     public IReadOnlyList<Kind> Kinds => kinds;
     public IReadOnlyList<Find> Finds => finds;
     public IReadOnlyList<PlaceTarget> Targets => targets;
+    public IReadOnlyList<PlaceScene> Scenes => scenes;
+    public Material Smoke => smoke;
+
+    /// <summary>The place's own scene, or null.</summary>
+    public PlaceScene SceneOf(string placeId)
+    {
+        foreach (PlaceScene scene in scenes)
+        {
+            if (scene != null && scene.placeId == placeId)
+            {
+                return scene;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>True when a find or stage with this gate shows now, at a place in <paramref name="region"/>.</summary>
+    public static bool Passes(Gate gate, QuestDefinition quest, string region)
+    {
+        switch (gate)
+        {
+            case Gate.QuestStarted:
+                return quest != null && GameSession.Quests.StatusOf(quest) != QuestStatus.NotStarted;
+            case Gate.QuestDone:
+                return quest != null && GameSession.Quests.StatusOf(quest) == QuestStatus.Completed;
+            case Gate.Remembered:
+                return HavenLand.IsRemembered(region);
+            default:
+                return true;
+        }
+    }
 
     /// <summary>What reaching a place counts as for quests, or null.</summary>
     public QuestTargetDefinition TargetOf(string placeId)
@@ -137,6 +227,9 @@ public sealed class HavenPlaceVerbs : ScriptableObject
         finds = left ?? new List<Find>();
     }
 
+    /// <summary>Sets the places' scenes at once (the agent's eval that wrote them, tests).</summary>
+    public void SetScenes(List<PlaceScene> written) => scenes = written ?? new List<PlaceScene>();
+
     /// <summary>Stands what each place does at every place of this scene's atlas (none without one). Runs on every scene with a player;
     /// a scene's objects go with it, so it starts again on the next.</summary>
     public static void Begin(string sceneName)
@@ -157,46 +250,46 @@ public sealed class HavenPlaceVerbs : ScriptableObject
         foreach (WorldAtlas.Place place in atlas.Places)
         {
             Kind kind = verbs.KindOf(place.kind);
-            Vector3 at = Ground(place.at);
-            if (kind != null && (kind.thoughts.Length > 0 || kind.lookout || kind.sound != null))
+            PlaceScene scene = verbs.SceneOf(place.id);
+            string[] thoughts = scene != null && scene.thoughts.Length > 0 ? scene.thoughts : kind?.thoughts ?? Array.Empty<string>();
+            bool lookout = kind != null && kind.lookout;
+            SoundDefinition sound = kind?.sound;
+            if (thoughts.Length > 0 || lookout || sound != null)
             {
-                Stand(place, kind, at, verbs);
-            }
-
-            foreach (Find find in verbs.finds)
-            {
-                if (find != null && find.placeId == place.id && find.item != null)
-                {
-                    PlaceFind.Stand(stood.transform, place, find, Ground(place.at + find.offset));
-                }
+                Stand(place, kind, thoughts, Ground(place.at), verbs);
             }
         }
+
+        // The finds and the scenes' stages come and go with the story (a quest started, a region remembered), so they are stood by a
+        // keeper that looks again whenever it moves on.
+        stood.AddComponent<HavenPlaceScenes>().Begin(atlas, verbs);
     }
 
-    private static void Stand(WorldAtlas.Place place, Kind kind, Vector3 at, HavenPlaceVerbs verbs)
+    private static void Stand(WorldAtlas.Place place, Kind kind, string[] thoughts, Vector3 at, HavenPlaceVerbs verbs)
     {
         // Named for its place: CuriousPlace remembers what was thought by its name and position.
         var holder = new GameObject(place.id);
         holder.transform.SetParent(stood.transform, false);
         holder.transform.position = at;
+        bool lookout = kind != null && kind.lookout;
         // The thought first: a CuriousPlace answers the Interactable it finds as it wakes, and a lookout's press is the look out, not
         // "Look closer". A place with more to think than its first thought gets "Look closer" of its own.
-        if (kind.thoughts.Length > 0)
+        if (thoughts.Length > 0)
         {
-            if (!kind.lookout && kind.thoughts.Length > 1)
+            if (!lookout && thoughts.Length > 1)
             {
                 holder.AddComponent<Interactable>().Configure(InteractionAnimation.GatherLow, 0f, 4f, false, InteractionKind.Use);
             }
 
-            holder.AddComponent<CuriousPlace>().Configure(place.name, kind.thoughts, Mathf.Clamp(place.radius * 0.5f, 7f, 12f), remembered: true);
+            holder.AddComponent<CuriousPlace>().Configure(place.name, thoughts, Mathf.Clamp(place.radius * 0.5f, 7f, 12f), remembered: true);
         }
 
-        if (kind.lookout)
+        if (lookout)
         {
             HavenLookout.AddTo(holder, place, verbs);
         }
 
-        if (kind.sound != null)
+        if (kind?.sound != null)
         {
             holder.AddComponent<PlaceBeacon>().Configure(kind.sound, kind.soundWhen, kind.soundEvery);
         }

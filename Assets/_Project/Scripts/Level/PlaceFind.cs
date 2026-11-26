@@ -20,10 +20,25 @@ public sealed class PlaceFind : MonoBehaviour, IInteractionName, IInteractionVer
     /// <summary>The key its taking is remembered by.</summary>
     public static string TakenKey(string placeId, string item) => $"SafeHaven:once:{placeId}:{item}";
 
-    public static PlaceFind Stand(Transform parent, WorldAtlas.Place place, HavenPlaceVerbs.Find find, Vector3 at)
+    /// <summary>The key a find is taken by now: once for good, or a work site's yield once in every Every Days days at home (the days
+    /// counted in whole spans, so it is the same key all through one span).</summary>
+    public static string KeyOf(WorldAtlas.Place place, HavenPlaceVerbs.Find find) =>
+        KeyOf(place, find, GameSession.Home != null ? GameSession.Home.DaysPassed : 0);
+
+    /// <summary>The key a find is taken by after <paramref name="daysAtHome"/> days at home.</summary>
+    public static string KeyOf(WorldAtlas.Place place, HavenPlaceVerbs.Find find, int daysAtHome)
     {
         string key = TakenKey(place.id, find.item.Id);
-        if (GameSession.Progress != null && GameSession.Progress.HasUsedStone(key))
+        return find.everyDays <= 0 ? key : $"{key}:{Mathf.Max(0, daysAtHome) / find.everyDays}";
+    }
+
+    /// <summary>True when the find has been taken (this span, for a yield).</summary>
+    public static bool IsTaken(WorldAtlas.Place place, HavenPlaceVerbs.Find find) =>
+        GameSession.Progress != null && GameSession.Progress.HasUsedStone(KeyOf(place, find));
+
+    public static PlaceFind Stand(Transform parent, WorldAtlas.Place place, HavenPlaceVerbs.Find find, Vector3 at)
+    {
+        if (IsTaken(place, find))
         {
             return null;
         }
@@ -86,9 +101,22 @@ public sealed class PlaceFind : MonoBehaviour, IInteractionName, IInteractionVer
     {
         Player player = Player.Current;
         if (find == null || player == null || player.Bag.Container.SpaceFor(find.item) < find.amount
-            || !GameSession.Progress.MarkStoneUsed(TakenKey(place.id, find.item.Id)))
+            || !GameSession.Progress.MarkStoneUsed(KeyOf(place, find)))
         {
             return;
+        }
+
+        // What is taken for good counts as this span's yield of the same thing at the same place: the clamp just lit was raked out
+        // with it, and has more in a day or two, not at once.
+        if (find.everyDays <= 0 && HavenPlaceVerbs.Current != null)
+        {
+            foreach (HavenPlaceVerbs.Find yield in HavenPlaceVerbs.Current.Finds)
+            {
+                if (yield != null && yield.everyDays > 0 && yield.placeId == place.id && yield.item == find.item)
+                {
+                    GameSession.Progress.MarkStoneUsed(KeyOf(place, yield));
+                }
+            }
         }
 
         int given = player.Bag.Give(find.item, find.amount, ArrivalCause.Found);

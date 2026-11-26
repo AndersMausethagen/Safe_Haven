@@ -31,6 +31,10 @@ public sealed class HearthSmoke : MonoBehaviour
 
     private Construction construction;
     private BuildingObject building;
+    // A hearth's smoke; a column (ConfigureColumn) is darker and fuller.
+    private Color dayColour = new Color(0.78f, 0.77f, 0.75f);
+    private float puffSize = 1f;
+    private float drift = 1f;
 
     /// <summary>The building stands (built, not being built): its hearth burns and warms whoever is near.</summary>
     public bool Burning => construction == null || (construction.IsStanding && !construction.IsBuilding);
@@ -45,6 +49,26 @@ public sealed class HearthSmoke : MonoBehaviour
         lightAt = lightFrom;
         lightRange = range;
         smoke = material;
+    }
+
+    /// <summary>A column of smoke and no light, seen from afar (a worked place in the Haven's land: HavenPlaceScenes). Call it before
+    /// the object wakes (on an inactive holder).</summary>
+    public void ConfigureColumn(Vector3 smokeFrom, float height, float perSecond, float seenWithin, Material material)
+    {
+        chimney = smokeFrom;
+        rise = Mathf.Max(1f, height);
+        puffs = Mathf.Max(0.1f, perSecond);
+        drawnWithin = Mathf.Max(10f, seenWithin);
+        lightRange = 0f;
+        smoke = material;
+        // The mist is drawn over the smoke (the atmosphere's pass comes after transparent things), and pale smoke in pale mist is gone:
+        // a column meant to be found from afar is darker and fuller, as a smouldering clamp's is.
+        dayColour = new Color(0.42f, 0.41f, 0.4f);
+        puffSize = 2.2f;
+        // The wind and the lift are accelerations: over a column's long life they would carry it a hundred metres off. Scaled by the
+        // square of how much longer it lives than a hearth's, it leans as far as a chimney's plume does, for its height.
+        float longer = rise / 9f;
+        drift = 0.5f / (longer * longer);
     }
 
     private void Awake()
@@ -86,7 +110,7 @@ public sealed class HearthSmoke : MonoBehaviour
         main.simulationSpace = ParticleSystemSimulationSpace.World;
         main.startLifetime = new ParticleSystem.MinMaxCurve(rise / 1.1f, rise / 0.8f);
         main.startSpeed = new ParticleSystem.MinMaxCurve(0.6f, 1.0f);
-        main.startSize = new ParticleSystem.MinMaxCurve(1.1f, 1.7f);
+        main.startSize = new ParticleSystem.MinMaxCurve(1.1f * puffSize, 1.7f * puffSize);
         main.startRotation = new ParticleSystem.MinMaxCurve(0f, Mathf.PI * 2f);
         main.maxParticles = Mathf.CeilToInt(puffs * rise * 1.6f);
         ParticleSystem.EmissionModule emission = made.emission;
@@ -174,13 +198,13 @@ public sealed class HearthSmoke : MonoBehaviour
         }
 
         direction.Normalize();
-        float strength = 0.35f + 0.6f * Mathf.Clamp01(AtmosphereConditions.WeatherWind);
+        float strength = (0.35f + 0.6f * Mathf.Clamp01(AtmosphereConditions.WeatherWind)) * drift;
         ParticleSystem.ForceOverLifetimeModule force = system.forceOverLifetime;
         force.x = new ParticleSystem.MinMaxCurve(direction.x * strength * 0.7f, direction.x * strength * 1.3f);
-        force.y = new ParticleSystem.MinMaxCurve(0.05f, 0.15f);
+        force.y = new ParticleSystem.MinMaxCurve(0.05f * drift, 0.15f * drift);
         force.z = new ParticleSystem.MinMaxCurve(direction.y * strength * 0.7f, direction.y * strength * 1.3f);
         ParticleSystem.MainModule main = system.main;
         float night = Mathf.Clamp01(NightSettings.Darkness);
-        main.startColor = Color.Lerp(new Color(0.78f, 0.77f, 0.75f), new Color(0.24f, 0.27f, 0.33f), night);
+        main.startColor = Color.Lerp(dayColour, new Color(0.24f, 0.27f, 0.33f), night);
     }
 }

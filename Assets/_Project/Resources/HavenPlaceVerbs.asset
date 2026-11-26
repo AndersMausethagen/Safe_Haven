@@ -145,6 +145,9 @@ MonoBehaviour:
     markerScale: 0.55
     markerTurn: 25
     questTarget: {fileID: 11400000, guid: 925346d76a3b92040b606b7e1eb26b4b, type: 2}
+    gate: 0
+    quest: {fileID: 0}
+    everyDays: 0
   - placeId: haven.old_quarry.1
     name: Cut granite
     verb: Take
@@ -156,9 +159,60 @@ MonoBehaviour:
     markerScale: 0.55
     markerTurn: 25
     questTarget: {fileID: 0}
+    gate: 0
+    quest: {fileID: 0}
+    everyDays: 0
+  - placeId: haven.woodland_camp.2
+    name: The burners' clamp
+    verb: Light
+    item: {fileID: 11400000, guid: d4d2a84b7c6083a4dba750243db7aae9, type: 2}
+    amount: 8
+    taken: 'The turf catches. Under it the last burn is done: good black charcoal. The clamp smokes again.'
+    offset: {x: 3, y: 2}
+    marker: {fileID: 4899282080346734712, guid: bafb3edecdb6e914ea72803630ecb389, type: 3}
+    markerScale: 1
+    markerTurn: 20
+    questTarget: {fileID: 11400000, guid: 0e8daa99f1677b64ca03aa5e8c08da1b, type: 2}
+    gate: 1
+    quest: {fileID: 11400000, guid: 3c76010d130fc6a4e9f113f148b849ef, type: 2}
+    everyDays: 0
+  - placeId: haven.woodland_camp.2
+    name: Charcoal from the clamp
+    verb: Take
+    item: {fileID: 11400000, guid: d4d2a84b7c6083a4dba750243db7aae9, type: 2}
+    amount: 5
+    taken: Still warm. The clamp will have more in a day or two.
+    offset: {x: 6, y: 0.5}
+    marker: {fileID: 0}
+    markerScale: 1
+    markerTurn: 20
+    questTarget: {fileID: 0}
+    gate: 2
+    quest: {fileID: 11400000, guid: 3c76010d130fc6a4e9f113f148b849ef, type: 2}
+    everyDays: 2
   targets:
   - placeId: haven.old_quarry.0
     target: {fileID: 11400000, guid: 452286aed8706314fbb93b4d23abab81, type: 2}
+  - placeId: haven.woodland_camp.2
+    target: {fileID: 11400000, guid: 382d369f19e5ee6448c2c6863c1ed3c3, type: 2}
+  scenes:
+  - placeId: haven.woodland_camp.2
+    thoughts:
+    - Turf stacked to dry, a rake left in the ash, a ring of black earth where a clamp burned. Charcoal burners worked here.
+    - They kept the hearth in charcoal, the portal says, and were the last to leave. Somebody banked a clamp and meant to come back for it.
+    stages:
+    - note: 'The clamp lit again (Smoke in the Grey Pines): it smokes as the place comes into view, and from a lookout.'
+      gate: 2
+      quest: {fileID: 11400000, guid: 3c76010d130fc6a4e9f113f148b849ef, type: 2}
+      dressing: {fileID: 4899282080346734712, guid: bafb3edecdb6e914ea72803630ecb389, type: 3}
+      offset: {x: 3, y: 2}
+      turn: 20
+      thoughts:
+      - The clamp breathes again. From the meadows the smoke must look as if somebody lives out here.
+      smokeRise: 16
+      smokeAt: {x: 0, y: 1.4, z: 0}
+      hidesEarlier: 0
+  smoke: {fileID: 2100000, guid: e0dc5fdfe4f83b44294848291dbc9ed2, type: 2}
   lookoutReveal: 110
   lookoutSees: 180
   lookoutInsight: 30

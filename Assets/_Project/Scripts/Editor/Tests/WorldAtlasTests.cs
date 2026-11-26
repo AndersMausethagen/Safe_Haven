@@ -45,10 +45,29 @@ public sealed class WorldAtlasTests
         var recipe = AssetDatabase.LoadAssetAtPath<HavenWorldRecipe>("Assets/_Project/Data/World/Safe Haven/Haven World Recipe.asset");
         HavenWorldPlan plan = HavenWorldPlan.Make(recipe);
         WorldAtlas atlas = Haven;
-        Assert.AreEqual(plan.Pois.Count, atlas.Places.Count);
+        Assert.AreEqual(plan.Pois.Count, atlas.Baked.Count, "the places written by hand (Authored) are not the plan's");
         foreach (HavenWorldPlan.Poi poi in plan.Pois)
         {
-            Assert.IsTrue(atlas.Places.Any(p => (p.at - poi.At).sqrMagnitude < 1f), $"A {poi.Rule.name} at {poi.At} is not in the atlas: bake it again.");
+            Assert.IsTrue(atlas.Baked.Any(p => (p.at - poi.At).sqrMagnitude < 1f), $"A {poi.Rule.name} at {poi.At} is not in the atlas: bake it again.");
+        }
+
+        Assert.AreEqual(atlas.Baked.Count + atlas.Authored.Count, atlas.Places.Count, "every place, baked and written, is on the map");
+    }
+
+    [Test]
+    public void APlaceWrittenByHand_StandsInTheOpen_AwayFromTheOthers()
+    {
+        WorldAtlas atlas = Haven;
+        foreach (WorldAtlas.Place written in atlas.Authored)
+        {
+            Assert.IsFalse(string.IsNullOrWhiteSpace(written.id) || string.IsNullOrWhiteSpace(written.kind), written.name);
+            foreach (WorldAtlas.Place other in atlas.Places)
+            {
+                if (other != written)
+                {
+                    Assert.Greater((other.at - written.at).magnitude, 60f, $"{written.name} stands too near {other.name} to be a place of its own");
+                }
+            }
         }
     }
 

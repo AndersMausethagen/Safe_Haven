@@ -42,13 +42,44 @@ public sealed class WorldAtlas : ScriptableObject
     [SerializeField, HideInInspector] private byte[] grid = Array.Empty<byte>();
     [SerializeField] private List<Region> regions = new List<Region>();
     [SerializeField] private List<Place> places = new List<Place>();
+    [Tooltip("Places written by hand rather than baked from the plan (Docs/HavenWorldStory_2026-11-26.md step 4: scenes on the plan's " +
+             "empty glades, where the map had none). A re-bake keeps them.")]
+    [SerializeField] private List<Place> authored = new List<Place>();
+    [NonSerialized] private List<Place> all;
 
     public const byte NoRegion = 255;
 
     public Rect Area => area;
     public int GridSize => gridSize;
     public IReadOnlyList<Region> Regions => regions;
-    public IReadOnlyList<Place> Places => places;
+
+    /// <summary>Every named place: the baked ones, then those written by hand.</summary>
+    public IReadOnlyList<Place> Places => all ??= Merged();
+
+    /// <summary>The places baked from the world's plan.</summary>
+    public IReadOnlyList<Place> Baked => places;
+
+    /// <summary>The places written by hand.</summary>
+    public IReadOnlyList<Place> Authored => authored;
+
+    private List<Place> Merged()
+    {
+        var merged = new List<Place>(places.Count + authored.Count);
+        merged.AddRange(places);
+        merged.AddRange(authored);
+        return merged;
+    }
+
+    private void OnEnable() => all = null;
+
+    private void OnValidate() => all = null;
+
+    /// <summary>Sets the places written by hand (the agent's eval that wrote them).</summary>
+    public void SetAuthored(List<Place> written)
+    {
+        authored = written ?? new List<Place>();
+        all = null;
+    }
 
     /// <summary>The atlas of a scene, or null when it has none.</summary>
     public static WorldAtlas For(string sceneName) => string.IsNullOrEmpty(sceneName) ? null : Resources.Load<WorldAtlas>("Atlases/" + sceneName);
@@ -79,5 +110,6 @@ public sealed class WorldAtlas : ScriptableObject
         grid = cells;
         regions = named;
         places = found;
+        all = null;
     }
 }

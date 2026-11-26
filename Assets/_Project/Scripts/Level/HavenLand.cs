@@ -41,6 +41,52 @@ public sealed class HavenLand : MonoBehaviour
     private float[] remembered;
     private float nextRemake;
     private bool dirty;
+    // Worked places in the land (a relit clamp: HavenPlaceScenes' smoking stages) keep it in mind round them, before their region is
+    // remembered: x, z and radius of each, and for each texel how much it is kept (0 to 1).
+    private readonly Dictionary<Object, Vector3> keepers = new Dictionary<Object, Vector3>();
+    private float[] kept;
+
+    /// <summary>A worked place keeps the land round it in mind: thinner mist and some colour, out to <paramref name="radius"/> metres.</summary>
+    public void Keep(Object keeper, Vector2 at, float radius)
+    {
+        keepers[keeper] = new Vector3(at.x, at.y, Mathf.Max(1f, radius));
+        RemakeKept();
+    }
+
+    /// <summary>The place is no longer worked (or gone).</summary>
+    public void Release(Object keeper)
+    {
+        if (keepers.Remove(keeper))
+        {
+            RemakeKept();
+        }
+    }
+
+    private void RemakeKept()
+    {
+        kept ??= new float[MapSize * MapSize];
+        System.Array.Clear(kept, 0, kept.Length);
+        float texel = area.width / MapSize;
+        foreach (Vector3 keeper in keepers.Values)
+        {
+            int cx = Mathf.FloorToInt((keeper.x - area.xMin) / texel), cy = Mathf.FloorToInt((keeper.y - area.yMin) / (area.height / MapSize));
+            int reach = Mathf.CeilToInt(keeper.z / texel) + 1;
+            for (int y = Mathf.Max(0, cy - reach); y <= Mathf.Min(MapSize - 1, cy + reach); y++)
+            {
+                for (int x = Mathf.Max(0, cx - reach); x <= Mathf.Min(MapSize - 1, cx + reach); x++)
+                {
+                    float wx = area.xMin + (x + 0.5f) * texel, wz = area.yMin + (y + 0.5f) * (area.height / MapSize);
+                    float d = Mathf.Sqrt((wx - keeper.x) * (wx - keeper.x) + (wz - keeper.y) * (wz - keeper.y)) / keeper.z;
+                    // Whole within half the radius, fading to none at it.
+                    float k = 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.5f, 1f, d));
+                    int i = y * MapSize + x;
+                    kept[i] = Mathf.Max(kept[i], k);
+                }
+            }
+        }
+
+        dirty = true;
+    }
 
     /// <summary>The land's look for the atmosphere: RGB each region's colour filter (halved), A how forgotten.</summary>
     public Texture2D LookTexture => lookTexture;
@@ -237,9 +283,11 @@ public sealed class HavenLand : MonoBehaviour
     private void Remake()
     {
         float rememberedMist = settings.RememberedMist;
+        float keptRemembered = settings.KeptRemembered;
         for (int i = 0; i < MapSize * MapSize; i++)
         {
             float a = authored[i];
+            float keptHere = kept != null ? kept[i] * keptRemembered : 0f;
             float density = 0f, forgotten = 0f, weight = 0f;
             Vector3 filter = Vector3.zero, tint = Vector3.zero;
             for (int k = 0; k < PerTexel; k++)
@@ -263,7 +311,7 @@ public sealed class HavenLand : MonoBehaviour
                     continue;
                 }
 
-                float m = remembered[r];
+                float m = Mathf.Max(remembered[r], keptHere);
                 float thick = Mathf.Max(a * look.forgottenMist, look.forgottenFloor);
                 density += share * Mathf.Lerp(thick, a * rememberedMist, m);
                 forgotten += share * (1f - m);
