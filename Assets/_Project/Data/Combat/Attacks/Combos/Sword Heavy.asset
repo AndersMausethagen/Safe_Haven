@@ -71,7 +71,7 @@ MonoBehaviour:
   castRadius: 0.3
   castRange: 16
   castHazard: {fileID: 0}
-  animationState: Sword Heavy
+  animationState: Sword Heavy X
   animationSpeed: 1
   strikeSpeed: 1
   strikeLead: 0.15

@@ -3378,7 +3378,11 @@ sample textures and flames are in `Art/Effects/VFX Graph/Additions` (Unity Compa
   driven in phases through ActionSpeed (crouch to `pounceLaunchAt` over the wind-up, leap to `pounceLandAt` over
   `MonsterAI.ChargeSeconds`, the time to meet a standing target, then the settle; a leap cut short falls the rest in 0.1 s). "Hit Left"/
   "Hit Right" states: `TryBeastFlinch` on a standing (or spent) beast, the strike tail hands it back to the legs when it moves. Wolf.controller
-  has all three (Jump_ToIdle, Idle_HitReact_Left/Right).
+  has all three (Jump_ToIdle, Idle_HitReact_Left/Right). The beast flinch hands back to the legs on moving only (`UpdateBeastFlinch`).
+  `SwingExaggeration` (Editor/Characters): a swing clip's humanoid bake on the player's rig (HumanPoseHandler per 1/60 s; RootT/RootQ,
+  DOFs, goals and fingers copied from the source; copying the source's bindings alone was lossy), the trunk and arm muscles drawn by
+  `Strength`·w(t) away from their contact values (w a smoothstep bump, 0 at the start and at contact, 1 at `WindupTop`: the last pause
+  of the striking hand). `RemakeAll` (menu Exaggerate Big Swings) remakes the copies and refits blends and torso aim.
 - **Sounds** (Docs/CombatSkillsResearch 6): `SkillLook.castSound/releaseSound/releaseSoundDelay` (SkillFx plays them; the effects builder
   keeps them when it remakes a look) and `StatusEffectDefinition.consumeSound` (Shatter). Takes for 13 sounds wait on the user's ear:
   MOSS and Stable Audio 3 (two each) and `Tools/Audio/skills.py` (two each; none for the war cry's voice) on the Skill sound picks page.

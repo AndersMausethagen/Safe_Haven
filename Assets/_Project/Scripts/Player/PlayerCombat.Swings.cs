@@ -696,6 +696,28 @@ public sealed partial class PlayerCombat
         movement.SnapFacing(activeDirection);
     }
 
+    // Most the focused enemy may stand above or below for the reach assist: a creature on the terrace below doesn't draw the player
+    // off its edge (review 2026-11-26).
+    private const float ReachAssistMostRise = 0.75f;
+
+    // The reach assist is for the enemy in focus, at about the player's height, along the swing.
+    private bool ReachAssistFits()
+    {
+        if (focusTarget == null || focusTarget.Target == null)
+        {
+            return false;
+        }
+
+        Vector3 to = focusTarget.Target.transform.position - transform.position;
+        if (Mathf.Abs(to.y) > ReachAssistMostRise)
+        {
+            return false;
+        }
+
+        to.y = 0f;
+        return to.sqrMagnitude < 0.0001f || Vector3.Angle(activeDirection, to) <= aimAssistAngle;
+    }
+
     // The last part of the wind-up (the attack's Lunge Share of it): the body travels with the strike, as far as the target (or
     // half way with none), so the step ends as it lands instead of sliding at the start and then standing still through the swing.
     private void StepIntoBlow(float secondsLeft)
@@ -703,8 +725,7 @@ public sealed partial class PlayerCombat
         stepPending = false;
         // A light swing at an enemy in focus just out of reach steps further toward it (Light Reach Assist): a wolf that bit and
         // backed off is still caught.
-        float extra = activeKind == SwingKind.Light && activeMotion == ArtMotion.None && focusTarget != null && focusTarget.Target != null
-            ? Rules.LightReachAssist : 0f;
+        float extra = activeKind == SwingKind.Light && activeMotion == ArtMotion.None && ReachAssistFits() ? Rules.LightReachAssist : 0f;
         activeDirection = MeleeTargeting.AimAssist(transform.position, transform.forward, activeDirection, activeAttack, aimAssistAngle,
             aimAssistReach + extra, hitLayers, combatant.Faction, out float targetDistance);
         movement.SnapFacing(activeDirection);

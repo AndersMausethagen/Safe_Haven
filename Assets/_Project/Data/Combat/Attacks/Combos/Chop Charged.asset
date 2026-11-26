@@ -71,14 +71,14 @@ MonoBehaviour:
   castRadius: 0.3
   castRange: 16
   castHazard: {fileID: 0}
-  animationState: KI 1H Backhand
+  animationState: KI 1H Backhand X
   animationSpeed: 1
   strikeSpeed: 1
   strikeLead: 0.067
   followThroughSpeed: 1
   growsFromLight: 1
   blendIn: 0
-  blendInFromReady: 0.12
+  blendInFromReady: 0.11
   fromGuardStart: 0
   blendInFromGuard: 0
   fromHeavyStart: 0

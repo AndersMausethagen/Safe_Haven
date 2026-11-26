@@ -389,7 +389,10 @@ public sealed class MonsterAttacks
         chargeLength = action != null ? Mathf.Min(action.chargeDistance, toTarget.magnitude + 0.7f) : 0f;
         // Where it should meet a target that stands: its blow reaches from Range short of it (a leap timed to the whole run landed
         // after the bite, probe 2026-11-26).
-        chargeMeets = Mathf.Clamp(toTarget.magnitude - (Attack != null ? Attack.Range : 0f), 0f, chargeLength);
+        // The action's own attack, not Attack: Blow isn't reset yet, and a leftover follow-up index would read past a new action's
+        // follow-ups (review 2026-11-26: a friend's copy can start a strike while still in a combo's blow).
+        AttackDefinition chargedWith = action != null ? action.attack : null;
+        chargeMeets = Mathf.Clamp(toTarget.magnitude - (chargedWith != null ? chargedWith.Range : 0f), 0f, chargeLength);
         exposedAt = -1f;
         chargeHit = false;
         Blow = 0;

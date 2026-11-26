@@ -324,6 +324,13 @@ Combat lives or dies on seeing what is about to happen, so the animation is buil
   borrow the dagger's clips; spears no longer play the same thrust twice (the second swing is a low sweep); greataxes mirror their wide
   swing into a backhand. Every swing is retimed to the cadence of the attack it took its numbers from, so a new clip never moves a
   weapon's damage per second or gear score: each family's stays within 6% of what it was (`WeaponIdentityTests`).
+- **Big blows coil further** (2026-11-26, Docs/CombatFeelAnalysis_2026-11-26.md §3.6): the sword's heavy and finisher and the axe's
+  heavy and charged blow play copies of their clips (`Animation/Clips/Exaggerated`, states "… X") whose wind-up draws the trunk and arms
+  a third again further from where they will be at contact, easing in and out, so each starts on the same pose and meets the same contact
+  pose on the same frame. Timings, damage and the blade at contact are the source's. The copies are baked on the player's own rig
+  (`SwingExaggeration`); change `SwingExaggeration.Strength` and run Safe Haven › Tools › Exaggerate Big Swings. The sword's charged
+  spin-leap (it starts from its backswing top) and the axe's finisher (it left the chain swing before it too little room to blend) keep
+  their clips.
 - **The player reacts by stance and weight.** A flinch fits the grip (Hit 1H, 2H, Polearm, Unarmed); a blow worth 35% of health plays a
   knockdown on the whole body.
 - **Humanoid monsters strike and flinch properly.** The Draug, Root Guardian, Old Moss Troll and Huldra play their own strikes,

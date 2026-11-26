@@ -32,6 +32,14 @@ public sealed class ReelingHint : MonoBehaviour
     private float showUntil = -1f;
     private int keysVersion = -1;
     private bool shownThisScene;
+    // A show counts only once it has been on screen this long (review 2026-11-26: a hint hidden at once, by a stagger, a window, a
+    // cinematic or a spot off screen, used up one of the three).
+    private const float CountsAfter = 0.8f;
+    private float seenFor;
+    private bool counted;
+    // Once the save has had them all, nothing more is looked up (ShowKey builds a string).
+    private bool allShown;
+    private string[] showKeys;
 
     public static void AddTo(GameObject owner)
     {
@@ -108,7 +116,7 @@ public sealed class ReelingHint : MonoBehaviour
             return;
         }
 
-        if (focused == null || !focused.IsReeling || Player.Current != player || !MayShow())
+        if (allShown || focused == null || !focused.IsReeling || Player.Current != player || Covered() || !MayShow())
         {
             return;
         }
@@ -116,21 +124,44 @@ public sealed class ReelingHint : MonoBehaviour
         Show(focused);
     }
 
+    // A cinematic, a window or the pause menu is over the fight.
+    private static bool Covered() => InGameCinematic.HoldsTheWorld || CinematicScreen.IsPlaying || GamePause.IsPaused
+        || (UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen);
+
     private bool MayShow()
     {
         JournalRecord journal = GameSession.Progress != null ? GameSession.Progress.Journal : null;
-        return journal != null ? ShowsHad(journal) < MostShows : !shownThisScene;
+        if (journal == null)
+        {
+            return !shownThisScene;
+        }
+
+        showKeys ??= BuildKeys();
+        int had = 0;
+        while (had < MostShows && journal.HasNoticed(showKeys[had]))
+        {
+            had++;
+        }
+
+        allShown = had >= MostShows;
+        return !allShown;
+    }
+
+    private static string[] BuildKeys()
+    {
+        var keys = new string[MostShows];
+        for (int i = 0; i < MostShows; i++)
+        {
+            keys[i] = ShowKey(i);
+        }
+
+        return keys;
     }
 
     private void Show(MonsterAI creature)
     {
-        JournalRecord journal = GameSession.Progress != null ? GameSession.Progress.Journal : null;
-        if (journal != null)
-        {
-            NoteShow(journal);
-        }
-
-        shownThisScene = true;
+        seenFor = 0f;
+        counted = false;
         showingOn = creature;
         showUntil = Time.time + ShowSeconds;
         EnsureLabel();
@@ -153,17 +184,32 @@ public sealed class ReelingHint : MonoBehaviour
         }
     }
 
-    // Over the creature on the screen; hidden while that spot is behind the camera.
+    // Over the creature on the screen; hidden while that spot is off the screen or something covers the fight. Counted once seen
+    // for CountsAfter.
     private void Place()
     {
         Camera view = Camera.main;
         Vector3 world = showingOn.transform.position + Vector3.up * (showingOn.ChestHeight + AboveChest);
         Vector3 screen = view != null ? view.WorldToScreenPoint(world) : new Vector3(0f, 0f, -1f);
-        label.enabled = screen.z > 0f;
-        if (label.enabled)
+        label.enabled = screen.z > 0f && screen.x >= 0f && screen.x <= Screen.width && screen.y >= 0f && screen.y <= Screen.height
+            && !Covered();
+        if (!label.enabled)
         {
-            float scale = Mathf.Max(0.01f, canvas.scaleFactor);
-            ((RectTransform)label.transform).anchoredPosition = new Vector2(screen.x / scale, screen.y / scale);
+            return;
+        }
+
+        float scale = Mathf.Max(0.01f, canvas.scaleFactor);
+        ((RectTransform)label.transform).anchoredPosition = new Vector2(screen.x / scale, screen.y / scale);
+        seenFor += Time.unscaledDeltaTime;
+        if (!counted && seenFor >= CountsAfter)
+        {
+            counted = true;
+            shownThisScene = true;
+            JournalRecord journal = GameSession.Progress != null ? GameSession.Progress.Journal : null;
+            if (journal != null)
+            {
+                NoteShow(journal);
+            }
         }
     }
 

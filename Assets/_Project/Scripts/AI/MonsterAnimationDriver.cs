@@ -237,6 +237,7 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         // Story movement owns locomotion while the AI is disabled.
         float speed = MovedSpeed();
         UpdateStrikeTail(speed);
+        UpdateBeastFlinch(speed);
         UpdatePounce();
         // Walking and galloping beasts step round as they turn on the spot, and a bigger one takes longer strides (review 2026-11-24: a
         // pack leader at 1.2 over-ran the ground by a fifth).
@@ -494,6 +495,9 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     // with a "<state> Release" channels until the attack's Strike Lead before the hit, then lets go.
     private void OnAttackStarted()
     {
+        // A strike begun with no frame out of Attacking (a friend's copy a beat behind its host) mustn't inherit a pounce's phase.
+        pouncePhase = PouncePhase.None;
+        beastFlinchHash = 0;
         releaseAt = -1f;
         hangPhaseAt = strikePhaseAt = followPhaseAt = -1f;
         AttackDefinition attack = ai.CurrentAttack;
@@ -655,17 +659,33 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
 
         animator.SetFloat(ActionSpeedHash, 1f);
         animator.CrossFadeInFixedTime(flinch, FlinchFade, 0, 0f);
-        // It runs off as the clip plays out: the legs take over (UpdateStrikeTail), as after a strike.
-        if (state == MonsterAI.State.Attacking)
+        // Its own hand-over to the legs, on moving only: the strike tail's also ends for a creature waiting its turn, which a standing
+        // wolf nearly always is (review 2026-11-26: the flinch showed for a quarter second).
+        beastFlinchHash = flinch;
+        return true;
+    }
+
+    private int beastFlinchHash;
+
+    private void UpdateBeastFlinch(float speed)
+    {
+        if (beastFlinchHash == 0 || animator == null || !animator.enabled)
         {
-            strikeStateHash = flinch;
-        }
-        else
-        {
-            tailStrikeHash = flinch;
+            return;
         }
 
-        return true;
+        AnimatorStateInfo now = animator.IsInTransition(0) ? animator.GetNextAnimatorStateInfo(0) : animator.GetCurrentAnimatorStateInfo(0);
+        if (now.shortNameHash != beastFlinchHash)
+        {
+            beastFlinchHash = 0;
+            return;
+        }
+
+        if (speed > TailMovingSpeed)
+        {
+            beastFlinchHash = 0;
+            animator.CrossFadeInFixedTime(LocomotionStateHash, StrikeTailFade, 0, 0f);
+        }
     }
 
     // A strike left before its blow (cut off, broken, called away) doesn't keep the raise's or the hang's slow pace for the rest of

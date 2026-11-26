@@ -107,6 +107,98 @@ public sealed class CombatFeelTests1126
         }
     }
 
+    /// <summary>
+    /// §3.6, the exaggeration pass: the sword's heavy and finisher and the axe's heavy and charged blow play copies of their clips whose
+    /// wind-up coils further (the sword's charged spin-leap starts from its backswing top, and the axe's finisher left the chain swing
+    /// before it too little room to blend, so those two keep their clips). Each copy starts on its source's pose and meets the same
+    /// contact pose on the same frame (the blade at contact and the timings stay the source's), plays the same after it, and its drawn
+    /// muscles stand further from the contact pose at the top.
+    /// </summary>
+    [Test]
+    public void TheBigBlowsWindUpDeeper_ButMeetOnTheSameFrame()
+    {
+        var controller = AssetDatabase.LoadAssetAtPath<UnityEditor.Animations.AnimatorController>(CombatAnimationSetup.PlayerControllerPath);
+        var clips = new System.Collections.Generic.Dictionary<string, AnimationClip>();
+        foreach (var layer in controller.layers)
+        {
+            if (layer.name == CombatAnimationSetup.FullBodyLayer)
+            {
+                foreach (var child in layer.stateMachine.states)
+                {
+                    clips[child.state.name] = child.state.motion as AnimationClip;
+                }
+            }
+        }
+
+        bool[] drawn = new bool[HumanTrait.MuscleCount];
+        for (int m = 0; m < drawn.Length; m++)
+        {
+            drawn[m] = SwingExaggeration.Drawn(HumanTrait.MuscleName[m]);
+        }
+
+        foreach (string name in new[] { "Sword Heavy", "Sword Finisher", "Chop Heavy", "Chop Charged" })
+        {
+            var attack = AssetDatabase.LoadAssetAtPath<AttackDefinition>($"{CombatAnimationSetup.ComboFolder}/{name}.asset");
+            StringAssert.EndsWith(" X", attack.AnimationState, $"{name} plays its exaggerated copy");
+            AnimationClip made = clips[attack.AnimationState];
+            AnimationClip source = clips[attack.AnimationState.Substring(0, attack.AnimationState.Length - 2)];
+            Assert.AreNotSame(source, made, name);
+            float contact = attack.HitDelay;
+            float top = SwingExaggeration.WindupTop(source, contact);
+            float[] Pose(AnimationClip clip, float t) => AttackFlow.Pose(clip, t, false);
+            float Apart(float[] a, float[] b, bool drawnOnly = false)
+            {
+                float sum = 0f;
+                for (int i = 0; i < Mathf.Min(a.Length, drawn.Length); i++)
+                {
+                    if (!drawnOnly || drawn[i])
+                    {
+                        sum += (a[i] - b[i]) * (a[i] - b[i]);
+                    }
+                }
+
+                return Mathf.Sqrt(sum);
+            }
+
+            // The same pose, judged where it counts: both hands (the weapon's and the off hand) on the player's rig, within 3 cm.
+            foreach ((float t, string when) in new[] { (0f, "starts where its source does"), (contact, "meets the same contact pose"),
+                         (contact + 0.1f, "plays the same after contact") })
+            {
+                Assert.Less(HandsApart(source, made, t), 0.03f, $"{name} {when}");
+            }
+            float before = Apart(Pose(source, top), Pose(source, contact), true), after = Apart(Pose(made, top), Pose(made, contact), true);
+            // Strength 0.35 draws the muscles a third again further, but those at their limit clamp (the sword heavy gains 11%), and a
+            // copy at strength 0 differs by about 3% from the bake's rounding: 8% tells a deeper coil from none.
+            Assert.Greater(after, before * 1.08f, $"{name} stands further back at the top of its wind-up ({after:0.00} vs {before:0.00})");
+        }
+
+        Assert.AreEqual(0f, SwingExaggeration.Weight(0f, 0.3f, 0.5f));
+        Assert.AreEqual(1f, SwingExaggeration.Weight(0.3f, 0.3f, 0.5f), 1e-4f);
+        Assert.AreEqual(0f, SwingExaggeration.Weight(0.5f, 0.3f, 0.5f));
+    }
+
+    // The farther apart of the two hands, in metres, with each clip at time t on a bare copy of the player's rig.
+    private static float HandsApart(AnimationClip a, AnimationClip b, float t)
+    {
+        var player = AssetDatabase.LoadAssetAtPath<GameObject>(CombatAnimationSetup.PlayerPrefabPath);
+        GameObject rig = CombatAnimationSetup.BareRig(player.GetComponentInChildren<Animator>());
+        try
+        {
+            var animator = rig.GetComponent<Animator>();
+            animator.applyRootMotion = false;
+            Transform right = animator.GetBoneTransform(HumanBodyBones.RightHand), left = animator.GetBoneTransform(HumanBodyBones.LeftHand);
+            a.SampleAnimation(rig, t);
+            Vector3 ra = rig.transform.InverseTransformPoint(right.position), la = rig.transform.InverseTransformPoint(left.position);
+            b.SampleAnimation(rig, t);
+            Vector3 rb = rig.transform.InverseTransformPoint(right.position), lb = rig.transform.InverseTransformPoint(left.position);
+            return Mathf.Max((ra - rb).magnitude, (la - lb).magnitude);
+        }
+        finally
+        {
+            Object.DestroyImmediate(rig);
+        }
+    }
+
     private static Transform FindBone(Transform at, string name)
     {
         if (at.name == name)

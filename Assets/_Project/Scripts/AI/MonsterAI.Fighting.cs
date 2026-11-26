@@ -344,6 +344,8 @@ public sealed partial class MonsterAI
     {
         int blow = attacks.Blow;
         MonsterAttack doing = attacks.Action;
+        // The blow under way (a combo's last follow-up, not its first): the break-away's ring goes on from its opening.
+        AttackDefinition lastBlow = attacks.Attack;
         if (!attacks.Update(CanTarget(target) ? targetComponent.transform.position : (Vector3?)null))
         {
             // What the blow met may already have moved it on (a parry staggers it as it lands): that state stands.
@@ -369,7 +371,7 @@ public sealed partial class MonsterAI
 
             if (doing != null && doing.breakAway > 0f && doing.kind == MonsterAttackKind.Melee && CurrentState == State.Chasing)
             {
-                StartBreakAway(doing);
+                StartBreakAway(doing, lastBlow);
             }
 
             // A shooter moves on after its shot (§6), instead of standing as a turret.
@@ -676,14 +678,18 @@ public sealed partial class MonsterAI
         return left > 0f && Time.time < breakingAwayUntil;
     }
 
-    /// <summary>The seconds a strike's break-away waits (Break Away Delay), for the ring shown while the strike is still recovering.</summary>
-    private static float BreakAwayWaitOf(MonsterAttack action) =>
-        action != null && action.breakAway > 0f && action.kind == MonsterAttackKind.Melee ? action.breakAwayDelay : 0f;
+    /// <summary>The seconds a strike's break-away waits (Break Away Delay), for the ring shown while the strike is still recovering: 0
+    /// when it won't break away from what it struck (a wall). Ground and leash are judged only as it starts, so rarely the ring
+    /// promises a wait that doesn't come.</summary>
+    private float BreakAwayWaitOf(MonsterAttack action) =>
+        action != null && action.breakAway > 0f && action.kind == MonsterAttackKind.Melee && BreaksAwayFromTarget ? action.breakAwayDelay : 0f;
 
-    private void StartBreakAway(MonsterAttack doing)
+    // At a wall or a building it keeps at it: hit and run is for living foes.
+    private bool BreaksAwayFromTarget => targetComponent != null && !(target is Damageable struck && struck.Category == TargetCategory.Structure);
+
+    private void StartBreakAway(MonsterAttack doing, AttackDefinition lastBlow)
     {
-        // At a wall or a building it keeps at it: hit and run is for living foes.
-        if (targetComponent == null || (target is Damageable struck && struck.Category == TargetCategory.Structure))
+        if (!BreaksAwayFromTarget)
         {
             return;
         }
@@ -715,7 +721,8 @@ public sealed partial class MonsterAI
         breakAwayArrived = false;
         float least = Mathf.Min(doing.breakAwaySeconds.x, doing.breakAwaySeconds.y), most = Mathf.Max(doing.breakAwaySeconds.x, doing.breakAwaySeconds.y);
         // The open beat, the run there, then the hold.
-        float strikeOpening = doing.attack != null ? Mathf.Max(0f, doing.attack.RecoveryTime - doing.attack.HitDelay) : 0f;
+        AttackDefinition spent = lastBlow != null ? lastBlow : doing.attack;
+        float strikeOpening = spent != null ? Mathf.Max(0f, spent.RecoveryTime - spent.HitDelay) : 0f;
         breakAwayOpening = strikeOpening + doing.breakAwayDelay;
         breakAwayRunAt = Time.time + doing.breakAwayDelay;
         breakingAwayUntil = breakAwayRunAt + UnityEngine.Random.Range(least, most) + 0.6f;
