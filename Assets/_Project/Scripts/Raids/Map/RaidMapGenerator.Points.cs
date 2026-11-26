@@ -176,14 +176,14 @@ public static partial class RaidMapGenerator
             Object.Destroy(old.gameObject);
         }
 
+        var holder = new GameObject(ClutterName).transform;
+        holder.SetParent(map.transform, false);
         IReadOnlyList<GameObject> kinds = rules.SiteClutter;
         if (kinds == null || kinds.Count == 0)
         {
             return;
         }
 
-        var holder = new GameObject(ClutterName).transform;
-        holder.SetParent(map.transform, false);
         var random = new System.Random(plan.Seed * 31 + 7);
         Vector2Int count = rules.ClutterPerSite;
         Vector2 reach = rules.ClutterReach;
@@ -220,6 +220,100 @@ public static partial class RaidMapGenerator
                 made.name = kind.name;
             }
         }
+    }
+
+    // The steepest ground a dressing piece stands on (a lean-to on a bank leans out of it), the half-width of its footprint checked
+    // for water, and how far it keeps from a trail's middle beyond the trail's own half-width.
+    private const float DressingSteepest = 18f;
+    private const float DressingHalfFootprint = 1.5f;
+    private const float DressingFromTrail = 2f;
+    private const int DressingTries = 8;
+    public const string CampDressingName = "Camp Dressing";
+
+    /// <summary>
+    /// What makes a camp read as one (Docs/RaidLayoutAnalysis_2026-11-26.md, follow-up 2): a few of the rules' Camp Dressing round each
+    /// camp, each kind once, spread round the ring beyond its creatures' points and stash, facing the middle. Called once the water stands
+    /// (ponds, fen, rivers), so a piece keeps its whole footprint out of any water, off trails and off steep ground; solid, so the navmesh
+    /// built after goes round it. From its own stream, so the clutter's rolls are as before.
+    /// </summary>
+    public static void PlaceCampDressing(RaidMap map, RaidLayoutPlan plan, RaidLayoutRules rules)
+    {
+        Transform old = map.transform.Find(CampDressingName);
+        if (old != null)
+        {
+            old.SetParent(null);
+            Object.Destroy(old.gameObject);
+        }
+
+        IReadOnlyList<GameObject> kinds = rules.CampDressing;
+        if (kinds == null || kinds.Count == 0)
+        {
+            return;
+        }
+
+        var holder = new GameObject(CampDressingName).transform;
+        holder.SetParent(map.transform, false);
+        Terrain terrain = map.Terrain;
+        Vector3 origin = terrain.transform.position;
+        var random = new System.Random(RaidLayout.SeedFor(plan.Seed, "Camp Dressing"));
+        Vector2Int count = rules.CampDressingPerCamp;
+        Vector2 reach = rules.CampDressingReach;
+        TerrainData data = terrain.terrainData;
+        float trailKeep = rules.TrailHalfWidth + DressingHalfFootprint + DressingFromTrail;
+        foreach (RaidSite site in plan.SitesOf(RaidSiteKind.EnemyCamp))
+        {
+            Vector3 centre = RaidMapSurface.Ground(terrain, origin + new Vector3(site.Position.x * plan.Size, 0f, site.Position.y * plan.Size));
+            List<int> picks = RaidLayout.PickIndices(random, kinds.Count, Mathf.Min(kinds.Count, random.Next(count.x, count.y + 1)));
+            float start = (float)(random.NextDouble() * Mathf.PI * 2.0);
+            for (int i = 0; i < picks.Count; i++)
+            {
+                GameObject kind = kinds[picks[i]];
+                // Spread round the ring, a little off even, so two pieces never stand together; where that spot won't do (a trail, a
+                // bank, water), a little further round each try, within this piece's share of the ring.
+                float turn = start + i * Mathf.PI * 2f / picks.Count + (float)(random.NextDouble() - 0.5) * 0.6f;
+                float far = Mathf.Lerp(reach.x, reach.y, (float)random.NextDouble());
+                float share = Mathf.PI * 2f / picks.Count;
+                Vector3 at = centre;
+                bool found = false;
+                for (int attempt = 0; attempt < DressingTries && kind != null && !found; attempt++)
+                {
+                    float tried = turn + (attempt % 2 == 0 ? 1f : -1f) * ((attempt + 1) / 2) * share / DressingTries;
+                    at = centre + new Vector3(Mathf.Cos(tried), 0f, Mathf.Sin(tried)) * far;
+                    Vector3 local = at - terrain.transform.position;
+                    var spot = new Vector2(local.x, local.z);
+                    found = spot.x >= 3f && spot.y >= 3f && spot.x <= plan.Size - 3f && spot.y <= plan.Size - 3f
+                        && !NearAny(plan.Trails, spot, trailKeep) && !NearAny(plan.Spurs, spot, trailKeep)
+                        && data.GetSteepness(spot.x / data.size.x, spot.y / data.size.z) <= DressingSteepest && FootprintDry(plan, terrain, spot);
+                }
+
+                if (!found)
+                {
+                    continue;
+                }
+
+                at.y = terrain.SampleHeight(at) + terrain.transform.position.y;
+                Vector3 inward = centre - at;
+                inward.y = 0f;
+                GameObject made = Object.Instantiate(kind, at, Quaternion.LookRotation(inward.sqrMagnitude > 0.01f ? inward : Vector3.forward), holder);
+                made.name = kind.name;
+            }
+        }
+    }
+
+    // The middle and four points round a piece's footprint: none in a pond, a river or any water surface standing on the map (a fen's).
+    private static bool FootprintDry(RaidLayoutPlan plan, Terrain terrain, Vector2 spot)
+    {
+        Vector3 origin = terrain.transform.position;
+        for (int i = -1; i < 4; i++)
+        {
+            Vector2 at = i < 0 ? spot : spot + new Vector2(Mathf.Cos(i * Mathf.PI * 0.5f), Mathf.Sin(i * Mathf.PI * 0.5f)) * DressingHalfFootprint;
+            if (plan.InWater(at) || plan.InRiver(at, 0.5f) || !RaidSpots.IsDryEnough(RaidMapSurface.Ground(terrain, origin + new Vector3(at.x, 0f, at.y))))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static void PlaceStart(RaidMap map, RaidLayoutPlan plan, System.Func<Vector2, Vector3> world)
@@ -388,7 +482,7 @@ public static partial class RaidMapGenerator
             for (int i = 0; i < sites.Count; i++)
             {
                 Vector3 centre = world(sites[i].Position);
-                places?.Add(new RaidPlace(pair.Key, owners[i] >= 0 ? groups[owners[i]].name : null, centre));
+                places?.Add(new RaidPlace(pair.Key, owners[i] >= 0 ? groups[owners[i]].name : null, centre, owners[i] >= 0 ? groups[owners[i]].MapIcon : null));
                 if (owners[i] < 0)
                 {
                     continue;

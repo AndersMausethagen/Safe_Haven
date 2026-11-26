@@ -284,6 +284,8 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             RaidMapGenerator.PlaceRavines(this, Layout, rules, pondMeshes);
             RaidMapGenerator.PlaceRivers(this, Layout, rules, pondMeshes);
             RaidMapGenerator.PlaceBridges(this, Layout, rules);
+            // Once every water stands, so a lean-to never stands in a pond or the fen (before the navmesh, which goes round it).
+            RaidMapGenerator.PlaceCampDressing(this, Layout, rules);
             // On the still water, once the ground and the water are where they will stay (their meshes go with the ponds').
             string lilyPads = RaidMapGenerator.PlaceLilyPads(this, Layout, rules, field, pondMeshes);
             // The water's heights, for the plants that grow by them (Dress), from the attempt that is kept.

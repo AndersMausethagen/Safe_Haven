@@ -9,7 +9,8 @@
     "UltraTex (FLUX) is a non-commercial licence and Hunyuan3D's licence excludes some territories: re-texture/check before a release.",
     "2026-11-14: the raids' and items' primitive stand-ins (Cache Crate to Shaman Staff); built into their prefabs by BuildStructureModels.Placeholders, not BuildWorldProps.",
     "2026-11-17, the user: 'Create props and aditional monsters you need with LocalSpawn' for Troll Valley (the Brukam bridge troll boss, his bridge, club, hoard and bones, a ruined seter, a petrified troll) and the Moss Marsh after it (the corrupted Nøkk of the Black Pool, the deildegast, the lindorm's head and coils, boardwalk, peat, bloomery, rowboat, fiddle, boundary stone). Docs/TrollValleyPlan.md, Docs/NextRaidResearch_2026-11-17.md.",
-    "2026-11-17, boss encounters (Docs/BossEncounterResearch_2026-11-17.md, the user: \"go for option C\"): Brukam's Bridge arena needs a long straight bridge whose segments fall: Bridge Span (one segment of deck, square broken ends, laid end to end on piers), Bridge Pier, and the Toll Post its gate stands at."
+    "2026-11-17, boss encounters (Docs/BossEncounterResearch_2026-11-17.md, the user: \"go for option C\"): Brukam's Bridge arena needs a long straight bridge whose segments fall: Bridge Span (one segment of deck, square broken ends, laid end to end on piers), Bridge Pier, and the Toll Post its gate stands at.",
+    "2026-11-26, the user: 'Bruk gjerne localspawn for å generere nye assets ... lag gjerne flere, spennende og unike events': camp dressing (Raider Lean-to, Drying Rack, Camp Stash) and the new raid events' sites (Scree Slide, Troll Cookpot, Herder's Lur, Bog Body, Marsh Lantern, Peat Hut, Charcoal Clamp). Docs/RaidLayoutAnalysis_2026-11-26.md."
   ],
   "art": "Assets/_Project/Art/World/Props",
   "common": "Three-quarter view from slightly above, whole object visible and centred, isolated on a plain light grey background. Matte, softly lit, no glow, no light rays, no fog.",
@@ -512,6 +513,146 @@
           "key": "C",
           "seed": 18103,
           "prompt": "A single huge slab of weathered grey Nordic granite that forms the very edge of a cliff, seen as one loose piece: a broad, almost level flat top with crusty patches of ochre-yellow and pale grey-green lichen on the top surface only, the front face made of two thick horizontal stacked beds of rock of different thickness, the top bed jutting forward as an overhanging lip with a dark worn hollow underneath it, long and low, the lip overhanging far at the middle, the ends worn rounder. Hard, angular, solid rock with fine grain, no pebbles, no grass, no moss carpet, no tree, no soil. One solid stone."
+        }
+      ]
+    },
+    {
+      "asset": "Raider Lean-to",
+      "width": 2.8,
+      "max_height": 1.8,
+      "texture_size": 2048,
+      "lod0_triangles": 6000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7311,
+          "prompt": "A rough Norse hunters' lean-to shelter in the forest: three slanted wooden poles lashed to a crossbar, stretched stitched brown animal hides pulled over them and tied down with rope, open at the front, a rolled fur bedroll and a wooden bowl inside on the ground, a few stones holding down the hide edges. Everything grown together into one solid piece, nothing loose or floating."
+        }
+      ]
+    },
+    {
+      "asset": "Drying Rack",
+      "width": 2.2,
+      "max_height": 1.8,
+      "texture_size": 2048,
+      "lod0_triangles": 5000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7322,
+          "prompt": "A rough Norse camp drying rack: a frame of grey weathered branches lashed together with rope, strips of dark dried meat and a stretched grey wolf pelt hanging from the top pole, a few bones at its foot. Everything grown together into one solid piece, nothing loose or floating."
+        }
+      ]
+    },
+    {
+      "asset": "Camp Stash",
+      "width": 1.2,
+      "max_height": 0.8,
+      "texture_size": 2048,
+      "lod0_triangles": 4000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7333,
+          "prompt": "A raiders' stash of plunder: a bulging bundle of goods wrapped tight in a stitched brown hide and tied with thick rope, sitting on a few flat grey stones, a small iron-bound wooden box and a dented copper pot tucked against it, an antler tied to the top. Everything grown together into one solid piece, nothing loose or floating."
+        }
+      ]
+    },
+    {
+      "asset": "Scree Slide",
+      "width": 5.0,
+      "max_height": 1.6,
+      "texture_size": 2048,
+      "lod0_triangles": 7000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7344,
+          "prompt": "A fresh rockslide: a low fan-shaped heap of sharp, newly broken pale grey rocks of many sizes spilled across the ground, and sticking out from under the rocks a crushed wooden pack frame with a torn sack and the broken handle of a pickaxe. Everything grown together into one solid piece, nothing loose or floating."
+        }
+      ]
+    },
+    {
+      "asset": "Troll Cookpot",
+      "width": 2.6,
+      "max_height": 1.9,
+      "texture_size": 2048,
+      "lod0_triangles": 6000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7355,
+          "prompt": "A huge soot-blackened iron cauldron from Norse folklore, big enough to sit a man in, standing on three rough grey boulders over a heap of charred logs and grey ash, thick grey stew inside with large bones and a cow's skull sticking out over the rim, a giant crude wooden ladle leaning against it. Everything grown together into one solid piece, nothing loose or floating."
+        }
+      ]
+    },
+    {
+      "asset": "Herder's Lur",
+      "width": 1.8,
+      "max_height": 2.0,
+      "texture_size": 2048,
+      "lod0_triangles": 5000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7366,
+          "prompt": "A weathered grey wooden fence post with a long straight Norwegian lur herding horn hanging from it on a leather strap: the horn is about a metre and a half long, slender, made of wood wound tightly in pale birch bark, flaring at the end; at the foot of the post a short stretch of old dry-stone wall with moss on top. Everything grown together into one solid piece, nothing loose or floating."
+        }
+      ]
+    },
+    {
+      "asset": "Bog Body",
+      "width": 2.0,
+      "max_height": 0.5,
+      "texture_size": 2048,
+      "lod0_triangles": 5000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7377,
+          "prompt": "A preserved bog body like those found in Scandinavian peat bogs, as seen in a museum, not gory: a small curled human figure with dark brown leathery skin lying half sunk in black wet peat and green sphagnum moss, wrapped in rotten dark wool rags, one hand open on the moss with a green bronze ring on a finger. Everything grown together into one solid piece, nothing loose or floating."
+        }
+      ]
+    },
+    {
+      "asset": "Marsh Lantern",
+      "width": 0.9,
+      "max_height": 2.0,
+      "texture_size": 2048,
+      "lod0_triangles": 4000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7388,
+          "prompt": "A crude medieval Norse lantern: a small square box of dark hand-forged iron straps with thin scraped horn panes and a pointed iron cap, a stub of tallow candle inside, hanging on a short rusty chain from the end of a thick crooked grey wooden stake that leans out of a clump of brown reeds and green moss. The candle is not lit. Everything grown together into one solid piece, nothing loose or floating."
+        }
+      ]
+    },
+    {
+      "asset": "Peat Hut",
+      "width": 4.5,
+      "max_height": 3.0,
+      "texture_size": 2048,
+      "lod0_triangles": 8000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7399,
+          "prompt": "A tiny half-sunken Norse peat cutter's hut: thick walls of stacked dark brown peat blocks, a low roof of grass-grown turf, a small low wooden door on the front, a short chimney of flat stones, a stack of drying peat bricks and a long peat spade leaning beside the door. Everything grown together into one solid piece, nothing loose or floating."
+        }
+      ]
+    },
+    {
+      "asset": "Charcoal Clamp",
+      "width": 4.0,
+      "max_height": 1.6,
+      "texture_size": 2048,
+      "lod0_triangles": 7000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7411,
+          "prompt": "A Norse charcoal kiln: a wide round dome-shaped mound of earth and turf built over stacked logs, a few small square vent holes around its base, a ring of black ash and lumps of black charcoal raked around it, a long wooden rake leaning against the mound. No fire, no smoke. Everything grown together into one solid piece, nothing loose or floating."
         }
       ]
     }

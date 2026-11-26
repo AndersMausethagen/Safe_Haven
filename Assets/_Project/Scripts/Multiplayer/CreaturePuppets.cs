@@ -231,6 +231,11 @@ public sealed class CreaturePuppets : IRaidCreatureSource
             foreach (GameObject made in group.PlaceSkipped(player.transform.position, CreatureHost.SendReach))
             {
                 raid.Creatures.Prepare(made, false);
+                // A trail walker made here walks its round, as the host's did (Docs/RaidLayoutAnalysis_2026-11-26.md R10).
+                if (group.List != null && group.List.walksTheTrails)
+                {
+                    RaidGenerator.WalkTheTrails(made);
+                }
             }
         }
     }

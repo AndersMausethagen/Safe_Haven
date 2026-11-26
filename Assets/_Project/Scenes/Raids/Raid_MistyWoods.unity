@@ -562,6 +562,7 @@ MonoBehaviour:
   siteShare: 1.09
   farthestSites: 0
   everySite: 0
+  mapIcon: {fileID: 21300000, guid: d3d98f145e91f764786333278515b5e0, type: 3}
 --- !u!1 &54355309
 GameObject:
   m_ObjectHideFlags: 0
@@ -1492,6 +1493,7 @@ MonoBehaviour:
   siteShare: 1
   farthestSites: 0
   everySite: 0
+  mapIcon: {fileID: 0}
 --- !u!1 &206922232
 GameObject:
   m_ObjectHideFlags: 0
@@ -2951,6 +2953,7 @@ MonoBehaviour:
   siteShare: 1
   farthestSites: 0
   everySite: 0
+  mapIcon: {fileID: 0}
 --- !u!1 &418074918
 GameObject:
   m_ObjectHideFlags: 0
@@ -3169,6 +3172,7 @@ MonoBehaviour:
   siteShare: 1.37
   farthestSites: 0
   everySite: 0
+  mapIcon: {fileID: 21300000, guid: 820c229c04231d044b3f4230f7d7c5b8, type: 3}
 --- !u!1001 &457076108
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4094,6 +4098,7 @@ MonoBehaviour:
   siteShare: 1
   farthestSites: 0
   everySite: 0
+  mapIcon: {fileID: 0}
 --- !u!1 &545020515
 GameObject:
   m_ObjectHideFlags: 0
@@ -4167,6 +4172,7 @@ MonoBehaviour:
   siteShare: 1
   farthestSites: 0
   everySite: 0
+  mapIcon: {fileID: 0}
 --- !u!1 &548246109
 GameObject:
   m_ObjectHideFlags: 0
@@ -4261,6 +4267,7 @@ MonoBehaviour:
   siteShare: 1
   farthestSites: 0
   everySite: 0
+  mapIcon: {fileID: 0}
 --- !u!1 &578855634
 GameObject:
   m_ObjectHideFlags: 0
@@ -5644,6 +5651,7 @@ MonoBehaviour:
   siteShare: 0.67
   farthestSites: 1
   everySite: 0
+  mapIcon: {fileID: 21300000, guid: 9b685a4ee6545e447a915bf67512f149, type: 3}
 --- !u!1 &792927704
 GameObject:
   m_ObjectHideFlags: 0
@@ -5848,6 +5856,7 @@ MonoBehaviour:
   siteShare: 1
   farthestSites: 0
   everySite: 0
+  mapIcon: {fileID: 0}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -6358,6 +6367,7 @@ MonoBehaviour:
   siteShare: 1
   farthestSites: 0
   everySite: 0
+  mapIcon: {fileID: 0}
 --- !u!1 &920984702
 GameObject:
   m_ObjectHideFlags: 0
@@ -6756,6 +6766,7 @@ MonoBehaviour:
   siteShare: 1
   farthestSites: 0
   everySite: 0
+  mapIcon: {fileID: 0}
 --- !u!1 &950448047
 GameObject:
   m_ObjectHideFlags: 0
@@ -8463,6 +8474,7 @@ MonoBehaviour:
   siteShare: 1
   farthestSites: 0
   everySite: 0
+  mapIcon: {fileID: 0}
 --- !u!1 &1175908233
 GameObject:
   m_ObjectHideFlags: 0
@@ -9920,6 +9932,7 @@ MonoBehaviour:
   siteShare: 1
   farthestSites: 0
   everySite: 0
+  mapIcon: {fileID: 0}
 --- !u!1 &1353272684
 GameObject:
   m_ObjectHideFlags: 0
@@ -11129,6 +11142,7 @@ MonoBehaviour:
   siteShare: 1
   farthestSites: 0
   everySite: 0
+  mapIcon: {fileID: 0}
 --- !u!1 &1546706480
 GameObject:
   m_ObjectHideFlags: 0
@@ -11297,6 +11311,7 @@ MonoBehaviour:
   siteShare: 0.87
   farthestSites: 0
   everySite: 0
+  mapIcon: {fileID: 21300000, guid: f79a58b1e1304f64aa3c58d290c0f6a2, type: 3}
 --- !u!1 &1551466491
 GameObject:
   m_ObjectHideFlags: 0
@@ -12343,6 +12358,7 @@ MonoBehaviour:
   siteShare: 1
   farthestSites: 0
   everySite: 1
+  mapIcon: {fileID: 0}
 --- !u!1 &1691537312
 GameObject:
   m_ObjectHideFlags: 0

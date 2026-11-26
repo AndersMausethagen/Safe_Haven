@@ -57,6 +57,9 @@ public sealed class SpawnGroup : MonoBehaviour
     [Tooltip("Generated maps: takes one point at every site of its kind instead of a share of them, beside what stands there (a camp's " +
              "stash beside its guards). Not counted in the share of the others.")]
     [SerializeField] private bool everySite;
+    [Tooltip("Generated maps: the minimap's mark for a site of this group once the player has seen it (an ore vein, a timber stand), " +
+             "until what stands there is gathered. Empty: not marked.")]
+    [SerializeField] private Sprite mapIcon;
 
     private readonly List<GameObject> spawned = new List<GameObject>();
 
@@ -74,6 +77,7 @@ public sealed class SpawnGroup : MonoBehaviour
     public float SiteShare => siteShare;
     public bool FarthestSites => farthestSites;
     public bool EverySite => everySite;
+    public Sprite MapIcon => mapIcon;
     /// <summary>True when baking the raid map rebuilds this group's points (it has a Site or a Zone).</summary>
     public bool IsBakedFromMap => site != RaidSiteKind.None || !string.IsNullOrEmpty(zone);
     public EntryBand Band => entryBand;
@@ -318,6 +322,9 @@ public sealed class SpawnGroup : MonoBehaviour
         farthestSites = farthest;
         everySite = every;
     }
+
+    /// <summary>For builders and tests: the minimap's mark for this group's sites.</summary>
+    public void ConfigureMapIcon(Sprite icon) => mapIcon = icon;
 
     private void OnDrawGizmos()
     {

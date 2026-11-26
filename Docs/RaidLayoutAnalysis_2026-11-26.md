@@ -42,6 +42,19 @@ Timber 60 (168 nodes, as before), Supply Caches 5 of 5, Camp Stashes 7 of 7, Tra
 still stand". The walkers moved between camps. An event stood 0 m from an event room (before the stretch, one landed 40 m off: the rooms
 lay 80-134 m from the start). An Old Offering read from the game camera with its name and glint. `CameUpon` rows were written.
 
+**Round 2 (same day, the user: "sett i gang med 1-4 ... Bruk gjerne localspawn ... lag gjerne flere, spennende og unike events"):**
+
+| # | As built |
+|---|---|
+| 1 | Resource sites on the minimap: a site whose group has a Map Icon (`SpawnGroup` › Map Icon: copper ore, oak, healing herb, life orb) is marked once seen through the fog of war, until its nodes are gathered (`MinimapHud.ReadResourceSites`, `RaidPlace.Icon`) |
+| 2 | Camps look like camps: `RaidLayoutRules` › Camp Dressing (a Raider Lean-to, a Drying Rack, the Bone Pile), 2-3 a camp, 6-8 m out, facing in (`RaidMapGenerator.PlaceCampDressing`, own stream). The Camp Stash has its own look (a hide-wrapped bundle on stones) in place of the supply crate |
+| 3 | Event rooms checked in a launched Troll Valley: the Troll's Cookpot stood 0 m from its room, no clutter within 3 m |
+| 4 | Co-op: trail walkers made on a friend's copy after the host leaves get their round (`CreaturePuppets.RefillTheRaid`) |
+| Events | Seven new ones, each raid's own. **Troll Valley:** Rockfall on the Ledge (dig a buried pack out of fresh scree, or grab and risk the slope), The Troll's Cookpot (fish out the trolls' bones and loot and have two runts come back for you, or taste the broth: +30 health or poison), The Herder's Lur (blow it hard: the valley and its exits revealed and everything hears; or the herders' call: faster feet). **Moss Marsh:** The Bog Body (take the ring and maybe wake a draug, or lay them back: armour and purified essence), Lights on the Water (follow them to a drowned man's purse or into marsh lights; or light the lantern and fight what comes), The Peat Cutter's Hut (rest, search, or pay two pennies). **Misty Woods:** The Charcoal Clamp (tend it for charcoal, or break it open hot). Pools: Woods 11, Valley 10, Marsh 8 |
+| Art | LocalSpawn (Hunyuan3D + UltraTex, `props_manifest.json`): Raider Lean-to, Drying Rack, Camp Stash, Scree Slide, Troll Cookpot, Herder's Lur, Bog Body, Marsh Lantern, Peat Hut, Charcoal Clamp, 1,700-8,000 LOD0 triangles; event paintings in `event_art.json`. UltraTex and Hunyuan3D licences: re-texture/check before a release, like the others |
+
+Tests: `RaidCampsAndEventsTests1126`. Checked live in Troll Valley (the cookpot in its room, lean-tos at the camps, iron ore sites as one cluster, icons on the minimap).
+
 **Tune after a playtest:** camp stash loot (`Data/Loot/Caches/Camp Stash`, 0.6 × a Hunter's Cache, 7 a map); pack size; small-find
 tables. Golden layouts re-pinned (5 caches, 7 camps); `RaidWorldDesignTests` keeps its old pins by restoring the old counts.
 

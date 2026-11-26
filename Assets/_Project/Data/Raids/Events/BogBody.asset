@@ -1,0 +1,127 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: BogBody
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: BogBody
+  displayName: The Bog Body
+  weight: 1
+  earliestSeconds: 40
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: The peat has slumped by the water. A brown hand lies open on the moss, a ring on one finger.
+  warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
+  sitePrefab: {fileID: 7940016432191105948, guid: 7205d1f5181860f459166d85ef72d918, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: Someone the bog has kept for a very long time. The ring is green bronze, the hand as soft as old leather. The water around it is very still.
+  artwork: {fileID: 21300000, guid: 48c2f4fd9287ae14bbb26892ac2b71ac, type: 3}
+  onStart: []
+  choices:
+  - label: Take the ring
+    detail: What the bog keeps, it keeps for a reason.
+    cost: []
+    result: The ring slides off easily. Too easily.
+    outcomes:
+    - rid: 2623126381840826386
+    - rid: 2623126381840826387
+  - label: Lay them back under the peat
+    detail: Costs 40 seconds. The dead remember kindness.
+    cost: []
+    result: You fold the peat back over them. The water stirs, once, and is still.
+    outcomes:
+    - rid: 2623126381840826390
+    - rid: 2623126381840826391
+    - rid: 2623126381840826392
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126381840826386
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 8e4b25b050fb23840a86f61b5a5b074c, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 3
+            maxQuantity: 6
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 96459a8d9566ae74cb04ee74d08a597b, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 2
+            probability: 0.5
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126381840826387
+      type: {class: ChanceOutcome, ns: , asm: SafeHaven}
+      data:
+        chance: 0.5
+        ifLucky:
+        - rid: 2623126381840826388
+        - rid: 2623126381840826389
+        ifNot: []
+    - rid: 2623126381840826388
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: Something rises out of the water behind you.
+        kind: 2
+    - rid: 2623126381840826389
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+        count: 1
+        radius: 8
+        hunt: 1
+    - rid: 2623126381840826390
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -40
+    - rid: 2623126381840826391
+      type: {class: GiveBoonOutcome, ns: , asm: SafeHaven}
+      data:
+        name: The Bog's Peace
+        bonuses:
+        - stat: 7
+          op: 0
+          value: 15
+        seconds: 300
+    - rid: 2623126381840826392
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 0}
+            resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
+            minQuantity: 1
+            maxQuantity: 2
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}

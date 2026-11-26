@@ -1,0 +1,136 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: Rockfall
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: Rockfall
+  displayName: Rockfall on the Ledge
+  weight: 1
+  earliestSeconds: 40
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: A roar of stone up the valley wall, then quiet. Something was under it.
+  warningSound: {fileID: 11400000, guid: 10f67b83128cc194c8187151a24531c4, type: 2}
+  sitePrefab: {fileID: 7940016432191105948, guid: bcf91ba8fe006f3489cb84b9503bb13f, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: Fresh scree across the ledge. Under it, a crushed pack frame, a broken pick and the corner of a sack. Above, the slope still trickles.
+  artwork: {fileID: 21300000, guid: ddc785f5c118ab640a992cfb66de964e, type: 3}
+  onStart: []
+  choices:
+  - label: Dig the pack out
+    detail: Costs you 40 seconds of loud digging.
+    cost: []
+    result: 'Stone by stone, until the sack comes free. Ore, mostly: someone had a good day before this one.'
+    outcomes:
+    - rid: 2623126381840826368
+    - rid: 2623126381840826369
+    - rid: 2623126381840826370
+  - label: Pull out what shows
+    detail: Quick, but the slope above is still loose.
+    cost: []
+    result: You grab what sticks out of the stones.
+    outcomes:
+    - rid: 2623126381840826371
+    - rid: 2623126381840826372
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126381840826368
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -40
+    - rid: 2623126381840826369
+      type: {class: MakeNoiseOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 25
+    - rid: 2623126381840826370
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 3
+            maxQuantity: 6
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: a9f806359436036488427616ef8b8c44, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 4
+            probability: 0.7
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 2
+            probability: 0.4
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 5
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126381840826371
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 3
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 3
+            probability: 0.7
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126381840826372
+      type: {class: ChanceOutcome, ns: , asm: SafeHaven}
+      data:
+        chance: 0.35
+        ifLucky:
+        - rid: 2623126381840826373
+        - rid: 2623126381840826374
+        ifNot: []
+    - rid: 2623126381840826373
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: The slope lets go again, right on top of you.
+        kind: 2
+    - rid: 2623126381840826374
+      type: {class: ChangeHealthOutcome, ns: , asm: SafeHaven}
+      data:
+        share: -0.15

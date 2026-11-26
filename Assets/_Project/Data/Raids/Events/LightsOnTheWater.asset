@@ -1,0 +1,141 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: LightsOnTheWater
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: LightsOnTheWater
+  displayName: Lights on the Water
+  weight: 0.9
+  earliestSeconds: 60
+  latestSecondsLeft: 100
+  minimumStage: 0
+  warning: A row of small lights crosses the black water, as if someone walks there with a lantern.
+  warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
+  sitePrefab: {fileID: 7940016432191105948, guid: c8f016487972ec64c974a9845399fb6c, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: At the water's edge an old lantern hangs on a stake, unlit. Out on the bog the lights wait in a line, toward a hummock no path leads to.
+  artwork: {fileID: 21300000, guid: 19116eb4d7cf489499eb051c9af548ad, type: 3}
+  onStart: []
+  choices:
+  - label: Follow the lights
+    detail: Costs 30 seconds. They lead somewhere, not always somewhere good.
+    cost: []
+    result: You step from tussock to tussock after them.
+    outcomes:
+    - rid: 2623126381840826393
+    - rid: 2623126381840826394
+  - label: Light the lantern
+    detail: Their embers are yours at once. The lights themselves come to see who called.
+    cost: []
+    result: The flame takes. Out on the water, every light turns toward you.
+    outcomes:
+    - rid: 2623126381840826399
+    - rid: 2623126381840826400
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126381840826393
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -30
+    - rid: 2623126381840826394
+      type: {class: ChanceOutcome, ns: , asm: SafeHaven}
+      data:
+        chance: 0.55
+        ifLucky:
+        - rid: 2623126381840826395
+        - rid: 2623126381840826396
+        ifNot:
+        - rid: 2623126381840826397
+        - rid: 2623126381840826398
+    - rid: 2623126381840826395
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: 'The lights led true: a drowned man''s purse on the hummock.'
+        kind: 0
+    - rid: 2623126381840826396
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 4
+            maxQuantity: 9
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: c7138267f80f6644fb98ef1cc46e7dab, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 2
+            probability: 0.8
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 96459a8d9566ae74cb04ee74d08a597b, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 2
+            probability: 0.5
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 4
+            probability: 0.6
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126381840826397
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: The lights go out all at once, and come back closer.
+        kind: 2
+    - rid: 2623126381840826398
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 5318185529198269020, guid: d281dc652b3e50445a465365ff40b433, type: 3}
+        count: 2
+        radius: 10
+        hunt: 1
+    - rid: 2623126381840826399
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 5318185529198269020, guid: d281dc652b3e50445a465365ff40b433, type: 3}
+        count: 2
+        radius: 8
+        hunt: 1
+    - rid: 2623126381840826400
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: c7138267f80f6644fb98ef1cc46e7dab, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 3
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}

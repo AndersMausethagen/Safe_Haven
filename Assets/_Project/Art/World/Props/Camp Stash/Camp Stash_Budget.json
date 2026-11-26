@@ -1,0 +1,18 @@
+{
+ "note": "LOD0 triangles per look, by ingest_generated.py: the top-down view's budget, raised where a decimation would break the shape (shape_limited)",
+ "looks": {
+  "Camp Stash A": {
+   "source": 9980,
+   "view": 600,
+   "triangles": 1991,
+   "shape_limited": true,
+   "check": "(deviation 1.4%, silhouette 0.975)",
+   "holes_generated": 2,
+   "holes_filled": 0,
+   "holes": 2,
+   "largest_hole": 0.016,
+   "non_manifold_edges": 25,
+   "unwrap": "regions"
+  }
+ }
+}

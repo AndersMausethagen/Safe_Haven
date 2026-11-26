@@ -45,12 +45,15 @@ public readonly struct RaidPlace
     public readonly RaidSiteKind Kind;
     public readonly string Label;
     public readonly Vector3 Position;
+    /// <summary>The minimap's mark for the place once seen (its group's Map Icon); null: not marked.</summary>
+    public readonly Sprite Icon;
 
-    public RaidPlace(RaidSiteKind kind, string label, Vector3 position)
+    public RaidPlace(RaidSiteKind kind, string label, Vector3 position, Sprite icon = null)
     {
         Kind = kind;
         Label = string.IsNullOrEmpty(label) ? kind.ToString() : label;
         Position = position;
+        Icon = icon;
     }
 }
 

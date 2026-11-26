@@ -303,7 +303,7 @@ public sealed class RaidGenerator : MonoBehaviour, ISceneSetup
     /// A creature that walks the trails (Raid Spawn List › Walks The Trails, Docs/RaidLayoutAnalysis_2026-11-26.md R10): a round from where
     /// it stands through the nearest camps and patrol spots of the generated map, each next stop the nearest left. Nothing on a painted map.
     /// </summary>
-    private static void WalkTheTrails(GameObject made)
+    public static void WalkTheTrails(GameObject made)
     {
         RaidMap map = FindAnyObjectByType<RaidMap>();
         if (map == null || map.Places.Count == 0)

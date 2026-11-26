@@ -426,6 +426,13 @@ public sealed class RaidLayoutRules : ScriptableObject
     [SerializeField] private Vector2Int clutterPerSite = new Vector2Int(2, 5);
     [Tooltip("How far from the site's middle, nearest and furthest, in metres.")]
     [SerializeField] private Vector2 clutterReach = new Vector2(3.5f, 8f);
+    [Tooltip("What makes a camp read as one from the camera (Docs/RaidLayoutAnalysis_2026-11-26.md, follow-up 2): a lean-to, a drying " +
+             "rack, a cold fire. Each camp takes a few, each kind once, turned to face the camp's middle.")]
+    [SerializeField] private List<GameObject> campDressing = new List<GameObject>();
+    [Tooltip("How many dressing pieces each camp gets, least and most.")]
+    [SerializeField] private Vector2Int campDressingPerCamp = new Vector2Int(2, 3);
+    [Tooltip("How far from the camp's middle, nearest and furthest, in metres: beyond its creatures' points and its stash.")]
+    [SerializeField] private Vector2 campDressingReach = new Vector2(7.5f, 9.5f);
 
     [Header("Boulders and Lookouts")]
     [Tooltip("The great boulders that lie about in the wild ground, solid to walk into (a Cliff Kit's pieces).")]
@@ -739,6 +746,9 @@ public sealed class RaidLayoutRules : ScriptableObject
     public Vector2 GreatHillRadius => greatHillRadius;
     public CliffKit BoulderKit => boulderKit;
     public IReadOnlyList<GameObject> SiteClutter => siteClutter;
+    public IReadOnlyList<GameObject> CampDressing => campDressing;
+    public Vector2Int CampDressingPerCamp => campDressingPerCamp;
+    public Vector2 CampDressingReach => campDressingReach;
     public Vector2Int ClutterPerSite => clutterPerSite;
     public Vector2 ClutterReach => clutterReach;
     public Vector2Int BoulderClusters => boulderClusters;

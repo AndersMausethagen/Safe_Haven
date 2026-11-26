@@ -46,6 +46,12 @@ MonoBehaviour:
   - {fileID: 7160763822417819799, guid: b6580e4b71d5c8449ac4f63fedfc4f36, type: 3}
   clutterPerSite: {x: 2, y: 5}
   clutterReach: {x: 3.5, y: 8}
+  campDressing:
+  - {fileID: 1162663182193202381, guid: c042c5af8e719a9409d4c17ebe5b7796, type: 3}
+  - {fileID: 7678184184505245748, guid: a2cb76154fbe16b4cba1c87655ba8bb5, type: 3}
+  - {fileID: 1568604950879383849, guid: 5aeb77e5fc7452a4aad2a53322d2dd74, type: 3}
+  campDressingPerCamp: {x: 2, y: 3}
+  campDressingReach: {x: 7.5, y: 9.5}
   boulderKit: {fileID: 11400000, guid: 09d68cb9a41a99f4cbf14c7093db892d, type: 2}
   boulderClusters: {x: 10, y: 16}
   boulderClusterSize: {x: 3, y: 6}

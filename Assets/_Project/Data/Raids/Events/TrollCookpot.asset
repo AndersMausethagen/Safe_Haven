@@ -1,0 +1,127 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: TrollCookpot
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: TrollCookpot
+  displayName: The Troll's Cookpot
+  weight: 1
+  earliestSeconds: 60
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: Smoke behind the boulders, and a smell like boiled boots. The trolls are cooking.
+  warningSound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
+  sitePrefab: {fileID: 7940016432191105948, guid: 93360d23461e3f34492b27e47c999ef5, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: A cauldron big enough to sit in bubbles over a dying fire. Bones in the stew. Huge footprints lead off toward the river, and they will lead back.
+  artwork: {fileID: 21300000, guid: 85462276f09f89b4cb68c4ae77c41a40, type: 3}
+  onStart: []
+  choices:
+  - label: Fish out the bones
+    detail: Troll cooks keep the good bits in the pot. They'll be back soon, and they'll know.
+    cost: []
+    result: Your arms come out grey to the elbow. Somewhere by the river, someone roars.
+    outcomes:
+    - rid: 2623126381840826375
+    - rid: 2623126381840826376
+  - label: Taste the broth
+    detail: 'Thick, foul and strong: +30 health for 4 minutes, if it stays down.'
+    cost: []
+    result: You hold your nose and drink.
+    outcomes:
+    - rid: 2623126381840826377
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126381840826375
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 4f80b5d6098abc64b903316903de5b64, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 3
+            maxQuantity: 6
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: a05ec5c068d801f4ca366a23e00a7460, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 2
+            probability: 0.6
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 3
+            maxQuantity: 7
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 6a6c76b4e635d9e48be91d875f758c4a, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 0.05
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126381840826376
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 6267209934607442583, guid: 3c524ee8a21d0aa48b70eb5f371bba06, type: 3}
+        count: 2
+        radius: 18
+        hunt: 1
+    - rid: 2623126381840826377
+      type: {class: ChanceOutcome, ns: , asm: SafeHaven}
+      data:
+        chance: 0.65
+        ifLucky:
+        - rid: 2623126381840826378
+        - rid: 2623126381840826379
+        ifNot:
+        - rid: 2623126381840826380
+        - rid: 2623126381840826381
+    - rid: 2623126381840826378
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: It stays down. You feel enormous.
+        kind: 0
+    - rid: 2623126381840826379
+      type: {class: GiveBoonOutcome, ns: , asm: SafeHaven}
+      data:
+        name: Troll Broth
+        bonuses:
+        - stat: 0
+          op: 0
+          value: 30
+        seconds: 240
+    - rid: 2623126381840826380
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: It does not stay down.
+        kind: 2
+    - rid: 2623126381840826381
+      type: {class: ApplyStatusOutcome, ns: , asm: SafeHaven}
+      data:
+        effect: {fileID: 11400000, guid: 5e5542ad4304a994f97fcb8f9b6e0f46, type: 2}

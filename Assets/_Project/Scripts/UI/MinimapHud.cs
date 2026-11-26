@@ -474,6 +474,7 @@ public sealed class MinimapHud : MonoBehaviour
 
         ReadRaidSites(player, style);
         ReadLandmarks(player, style);
+        ReadResourceSites(style);
         ReadHavenPlaces(player, style);
         ReadQuest(style);
         ReadBreach(style);
@@ -549,6 +550,99 @@ public sealed class MinimapHud : MonoBehaviour
                 Add(landmark.transform, landmark.Icon != null ? landmark.Icon : dot, style.Text, landmark.Icon != null ? 15f : 8f, pinned: true);
             }
         }
+    }
+
+    // A generated raid map's resource sites (Docs/RaidLayoutAnalysis_2026-11-26.md, follow-up 1): once seen through the fog of war, a
+    // site whose group has a Map Icon is marked with it (an ore vein, a timber stand) until what grew there is gathered, so a place
+    // seen in passing can be come back to. Not pinned to the rim: it is a find nearby, not a way to steer by.
+    private const float SiteNodeReach = 9f;
+    private RaidMap sitesOf;
+    // By the site's place, not its index: a map laid out again fills its places anew (review 2026-11-26).
+    private readonly Dictionary<Vector3, List<ResourceNode>> siteNodes = new Dictionary<Vector3, List<ResourceNode>>();
+    private readonly Dictionary<Vector3, float> siteLookAgain = new Dictionary<Vector3, float>();
+
+    private void ReadResourceSites(UIStyle style)
+    {
+        // Once the raid runs: the map is laid out for good and its nodes placed, so a site seen early isn't taken for an empty one.
+        if (RaidDirector.Current == null || !RaidDirector.Current.IsRunning)
+        {
+            return;
+        }
+
+        if (sitesOf == null)
+        {
+            sitesOf = FindAnyObjectByType<RaidMap>();
+            siteNodes.Clear();
+            siteLookAgain.Clear();
+            if (sitesOf == null)
+            {
+                return;
+            }
+        }
+
+        ExplorationMap explored = ExplorationMap.Current;
+        IReadOnlyList<RaidPlace> places = sitesOf.Places;
+        for (int i = 0; i < places.Count; i++)
+        {
+            RaidPlace place = places[i];
+            if (place.Icon == null || !Found(place.Position, explored))
+            {
+                continue;
+            }
+
+            if (!siteNodes.TryGetValue(place.Position, out List<ResourceNode> nodes))
+            {
+                // Nothing found: not kept, so it is looked for again, at most every few seconds.
+                if (siteLookAgain.TryGetValue(place.Position, out float again) && Time.unscaledTime < again)
+                {
+                    continue;
+                }
+
+                nodes = NodesAt(place.Position);
+                if (nodes.Count == 0)
+                {
+                    siteLookAgain[place.Position] = Time.unscaledTime + 5f;
+                    continue;
+                }
+
+                siteNodes[place.Position] = nodes;
+            }
+
+            if (AnyLeft(nodes))
+            {
+                Add(null, place.Icon, Color.white, 17f).Position = place.Position;
+            }
+        }
+    }
+
+    // Once per site, the first time it is seen: the nodes its spawn group placed round it.
+    private static List<ResourceNode> NodesAt(Vector3 centre)
+    {
+        var nodes = new List<ResourceNode>();
+        foreach (ResourceNode node in FindObjectsByType<ResourceNode>(FindObjectsInactive.Exclude))
+        {
+            Vector3 flat = node.transform.position - centre;
+            flat.y = 0f;
+            if (flat.sqrMagnitude <= SiteNodeReach * SiteNodeReach)
+            {
+                nodes.Add(node);
+            }
+        }
+
+        return nodes;
+    }
+
+    private static bool AnyLeft(List<ResourceNode> nodes)
+    {
+        foreach (ResourceNode node in nodes)
+        {
+            if (node != null && !node.IsDepleted)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     // The Haven's named places (Docs/HavenExplorationReview_2026-11-19.md §3): the minimap showed none. A found one (or one seen from a

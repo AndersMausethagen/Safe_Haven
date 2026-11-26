@@ -1,0 +1,68 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: HerdersLur
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: HerdersLur
+  displayName: The Herder's Lur
+  weight: 0.9
+  earliestSeconds: 60
+  latestSecondsLeft: 100
+  minimumStage: 0
+  warning: High on the valley side, an empty seter fold. A long horn hangs on its gatepost.
+  warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
+  sitePrefab: {fileID: 7940016432191105948, guid: 667c8a45b3b80074f9c738643c221f7b, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: The herders are long gone, but their lur still hangs on the gatepost, wrapped in birch bark. Blown hard, it carries across the whole valley.
+  artwork: {fileID: 21300000, guid: 1376e2bc405186941ace0a85e714835d, type: 3}
+  onStart: []
+  choices:
+  - label: Blow it hard
+    detail: Shows you the valley and its ways out. Everything in the valley hears it too.
+    cost: []
+    result: The note rolls down the valley and comes back from every wall. So will whatever heard it.
+    outcomes:
+    - rid: 2623126381840826382
+    - rid: 2623126381840826383
+  - label: Blow the herders' call
+    detail: Soft and low, the way herders called their cattle home. Costs 20 seconds.
+    cost: []
+    result: An old, easy tune. Your feet remember paths they never walked.
+    outcomes:
+    - rid: 2623126381840826384
+    - rid: 2623126381840826385
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126381840826382
+      type: {class: RevealMapOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 90
+        showExits: 1
+    - rid: 2623126381840826383
+      type: {class: MakeNoiseOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 60
+    - rid: 2623126381840826384
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -20
+    - rid: 2623126381840826385
+      type: {class: GiveBoonOutcome, ns: , asm: SafeHaven}
+      data:
+        name: Herder's Stride
+        bonuses:
+        - stat: 16
+          op: 0
+          value: 0.1
+        seconds: 240

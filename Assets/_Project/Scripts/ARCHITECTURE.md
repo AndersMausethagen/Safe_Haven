@@ -1022,7 +1022,10 @@ keeps the old ones for the at-defaults check).
 - **Events** take a free event room first (`RaidSpots.TryTakeRoom`, at the event's distance, then up to 1.6 × its far distance); the Event Sites list is empty.
 - **Walkers:** a list with Walks The Trails gives each creature a `MonsterPatrol` round through the nearest camps and patrol spots (`RaidGenerator.RoundFrom`).
 - **The log:** `RaidPlacesSeen` (added by `RaidDirector`) writes `CameUpon` the first time the player comes within 14 m of a site, set piece or landmark.
-Tests: `RaidPlacesTests1126` (including that every raid's plans meet 90% of each quota).
+- **Camp dressing:** `RaidLayoutRules` › Camp Dressing stands 2-3 pieces 6-8 m round each camp, facing in (`PlaceCampDressing`, its own stream, under the map's Clutter).
+- **Resource sites on the minimap:** `SpawnGroup` › Map Icon goes into the place (`RaidPlace.Icon`); `MinimapHud.ReadResourceSites` marks a site once explored until its nodes are gone.
+- **Each raid's own events:** Troll Valley (Rockfall, Troll's Cookpot, Herder's Lur), Moss Marsh (Bog Body, Lights on the Water, Peat Cutter's Hut), Misty Woods (Charcoal Clamp); sites in `Prefabs/Raids/Events/Sites` on LocalSpawn models.
+Tests: `RaidPlacesTests1126` (including that every raid's plans meet 90% of each quota), `RaidCampsAndEventsTests1126`.
 
 ## World rendering: light, weather on surfaces, decals
 
