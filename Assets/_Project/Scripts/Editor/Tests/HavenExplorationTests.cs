@@ -44,7 +44,14 @@ public sealed class HavenExplorationTests
         foreach (HavenPlaceVerbs.Find find in verbs.Finds)
         {
             Assert.IsTrue(ids.Contains(find.placeId), $"{find.name}: no place {find.placeId} in the atlas (renamed?)");
-            Assert.IsNotNull(find.item, find.name);
+            if (find.item == null)
+            {
+                // A thing only to use (a lantern to light): something to see, and a quest it counts for.
+                Assert.IsNotNull(find.marker, $"{find.name}: a thing only to use needs a marker to be seen");
+                Assert.IsNotNull(find.questTarget, $"{find.name}: a thing only to use counts for a quest, or it is nothing");
+                continue;
+            }
+
             Assert.IsFalse(find.item.RaidOnly, $"{find.name}: {find.item.name} is raid-only, never a Haven find");
             Assert.Greater(find.amount, 0, find.name);
         }

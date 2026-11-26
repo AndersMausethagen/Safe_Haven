@@ -44,6 +44,8 @@ public static class ContentAudit
         "TerritorySettings.regions[].outpost[].item",
         // What a foray may bring home (Forays): residents raiding on their own.
         "ForaySettings.destinations[].loot[].item",
+        // What someone met in a raid leaves at the gate when they come by (HomecomingSettings' visits: the pedlar freed).
+        "HomecomingSettings.visits[].item",
     };
 
     private static readonly string[] ItemUses =
@@ -84,6 +86,8 @@ public static class ContentAudit
         "WorkerSettings.quarryTool", "KeeperViewSettings.stores",
         // The herbs a module makes one fewer of (the Herb Rack: no recipe of its own); the raw meat and fish residents leave for the cook.
         "BuildingModuleDefinition.oneFewer", "HomeLifeSettings.uneaten",
+        // A raid choice open only to whoever carries one of these (CarriesItem: a pickaxe to break the stone head): carried, not spent.
+        "RaidEventDefinition.choices[].requires[].anyOf",
     };
 
     private static readonly string[] RecipeTeachers =

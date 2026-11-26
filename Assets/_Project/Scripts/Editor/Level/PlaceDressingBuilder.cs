@@ -172,6 +172,45 @@ public static class PlaceDressingBuilder
             P(Props + "Waystone/Waystone.prefab", -4.6f, -2.5f, 35f),
         },
 
+        // Ravenwood remembered (Ravenwood Remembered): the old quarry worked again, beside its face: blocks squared and stacked, a
+        // hoist frame, the masons' logs.
+        ["Old Quarry Worked"] = new[]
+        {
+            P(R("Cut Stone A"), 0f, 0f, 90f),
+            P(R("Cut Stone B"), 0.9f, 0f, 92f),
+            P(R("Cut Stone C"), 0.45f, 0.1f, 88f, 1f, 0.45f),
+            P(R("Cut Stone A"), -1.2f, 1.6f, 10f),
+            P(R("Cut Stone B"), 2.4f, 1.4f, 35f, 0.9f),
+            P(R("Timber Frame A"), -0.5f, -2.8f, 90f),
+            P(R("Log Pile"), 3.2f, -1.8f, 20f),
+            P(R("Old Bucket"), 1.8f, -0.9f, 0f),
+            D("Trampled Ground", 0.5f, -0.5f, 7f, 6f),
+        },
+
+        // The Hollow Pines remembered (The Hollow Pines Remembered): Asa's field by the burnt farm, sown with the family's old seed.
+        ["Burnt Farmstead Field"] = new[]
+        {
+            P(R("Wattle Fence"), -3f, 0f, 0f),
+            P(R("Wattle Fence"), 3f, 0f, 0f),
+            P(R("Wattle Fence"), 0f, 2.6f, 90f),
+            P(R("Stick Fence Gate"), 0f, -2.6f, 90f),
+            D("Trampled Ground", 0f, 0f, 6f, 5f),
+            P(R("Old Bucket"), 1.8f, -3.4f, 0f),
+            P(R("Log Pile"), 5f, -2.5f, 90f),
+            P(R("Cut Stone C"), 5.2f, 1.2f, 20f, 0.6f, -0.05f),
+        },
+
+        // Stillwater remembered (Stillwater Remembered): the fishers' rest worked again, fish drying over a smoking fire.
+        ["Fisher's Rest Worked"] = new[]
+        {
+            P("Assets/_Project/Prefabs/Raids/Camps/Drying Rack.prefab", 0f, 0f, 15f),
+            P("Assets/_Project/Prefabs/Raids/Camps/Drying Rack.prefab", 2.3f, 0.5f, 8f),
+            P(R("Log Pile"), -2.4f, -1f, 80f),
+            P(R("Old Barrel"), 1.2f, -2f, 0f),
+            P(R("Old Bucket"), 0.2f, -2.4f, 0f),
+            D("Scorch", 1.1f, 1.8f, 1.6f, 1.6f),
+        },
+
         // The drowned road: a causeway of boards across the fen, sunk and broken, its posts leaning.
         ["Sunken Causeway Scene"] = new[]
         {

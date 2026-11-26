@@ -20,6 +20,7 @@ public sealed class HavenPlaceScenes : MonoBehaviour
     private readonly Dictionary<HavenPlaceVerbs.Find, PlaceFind> finds = new Dictionary<HavenPlaceVerbs.Find, PlaceFind>();
     private bool dirty = true;
     private int day = -1;
+    private bool night;
     private float nextDayCheck;
 
     /// <summary>The stage's stood object, or null while it doesn't show (tests and probes).</summary>
@@ -65,9 +66,11 @@ public sealed class HavenPlaceScenes : MonoBehaviour
         {
             nextDayCheck = Time.unscaledTime + DayCheckSeconds;
             int today = GameSession.Home != null ? GameSession.Home.DaysPassed : 0;
-            if (today != day)
+            bool dark = !PlaceBeacon.PlaysAt(HavenPlaceVerbs.When.Day, AtmosphereConditions.Hour);
+            if (today != day || dark != night)
             {
                 day = today;
+                night = dark;
                 dirty = true;
             }
         }
@@ -97,7 +100,8 @@ public sealed class HavenPlaceScenes : MonoBehaviour
 
         foreach (HavenPlaceVerbs.Find find in verbs.Finds)
         {
-            if (find != null && find.item != null && places.TryGetValue(find.placeId ?? "", out WorldAtlas.Place place))
+            // A find with no item is a thing only to use (a lantern to light), shown by its marker.
+            if (find != null && (find.item != null || find.marker != null) && places.TryGetValue(find.placeId ?? "", out WorldAtlas.Place place))
             {
                 RefreshFind(find, place);
             }
@@ -192,7 +196,7 @@ public sealed class HavenPlaceScenes : MonoBehaviour
 
     private void RefreshFind(HavenPlaceVerbs.Find find, WorldAtlas.Place place)
     {
-        bool open = HavenPlaceVerbs.Passes(find.gate, find.quest, RegionOf(place));
+        bool open = HavenPlaceVerbs.Passes(find.gate, find.quest, RegionOf(place)) && PlaceBeacon.PlaysAt(find.when, AtmosphereConditions.Hour);
         finds.TryGetValue(find, out PlaceFind shown);
         bool there = shown != null && shown.gameObject.activeSelf;
         if (open && !there && !PlaceFind.IsTaken(place, find))

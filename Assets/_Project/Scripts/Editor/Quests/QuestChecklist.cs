@@ -319,6 +319,19 @@ public static class QuestChecklist
                     return $"{find.name} at {find.placeId}";
                 }
             }
+
+            // A region's boundary stone, lit by the territory (a region's arc ends with it remembered).
+            HavenRegionSettings regions = HavenRegionSettings.Current;
+            if (regions != null)
+            {
+                foreach (HavenRegionSettings.RegionLook look in regions.Regions)
+                {
+                    if (look != null && look.stoneTarget == thing)
+                    {
+                        return $"{look.region}'s boundary stone, lit by the territory";
+                    }
+                }
+            }
         }
 
         return null;

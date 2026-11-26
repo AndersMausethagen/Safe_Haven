@@ -116,6 +116,56 @@ public sealed class HavenPlaceScenesTests
         }
     }
 
+    [TestCase("WhereThePactStonesWereCut", "RavenwoodRemembered", "Ravenwood")]
+    [TestCase("AshesInTheHollowPines", "TheHollowPinesRemembered", "The Hollow Pines")]
+    [TestCase("NetsAtTheFishersRest", "StillwaterRemembered", "Stillwater")]
+    public void ANearRingArc_LeadsFromSomeoneHome_ToTheirRegion_RememberedAtItsStone(string first, string last, string region)
+    {
+        var hook = AssetDatabase.LoadAssetAtPath<QuestDefinition>($"Assets/_Project/Data/Quests/{first}.asset");
+        var end = AssetDatabase.LoadAssetAtPath<QuestDefinition>($"Assets/_Project/Data/Quests/{last}.asset");
+        Assert.IsTrue(hook.HeldForHomecoming, "the hook waits for a homecoming (Story Pacing: two at most)");
+        Assert.AreEqual(ObjectiveType.TalkTo, hook.Objectives[0].Type);
+        Assert.IsNotNull(hook.Objectives[0].Person, "someone home tells of the place");
+        Assert.That(hook.Prerequisites.Select(p => p.name), Does.Contain("TheColdStones"), "the near ring opens with the Cold Stones");
+
+        // Walk the chain from the hook to the end: each quest follows the last, and every place and thing it asks for is there.
+        HavenPlaceVerbs verbs = Verbs;
+        var quests = AssetDatabase.FindAssets("t:QuestDefinition", new[] { "Assets/_Project/Data/Quests" })
+            .Select(g => AssetDatabase.LoadAssetAtPath<QuestDefinition>(AssetDatabase.GUIDToAssetPath(g))).ToList();
+        QuestDefinition at = hook;
+        for (int guard = 0; at != end && guard < 8; guard++)
+        {
+            QuestDefinition next = quests.Single(q => q.Prerequisites.Contains(at) && q.Chain == hook.Chain);
+            Assert.IsFalse(next.HeldForHomecoming, $"{next.name}: carries on from {at.name}, not held for another homecoming");
+            at = next;
+        }
+
+        Assert.AreEqual(end, at, $"{first} leads to {last}");
+        QuestTargetDefinition stone = HavenRegionSettings.Current.LookOf(region).stoneTarget;
+        Assert.AreEqual(stone, end.Objectives.Last().Target, $"{last} ends with {region}'s stone lit");
+        Assert.IsNotNull(end.RewardWorkFor, "the one who told of it grows in their work");
+
+        foreach (QuestDefinition quest in quests.Where(q => q.Chain == hook.Chain && (q == hook || q.Prerequisites.Any(p => p.Chain == hook.Chain))))
+        {
+            foreach (QuestObjective step in quest.Objectives)
+            {
+                if (step.Type == ObjectiveType.ReachPlace)
+                {
+                    Assert.IsTrue(verbs.Targets.Any(t => t.target == step.Target), $"{quest.name}: no place counts as reaching {step.Target?.name}");
+                }
+                else if (step.Type == ObjectiveType.UseObject && step.Target != stone)
+                {
+                    HavenPlaceVerbs.Find thing = verbs.Finds.SingleOrDefault(f => f.questTarget == step.Target);
+                    Assert.IsNotNull(thing, $"{quest.name}: nothing to use for {step.Target?.name}");
+                    Assert.AreEqual(quest, thing.quest, $"{thing.name}: there on {quest.name}'s errand");
+                }
+            }
+        }
+
+        Assert.IsTrue(verbs.Scenes.Any(s => s.stages.Any(st => st.quest == end && st.gate == HavenPlaceVerbs.Gate.QuestDone)), "remembered, a place is worked");
+        Assert.IsTrue(verbs.Finds.Any(f => f.quest == end && f.everyDays > 0), "and gives back every few days");
+    }
+
     [Test]
     public void AGate_WithNoQuest_NeverOpens_AndAlwaysDoes()
     {

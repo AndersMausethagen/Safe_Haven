@@ -1,0 +1,106 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
+  m_Name: ALanternForTheIsle
+  m_EditorClassIdentifier: SafeHaven::QuestDefinition
+  id: alanternfortheisle
+  displayName: A Lantern for the Isle
+  description: The fishers rowed their dead out to the Island Stones and lit a lantern on the shore, so they would find their way. Nobody has lit it in a hundred winters. Go after dark.
+  chain: Yrsa
+  journalNotes: The lantern stands at the Netmender's Rest, south of the Fisher's Rest, facing the isle. It takes a flame only at night.
+  rank: 4
+  availableObjective: 
+  announceStart: 1
+  announceCompletion: 1
+  showTimerInHud: 0
+  prerequisites:
+  - {fileID: 11400000, guid: cf2545313771e9a4288fcb71d5a9f678, type: 2}
+  startedFirst: []
+  start: 0
+  startEvent: {fileID: 0}
+  startWhen:
+    type: 0
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
+  closedBy: {fileID: 0}
+  startDelay: 3
+  startsInAFight: 0
+  startsWithoutWaiting: 1
+  onStarted: []
+  objectivesInOrder: 1
+  objectives:
+  - type: 11
+    description: Light the fishers' lantern at the Netmender's Rest, after dark
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 0
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 11400000, guid: 2e28c13cc19babe4291e0646d58aad0d, type: 2}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 0
+    tier: 0
+    bringHome: 0
+    countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 0
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
+  unlocksBuildings: []
+  unlocksModules: []
+  turnInToGiver: 0
+  turnInTo: 
+  rewardItems: []
+  rewardResources: []
+  rewardRecipes: []
+  rewardSkills: []
+  teachesAtStart: []
+  rewardEnchantments: []
+  rewardWorkFor: {fileID: 0}
+  rewardWork: 0
+  rewardPassion: 0
+  rewardMark: {fileID: 0}
+  experience: 0
+  completionEvent: {fileID: 0}
+  onCompleted: []

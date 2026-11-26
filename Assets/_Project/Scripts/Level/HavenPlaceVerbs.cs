@@ -53,6 +53,8 @@ public sealed class HavenPlaceVerbs : ScriptableObject
         public string name = "Cut stone";
         [Tooltip("The prompt's verb.")]
         public string verb = "Take";
+        [Tooltip("What is taken. Empty: a thing only to use (a lantern to light, marks to read), shown by its Marker, counted for quests " +
+                 "by its Quest Target.")]
         public ItemDefinition item;
         [Min(1)] public int amount = 1;
         [Tooltip("Said as it is taken.")]
@@ -73,6 +75,8 @@ public sealed class HavenPlaceVerbs : ScriptableObject
         [Tooltip("0: taken once for good. More: a work site's yield, there once in every so many days at home (the relit clamp's " +
                  "charcoal).")]
         [Min(0)] public int everyDays;
+        [Tooltip("Only at these hours (night from 20 to 6, as a place's sounds): a lantern lit after dark.")]
+        public When when = When.Always;
     }
 
     /// <summary>

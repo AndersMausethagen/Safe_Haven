@@ -287,6 +287,14 @@ public static class Territory
         State.Claim(region, Settings);
         GameMessages.Post($"The boundary stone of {region} burns again. Hold the land in mind, and it will give back.", MessageKind.Gain);
         Tell(Settings.StoneLit);
+        // This region's own stone, for a quest that ends with remembering it (a region's arc: HavenRegionSettings › Stone Target).
+        QuestTargetDefinition stone = HavenRegionSettings.Current.LookOf(region)?.stoneTarget;
+        GameObject by = user != null ? user : Player.Current != null ? Player.Current.gameObject : null;
+        if (stone != null && by != null)
+        {
+            QuestDeeds.Raise(GameEventKind.Used, stone, by);
+        }
+
         Changed?.Invoke();
     }
 

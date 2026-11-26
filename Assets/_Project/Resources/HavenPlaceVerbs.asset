@@ -196,6 +196,7 @@ MonoBehaviour:
     gate: 0
     quest: {fileID: 0}
     everyDays: 0
+    when: 0
   - placeId: haven.old_quarry.1
     name: Cut granite
     verb: Take
@@ -210,6 +211,7 @@ MonoBehaviour:
     gate: 0
     quest: {fileID: 0}
     everyDays: 0
+    when: 0
   - placeId: haven.woodland_camp.2
     name: The burners' clamp
     verb: Light
@@ -224,6 +226,7 @@ MonoBehaviour:
     gate: 1
     quest: {fileID: 11400000, guid: 3c76010d130fc6a4e9f113f148b849ef, type: 2}
     everyDays: 0
+    when: 0
   - placeId: haven.woodland_camp.2
     name: Charcoal from the clamp
     verb: Take
@@ -238,11 +241,138 @@ MonoBehaviour:
     gate: 2
     quest: {fileID: 11400000, guid: 3c76010d130fc6a4e9f113f148b849ef, type: 2}
     everyDays: 2
+    when: 0
+  - placeId: haven.old_quarry.0
+    name: The half-cut stone
+    verb: Read the marks
+    item: {fileID: 0}
+    amount: 1
+    taken: The pact's marks, cut half-way into the stone. They stopped in the middle of a word.
+    offset: {x: 9.5, y: 3}
+    marker: {fileID: 1987186056636952893, guid: 9c63895aedf974b41ac19d55902cc357, type: 3}
+    markerScale: 1
+    markerTurn: 75
+    questTarget: {fileID: 11400000, guid: 6f84007ff0f9a674496a6bc1b2db27d4, type: 2}
+    gate: 1
+    quest: {fileID: 11400000, guid: ddec661597421b24185a35a14896a28c, type: 2}
+    everyDays: 0
+    when: 0
+  - placeId: haven.old_quarry.0
+    name: Squared stone
+    verb: Take
+    item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+    amount: 3
+    taken: Squared and stacked. The quarry will have more in a few days.
+    offset: {x: -10, y: -1.5}
+    marker: {fileID: 0}
+    markerScale: 1
+    markerTurn: 0
+    questTarget: {fileID: 0}
+    gate: 2
+    quest: {fileID: 11400000, guid: e4198f41e072322478873d87c9852ccc, type: 2}
+    everyDays: 3
+    when: 0
+  - placeId: haven.burnt_farmstead.0
+    name: The cracked hearthstone
+    verb: Lift
+    item: {fileID: 11400000, guid: 17b016991a7aa4846a121d6027443bf2, type: 2}
+    amount: 1
+    taken: Under the cracked hearthstone, a pouch of seed sealed in wax. They meant to sow again.
+    offset: {x: -7.5, y: -5.5}
+    marker: {fileID: 231233657689741705, guid: 58a01be98be75814faad36567695cb27, type: 3}
+    markerScale: 0.6
+    markerTurn: 30
+    questTarget: {fileID: 11400000, guid: 31f1b4d08c6a33a4f9539669f973b82a, type: 2}
+    gate: 1
+    quest: {fileID: 11400000, guid: 53e34a73f89dac640ab91738fbc66874, type: 2}
+    everyDays: 0
+    when: 0
+  - placeId: haven.burnt_farmstead.0
+    name: A child's sling
+    verb: Take
+    item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
+    amount: 1
+    taken: A child's sling of nettle cord, dropped where the fence runs out. They went this way.
+    offset: {x: 27, y: -7.5}
+    marker: {fileID: 0}
+    markerScale: 1
+    markerTurn: 0
+    questTarget: {fileID: 11400000, guid: 9a7bc0505447a724681b786d3db2d627, type: 2}
+    gate: 1
+    quest: {fileID: 11400000, guid: c02abb0f34687e841b484a01d52b7be5, type: 2}
+    everyDays: 0
+    when: 0
+  - placeId: haven.burnt_farmstead.0
+    name: Seed from Asa's field
+    verb: Take
+    item: {fileID: 11400000, guid: 17b016991a7aa4846a121d6027443bf2, type: 2}
+    amount: 1
+    taken: Asa's field gives back the family's seed. More in a few days.
+    offset: {x: -12, y: 2.5}
+    marker: {fileID: 0}
+    markerScale: 1
+    markerTurn: 0
+    questTarget: {fileID: 0}
+    gate: 2
+    quest: {fileID: 11400000, guid: 7fd51412ce7494e4394efdf6c6ebd5a6, type: 2}
+    everyDays: 3
+    when: 0
+  - placeId: haven.fisher_s_rest.0
+    name: The fishers' old nets
+    verb: Take
+    item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
+    amount: 2
+    taken: Rotten mostly. The weights are good, and the cord will twist into something.
+    offset: {x: -5.5, y: 2}
+    marker: {fileID: 0}
+    markerScale: 1
+    markerTurn: 0
+    questTarget: {fileID: 11400000, guid: b5a67b0cdcea4264ca91df7d7792a83e, type: 2}
+    gate: 1
+    quest: {fileID: 11400000, guid: cf2545313771e9a4288fcb71d5a9f678, type: 2}
+    everyDays: 0
+    when: 0
+  - placeId: haven.fisher_s_rest.1
+    name: The fishers' lantern
+    verb: Light
+    item: {fileID: 0}
+    amount: 1
+    taken: The flame takes. Out on the water, toward the Island Stones, nothing answers, and that is how it should be.
+    offset: {x: -5.5, y: -1.5}
+    marker: {fileID: 2291401759501754958, guid: 9656fa983d6378f499d619188c8f9c27, type: 3}
+    markerScale: 1.8
+    markerTurn: 0
+    questTarget: {fileID: 11400000, guid: 2e28c13cc19babe4291e0646d58aad0d, type: 2}
+    gate: 1
+    quest: {fileID: 11400000, guid: d4977cc14786c464184618e1aba5cfa8, type: 2}
+    everyDays: 0
+    when: 2
+  - placeId: haven.fisher_s_rest.0
+    name: Smoked fish
+    verb: Take
+    item: {fileID: 11400000, guid: 1deba4cfdd0cc854ba9f9d3fa96aacd9, type: 2}
+    amount: 2
+    taken: Smoked through. The rest will have more in a day or two.
+    offset: {x: -6, y: -1}
+    marker: {fileID: 0}
+    markerScale: 1
+    markerTurn: 0
+    questTarget: {fileID: 0}
+    gate: 2
+    quest: {fileID: 11400000, guid: c4c19733c3b2411499cb991d0c3f3788, type: 2}
+    everyDays: 2
+    when: 0
   targets:
   - placeId: haven.old_quarry.0
     target: {fileID: 11400000, guid: 452286aed8706314fbb93b4d23abab81, type: 2}
   - placeId: haven.woodland_camp.2
     target: {fileID: 11400000, guid: 382d369f19e5ee6448c2c6863c1ed3c3, type: 2}
+  - placeId: haven.burnt_farmstead.0
+    target: {fileID: 11400000, guid: 142da07c5d54e2048a561d8f7097bf20, type: 2}
+  - placeId: haven.authored.familys_grave
+    target: {fileID: 11400000, guid: 8c95358a1b055254f812958eecc25e97, type: 2}
+  - placeId: haven.fisher_s_rest.0
+    target: {fileID: 11400000, guid: 464f786004dea1c4eb0cfbf441b6e72d, type: 2}
   scenes:
   - placeId: haven.woodland_camp.2
     thoughts:
@@ -275,6 +405,18 @@ MonoBehaviour:
       smokeAt: {x: 0, y: 0, z: 0}
       clearsMist: 0
       hidesEarlier: 0
+    - note: 'The Hollow Pines remembered: Asa''s field, sown with the family''s seed.'
+      gate: 2
+      quest: {fileID: 11400000, guid: 7fd51412ce7494e4394efdf6c6ebd5a6, type: 2}
+      dressing: {fileID: 7068372400524217436, guid: a4f59f0cf59f92045987873a25259032, type: 3}
+      offset: {x: -12, y: 6}
+      turn: 0
+      thoughts:
+      - Green rows where the ash was. The seed they kept took after all.
+      smokeRise: 0
+      smokeAt: {x: 1.1, y: 0.6, z: 1.8}
+      clearsMist: 0
+      hidesEarlier: 0
   - placeId: haven.authored.familys_grave
     thoughts: []
     stages:
@@ -287,6 +429,18 @@ MonoBehaviour:
       thoughts: []
       smokeRise: 0
       smokeAt: {x: 0, y: 0, z: 0}
+      clearsMist: 0
+      hidesEarlier: 0
+    - note: 'The family found: the grave tended.'
+      gate: 2
+      quest: {fileID: 11400000, guid: c02abb0f34687e841b484a01d52b7be5, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts:
+      - Whoever they were, they're remembered now. That was the point of the fire.
+      smokeRise: 0
+      smokeAt: {x: 1.1, y: 0.6, z: 1.8}
       clearsMist: 0
       hidesEarlier: 0
   - placeId: haven.authored.old_steading
@@ -357,6 +511,36 @@ MonoBehaviour:
       thoughts: []
       smokeRise: 0
       smokeAt: {x: 0, y: 0, z: 0}
+      clearsMist: 0
+      hidesEarlier: 0
+  - placeId: haven.old_quarry.0
+    thoughts: []
+    stages:
+    - note: 'Ravenwood remembered: the quarry worked again.'
+      gate: 2
+      quest: {fileID: 11400000, guid: e4198f41e072322478873d87c9852ccc, type: 2}
+      dressing: {fileID: 7139662975026798710, guid: f10ec6baa0a83e7439332fdd8f4befa4, type: 3}
+      offset: {x: -11, y: -4}
+      turn: 0
+      thoughts:
+      - Fresh chips on the old ones. Somebody from home has been cutting here.
+      smokeRise: 0
+      smokeAt: {x: 1.1, y: 0.6, z: 1.8}
+      clearsMist: 0
+      hidesEarlier: 0
+  - placeId: haven.fisher_s_rest.0
+    thoughts: []
+    stages:
+    - note: 'Stillwater remembered: the rest smokes fish again.'
+      gate: 2
+      quest: {fileID: 11400000, guid: c4c19733c3b2411499cb991d0c3f3788, type: 2}
+      dressing: {fileID: 3173507925919521862, guid: 600c6c22a2d556e43b97d3e8d4833890, type: 3}
+      offset: {x: -7, y: -3}
+      turn: 0
+      thoughts:
+      - Fish on the racks and smoke in the reeds. The rest is a rest again.
+      smokeRise: 9
+      smokeAt: {x: 1.1, y: 0.6, z: 1.8}
       clearsMist: 0
       hidesEarlier: 0
   smoke: {fileID: 2100000, guid: e0dc5fdfe4f83b44294848291dbc9ed2, type: 2}

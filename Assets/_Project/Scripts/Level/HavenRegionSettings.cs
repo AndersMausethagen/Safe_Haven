@@ -30,6 +30,8 @@ public sealed class HavenRegionSettings : GameSettings<HavenRegionSettings>
         [Range(0f, 1f)] public float forgottenFloor = 0.35f;
         [Tooltip("Shown when it is remembered, under its name.")]
         [TextArea(1, 3)] public string rememberedLine = "";
+        [Tooltip("Lighting its boundary stone counts as using this, for quests (Use Object): a region's arc ends with remembering it.")]
+        public QuestTargetDefinition stoneTarget;
     }
 
     [Serializable]
@@ -70,6 +72,20 @@ public sealed class HavenRegionSettings : GameSettings<HavenRegionSettings>
     [SerializeField, Min(0f)] private float borderSoftness = 18f;
 
     public IReadOnlyList<RegionLook> Regions => regions;
+
+    /// <summary>The region whose boundary stone this is (its Stone Target), or null.</summary>
+    public string RegionOfStone(QuestTargetDefinition stone)
+    {
+        foreach (RegionLook look in regions)
+        {
+            if (look != null && stone != null && look.stoneTarget == stone)
+            {
+                return look.region;
+            }
+        }
+
+        return null;
+    }
     public IReadOnlyList<RingOpening> Openings => openings;
     public float ForgottenDesaturation => forgottenDesaturation;
     public float ForgottenDarkening => forgottenDarkening;

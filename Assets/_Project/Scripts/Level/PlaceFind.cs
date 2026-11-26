@@ -25,10 +25,11 @@ public sealed class PlaceFind : MonoBehaviour, IInteractionName, IInteractionVer
     public static string KeyOf(WorldAtlas.Place place, HavenPlaceVerbs.Find find) =>
         KeyOf(place, find, GameSession.Home != null ? GameSession.Home.DaysPassed : 0);
 
-    /// <summary>The key a find is taken by after <paramref name="daysAtHome"/> days at home.</summary>
+    /// <summary>The key a find is taken by after <paramref name="daysAtHome"/> days at home. A thing only to use (no item: a lantern to
+    /// light, marks to read) is remembered by its name.</summary>
     public static string KeyOf(WorldAtlas.Place place, HavenPlaceVerbs.Find find, int daysAtHome)
     {
-        string key = TakenKey(place.id, find.item.Id);
+        string key = TakenKey(place.id, find.item != null ? find.item.Id : find.name);
         return find.everyDays <= 0 ? key : $"{key}:{Mathf.Max(0, daysAtHome) / find.everyDays}";
     }
 
@@ -79,8 +80,8 @@ public sealed class PlaceFind : MonoBehaviour, IInteractionName, IInteractionVer
             return false;
         }
 
-        // Taken whole or not at all: a full bag lost the stack for good, and the quest still counted it.
-        if (Player.Current.Bag.Container.SpaceFor(find.item) < find.amount)
+        // Taken whole or not at all: a full bag lost the stack for good, and the quest still counted it. A thing only to use needs no room.
+        if (find.item != null && Player.Current.Bag.Container.SpaceFor(find.item) < find.amount)
         {
             reason = $"Your bag has no room for {find.amount} {find.item.DisplayName}.";
             return false;
@@ -100,7 +101,7 @@ public sealed class PlaceFind : MonoBehaviour, IInteractionName, IInteractionVer
     private void OnTaken()
     {
         Player player = Player.Current;
-        if (find == null || player == null || player.Bag.Container.SpaceFor(find.item) < find.amount
+        if (find == null || player == null || (find.item != null && player.Bag.Container.SpaceFor(find.item) < find.amount)
             || !GameSession.Progress.MarkStoneUsed(KeyOf(place, find)))
         {
             return;
@@ -108,7 +109,7 @@ public sealed class PlaceFind : MonoBehaviour, IInteractionName, IInteractionVer
 
         // What is taken for good counts as this span's yield of the same thing at the same place: the clamp just lit was raked out
         // with it, and has more in a day or two, not at once.
-        if (find.everyDays <= 0 && HavenPlaceVerbs.Current != null)
+        if (find.item != null && find.everyDays <= 0 && HavenPlaceVerbs.Current != null)
         {
             foreach (HavenPlaceVerbs.Find yield in HavenPlaceVerbs.Current.Finds)
             {
@@ -119,13 +120,13 @@ public sealed class PlaceFind : MonoBehaviour, IInteractionName, IInteractionVer
             }
         }
 
-        int given = player.Bag.Give(find.item, find.amount, ArrivalCause.Found);
+        int given = find.item != null ? player.Bag.Give(find.item, find.amount, ArrivalCause.Found) : 0;
         if (find.questTarget != null)
         {
             QuestDeeds.Raise(GameEventKind.Used, find.questTarget, player.gameObject);
         }
 
-        PlaytestLogger.Note(PlaytestLog.PlaceFindTaken, place.id, given, find.item.Id);
+        PlaytestLogger.Note(PlaytestLog.PlaceFindTaken, place.id, given, find.item != null ? find.item.Id : find.name);
         if (!string.IsNullOrEmpty(find.taken) && DialogueBox.Current != null && !DialogueBox.IsSpeaking)
         {
             DialogueBox.Current.Bark(DialogueSpeaker.Player(), $"<i>{find.taken}</i>", null);

@@ -149,6 +149,13 @@ public sealed class QuestObjective
         && type != ObjectiveType.CompleteForay;
     public int Amount => Mathf.Max(1, amount);
     public bool CountAlreadyOwned => countAlreadyOwned && Array.IndexOf(FieldsOf(type), nameof(countAlreadyOwned)) >= 0;
+
+    // The target is a region's boundary stone (HavenRegionSettings › Stone Target) and that region is remembered at home.
+    private bool StoneAlreadyLit()
+    {
+        string region = target != null ? HavenRegionSettings.Current.RegionOfStone(target) : null;
+        return region != null && !HavenVisit.IsVisiting && GameSession.Here.Territory.IsClaimed(region);
+    }
     public ItemDefinition Item => item;
     public ResourceDefinition Resource => resource;
     /// <summary>What a gather objective counts: the material item, or the essence when no item is set.</summary>
@@ -510,8 +517,11 @@ public sealed class QuestObjective
                 return player == null ? 0 : item != null ? player.Bag.Container.Count(item) : player.Resources.Storage.GetAmount(resource);
             case ObjectiveType.TalkTo:
             case ObjectiveType.ReachPlace:
-            case ObjectiveType.UseObject:
                 return log != null && log.HasDone(DeedKey) ? 1 : 0;
+            case ObjectiveType.UseObject:
+                // A region's boundary stone lit before the quest (or in a save from before stones were told as deeds) is lit: the region
+                // is remembered, which is what the quest asks.
+                return log != null && (log.HasDone(DeedKey) || StoneAlreadyLit()) ? 1 : 0;
             case ObjectiveType.RescuePerson:
                 // Home already (an older save, or rescued before the quest): that is found and home both. Home is the player's own
                 // Haven: in a friend's (co-op) the settlement is the host's, where the person may long have lived.

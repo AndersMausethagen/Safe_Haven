@@ -383,11 +383,16 @@ public sealed class TerritoryTests
         GameSession.StartNewGame();
         ForgetBurnedHearts();
         var heard = new System.Collections.Generic.List<GameEventDefinition>();
+        var used = new System.Collections.Generic.List<QuestTargetDefinition>();
         System.Action<GameEvent> listen = e =>
         {
             if (e.Kind == GameEventKind.Custom && e.Subject is GameEventDefinition said)
             {
                 heard.Add(said);
+            }
+            else if (e.Kind == GameEventKind.Used && e.Subject is QuestTargetDefinition thing)
+            {
+                used.Add(thing);
             }
         };
         var user = new GameObject("Player");
@@ -403,6 +408,9 @@ public sealed class TerritoryTests
 
             Territory.Claim(Region, user);
             CollectionAssert.Contains(heard, Settings.StoneLit);
+            QuestTargetDefinition stone = HavenRegionSettings.Current.LookOf(Region)?.stoneTarget;
+            Assert.IsNotNull(stone, $"{Region}: a stone a region's arc can end with");
+            CollectionAssert.AreEqual(new[] { stone }, used, "its own stone is told, and no other region's");
 
             user.AddComponent<ItemInventory>().Container.SetSlot(0, new ItemStack(Settings.PactRune, 1));
             Territory.Offer(Region, user);
