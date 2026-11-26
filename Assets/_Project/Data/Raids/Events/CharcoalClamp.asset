@@ -24,11 +24,16 @@ MonoBehaviour:
   siteDistance: {x: 35, y: 70}
   siteText: 'The burner left in a hurry: his rake is still in the ash. The clamp is nearly done. Opened too soon, it catches.'
   artwork: {fileID: 21300000, guid: 64b394a0b361d4745a5624cef418a43c, type: 3}
+  stakes:
+    loot: 1
+    danger: 0
+    time: 2
   onStart: []
   choices:
   - label: Tend it till it's done
     detail: Costs 45 seconds. A good burn.
     cost: []
+    requires: []
     result: You close the vents one by one and wait. Good, black charcoal.
     outcomes:
     - rid: 2623126381840826408
@@ -36,6 +41,7 @@ MonoBehaviour:
   - label: Break it open now
     detail: 'Quick and hot: it costs a tenth of your health, and it''s loud.'
     cost: []
+    requires: []
     result: The turf comes away in a gout of heat.
     outcomes:
     - rid: 2623126381840826410

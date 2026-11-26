@@ -24,11 +24,16 @@ MonoBehaviour:
   siteDistance: {x: 35, y: 70}
   siteText: A stone-framed door into the mound. Silver in the dark, and an old smell. Whoever lies in there has not been disturbed in a long time.
   artwork: {fileID: 21300000, guid: fd21f62745909f740be7b6128c06ce18, type: 3}
+  stakes:
+    loot: 2
+    danger: 1
+    time: 0
   onStart: []
   choices:
   - label: Reach in and take it
     detail: Barrow silver and grave iron. The owner may mind.
     cost: []
+    requires: []
     result: Your fingers close on cold metal. Behind it, something breathes in.
     outcomes:
     - rid: 287758281410609297
@@ -38,9 +43,20 @@ MonoBehaviour:
     cost:
     - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
       amount: 2
+    requires: []
     result: A cold breath passes over you, and it feels like thanks.
     outcomes:
     - rid: 287758281410609299
+  - label: Seal it with the old marks
+    detail: The dead sleep on, and bless whoever closed their door.
+    cost: []
+    requires:
+    - rid: 2623126383268724785
+    result: You cut the marks into the lintel stone. The cold breath from the door stops.
+    outcomes:
+    - rid: 2623126383268724786
+    - rid: 2623126383268724787
+  raisesWhenChosen: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -54,16 +70,28 @@ MonoBehaviour:
             minQuantity: 2
             maxQuantity: 3
             probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
           - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
             resource: {fileID: 0}
             minQuantity: 5
             maxQuantity: 10
             probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
           - item: {fileID: 11400000, guid: 6a6c76b4e635d9e48be91d875f758c4a, type: 2}
             resource: {fileID: 0}
             minQuantity: 1
             maxQuantity: 1
             probability: 0.15
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
     - rid: 287758281410609298
       type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
       data:
@@ -84,3 +112,31 @@ MonoBehaviour:
           op: 0
           value: 0.15
         seconds: 300
+    - rid: 2623126383268724785
+      type: {class: SkillAtLeast, ns: , asm: SafeHaven}
+      data:
+        skill: {fileID: 11400000, guid: 0bf8c75e4c32304428c7000e1e01913b, type: 2}
+        level: 20
+    - rid: 2623126383268724786
+      type: {class: GiveBoonOutcome, ns: , asm: SafeHaven}
+      data:
+        name: Barrow's Blessing
+        bonuses:
+        - stat: 7
+          op: 0
+          value: 15
+        seconds: 300
+    - rid: 2623126383268724787
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 8e4b25b050fb23840a86f61b5a5b074c, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}

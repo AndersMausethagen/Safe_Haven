@@ -24,11 +24,16 @@ MonoBehaviour:
   siteDistance: {x: 35, y: 70}
   siteText: Fresh scree across the ledge. Under it, a crushed pack frame, a broken pick and the corner of a sack. Above, the slope still trickles.
   artwork: {fileID: 21300000, guid: ddc785f5c118ab640a992cfb66de964e, type: 3}
+  stakes:
+    loot: 2
+    danger: 1
+    time: 2
   onStart: []
   choices:
   - label: Dig the pack out
     detail: Costs you 40 seconds of loud digging.
     cost: []
+    requires: []
     result: 'Stone by stone, until the sack comes free. Ore, mostly: someone had a good day before this one.'
     outcomes:
     - rid: 2623126381840826368
@@ -37,6 +42,7 @@ MonoBehaviour:
   - label: Pull out what shows
     detail: Quick, but the slope above is still loose.
     cost: []
+    requires: []
     result: You grab what sticks out of the stones.
     outcomes:
     - rid: 2623126381840826371

@@ -12,6 +12,26 @@ unique?) and then: "skriv det som et dokument med konkrete forslag" (write it as
 
 What other games do is described from general knowledge of them, not from new sources.
 
+## Status (2026-11-26, the user: "enig med dine anbefalinger. kjør på")
+
+Steps 1-3 are built. Step 1 measures whether 4-6 are needed. The §6 answers are as recommended: consequences may show at home, a carried thing takes the hands, and legends are unique. None of it has been played by hand.
+
+| Step | As built |
+|---|---|
+| 1 (E1) | `RaidEventDefinition` › Stakes (loot, danger, time, 0-2) on every event, told in the open-site alert as words ("rich · risky · takes time"). Every site with choices has one anyone can take that costs no time (test). Log rows `EventReached` (first within 10 m) and `EventSkipped` (still open as the raid ends: reached or not, when it began, how far) |
+| 2 (E2) | `RaidEventChoice` › Requires (`ChoiceRequirement`: Skill At Least, Carries Item, Companion Along, Hour Is, Knows Mark). An unmet choice shows greyed with "Needs Woodcutting 20". New choices on the existing events: Cries from the Ditch (Woodcutting 20), Three Wishes (Runecraft 20), Overturned Wagon (Construction 20), Toll Troll (a moss troll's tusk), Living Path (Runecraft 15), Open Barrow (Runecraft 20), Blighted Tree (Alchemy 20) |
+| 3 (E3) | `DefendOutcome`/`DefendTask` (hold the site's lit ring while waves come; the count waits outside it; paid once) and `CarryOutcome`/`CarriedBurden` (in the hands: slows, is heard, set down to fight, picked up again, pays in an open exit's circle). Task lines on the HUD under the companions. The Old Beacon: "Light it and hold it". New: **The Elder's Bell** (Woods: hold the oak, or climb up quietly with Sneaking 20), **The Stone Head** (Valley: carry it out, or break it with a pickaxe; Trollstone only from tier IV), **The Sunken Bell Tower** (Marsh: hold the belfry while the drowned come, or dive the stair after dark). LocalSpawn models: Bell Oak, Stone Head, Sunken Tower; paintings. Pools 12/11/9 |
+
+**Checked live:**
+- **Troll Valley:** the stone head was lifted (the site's own head hidden), its line read "Carry the stone head out: 75 m to …", it was set down and taken again, and it paid when carried into an open exit.
+- **Misty Woods:** the Elder's Bell showed the Sneaking choice greyed with its reason, and choosing it did nothing. The hold counted down from 0:40, Rootlings came in waves, and it paid once at 40 s.
+
+Tests: `RaidEventsPlanTests1126`.
+
+**Watch in a playtest:**
+- the `EventReached` and `EventSkipped` rows: is the share of begun events acted on now over half?
+- the Bell Oak (4.5 m) can hide the player standing beside it.
+
 ---
 
 ## 0. The short answer

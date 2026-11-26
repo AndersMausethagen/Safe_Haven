@@ -255,7 +255,11 @@ public sealed class RaidHudView : MonoBehaviour
             {
                 Vector3 offset = site.transform.position - position;
                 offset.y = 0f;
-                alerts.Post($"<color={UIStyle.Current.TextHex}>{site.DisplayName}  {Mathf.RoundToInt(offset.magnitude)} m  {SideOf(offset)}</color>");
+                // What is at stake, so the walk is a choice (Docs/RaidEventsPlan_2026-11-26.md E1).
+                string stakes = site.Definition != null && !site.Definition.Stakes.IsEmpty
+                    ? "  ·  " + site.Definition.Stakes.Words(UIStyle.Current.AccentHex, UIStyle.Current.WarningHex, UIStyle.Current.MutedHex)
+                    : "";
+                alerts.Post($"<color={UIStyle.Current.TextHex}>{site.DisplayName}  {Mathf.RoundToInt(offset.magnitude)} m  {SideOf(offset)}</color>{stakes}");
             }
         }
     }
@@ -496,7 +500,10 @@ public sealed class RaidHudView : MonoBehaviour
     {
         string along = HowTheyAre(director != null ? director.Companions.Companion : null);
         string found = director != null && director.Companions.LostOneFollows ? HowTheyAre(director.Companions.LostOne) : "";
-        return along.Length > 0 && found.Length > 0 ? $"{along}  ·  {found}" : along + found;
+        string who = along.Length > 0 && found.Length > 0 ? $"{along}  ·  {found}" : along + found;
+        // A task an event set going (hold the bell, carry the head out): its line under the companions (RaidEventTask).
+        string tasks = RaidEventTask.HudLines();
+        return who.Length > 0 && tasks.Length > 0 ? $"{who}\n{tasks}" : who + tasks;
     }
 
     private static string HowTheyAre(Companion companion)

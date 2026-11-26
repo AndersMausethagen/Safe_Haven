@@ -78,6 +78,50 @@ public sealed class RaidEventSite : MonoBehaviour, IInteractionName, IInteractio
     {
         definition = eventDefinition;
         context = eventContext;
+        BegunAt = context?.Session != null ? context.Session.Elapsed : 0f;
+        if (context?.Player != null)
+        {
+            Vector3 offset = transform.position - context.Player.transform.position;
+            offset.y = 0f;
+            BegunMetres = offset.magnitude;
+        }
+    }
+
+    /// <summary>Lights the site's ring again while a task runs there (hold the bell): the ring says where to stand.</summary>
+    public void ShowMark(bool shown)
+    {
+        if (mark != null)
+        {
+            mark.SetActive(shown);
+        }
+    }
+
+    /// <summary>The event this site is for.</summary>
+    public RaidEventDefinition Definition => definition;
+
+    /// <summary>The raid's seconds when it began, and how far off the player was (the playtest log's EventSkipped).</summary>
+    public float BegunAt { get; private set; }
+    public float BegunMetres { get; private set; }
+
+    /// <summary>True once the player has come within <see cref="ReachedWithin"/> metres (the log's EventReached).</summary>
+    public bool WasReached { get; private set; }
+
+    public const float ReachedWithin = 10f;
+
+    private void NoteReached()
+    {
+        if (WasReached || definition == null || context?.Player == null)
+        {
+            return;
+        }
+
+        Vector3 offset = transform.position - context.Player.transform.position;
+        offset.y = 0f;
+        if (offset.sqrMagnitude <= ReachedWithin * ReachedWithin)
+        {
+            WasReached = true;
+            PlaytestLogger.Note(PlaytestLog.EventReached, definition.name, Mathf.RoundToInt(context.Session != null ? context.Session.Elapsed : 0f));
+        }
     }
 
     private void ShowBeaconByDistance()
@@ -98,6 +142,7 @@ public sealed class RaidEventSite : MonoBehaviour, IInteractionName, IInteractio
     private void Update()
     {
         ShowBeaconByDistance();
+        NoteReached();
         if (IsResolved || definition == null || definition.Choices.Count > 0 || context.Player == null)
         {
             return;
@@ -148,7 +193,14 @@ public sealed class RaidEventSite : MonoBehaviour, IInteractionName, IInteractio
             bool canPay = choice.cost.Count == 0 || (pool != null && pool.CanAfford(null, choice.cost));
             string price = choice.cost.Count > 0 ? AmountText.Describe(choice.cost) : "";
             string detail = string.IsNullOrEmpty(price) ? choice.detail : string.IsNullOrEmpty(choice.detail) ? price : $"{price}. {choice.detail}";
-            page.Add(new MenuAction(choice.label, detail, canPay, () => Choose(index, user), closesMenu: true));
+            // A need not met: shown, greyed, with what it needs first (Docs/RaidEventsPlan_2026-11-26.md E2).
+            ChoiceRequirement unmet = choice.Unmet(user, context?.Session);
+            if (unmet != null)
+            {
+                detail = string.IsNullOrEmpty(detail) ? unmet.Reason : $"{unmet.Reason}. {detail}";
+            }
+
+            page.Add(new MenuAction(choice.label, detail, canPay && unmet == null, () => Choose(index, user), closesMenu: true));
         }
 
         return page;
@@ -158,7 +210,7 @@ public sealed class RaidEventSite : MonoBehaviour, IInteractionName, IInteractio
     {
         RaidEventChoice choice = definition.Choices[index];
         MaterialPool pool = MaterialPool.For(user);
-        if (IsResolved || (choice.cost.Count > 0 && (pool == null || !pool.TrySpend(null, choice.cost))))
+        if (IsResolved || choice.Unmet(user, context?.Session) != null || (choice.cost.Count > 0 && (pool == null || !pool.TrySpend(null, choice.cost))))
         {
             return;
         }

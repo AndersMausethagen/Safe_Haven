@@ -24,11 +24,16 @@ MonoBehaviour:
   siteDistance: {x: 35, y: 70}
   siteText: The herders are long gone, but their lur still hangs on the gatepost, wrapped in birch bark. Blown hard, it carries across the whole valley.
   artwork: {fileID: 21300000, guid: 1376e2bc405186941ace0a85e714835d, type: 3}
+  stakes:
+    loot: 1
+    danger: 1
+    time: 0
   onStart: []
   choices:
   - label: Blow it hard
     detail: Shows you the valley and its ways out. Everything in the valley hears it too.
     cost: []
+    requires: []
     result: The note rolls down the valley and comes back from every wall. So will whatever heard it.
     outcomes:
     - rid: 2623126381840826382
@@ -36,6 +41,7 @@ MonoBehaviour:
   - label: Blow the herders' call
     detail: Soft and low, the way herders called their cattle home. Costs 20 seconds.
     cost: []
+    requires: []
     result: An old, easy tune. Your feet remember paths they never walked.
     outcomes:
     - rid: 2623126381840826384

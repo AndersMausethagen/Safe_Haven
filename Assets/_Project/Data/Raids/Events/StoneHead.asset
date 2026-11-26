@@ -1,0 +1,179 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: StoneHead
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: StoneHead
+  displayName: The Stone Head
+  weight: 1
+  earliestSeconds: 40
+  latestSecondsLeft: 150
+  minimumStage: 0
+  warning: On the scree above the path, something the size of a barrel caught the dawn and never moved again.
+  warningSound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
+  sitePrefab: {fileID: 7940016432191105948, guid: fa1c80b570c2e0c4aab82ed80af86aaf, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: A troll's head, turned to stone at sunrise and rolled down the scree. Heavy, but not too heavy for a determined back, and worth a great deal at home.
+  artwork: {fileID: 21300000, guid: 667b9f0189e11224f98c04c558542aa1, type: 3}
+  stakes:
+    loot: 2
+    danger: 1
+    time: 2
+  onStart: []
+  choices:
+  - label: Carry it out
+    detail: Slow, loud and worth a great deal at home. Strike, dodge or guard and you set it down; pick it up again after.
+    cost: []
+    requires: []
+    result: You get your arms round it and lift. Your knees argue.
+    outcomes:
+    - rid: 2623126383268724747
+  - label: Break it open
+    detail: Costs 25 seconds of loud work with a pickaxe.
+    cost: []
+    requires:
+    - rid: 2623126383268724749
+    result: It splits along an old crack.
+    outcomes:
+    - rid: 2623126383268724750
+    - rid: 2623126383268724751
+    - rid: 2623126383268724752
+  - label: Leave it grinning
+    detail: Nothing for it here.
+    cost: []
+    requires: []
+    result: You leave it on the scree.
+    outcomes:
+    - rid: 2623126383268724753
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126383268724747
+      type: {class: CarryOutcome, ns: , asm: SafeHaven}
+      data:
+        burden: {fileID: 2898673619346480294, guid: 97017ea0374d0574aa52645368c8a21a, type: 3}
+        takenFromSite: 1
+        onDelivered:
+        - rid: 2623126383268724748
+    - rid: 2623126383268724748
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 3
+            probability: 1
+            fromTier: 4
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 4
+            maxQuantity: 6
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 6
+            maxQuantity: 12
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 6a6c76b4e635d9e48be91d875f758c4a, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 0.2
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 3
+            probability: 1
+            fromTier: 0
+            toTier: 3
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126383268724749
+      type: {class: CarriesItem, ns: , asm: SafeHaven}
+      data:
+        anyOf:
+        - {fileID: 11400000, guid: ba562466b4b1c4244be6b239b426c671, type: 2}
+        - {fileID: 11400000, guid: 174bdf8b6dd19c743a0a229e1ad4c35f, type: 2}
+        - {fileID: 11400000, guid: 44bb107354f1ab642ad103daabd39268, type: 2}
+        called: a pickaxe
+    - rid: 2623126383268724750
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -25
+    - rid: 2623126383268724751
+      type: {class: MakeNoiseOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 35
+    - rid: 2623126383268724752
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 1
+            fromTier: 4
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 3
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 4
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 1
+            fromTier: 0
+            toTier: 3
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126383268724753
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: Its stone eyes seem to follow you down the valley.
+        kind: 0

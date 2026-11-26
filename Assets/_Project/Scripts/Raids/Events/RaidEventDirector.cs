@@ -64,6 +64,38 @@ public sealed class RaidEventDirector : MonoBehaviour
         path = new NavMeshPath();
     }
 
+    private void OnEnable() => GameEvents.Raised += OnGameEvent;
+
+    private void OnDisable() => GameEvents.Raised -= OnGameEvent;
+
+    // As the raid ends, every site still open goes to the playtest log: reached and passed by, or never reached
+    // (Docs/RaidEventsPlan_2026-11-26.md E1: why players pass events by).
+    private void OnGameEvent(GameEvent raised)
+    {
+        if (raised.Kind != GameEventKind.RaidFinished)
+        {
+            return;
+        }
+
+        foreach (List<RaidEventSite> sites in new[] { open, pinned, standing })
+        {
+            foreach (RaidEventSite site in sites)
+            {
+                // A standing site (a bridge's toll) is part of the map from the start: passed by only if the player came to it.
+                if (sites == standing && site != null && !site.WasReached)
+                {
+                    continue;
+                }
+
+                if (site != null && !site.IsResolved && site.Definition != null)
+                {
+                    PlaytestLogger.Note(PlaytestLog.EventSkipped, site.Definition.name, site.WasReached ? 1 : 0,
+                        $"began {Mathf.RoundToInt(site.BegunAt)} s, {Mathf.RoundToInt(site.BegunMetres)} m off");
+                }
+            }
+        }
+    }
+
     private void Update()
     {
         if (!director.IsRunning || director.Player == null || Time.time < nextThink)
@@ -229,6 +261,7 @@ public sealed class RaidEventDirector : MonoBehaviour
             return null;
         }
 
+        context.Site = site;
         site.Bind(definition, context);
         return site;
     }

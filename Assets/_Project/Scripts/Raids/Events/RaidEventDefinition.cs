@@ -42,6 +42,8 @@ public sealed class RaidEventDefinition : ScriptableObject, IDisplayName
     [SerializeField, TextArea(2, 5)] private string siteText;
     [Tooltip("A painting of the scene, above its words and choices (LocalSpawn: Tools/LocalSpawn/event_art.json). Optional.")]
     [SerializeField] private Sprite artwork;
+    [Tooltip("What is at stake, told with the warning (Docs/RaidEventsPlan_2026-11-26.md E1), so the walk is a choice: 0 none, 1 some, 2 much.")]
+    [SerializeField] private EventStakes stakes;
 
     [Header("What happens")]
     [Tooltip("Carried out when it begins, at the site if it has one.")]
@@ -61,6 +63,7 @@ public sealed class RaidEventDefinition : ScriptableObject, IDisplayName
     public Vector2 SiteDistance => siteDistance;
     public string SiteText => siteText;
     public Sprite Artwork => artwork;
+    public EventStakes Stakes => stakes;
     public IReadOnlyList<RaidEventOutcome> OnStart => onStart;
     public IReadOnlyList<RaidEventChoice> Choices => choices;
     public GameEventDefinition RaisesWhenChosen => raisesWhenChosen;
@@ -87,6 +90,35 @@ public sealed class RaidEventDefinition : ScriptableObject, IDisplayName
 #endif
 }
 
+/// <summary>What an event puts at stake, each 0 (none) to 2 (much): told with its warning, in words.</summary>
+[Serializable]
+public struct EventStakes
+{
+    [Range(0, 2)] public int loot;
+    [Range(0, 2)] public int danger;
+    [Range(0, 2)] public int time;
+
+    public EventStakes(int loot, int danger, int time)
+    {
+        this.loot = loot;
+        this.danger = danger;
+        this.time = time;
+    }
+
+    /// <summary>True when nothing has been set.</summary>
+    public bool IsEmpty => loot == 0 && danger == 0 && time == 0;
+
+    /// <summary>The words for the warning: "rich · risky", in the UI's colours. Pure, for tests.</summary>
+    public string Words(string lootHex, string dangerHex, string timeHex)
+    {
+        var parts = new List<string>(3);
+        if (loot > 0) parts.Add($"<color={lootHex}>{(loot >= 2 ? "rich" : "some loot")}</color>");
+        if (danger > 0) parts.Add($"<color={dangerHex}>{(danger >= 2 ? "deadly" : "risky")}</color>");
+        if (time > 0) parts.Add($"<color={timeHex}>{(time >= 2 ? "long" : "takes time")}</color>");
+        return string.Join("  ·  ", parts);
+    }
+}
+
 /// <summary>One thing the player can do at an event's site: what it says, what it costs and what comes of it.</summary>
 [Serializable]
 public sealed class RaidEventChoice
@@ -97,6 +129,28 @@ public sealed class RaidEventChoice
     public string detail;
     [Tooltip("Items paid from the bag. Without them the choice can't be taken.")]
     public List<ItemAmount> cost = new List<ItemAmount>();
+    [Tooltip("What else it needs: a skill, a thing carried, someone along, the hour (Docs/RaidEventsPlan_2026-11-26.md E2). Unmet, the " +
+             "choice still shows, greyed, with the reason.")]
+    [SerializeReference] public List<ChoiceRequirement> requires = new List<ChoiceRequirement>();
+
+    /// <summary>The first need the player doesn't meet, or null when every one is met.</summary>
+    public ChoiceRequirement Unmet(GameObject player, RaidSession session)
+    {
+        if (requires == null)
+        {
+            return null;
+        }
+
+        foreach (ChoiceRequirement requirement in requires)
+        {
+            if (requirement != null && !requirement.IsMet(player, session))
+            {
+                return requirement;
+            }
+        }
+
+        return null;
+    }
     [Tooltip("Told to the player after choosing.")]
     [TextArea] public string result;
     [SerializeReference] public List<RaidEventOutcome> outcomes = new List<RaidEventOutcome>();

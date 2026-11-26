@@ -24,11 +24,16 @@ MonoBehaviour:
   siteDistance: {x: 35, y: 70}
   siteText: A pedlar lies pinned under a fallen spruce, his pack just out of his reach. "Please. They'll smell me soon."
   artwork: {fileID: 21300000, guid: 28e3fb90cff3ffa499b1fb7a6e27529f, type: 3}
+  stakes:
+    loot: 1
+    danger: 1
+    time: 1
   onStart: []
   choices:
   - label: Lift the log
     detail: Costs you 45 seconds, and it's loud work.
     cost: []
+    requires: []
     result: He limps off into the trees, but not before pressing his purse into your hand.
     outcomes:
     - rid: 287758281410609252
@@ -37,10 +42,21 @@ MonoBehaviour:
   - label: Take his pack and go
     detail: Quick. You'll carry it with you for a while.
     cost: []
+    requires: []
     result: You don't look back. His voice follows you for a long time.
     outcomes:
     - rid: 287758281410609255
     - rid: 287758281410609256
+  - label: Lever the log off
+    detail: 'A woodsman knows where to push: 15 seconds, and quiet.'
+    cost: []
+    requires:
+    - rid: 2623126383268724766
+    result: One good heave in the right place and the log rolls. He presses his purse into your hand.
+    outcomes:
+    - rid: 2623126383268724767
+    - rid: 2623126383268724768
+  raisesWhenChosen: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -62,21 +78,37 @@ MonoBehaviour:
             minQuantity: 3
             maxQuantity: 6
             probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
           - item: {fileID: 11400000, guid: d0c7b274979b4ad46a9f3bf89b8cfa64, type: 2}
             resource: {fileID: 0}
             minQuantity: 1
             maxQuantity: 1
             probability: 0.6
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
           - item: {fileID: 11400000, guid: 3b62415dd6630ea4ca86bcf751d2891a, type: 2}
             resource: {fileID: 0}
             minQuantity: 1
             maxQuantity: 1
             probability: 0.4
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
           - item: {fileID: 11400000, guid: 1dd65120c9bb0304c8a45a8012af934c, type: 2}
             resource: {fileID: 0}
             minQuantity: 1
             maxQuantity: 2
             probability: 0.5
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
     - rid: 287758281410609255
       type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
       data:
@@ -87,11 +119,19 @@ MonoBehaviour:
             minQuantity: 2
             maxQuantity: 4
             probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
           - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
             resource: {fileID: 0}
             minQuantity: 1
             maxQuantity: 2
             probability: 0.6
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
     - rid: 287758281410609256
       type: {class: GiveBoonOutcome, ns: , asm: SafeHaven}
       data:
@@ -101,3 +141,53 @@ MonoBehaviour:
           op: 0
           value: -15
         seconds: 180
+    - rid: 2623126383268724766
+      type: {class: SkillAtLeast, ns: , asm: SafeHaven}
+      data:
+        skill: {fileID: 11400000, guid: a277ba53f2eae0648aa06826e44cbfd8, type: 2}
+        level: 20
+    - rid: 2623126383268724767
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -15
+    - rid: 2623126383268724768
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 3
+            maxQuantity: 6
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: d0c7b274979b4ad46a9f3bf89b8cfa64, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 0.6
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 3b62415dd6630ea4ca86bcf751d2891a, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 0.4
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 1dd65120c9bb0304c8a45a8012af934c, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 2
+            probability: 0.5
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}

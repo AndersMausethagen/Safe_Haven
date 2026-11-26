@@ -14,6 +14,8 @@ public sealed class RaidEventContext
     /// <summary>The site, or the player's feet for an event without one.</summary>
     public Vector3 Position;
     public System.Random Random;
+    /// <summary>The event's site, when it has one: what a task an outcome sets going stands at (RaidEventTask).</summary>
+    public RaidEventSite Site;
 }
 
 /// <summary>

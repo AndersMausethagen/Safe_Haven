@@ -891,6 +891,9 @@ a pool of `RaidEventDefinition`s, first delay, interval, a budget per raid and a
 - **Report:** `RaidSession.EventLog` reaches the raid summary ("On the way"), and each event raises `GameEventKind.RaidEvent`
   for the playtest log.
 
+- **What is at stake (2026-11-26, Docs/RaidEventsPlan_2026-11-26.md):** `RaidEventDefinition` › Stakes (loot, danger, time) is told in words with the open site's alert. `EventReached` and `EventSkipped` playtest rows say whether players went and chose.
+- **Choices that need something:** `RaidEventChoice` › Requires (`ChoiceRequirements.cs`: Skill At Least, Carries Item, Companion Along, Hour Is, Knows Mark; kind menu in the Content Editor). An unmet choice shows greyed with its reason and can't be taken.
+- **Tasks at the site:** `DefendOutcome` puts a `DefendTask` on the site (hold its ring for N seconds; Each Wave's outcomes at the start and every Wave Every held; On Held's once). `CarryOutcome` puts a `CarriedBurden` prefab in the player's hands (slower, heard, set down by attack, dodge, bash, skill, guard, swimming or death, picked up with Use; On Delivered's outcomes in an open exit's circle). Both are `RaidEventTask`s and show a line on the raid HUD under the companions. `RaidEventContext.Site` is the event's site.
 Content: `AgentScripts/BuildRaidEvents.cs` (sites are placeholder shapes in `Prefabs/Raids/Events/Sites`). The older prefabs
 in `Prefabs/Raids/Events` are static scenery for the Event Sites spawn list; they are not raid events.
 

@@ -10,7 +10,8 @@
     "2026-11-14: the raids' and items' primitive stand-ins (Cache Crate to Shaman Staff); built into their prefabs by BuildStructureModels.Placeholders, not BuildWorldProps.",
     "2026-11-17, the user: 'Create props and aditional monsters you need with LocalSpawn' for Troll Valley (the Brukam bridge troll boss, his bridge, club, hoard and bones, a ruined seter, a petrified troll) and the Moss Marsh after it (the corrupted Nøkk of the Black Pool, the deildegast, the lindorm's head and coils, boardwalk, peat, bloomery, rowboat, fiddle, boundary stone). Docs/TrollValleyPlan.md, Docs/NextRaidResearch_2026-11-17.md.",
     "2026-11-17, boss encounters (Docs/BossEncounterResearch_2026-11-17.md, the user: \"go for option C\"): Brukam's Bridge arena needs a long straight bridge whose segments fall: Bridge Span (one segment of deck, square broken ends, laid end to end on piers), Bridge Pier, and the Toll Post its gate stands at.",
-    "2026-11-26, the user: 'Bruk gjerne localspawn for å generere nye assets ... lag gjerne flere, spennende og unike events': camp dressing (Raider Lean-to, Drying Rack, Camp Stash) and the new raid events' sites (Scree Slide, Troll Cookpot, Herder's Lur, Bog Body, Marsh Lantern, Peat Hut, Charcoal Clamp). Docs/RaidLayoutAnalysis_2026-11-26.md."
+    "2026-11-26, the user: 'Bruk gjerne localspawn for å generere nye assets ... lag gjerne flere, spennende og unike events': camp dressing (Raider Lean-to, Drying Rack, Camp Stash) and the new raid events' sites (Scree Slide, Troll Cookpot, Herder's Lur, Bog Body, Marsh Lantern, Peat Hut, Charcoal Clamp). Docs/RaidLayoutAnalysis_2026-11-26.md.",
+    "2026-11-26, the user: 'enig med dine anbefalinger. kjør på' (Docs/RaidEventsPlan_2026-11-26.md E3): sites for the Elder's Bell (Bell Oak), the Stone Head (also its carried burden) and the Sunken Bell Tower (Sunken Tower)."
   ],
   "art": "Assets/_Project/Art/World/Props",
   "common": "Three-quarter view from slightly above, whole object visible and centred, isolated on a plain light grey background. Matte, softly lit, no glow, no light rays, no fog.",
@@ -653,6 +654,48 @@
           "key": "A",
           "seed": 7411,
           "prompt": "A Norse charcoal kiln: a wide round dome-shaped mound of earth and turf built over stacked logs, a few small square vent holes around its base, a ring of black ash and lumps of black charcoal raked around it, a long wooden rake leaning against the mound. No fire, no smoke. Everything grown together into one solid piece, nothing loose or floating."
+        }
+      ]
+    },
+    {
+      "asset": "Bell Oak",
+      "width": 4.0,
+      "max_height": 4.5,
+      "texture_size": 2048,
+      "lod0_triangles": 8000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7451,
+          "prompt": "A massive ancient oak trunk, very thick and only about four metres tall, broken off at the top, its bark deeply furrowed and mossy, hollow at the base, with one thick stubby low branch sticking out sideways, and from that branch hangs a big green-bronze bell as large as a barrel on a short thick rusty chain, old ribbons and little carved wooden offerings tied around the trunk, moss and roots at its foot. Everything grown together into one solid piece, nothing loose or floating."
+        }
+      ]
+    },
+    {
+      "asset": "Stone Head",
+      "width": 1.2,
+      "max_height": 1.0,
+      "texture_size": 2048,
+      "lod0_triangles": 5000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7432,
+          "prompt": "A huge troll's head turned to grey stone, the size of a barrel, lying on its side: a big crooked nose, heavy brow, a wide grinning mouth with blunt teeth, small closed eyes, stubby ears, rough lichen-spotted granite surface, cracks running through it. Everything grown together into one solid piece, nothing loose or floating."
+        }
+      ]
+    },
+    {
+      "asset": "Sunken Tower",
+      "width": 4.0,
+      "max_height": 4.0,
+      "texture_size": 2048,
+      "lod0_triangles": 8000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7463,
+          "prompt": "Only the very top of an old Norse wooden bell tower sticking out of flat black bog mud and leaning badly: a small open belfry under a steep dark shingled pyramid roof with a carved dragon head at one corner, a dark bronze bell visible inside; the mud comes right up to the bottom of the belfry, no walls, no doors, no lower roofs, no cross; moss and reeds around where it sinks in, the timbers grey and rotting. Everything grown together into one solid piece, nothing loose or floating."
         }
       ]
     }

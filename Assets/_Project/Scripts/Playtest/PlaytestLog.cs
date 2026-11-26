@@ -141,6 +141,12 @@ public static class PlaytestLog
     /// subject the place (its kind, "Kind: Group" where groups share the kind, a set piece's or landmark's name), amount the raid's
     /// seconds so far, detail "N m from the start".</summary>
     public const string CameUpon = "CameUpon";
+    /// <summary>The player first came within 10 m of a raid event's site (Docs/RaidEventsPlan_2026-11-26.md E1): subject the event,
+    /// amount the raid's seconds.</summary>
+    public const string EventReached = "EventReached";
+    /// <summary>A raid event's site still open as the raid ended: subject the event, amount 1 if the player reached it (and chose
+    /// nothing) or 0 if never, detail "began N s, M m off".</summary>
+    public const string EventSkipped = "EventSkipped";
     // Boss fights (Docs/HeartrootPlaytest_2026-11-23.md P0: the first hand try left no trace of the boss's side):
     /// <summary>A boss fight ended: subject the boss's id, amount its health left in percent, detail the outcome (won, died, left), the
     /// seconds from its waking, the stage reached, topples by cause, heart strikes, interrupts, calls and bound summons killed, the

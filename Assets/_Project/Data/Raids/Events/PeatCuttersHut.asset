@@ -24,11 +24,16 @@ MonoBehaviour:
   siteDistance: {x: 35, y: 70}
   siteText: 'Nobody is home, but the stove is still warm and the kettle full. On the shelf: bog iron, a pouch of myrtle, a peat cutter''s tools.'
   artwork: {fileID: 21300000, guid: cc658c6a7efc7964d839d12c39544079, type: 3}
+  stakes:
+    loot: 1
+    danger: 1
+    time: 1
   onStart: []
   choices:
   - label: Rest by the stove
     detail: Costs 30 seconds. Dry boots, warm hands.
     cost: []
+    requires: []
     result: You sit until your hands stop shaking.
     outcomes:
     - rid: 2623126381840826401
@@ -36,6 +41,7 @@ MonoBehaviour:
   - label: Search the shelves
     detail: Quick. Whoever lives here may not like it.
     cost: []
+    requires: []
     result: 'Bog iron, charcoal, myrtle: a peat cutter''s wealth.'
     outcomes:
     - rid: 2623126381840826403
@@ -45,6 +51,7 @@ MonoBehaviour:
     cost:
     - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
       amount: 2
+    requires: []
     result: You leave the coins by the kettle. The smoke seems to bend toward you.
     outcomes:
     - rid: 2623126381840826407

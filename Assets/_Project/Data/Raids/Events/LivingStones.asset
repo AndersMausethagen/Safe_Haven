@@ -24,11 +24,16 @@ MonoBehaviour:
   siteDistance: {x: 35, y: 70}
   siteText: 'Three runestones stand where the path should be. One is green with fresh moss. One is warm to the touch. One is scored with claw marks. Old rhyme: "Moss grows slow, so moss won''t lie."'
   artwork: {fileID: 21300000, guid: b3c0ce1e315ba624d9bb1b8df0ae46bc, type: 3}
+  stakes:
+    loot: 1
+    danger: 1
+    time: 1
   onStart: []
   choices:
   - label: Follow the mossy stone
     detail: It hasn't moved in a long time.
     cost: []
+    requires: []
     result: The path opens, and it leads somewhere shorter than it should.
     outcomes:
     - rid: 287758281410609285
@@ -36,16 +41,28 @@ MonoBehaviour:
   - label: Follow the warm stone
     detail: Something is under it. Could be good.
     cost: []
+    requires: []
     result: You put your shoulder to it.
     outcomes:
     - rid: 287758281410609287
   - label: Follow the clawed stone
     detail: Something else went this way.
     cost: []
+    requires: []
     result: The path closes behind you, and the cold comes up out of the ground.
     outcomes:
     - rid: 287758281410609292
     - rid: 287758281410609293
+  - label: Read the runes
+    detail: 'You know these marks: the right stone, no guessing.'
+    cost: []
+    requires:
+    - rid: 2623126383268724782
+    result: The runes say it plainly, if you can read them.
+    outcomes:
+    - rid: 2623126383268724783
+    - rid: 2623126383268724784
+  raisesWhenChosen: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -83,11 +100,19 @@ MonoBehaviour:
             minQuantity: 1
             maxQuantity: 1
             probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
           - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
             resource: {fileID: 0}
             minQuantity: 3
             maxQuantity: 5
             probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
     - rid: 287758281410609290
       type: {class: TellOutcome, ns: , asm: SafeHaven}
       data:
@@ -105,3 +130,36 @@ MonoBehaviour:
       type: {class: ApplyStatusOutcome, ns: , asm: SafeHaven}
       data:
         effect: {fileID: 11400000, guid: 32e9e33fb8f2e0748970b5e855fe720e, type: 2}
+    - rid: 2623126383268724782
+      type: {class: SkillAtLeast, ns: , asm: SafeHaven}
+      data:
+        skill: {fileID: 11400000, guid: 0bf8c75e4c32304428c7000e1e01913b, type: 2}
+        level: 15
+    - rid: 2623126383268724783
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: cbe9df10f8fa88f47be2f012ec678577, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 2
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 4
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126383268724784
+      type: {class: RevealMapOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 60
+        showExits: 1

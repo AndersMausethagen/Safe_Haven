@@ -24,6 +24,10 @@ MonoBehaviour:
   siteDistance: {x: 35, y: 70}
   siteText: A troll sits across the end of the bridge. "Toll," it says. "Or riddle. What runs and never walks, has a bed and never sleeps?"
   artwork: {fileID: 21300000, guid: 390f841f37daf3f4c96afdc728c3344d, type: 3}
+  stakes:
+    loot: 0
+    danger: 1
+    time: 0
   onStart: []
   choices:
   - label: Pay in silver
@@ -31,6 +35,7 @@ MonoBehaviour:
     cost:
     - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
       amount: 3
+    requires: []
     result: It bites each penny, pockets them somewhere in the moss, and points out every way up the valley.
     outcomes:
     - rid: 287758281410609273
@@ -40,6 +45,7 @@ MonoBehaviour:
     cost:
     - item: {fileID: 11400000, guid: 4f80b5d6098abc64b903316903de5b64, type: 2}
       amount: 3
+    requires: []
     result: It crunches them thoughtfully and points out every way up the valley.
     outcomes:
     - rid: 287758281410609273
@@ -47,12 +53,14 @@ MonoBehaviour:
   - label: '"A river."'
     detail: An answer.
     cost: []
+    requires: []
     result: It laughs until moss falls off it, and tosses you something from its pile.
     outcomes:
     - rid: 287758281410609275
   - label: '"The wind."'
     detail: An answer.
     cost: []
+    requires: []
     result: '"No," it says, and stands up.'
     outcomes:
     - rid: 287758281410609276
@@ -60,10 +68,12 @@ MonoBehaviour:
   - label: Walk through it
     detail: It won't move. Its children might.
     cost: []
+    requires: []
     result: It whistles through its teeth, and the rocks around you get up.
     outcomes:
     - rid: 287758281410609278
     - rid: 287758281410609279
+  raisesWhenChosen: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -89,6 +99,7 @@ MonoBehaviour:
             fromTier: 0
             toTier: 0
             fixedAmount: 0
+            onlyInRaid: {fileID: 0}
           - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
             resource: {fileID: 0}
             minQuantity: 3
@@ -97,6 +108,7 @@ MonoBehaviour:
             fromTier: 0
             toTier: 0
             fixedAmount: 0
+            onlyInRaid: {fileID: 0}
     - rid: 287758281410609276
       type: {class: ChangeHealthOutcome, ns: , asm: SafeHaven}
       data:

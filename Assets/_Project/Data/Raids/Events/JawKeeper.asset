@@ -24,6 +24,10 @@ MonoBehaviour:
   siteDistance: {x: 35, y: 70}
   siteText: Something of stone and antler sits across the way, older than the trolls, its jaw resting on its knees. "Everyone pays the Jaw-keeper," it says. "Iron, or a memory. Or try to pass, and see what the valley thinks of you."
   artwork: {fileID: 21300000, guid: 390f841f37daf3f4c96afdc728c3344d, type: 3}
+  stakes:
+    loot: 0
+    danger: 0
+    time: 1
   onStart: []
   choices:
   - label: Pay in iron
@@ -31,12 +35,14 @@ MonoBehaviour:
     cost:
     - item: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
       amount: 5
+    requires: []
     result: It takes the ore in one stone hand and crushes it like bread. "The way is yours," it says, and shows you all of it.
     outcomes:
     - rid: 2623126268168110234
   - label: Pay with a memory
     detail: Something you would rather keep. It costs time to find what it wants.
     cost: []
+    requires: []
     result: It reaches into your thoughts and takes a morning you liked. You stand blinking while the light moves. "Fair," it says, and something of its own goes into your pack.
     outcomes:
     - rid: 2623126268168110235
@@ -44,6 +50,7 @@ MonoBehaviour:
   - label: Walk past it
     detail: It won't stop you. The valley might.
     cost: []
+    requires: []
     result: It does not move. The rocks round it do.
     outcomes:
     - rid: 2623126268168110237
@@ -74,6 +81,7 @@ MonoBehaviour:
             fromTier: 0
             toTier: 0
             fixedAmount: 0
+            onlyInRaid: {fileID: 0}
     - rid: 2623126268168110237
       type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
       data:

@@ -24,11 +24,16 @@ MonoBehaviour:
   siteDistance: {x: 35, y: 70}
   siteText: At the water's edge an old lantern hangs on a stake, unlit. Out on the bog the lights wait in a line, toward a hummock no path leads to.
   artwork: {fileID: 21300000, guid: 19116eb4d7cf489499eb051c9af548ad, type: 3}
+  stakes:
+    loot: 2
+    danger: 2
+    time: 1
   onStart: []
   choices:
   - label: Follow the lights
     detail: Costs 30 seconds. They lead somewhere, not always somewhere good.
     cost: []
+    requires: []
     result: You step from tussock to tussock after them.
     outcomes:
     - rid: 2623126381840826393
@@ -36,6 +41,7 @@ MonoBehaviour:
   - label: Light the lantern
     detail: Their embers are yours at once. The lights themselves come to see who called.
     cost: []
+    requires: []
     result: The flame takes. Out on the water, every light turns toward you.
     outcomes:
     - rid: 2623126381840826399

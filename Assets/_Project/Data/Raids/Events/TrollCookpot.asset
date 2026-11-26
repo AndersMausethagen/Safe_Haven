@@ -24,11 +24,16 @@ MonoBehaviour:
   siteDistance: {x: 35, y: 70}
   siteText: A cauldron big enough to sit in bubbles over a dying fire. Bones in the stew. Huge footprints lead off toward the river, and they will lead back.
   artwork: {fileID: 21300000, guid: 85462276f09f89b4cb68c4ae77c41a40, type: 3}
+  stakes:
+    loot: 2
+    danger: 2
+    time: 0
   onStart: []
   choices:
   - label: Fish out the bones
     detail: Troll cooks keep the good bits in the pot. They'll be back soon, and they'll know.
     cost: []
+    requires: []
     result: Your arms come out grey to the elbow. Somewhere by the river, someone roars.
     outcomes:
     - rid: 2623126381840826375
@@ -36,6 +41,7 @@ MonoBehaviour:
   - label: Taste the broth
     detail: 'Thick, foul and strong: +30 health for 4 minutes, if it stays down.'
     cost: []
+    requires: []
     result: You hold your nose and drink.
     outcomes:
     - rid: 2623126381840826377

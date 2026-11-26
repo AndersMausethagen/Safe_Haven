@@ -1,0 +1,181 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: EldersBell
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: EldersBell
+  displayName: The Elder's Bell
+  weight: 1
+  earliestSeconds: 60
+  latestSecondsLeft: 100
+  minimumStage: 0
+  warning: A bell rings once in the deep wood, though there is no wind.
+  warningSound: {fileID: 11400000, guid: 53fe372285257d84faf9ea69968a9b0f, type: 2}
+  sitePrefab: {fileID: 7940016432191105948, guid: 99547257fa29eb64da45a89868659a62, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: An oak older than the forest round it. Bells hang from its last branch, green with age, and the roots at its foot are not still.
+  artwork: {fileID: 21300000, guid: 373a41dc7b8fceb4385f5bf65ae76a03, type: 3}
+  stakes:
+    loot: 2
+    danger: 2
+    time: 1
+  onStart: []
+  choices:
+  - label: Ring the bell and hold the oak
+    detail: Hold the oak for 40 seconds while the roots wake. The Elder pays those who stand.
+    cost: []
+    requires: []
+    result: The bell's note runs down into the roots, and the roots answer.
+    outcomes:
+    - rid: 2623126383268724736
+  - label: Climb up quietly
+    detail: Take the offerings tied in its branches without waking anything.
+    cost: []
+    requires:
+    - rid: 2623126383268724741
+    result: 'Silver, a carved stone, a pot of honey: what the woodfolk gave the Elder.'
+    outcomes:
+    - rid: 2623126383268724742
+  - label: Lay a hand on the bark
+    detail: Nothing taken, nothing asked.
+    cost: []
+    requires: []
+    result: You stand a moment with your palm on the old wood.
+    outcomes:
+    - rid: 2623126383268724743
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126383268724736
+      type: {class: DefendOutcome, ns: , asm: SafeHaven}
+      data:
+        label: Hold the Elder's oak
+        radius: 6
+        seconds: 40
+        waveEvery: 13
+        eachWave:
+        - rid: 2623126383268724737
+        onHeld:
+        - rid: 2623126383268724738
+        - rid: 2623126383268724739
+        - rid: 2623126383268724740
+    - rid: 2623126383268724737
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 3085881180223279310, guid: 049004d8140885f4db2790503b4ab12d, type: 3}
+        count: 2
+        radius: 12
+        hunt: 1
+    - rid: 2623126383268724738
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: The roots go still. The bark under your hand is warm.
+        kind: 1
+    - rid: 2623126383268724739
+      type: {class: GiveBoonOutcome, ns: , asm: SafeHaven}
+      data:
+        name: The Elder's Favour
+        bonuses:
+        - stat: 18
+          op: 0
+          value: 0.3
+        seconds: 300
+    - rid: 2623126383268724740
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: d0c7b274979b4ad46a9f3bf89b8cfa64, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 0}
+            resource: {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
+            minQuantity: 2
+            maxQuantity: 4
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126383268724741
+      type: {class: SkillAtLeast, ns: , asm: SafeHaven}
+      data:
+        skill: {fileID: 11400000, guid: cada299a42945b04b8c891d31b0c5351, type: 2}
+        level: 20
+    - rid: 2623126383268724742
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 4
+            maxQuantity: 8
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: cbe9df10f8fa88f47be2f012ec678577, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 0.5
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 1dd65120c9bb0304c8a45a8012af934c, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 2
+            probability: 0.6
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126383268724743
+      type: {class: ChanceOutcome, ns: , asm: SafeHaven}
+      data:
+        chance: 0.5
+        ifLucky:
+        - rid: 2623126383268724744
+        - rid: 2623126383268724745
+        ifNot:
+        - rid: 2623126383268724746
+    - rid: 2623126383268724744
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: The bark is warm. Your breath comes easier.
+        kind: 1
+    - rid: 2623126383268724745
+      type: {class: GiveBoonOutcome, ns: , asm: SafeHaven}
+      data:
+        name: Elder's Calm
+        bonuses:
+        - stat: 15
+          op: 0
+          value: 15
+        seconds: 180
+    - rid: 2623126383268724746
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: Nothing. Only an old tree.
+        kind: 0

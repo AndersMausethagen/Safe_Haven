@@ -24,11 +24,16 @@ MonoBehaviour:
   siteDistance: {x: 35, y: 70}
   siteText: A stone hearth on a bare rise, stacked with dry wood. You can see a long way from here, and a long way off, things can see it.
   artwork: {fileID: 21300000, guid: 1f5bc08810268aa40b0dcf7740f71cd9, type: 3}
+  stakes:
+    loot: 1
+    danger: 1
+    time: 1
   onStart: []
   choices:
   - label: Light it
     detail: Shows you the land and every way out. Everything for a long way will come to look.
     cost: []
+    requires: []
     result: It goes up with a roar. For a moment the whole forest is laid out in front of you.
     outcomes:
     - rid: 287758281410609281
@@ -36,10 +41,19 @@ MonoBehaviour:
   - label: Keep a small fire and rest
     detail: Heals you. Costs you 20 seconds.
     cost: []
+    requires: []
     result: You sit with your hands to the warmth until they stop shaking.
     outcomes:
     - rid: 287758281410609283
     - rid: 287758281410609284
+  - label: Light it and hold it
+    detail: Hold the beacon for 40 seconds while the forest comes to see. Held, it shows the whole land.
+    cost: []
+    requires: []
+    result: The fire takes. Far off, things turn toward the light.
+    outcomes:
+    - rid: 2623126383268724777
+  raisesWhenChosen: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -60,3 +74,43 @@ MonoBehaviour:
       type: {class: ChangeHealthOutcome, ns: , asm: SafeHaven}
       data:
         share: 0.5
+    - rid: 2623126383268724777
+      type: {class: DefendOutcome, ns: , asm: SafeHaven}
+      data:
+        label: Hold the beacon
+        radius: 6
+        seconds: 40
+        waveEvery: 15
+        eachWave:
+        - rid: 2623126383268724778
+        onHeld:
+        - rid: 2623126383268724779
+        - rid: 2623126383268724780
+        - rid: 2623126383268724781
+    - rid: 2623126383268724778
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+        count: 2
+        radius: 14
+        hunt: 1
+    - rid: 2623126383268724779
+      type: {class: RevealMapOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 150
+        showExits: 1
+    - rid: 2623126383268724780
+      type: {class: GiveBoonOutcome, ns: , asm: SafeHaven}
+      data:
+        name: Beacon's Warmth
+        bonuses:
+        - stat: 0
+          op: 0
+          value: 20
+        seconds: 240
+    - rid: 2623126383268724781
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: 'The beacon burns high: the whole land lies open below you.'
+        kind: 1

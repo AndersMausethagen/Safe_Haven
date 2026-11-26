@@ -1,0 +1,183 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: SunkenBellTower
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: SunkenBellTower
+  displayName: The Sunken Bell Tower
+  weight: 1
+  earliestSeconds: 60
+  latestSecondsLeft: 100
+  minimumStage: 0
+  warning: Under the water a bell rings, slow and deep. Out in the fen, a belfry leans out of the mud.
+  warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
+  sitePrefab: {fileID: 7940016432191105948, guid: 78926bf6c389faf45858997193599ac6, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: A church's belfry, sunk to its eaves in the bog, its bell still hanging. The water round it is too black to see into, and something below keeps time with the bell.
+  artwork: {fileID: 21300000, guid: cff23f134d9051d4cb25298777d3a45c, type: 3}
+  stakes:
+    loot: 2
+    danger: 2
+    time: 1
+  onStart: []
+  choices:
+  - label: Ring it from the belfry
+    detail: Hold the belfry for 35 seconds while the drowned climb out to see who rang.
+    cost: []
+    requires: []
+    result: You haul the rope. The note goes down into the water, and the water stirs.
+    outcomes:
+    - rid: 2623126383268724754
+  - label: Dive the stair
+    detail: 'Only after dark is the water clear enough to find the stair. Cold: a sixth of your health and 30 seconds.'
+    cost: []
+    requires:
+    - rid: 2623126383268724760
+    result: You go down the drowned stair into the black.
+    outcomes:
+    - rid: 2623126383268724761
+    - rid: 2623126383268724762
+    - rid: 2623126383268724763
+  - label: Listen to the bell
+    detail: Free. Let it ring.
+    cost: []
+    requires: []
+    result: You stand still and let it ring.
+    outcomes:
+    - rid: 2623126383268724764
+    - rid: 2623126383268724765
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126383268724754
+      type: {class: DefendOutcome, ns: , asm: SafeHaven}
+      data:
+        label: Hold the belfry
+        radius: 5
+        seconds: 35
+        waveEvery: 15
+        eachWave:
+        - rid: 2623126383268724755
+        onHeld:
+        - rid: 2623126383268724756
+        - rid: 2623126383268724757
+        - rid: 2623126383268724758
+    - rid: 2623126383268724755
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+        count: 1
+        radius: 10
+        hunt: 1
+    - rid: 2623126383268724756
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: The bell falls still. In the mud at the belfry's foot, the drowned left what they carried.
+        kind: 1
+    - rid: 2623126383268724757
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 96459a8d9566ae74cb04ee74d08a597b, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 3
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 5
+            maxQuantity: 10
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 8e4b25b050fb23840a86f61b5a5b074c, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 0.7
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126383268724758
+      type: {class: ChanceOutcome, ns: , asm: SafeHaven}
+      data:
+        chance: 0.25
+        ifLucky:
+        - rid: 2623126383268724759
+        ifNot: []
+    - rid: 2623126383268724759
+      type: {class: GiveRelicOutcome, ns: , asm: SafeHaven}
+      data: 
+    - rid: 2623126383268724760
+      type: {class: HourIs, ns: , asm: SafeHaven}
+      data:
+        dark: 1
+    - rid: 2623126383268724761
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -30
+    - rid: 2623126383268724762
+      type: {class: ChangeHealthOutcome, ns: , asm: SafeHaven}
+      data:
+        share: -0.15
+    - rid: 2623126383268724763
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 6
+            maxQuantity: 12
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 96459a8d9566ae74cb04ee74d08a597b, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 2
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: cbe9df10f8fa88f47be2f012ec678577, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 0.6
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126383268724764
+      type: {class: RevealMapOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 70
+        showExits: 1
+    - rid: 2623126383268724765
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: 'Its note maps the fen in your head: you know where the ways out lie.'
+        kind: 0

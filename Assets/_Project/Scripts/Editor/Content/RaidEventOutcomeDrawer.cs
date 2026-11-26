@@ -89,6 +89,14 @@ public sealed class RaidEventOutcomeDrawer : KindMenuDrawer<RaidEventOutcome>
     protected override string EmptyText => "Choose what happens…";
 }
 
+/// <summary>The kind menu on a raid event choice's needs (Docs/RaidEventsPlan_2026-11-26.md E2).</summary>
+[CustomPropertyDrawer(typeof(ChoiceRequirement), true)]
+public sealed class ChoiceRequirementDrawer : KindMenuDrawer<ChoiceRequirement>
+{
+    protected override string NameOf(ChoiceRequirement value) => value.DisplayName;
+    protected override string EmptyText => "Choose what it needs…";
+}
+
 /// <summary>The kind menu on an elite affix's behaviours.</summary>
 [CustomPropertyDrawer(typeof(EliteBehaviour), true)]
 public sealed class EliteBehaviourDrawer : KindMenuDrawer<EliteBehaviour>

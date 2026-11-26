@@ -24,11 +24,16 @@ MonoBehaviour:
   siteDistance: {x: 35, y: 70}
   siteText: Rot runs up the trunk in black veins and something like a pulse moves under the bark. Roots stir by your feet.
   artwork: {fileID: 21300000, guid: 99fc96e51dda6bd4bb0ffd7b6ee96405, type: 3}
+  stakes:
+    loot: 1
+    danger: 2
+    time: 1
   onStart: []
   choices:
   - label: Cut out the rot
     detail: Costs 30 seconds. Rootlings will defend it.
     cost: []
+    requires: []
     result: It screams without sound. Clean sap runs from the wound, and it gives something back.
     outcomes:
     - rid: 287758281410609300
@@ -37,10 +42,21 @@ MonoBehaviour:
   - label: Drink from the black sap
     detail: Strength for 4 minutes, and poison in your blood.
     cost: []
+    requires: []
     result: It tastes like the bottom of a well.
     outcomes:
     - rid: 287758281410609303
     - rid: 287758281410609304
+  - label: Draw out the rot
+    detail: 'A brewer''s craft: bleed the sap without waking the roots. 20 seconds.'
+    cost: []
+    requires:
+    - rid: 2623126383268724788
+    result: The black sap runs out into your jars, and the tree sighs.
+    outcomes:
+    - rid: 2623126383268724789
+    - rid: 2623126383268724790
+  raisesWhenChosen: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -66,16 +82,28 @@ MonoBehaviour:
             minQuantity: 2
             maxQuantity: 3
             probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
           - item: {fileID: 11400000, guid: 7e57bf86766de2341bd9c47b5830cf76, type: 2}
             resource: {fileID: 0}
             minQuantity: 2
             maxQuantity: 4
             probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
           - item: {fileID: 11400000, guid: 50d6dfa982b3a264980eaec31b4aae11, type: 2}
             resource: {fileID: 0}
             minQuantity: 1
             maxQuantity: 2
             probability: 0.6
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
     - rid: 287758281410609303
       type: {class: ApplyStatusOutcome, ns: , asm: SafeHaven}
       data:
@@ -92,3 +120,35 @@ MonoBehaviour:
           op: 0
           value: 15
         seconds: 240
+    - rid: 2623126383268724788
+      type: {class: SkillAtLeast, ns: , asm: SafeHaven}
+      data:
+        skill: {fileID: 11400000, guid: fc9f5ddf81e83b64d9706fd80ce6aade, type: 2}
+        level: 20
+    - rid: 2623126383268724789
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -20
+    - rid: 2623126383268724790
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: a74ced39f6a083047955bfe7834c61f0, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 2
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 0}
+            resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
+            minQuantity: 2
+            maxQuantity: 3
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
