@@ -1,0 +1,136 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: SnareLine
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: SnareLine
+  displayName: The Snare Line
+  weight: 1
+  earliestSeconds: 60
+  latestSecondsLeft: 100
+  minimumStage: 0
+  warning: Something big thrashes in a snare not far off, then goes quiet.
+  warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
+  sitePrefab: {fileID: 7940016432191105948, guid: ef091e11fc01be34984a881fa6c2055e, type: 3}
+  siteDistance: {x: 35, y: 70}
+  nearWater: 0
+  siteText: A trapper's mark, and a line of snares going off along a game trail. One holds a young wolf, hurt and furious. The trapper hasn't been back in days.
+  artwork: {fileID: 21300000, guid: bcfc36081dff3584e84241d28349ff85, type: 3}
+  stakes:
+    loot: 1
+    danger: 1
+    time: 2
+  onStart: []
+  choices:
+  - label: Follow the line
+    detail: To wherever he kept his catch. A long walk.
+    cost: []
+    requires: []
+    hiddenUntilMet: 0
+    result: You find the next snare, and the next.
+    outcomes:
+    - rid: 2623126389041660023
+  - label: Free what's caught
+    detail: The forest notices. Free.
+    cost: []
+    requires: []
+    hiddenUntilMet: 0
+    result: The wolf limps off without looking back. The woods seem to breathe out.
+    outcomes:
+    - rid: 2623126389041660026
+  - label: Take the snares
+    detail: Cord and pelts. 15 seconds.
+    cost: []
+    requires:
+    - rid: 2623126389041660027
+    hiddenUntilMet: 0
+    result: You coil the cord and take the pelts.
+    outcomes:
+    - rid: 2623126389041660028
+    - rid: 2623126389041660029
+  needsMark: 
+  blockedByMark: 
+  oncePerSave: 0
+  moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126389041660023
+      type: {class: TrackOutcome, ns: , asm: SafeHaven}
+      data:
+        label: Follow the snare line
+        distance: {x: 60, y: 110}
+        signEvery: 13
+        sign: {fileID: 5900659046113400388, guid: 2fe59014f75c131479f1beb529fef90b, type: 3}
+        leader: {fileID: 0}
+        endPrefab: {fileID: 5968853061259378244, guid: 0f6e101d0c9b8694dba63fbf28daa212, type: 3}
+        onFound:
+        - rid: 2623126389041660024
+        - rid: 2623126389041660025
+    - rid: 2623126389041660024
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: His cache, under a spruce. He won't need it now.
+        kind: 1
+    - rid: 2623126389041660025
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 5022422f3d793b34dab4ad85e9581321, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 4
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 8f121a970bae6f54dbcc8ff5e2c2a48e, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 2
+            probability: 0.6
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126389041660026
+      type: {class: CalmForestOutcome, ns: , asm: SafeHaven}
+      data:
+        amount: 30
+    - rid: 2623126389041660027
+      type: {class: SkillAtLeast, ns: , asm: SafeHaven}
+      data:
+        skill: {fileID: 11400000, guid: 4fde8ce0d82ef0d42b6bc607ec3f9a7a, type: 2}
+        level: 15
+    - rid: 2623126389041660028
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -15
+    - rid: 2623126389041660029
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 5022422f3d793b34dab4ad85e9581321, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 3
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}

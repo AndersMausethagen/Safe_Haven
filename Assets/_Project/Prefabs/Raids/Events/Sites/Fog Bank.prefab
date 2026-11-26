@@ -2589,6 +2589,7 @@ GameObject:
   - component: {fileID: 3582420615281603699}
   - component: {fileID: 4482561316716409055}
   - component: {fileID: 2157515931514679406}
+  - component: {fileID: 1205332211566646354}
   m_Layer: 0
   m_Name: Fog Bank
   m_TagString: Untagged
@@ -2650,6 +2651,32 @@ MonoBehaviour:
   beacon: {fileID: 7612022202869666967}
   mark: {fileID: 3218690921786200282}
   findRadius: 8
+--- !u!114 &1205332211566646354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5294197929266190911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f655434a56283ac419a02d53bb587f9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Interactable
+  animationType: 2
+  duration: 3
+  range: 3
+  deactivateOnComplete: 0
+  kind: 1
+  started:
+    m_PersistentCalls:
+      m_Calls: []
+  completed:
+    m_PersistentCalls:
+      m_Calls: []
+  cancelled:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &5892937771240321227
 GameObject:
   m_ObjectHideFlags: 0

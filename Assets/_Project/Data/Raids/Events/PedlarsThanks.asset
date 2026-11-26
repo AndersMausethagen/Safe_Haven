@@ -22,6 +22,7 @@ MonoBehaviour:
   warningSound: {fileID: 11400000, guid: 53fe372285257d84faf9ea69968a9b0f, type: 2}
   sitePrefab: {fileID: 5231722663379009252, guid: eb150ca2a9fe8dd42a5b3278c781c95d, type: 3}
   siteDistance: {x: 35, y: 70}
+  nearWater: 0
   siteText: The pedlar you pulled out of the ditch, his leg strapped up. "I hoped you'd come this way. I owe you."
   artwork: {fileID: 21300000, guid: 80c5c967415a02c43bbc2ab167d72f70, type: 3}
   stakes:
@@ -34,6 +35,7 @@ MonoBehaviour:
     detail: He presses a wrapped bundle into your hands.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: 'Draughts, silver, a carved stone: a pedlar''s best.'
     outcomes:
     - rid: 2623126385950982158
@@ -42,6 +44,7 @@ MonoBehaviour:
     detail: Pedlars know every path.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: He draws the land in the dirt with a stick, and the ways out.
     outcomes:
     - rid: 2623126385950982160
@@ -50,6 +53,8 @@ MonoBehaviour:
   blockedByMark: event:pedlar:thanked
   oncePerSave: 0
   moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2

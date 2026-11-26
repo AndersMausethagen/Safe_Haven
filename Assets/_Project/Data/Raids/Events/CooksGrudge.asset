@@ -1,0 +1,125 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: CooksGrudge
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: CooksGrudge
+  displayName: The Cook's Grudge
+  weight: 3
+  earliestSeconds: 40
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: 'A roar down the valley: someone''s dinner went missing, and the cook has your scent.'
+  warningSound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
+  sitePrefab: {fileID: 7940016432191105948, guid: 93360d23461e3f34492b27e47c999ef5, type: 3}
+  siteDistance: {x: 35, y: 70}
+  nearWater: 0
+  siteText: The troll whose pot you robbed, its ladle in its fist, standing over its cauldron. It's been waiting for you.
+  artwork: {fileID: 21300000, guid: c986b34b5b36ab9428f7d5f44fe5e364, type: 3}
+  stakes:
+    loot: 1
+    danger: 2
+    time: 0
+  onStart: []
+  choices:
+  - label: Pay it back in bones
+    detail: Tusks for its pot, and it forgets you.
+    cost:
+    - item: {fileID: 11400000, guid: f502c59e5645f1c4f98fbca7982042d4, type: 2}
+      amount: 2
+    requires: []
+    hiddenUntilMet: 0
+    result: It sniffs the tusks, grunts, and drops them in the stew.
+    outcomes:
+    - rid: 2623126389041660061
+    - rid: 2623126389041660062
+  - label: Fight it
+    detail: The cook, and the runts that eat its scraps.
+    cost: []
+    requires: []
+    hiddenUntilMet: 0
+    result: It swings the ladle like a club.
+    outcomes:
+    - rid: 2623126389041660063
+    - rid: 2623126389041660064
+    - rid: 2623126389041660065
+    - rid: 2623126389041660066
+  - label: Run
+    detail: 'It throws the ladle: a sixth of your health.'
+    cost: []
+    requires: []
+    hiddenUntilMet: 0
+    result: The ladle catches you between the shoulders.
+    outcomes:
+    - rid: 2623126389041660067
+    - rid: 2623126389041660068
+  needsMark: event:troll:pot:robbed
+  blockedByMark: event:troll:pot:grudge
+  oncePerSave: 0
+  moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126389041660061
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: It turns back to its cooking.
+        kind: 0
+    - rid: 2623126389041660062
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:troll:pot:grudge
+    - rid: 2623126389041660063
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
+        count: 1
+        radius: 4
+        hunt: 1
+    - rid: 2623126389041660064
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 6267209934607442583, guid: 3c524ee8a21d0aa48b70eb5f371bba06, type: 3}
+        count: 2
+        radius: 7
+        hunt: 1
+    - rid: 2623126389041660065
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 3
+            maxQuantity: 5
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126389041660066
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:troll:pot:grudge
+    - rid: 2623126389041660067
+      type: {class: ChangeHealthOutcome, ns: , asm: SafeHaven}
+      data:
+        share: -0.16
+    - rid: 2623126389041660068
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:troll:pot:grudge

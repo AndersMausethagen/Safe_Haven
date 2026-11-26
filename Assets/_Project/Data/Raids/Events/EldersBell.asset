@@ -22,6 +22,7 @@ MonoBehaviour:
   warningSound: {fileID: 11400000, guid: 53fe372285257d84faf9ea69968a9b0f, type: 2}
   sitePrefab: {fileID: 7940016432191105948, guid: 99547257fa29eb64da45a89868659a62, type: 3}
   siteDistance: {x: 35, y: 70}
+  nearWater: 0
   siteText: An oak older than the forest round it. Bells hang from its last branch, green with age, and the roots at its foot are not still.
   artwork: {fileID: 21300000, guid: 373a41dc7b8fceb4385f5bf65ae76a03, type: 3}
   stakes:
@@ -34,6 +35,7 @@ MonoBehaviour:
     detail: Hold the oak for 40 seconds while the roots wake. The Elder pays those who stand.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: The bell's note runs down into the roots, and the roots answer.
     outcomes:
     - rid: 2623126383268724736
@@ -42,6 +44,7 @@ MonoBehaviour:
     cost: []
     requires:
     - rid: 2623126383268724741
+    hiddenUntilMet: 0
     result: 'Silver, a carved stone, a pot of honey: what the woodfolk gave the Elder.'
     outcomes:
     - rid: 2623126383268724742
@@ -49,6 +52,7 @@ MonoBehaviour:
     detail: Nothing taken, nothing asked.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: You stand a moment with your palm on the old wood.
     outcomes:
     - rid: 2623126383268724743
@@ -56,6 +60,8 @@ MonoBehaviour:
   blockedByMark: 
   oncePerSave: 0
   moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2

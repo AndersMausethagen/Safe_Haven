@@ -20,9 +20,10 @@ MonoBehaviour:
   minimumStage: 1
   warning: A horn, far off and coming closer. The Oskorei ride. Get off the path, or be ready.
   warningSound: {fileID: 11400000, guid: 6510718f5af764e4aa78349c4b3f7cdf, type: 2}
-  sitePrefab: {fileID: 0}
+  sitePrefab: {fileID: 7940016432191105948, guid: 77250aba962d1dd4a9a5fb660b38bb2e, type: 3}
   siteDistance: {x: 35, y: 70}
-  siteText: 
+  nearWater: 0
+  siteText: A horn hangs on the waystone where the old road crosses. The hunt rides this way, and the horn is how you hail it.
   artwork: {fileID: 21300000, guid: 9ef79a3a2658be545b4b5d1299528144, type: 3}
   stakes:
     loot: 0
@@ -32,11 +33,41 @@ MonoBehaviour:
   - rid: 287758281410609294
   - rid: 287758281410609295
   - rid: 287758281410609296
-  choices: []
+  choices:
+  - label: Ride with them
+    detail: Blow the horn as they pass. They take you along a stretch, and share the spoils.
+    cost: []
+    requires:
+    - rid: 2623126389041660099
+    - rid: 2623126389041660100
+    hiddenUntilMet: 0
+    result: '"Rider! Ride!" For a while you are part of the hunt.'
+    outcomes:
+    - rid: 2623126389041660101
+    - rid: 2623126389041660102
+  - label: Raise a hand to them
+    detail: They know you. They'll let you be, and leave you something.
+    cost: []
+    requires:
+    - rid: 2623126389041660103
+    hiddenUntilMet: 1
+    result: A rider leans from the saddle as they pass and drops a pouch at your feet.
+    outcomes:
+    - rid: 2623126389041660104
+  - label: Get off the road
+    detail: Free. Hide and let them pass.
+    cost: []
+    requires: []
+    hiddenUntilMet: 0
+    result: You press into the ferns. The hunt goes by like a storm.
+    outcomes:
+    - rid: 2623126389041660105
   needsMark: 
   blockedByMark: 
   oncePerSave: 0
   moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2
@@ -61,3 +92,62 @@ MonoBehaviour:
         count: 2
         radius: 30
         hunt: 1
+    - rid: 2623126389041660099
+      type: {class: SkillAtLeast, ns: , asm: SafeHaven}
+      data:
+        skill: {fileID: 11400000, guid: ad510c562ab935f468111dad718b4bcb, type: 2}
+        level: 20
+    - rid: 2623126389041660100
+      type: {class: Mounted, ns: , asm: SafeHaven}
+      data: 
+    - rid: 2623126389041660101
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 4
+            maxQuantity: 8
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 8f121a970bae6f54dbcc8ff5e2c2a48e, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 2
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126389041660102
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:oskorei:rode
+    - rid: 2623126389041660103
+      type: {class: KnowsMark, ns: , asm: SafeHaven}
+      data:
+        mark: event:oskorei:rode
+        called: to have ridden with the Oskorei
+    - rid: 2623126389041660104
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 4
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126389041660105
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: Hooves, horns, and then nothing.
+        kind: 0

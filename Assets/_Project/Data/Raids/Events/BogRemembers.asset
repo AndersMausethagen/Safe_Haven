@@ -22,6 +22,7 @@ MonoBehaviour:
   warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
   sitePrefab: {fileID: 7940016432191105948, guid: 7205d1f5181860f459166d85ef72d918, type: 3}
   siteDistance: {x: 35, y: 70}
+  nearWater: 0
   siteText: The water by the bank is very still, and under it a pale face you laid to rest once. "You were kind. Listen."
   artwork: {fileID: 21300000, guid: 35a7591efe75d1b43a067f41e98a0534, type: 3}
   stakes:
@@ -34,6 +35,7 @@ MonoBehaviour:
     detail: It tells where the deep peat holds iron.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: Where the bog keeps its iron, and the ways through.
     outcomes:
     - rid: 2623126385950982168
@@ -43,6 +45,7 @@ MonoBehaviour:
     detail: Nothing asked.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: The face smiles, and sinks.
     outcomes:
     - rid: 2623126385950982171
@@ -51,6 +54,8 @@ MonoBehaviour:
   blockedByMark: event:bog:answered
   oncePerSave: 0
   moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2

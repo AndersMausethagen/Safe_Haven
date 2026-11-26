@@ -22,6 +22,7 @@ MonoBehaviour:
   warningSound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
   sitePrefab: {fileID: 7940016432191105948, guid: 93360d23461e3f34492b27e47c999ef5, type: 3}
   siteDistance: {x: 35, y: 70}
+  nearWater: 0
   siteText: A cauldron big enough to sit in bubbles over a dying fire. Bones in the stew. Huge footprints lead off toward the river, and they will lead back.
   artwork: {fileID: 21300000, guid: 85462276f09f89b4cb68c4ae77c41a40, type: 3}
   stakes:
@@ -34,14 +35,17 @@ MonoBehaviour:
     detail: Troll cooks keep the good bits in the pot. They'll be back soon, and they'll know.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: Your arms come out grey to the elbow. Somewhere by the river, someone roars.
     outcomes:
     - rid: 2623126381840826375
     - rid: 2623126381840826376
+    - rid: 2623126389041659978
   - label: Taste the broth
     detail: 'Thick, foul and strong: +30 health for 4 minutes, if it stays down.'
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: You hold your nose and drink.
     outcomes:
     - rid: 2623126381840826377
@@ -49,6 +53,8 @@ MonoBehaviour:
   blockedByMark: 
   oncePerSave: 0
   moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2
@@ -135,3 +141,7 @@ MonoBehaviour:
       type: {class: ApplyStatusOutcome, ns: , asm: SafeHaven}
       data:
         effect: {fileID: 11400000, guid: 5e5542ad4304a994f97fcb8f9b6e0f46, type: 2}
+    - rid: 2623126389041659978
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:troll:pot:robbed

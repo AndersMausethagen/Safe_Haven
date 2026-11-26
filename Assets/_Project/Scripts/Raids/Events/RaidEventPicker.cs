@@ -24,7 +24,7 @@ public static class RaidEventPicker
         foreach (RaidEventDefinition candidate in pool)
         {
             bool open = candidate != null && !used.Contains(candidate) && candidate.CanHappen(elapsed, secondsLeft, stage) && candidate.AllowedBy(hasMark, hadAtStart);
-            float weight = open ? candidate.WeightIn(states) : 0f;
+            float weight = open ? candidate.WeightIn(states, hasMark) : 0f;
             if (open && condition != null)
             {
                 weight *= condition.Boosts(candidate);

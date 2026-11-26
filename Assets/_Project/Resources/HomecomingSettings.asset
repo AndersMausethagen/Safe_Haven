@@ -12,6 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29650479566c4214ba545a3ba5a2fbd5, type: 3}
   m_Name: HomecomingSettings
   m_EditorClassIdentifier: SafeHaven::HomecomingSettings
+  visits:
+  - needsMark: event:pedlar:freed
+    doneMark: event:pedlar:visited
+    item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+    amount: 6
+    line: The pedlar you freed from under the log came by the gate while you were out. He left silver, and his thanks.
+  - needsMark: event:dairymaid:home
+    doneMark: event:dairymaid:visited
+    item: {fileID: 11400000, guid: 4f0ad2fc96d35f9458f41cc859ab82a9, type: 2}
+    amount: 3
+    line: The dairymaid you brought down from the seter came by with a basket for you.
   chance: 0.6
   gifts:
   - job: {fileID: 11400000, guid: b33d365bf7bdfe74793c6d3f0f4b33a5, type: 2}

@@ -22,6 +22,7 @@ MonoBehaviour:
   warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
   sitePrefab: {fileID: 5231722663379009252, guid: eb150ca2a9fe8dd42a5b3278c781c95d, type: 3}
   siteDistance: {x: 35, y: 70}
+  nearWater: 0
   siteText: The hooded stranger, not looking up. "You took a wish. I always collect."
   artwork: {fileID: 21300000, guid: 828dc97ffe5729549bdcaec9221e6eb7, type: 3}
   stakes:
@@ -34,32 +35,40 @@ MonoBehaviour:
     detail: A fifth of your health, and you're square.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: Cold fingers on your wrist. Then nothing.
     outcomes:
     - rid: 2623126385950982162
     - rid: 2623126385950982163
+    - rid: 2623126389041659980
   - label: Pay in silver
     detail: Eight pennies, and you're square.
     cost:
     - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
       amount: 8
     requires: []
+    hiddenUntilMet: 0
     result: The coins vanish into the grey sleeve.
     outcomes:
     - rid: 2623126385950982164
     - rid: 2623126385950982165
+    - rid: 2623126389041659981
   - label: Refuse
     detail: The stranger lets the hounds decide.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: '"Then the hounds will collect."'
     outcomes:
     - rid: 2623126385950982166
     - rid: 2623126385950982167
+    - rid: 2623126389041659982
   needsMark: event:stranger:owed
   blockedByMark: event:stranger:paid
   oncePerSave: 0
   moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2
@@ -93,3 +102,15 @@ MonoBehaviour:
       type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
       data:
         mark: event:stranger:paid
+    - rid: 2623126389041659980
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:stranger:settled
+    - rid: 2623126389041659981
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:stranger:settled
+    - rid: 2623126389041659982
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:stranger:refused

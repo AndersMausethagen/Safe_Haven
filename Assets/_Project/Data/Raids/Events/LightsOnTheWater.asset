@@ -22,6 +22,7 @@ MonoBehaviour:
   warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
   sitePrefab: {fileID: 7940016432191105948, guid: c8f016487972ec64c974a9845399fb6c, type: 3}
   siteDistance: {x: 35, y: 70}
+  nearWater: 0
   siteText: At the water's edge an old lantern hangs on a stake, unlit. Out on the bog the lights wait in a line, toward a hummock no path leads to.
   artwork: {fileID: 21300000, guid: 19116eb4d7cf489499eb051c9af548ad, type: 3}
   stakes:
@@ -34,6 +35,7 @@ MonoBehaviour:
     detail: Costs 30 seconds. They lead somewhere, not always somewhere good.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: You step from tussock to tussock after them.
     outcomes:
     - rid: 2623126381840826393
@@ -42,14 +44,18 @@ MonoBehaviour:
     detail: Their embers are yours at once. The lights themselves come to see who called.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: The flame takes. Out on the water, every light turns toward you.
     outcomes:
     - rid: 2623126381840826399
     - rid: 2623126381840826400
+    - rid: 2623126389041659983
   needsMark: 
   blockedByMark: 
   oncePerSave: 0
   moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2
@@ -149,3 +155,7 @@ MonoBehaviour:
             toTier: 0
             fixedAmount: 0
             onlyInRaid: {fileID: 0}
+    - rid: 2623126389041659983
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:lantern:lit

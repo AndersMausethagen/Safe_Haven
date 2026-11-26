@@ -11,9 +11,19 @@ public static class RaidReportText
     public static string Loss => UIStyle.Current.DangerHex;
     public static string Muted => UIStyle.Current.MutedHex;
 
+    /// <summary>The title of a raid the player fell in, as the journal keeps it (RaidRecord.Outcome).</summary>
+    public const string DiedTitle = "You Died";
+
     public static string Title(RaidReport report)
     {
-        return report.Extracted ? "Extracted!" : report.Outcome == RaidOutcome.Died ? "You Died" : "Raid Collapsed";
+        return report.Extracted ? "Extracted!" : report.Outcome == RaidOutcome.Died ? DiedTitle : "Raid Collapsed";
+    }
+
+    /// <summary>True when the last raid in the journal ended with the player fallen: kept in the save, unlike Homecoming.LastOutcome.</summary>
+    public static bool FellLastRaid(JournalRecord journal)
+    {
+        IReadOnlyList<RaidRecord> raids = journal?.Raids;
+        return raids != null && raids.Count > 0 && raids[raids.Count - 1].Outcome == DiedTitle;
     }
 
     public static string Subtitle(RaidReport report)

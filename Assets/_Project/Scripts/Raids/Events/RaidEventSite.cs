@@ -200,6 +200,12 @@ public sealed class RaidEventSite : MonoBehaviour, IInteractionName, IInteractio
             string detail = string.IsNullOrEmpty(price) ? choice.detail : string.IsNullOrEmpty(choice.detail) ? price : $"{price}. {choice.detail}";
             // A need not met: shown, greyed, with what it needs first (Docs/RaidEventsPlan_2026-11-26.md E2).
             ChoiceRequirement unmet = choice.Unmet(user, context?.Session);
+            // One the player's past opens (a troll who knows them) isn't hinted at before.
+            if (unmet != null && choice.hiddenUntilMet)
+            {
+                continue;
+            }
+
             if (unmet != null)
             {
                 detail = string.IsNullOrEmpty(detail) ? unmet.Reason : $"{unmet.Reason}. {detail}";

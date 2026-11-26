@@ -38,6 +38,8 @@ public sealed class RaidEventDefinition : ScriptableObject, IDisplayName
     [SerializeField] private GameObject sitePrefab;
     [Tooltip("How far from the player the site appears, out of sight.")]
     [SerializeField] private Vector2 siteDistance = new Vector2(35f, 70f);
+    [Tooltip("The site stands on a shore, dry but with water a few steps off (a ferryman's raft). Event rooms are skipped for it.")]
+    [SerializeField] private bool nearWater;
     [Tooltip("What the player sees on arriving, shown above the choices.")]
     [SerializeField, TextArea(2, 5)] private string siteText;
     [Tooltip("A painting of the scene, above its words and choices (LocalSpawn: Tools/LocalSpawn/event_art.json). Optional.")]
@@ -59,6 +61,10 @@ public sealed class RaidEventDefinition : ScriptableObject, IDisplayName
     [SerializeField] private bool oncePerSave;
     [Tooltip("More likely while the player is in these states: a full bag, an angry forest, a fall last raid, the night.")]
     [SerializeField] private List<EventStateWeight> moreLikelyWhen = new List<EventStateWeight>();
+    [Tooltip("More likely once the journal holds these marks (the bell told where the Lindorm sleeps), without needing them.")]
+    [SerializeField] private List<EventMarkWeight> moreLikelyWithMark = new List<EventMarkWeight>();
+    [Tooltip("A legend's page in the journal's Strange Things, once met (Once Per Save). Empty: the site's words.")]
+    [SerializeField, TextArea(3, 8)] private string legendPage = "";
     [Tooltip("A Story Event raised when any choice is taken here: how a quest counts what was done at the site, whichever way it went " +
              "(Act II's set pieces: the door in the snow, the wrong door at the Black Pool). Empty: none.")]
     [RaisedByGame, SerializeField] private GameEventDefinition raisesWhenChosen;
@@ -78,6 +84,9 @@ public sealed class RaidEventDefinition : ScriptableObject, IDisplayName
     public GameEventDefinition RaisesWhenChosen => raisesWhenChosen;
     public bool OncePerSave => oncePerSave;
     public string NeedsMark => needsMark;
+    public bool NearWater => nearWater;
+    /// <summary>What the journal's Strange Things says of it, once met.</summary>
+    public string LegendPage => string.IsNullOrWhiteSpace(legendPage) ? siteText : legendPage;
 
     /// <summary>The journal mark a legend leaves once the player reaches it.</summary>
     public string OnceMark => "event:once:" + Id;
@@ -99,8 +108,8 @@ public sealed class RaidEventDefinition : ScriptableObject, IDisplayName
             && (!oncePerSave || !hasMark(OnceMark));
     }
 
-    /// <summary>Its weight times every state's that holds now (1 when none).</summary>
-    public float WeightIn(ICollection<RaidEventState> states)
+    /// <summary>Its weight times every state's that holds now and every mark's the save holds (1 when none).</summary>
+    public float WeightIn(ICollection<RaidEventState> states, System.Func<string, bool> hasMark = null)
     {
         float scale = 1f;
         if (states != null)
@@ -108,6 +117,17 @@ public sealed class RaidEventDefinition : ScriptableObject, IDisplayName
             foreach (EventStateWeight rule in moreLikelyWhen)
             {
                 if (rule != null && states.Contains(rule.state))
+                {
+                    scale *= Mathf.Max(0f, rule.times);
+                }
+            }
+        }
+
+        if (hasMark != null)
+        {
+            foreach (EventMarkWeight rule in moreLikelyWithMark)
+            {
+                if (rule != null && !string.IsNullOrEmpty(rule.mark) && hasMark(rule.mark))
                 {
                     scale *= Mathf.Max(0f, rule.times);
                 }
@@ -156,6 +176,14 @@ public sealed class EventStateWeight
     [Min(0f)] public float times = 3f;
 }
 
+/// <summary>How many times likelier an event is once the journal holds a mark.</summary>
+[Serializable]
+public sealed class EventMarkWeight
+{
+    public string mark;
+    [Min(0f)] public float times = 4f;
+}
+
 /// <summary>What an event puts at stake, each 0 (none) to 2 (much): told with its warning, in words.</summary>
 [Serializable]
 public struct EventStakes
@@ -198,6 +226,9 @@ public sealed class RaidEventChoice
     [Tooltip("What else it needs: a skill, a thing carried, someone along, the hour (Docs/RaidEventsPlan_2026-11-26.md E2). Unmet, the " +
              "choice still shows, greyed, with the reason.")]
     [SerializeReference] public List<ChoiceRequirement> requires = new List<ChoiceRequirement>();
+    [Tooltip("Not shown at all until its needs are met (a troll who knows you, a barrow you sealed): a choice the player's past opens, " +
+             "not one to aim for.")]
+    public bool hiddenUntilMet;
 
     /// <summary>The first need the player doesn't meet, or null when every one is met.</summary>
     public ChoiceRequirement Unmet(GameObject player, RaidSession session)

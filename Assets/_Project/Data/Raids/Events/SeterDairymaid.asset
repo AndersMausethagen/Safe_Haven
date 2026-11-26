@@ -1,0 +1,146 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: SeterDairymaid
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: SeterDairymaid
+  displayName: The Dairymaid of the Seter
+  weight: 1
+  earliestSeconds: 60
+  latestSecondsLeft: 150
+  minimumStage: 0
+  warning: 'A girl''s voice from the high seter: a cattle call, then a scream, then nothing.'
+  warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
+  sitePrefab: {fileID: 7940016432191105948, guid: d320bd2aba776794ab15dfa993b9c60b, type: 3}
+  siteDistance: {x: 35, y: 70}
+  nearWater: 0
+  siteText: An empty seter, the door off its hinges, troll prints in the trampled grass. In the dark of the byre a dairymaid hides, white-faced. "They took the cows. They'll be back for me."
+  artwork: {fileID: 21300000, guid: 7d70a1d7a5491094888f50eb2a5da589, type: 3}
+  stakes:
+    loot: 1
+    danger: 2
+    time: 2
+  onStart: []
+  choices:
+  - label: Take her to a way out
+    detail: She walks slowly, and trolls follow her scent. She'll remember you.
+    cost: []
+    requires: []
+    hiddenUntilMet: 0
+    result: '"Stay close behind me." She nods, and takes a milking stool for a weapon.'
+    outcomes:
+    - rid: 2623126389041660040
+    - rid: 2623126389041660045
+  - label: Show her the goat path
+    detail: She goes down alone by a hidden way. Safer for you both.
+    cost: []
+    requires:
+    - rid: 2623126389041660046
+    hiddenUntilMet: 0
+    result: You point out the old goat path. She goes like a shadow.
+    outcomes:
+    - rid: 2623126389041660047
+    - rid: 2623126389041660048
+  - label: Leave her
+    detail: Free. She stays in the dark.
+    cost: []
+    requires: []
+    hiddenUntilMet: 0
+    result: You leave her in the byre. Her breathing follows you a long way.
+    outcomes:
+    - rid: 2623126389041660049
+  needsMark: 
+  blockedByMark: 
+  oncePerSave: 0
+  moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126389041660040
+      type: {class: EscortOutcome, ns: , asm: SafeHaven}
+      data:
+        label: Bring the dairymaid out
+        follower: {fileID: 5350680639275330651, guid: f3119215b103217498e8e5ed894f5014, type: 3}
+        onDelivered:
+        - rid: 2623126389041660041
+        - rid: 2623126389041660042
+        - rid: 2623126389041660043
+        onLost:
+        - rid: 2623126389041660044
+    - rid: 2623126389041660041
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: '"I''ll not forget this. Ask for me at the seter in summer."'
+        kind: 1
+    - rid: 2623126389041660042
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:dairymaid:home
+    - rid: 2623126389041660043
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 8ae780c7423381b4bae5edf4e4beabc9, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 3
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126389041660044
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: She'll not see the seter again.
+        kind: 2
+    - rid: 2623126389041660045
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 6267209934607442583, guid: 3c524ee8a21d0aa48b70eb5f371bba06, type: 3}
+        count: 2
+        radius: 18
+        hunt: 1
+    - rid: 2623126389041660046
+      type: {class: SkillAtLeast, ns: , asm: SafeHaven}
+      data:
+        skill: {fileID: 11400000, guid: cada299a42945b04b8c891d31b0c5351, type: 2}
+        level: 15
+    - rid: 2623126389041660047
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: She leaves you the last of her honey.
+        kind: 1
+    - rid: 2623126389041660048
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 1dd65120c9bb0304c8a45a8012af934c, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 2
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126389041660049
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: Behind you the seter is quiet.
+        kind: 0

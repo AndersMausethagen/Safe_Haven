@@ -970,6 +970,11 @@ MonoBehaviour:
           - {fileID: 11400000, guid: b7977d02ffc4a1c4fa44cce60ed4086b, type: 2}
           - {fileID: 11400000, guid: d77c1c9fb8e54c7408f70e7335be21a4, type: 2}
           - {fileID: 11400000, guid: 22896ee66dd596a41a67a75551c5576f, type: 2}
+          - {fileID: 11400000, guid: 4e430eeb93cdd714d9cc47a178b7b4ca, type: 2}
+          - {fileID: 11400000, guid: 975aa1c608a1fef4ba37bcbba4ec4e65, type: 2}
+          - {fileID: 11400000, guid: 7a21fbffb7ec9224e82103fd0947a6ca, type: 2}
+          - {fileID: 11400000, guid: 12a4ea1a72b1cf84c817611a7980ee21, type: 2}
+          - {fileID: 11400000, guid: d4dbe1b889ca60b4886cc35f2b49bcf5, type: 2}
           firstDelay: 45
           interval: 110
           intervalSpread: 35
@@ -983,6 +988,7 @@ MonoBehaviour:
             - {fileID: 11400000, guid: a6e4e2258b6e47947a4f021faf7f72c6, type: 2}
             - {fileID: 11400000, guid: 0bf6173a2dad65d4b95705cfd803da75, type: 2}
             - {fileID: 11400000, guid: af0df18316e8d234db83d6f5d0c5eaad, type: 2}
+            - {fileID: 11400000, guid: 975aa1c608a1fef4ba37bcbba4ec4e65, type: 2}
             times: 3
           - name: Peat-cutting time
             briefing: The peat cutters are out. Their huts are warm, and their paths are marked.
@@ -990,6 +996,7 @@ MonoBehaviour:
             events:
             - {fileID: 11400000, guid: 22ab06155b93f724fb4994d59d02dbc5, type: 2}
             - {fileID: 11400000, guid: 0e80131760e7a4745b441cf5c2943695, type: 2}
+            - {fileID: 11400000, guid: 4e430eeb93cdd714d9cc47a178b7b4ca, type: 2}
             times: 3
     - rid: 287758281410609374
       type: {class: RaidRumoursSystem, ns: , asm: SafeHaven}

@@ -1,0 +1,178 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: WoodcuttersLastTree
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: WoodcuttersLastTree
+  displayName: The Woodcutter's Last Tree
+  weight: 1
+  earliestSeconds: 60
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: Somewhere close, an axe stopped mid-stroke. It hasn't started again.
+  warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
+  sitePrefab: {fileID: 7940016432191105948, guid: 09b63056c186bff4ba9fa6dacbe2c534, type: 3}
+  siteDistance: {x: 35, y: 70}
+  nearWater: 0
+  siteText: A giant cedar, cut halfway through. The axe is still in it; the woodcutter isn't. Wolf tracks circle the stump, and below the bank a den stinks of old meat.
+  artwork: {fileID: 21300000, guid: 731b8679cab6b5047a701cce33f24fd9, type: 3}
+  stakes:
+    loot: 2
+    danger: 1
+    time: 1
+  onStart: []
+  choices:
+  - label: Fell it onto the den
+    detail: It crushes the wolves' den, and what they dragged in spills out. 20 seconds.
+    cost: []
+    requires:
+    - rid: 2623126389041660013
+    hiddenUntilMet: 0
+    result: Three blows, a crack like thunder, and the cedar comes down across the den.
+    outcomes:
+    - rid: 2623126389041660014
+    - rid: 2623126389041660015
+    - rid: 2623126389041660016
+    - rid: 2623126389041660017
+  - label: Fell it for the timber
+    detail: 'Good wood, but loud: the wolves come to see. 30 seconds.'
+    cost: []
+    requires: []
+    hiddenUntilMet: 0
+    result: It comes down slow and huge. Something howls.
+    outcomes:
+    - rid: 2623126389041660018
+    - rid: 2623126389041660019
+    - rid: 2623126389041660020
+    - rid: 2623126389041660021
+  - label: Take the axe and go
+    detail: Free. It's still sharp.
+    cost: []
+    requires: []
+    hiddenUntilMet: 0
+    result: You work it loose. The tree creaks, and holds.
+    outcomes:
+    - rid: 2623126389041660022
+  needsMark: 
+  blockedByMark: 
+  oncePerSave: 0
+  moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126389041660013
+      type: {class: SkillAtLeast, ns: , asm: SafeHaven}
+      data:
+        skill: {fileID: 11400000, guid: a277ba53f2eae0648aa06826e44cbfd8, type: 2}
+        level: 25
+    - rid: 2623126389041660014
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -20
+    - rid: 2623126389041660015
+      type: {class: ShowSitePartOutcome, ns: , asm: SafeHaven}
+      data:
+        part: After
+        hideModel: 1
+    - rid: 2623126389041660016
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 3
+            maxQuantity: 6
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 8f121a970bae6f54dbcc8ff5e2c2a48e, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 2
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 5022422f3d793b34dab4ad85e9581321, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 2
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126389041660017
+      type: {class: MakeNoiseOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 30
+    - rid: 2623126389041660018
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -30
+    - rid: 2623126389041660019
+      type: {class: ShowSitePartOutcome, ns: , asm: SafeHaven}
+      data:
+        part: After
+        hideModel: 1
+    - rid: 2623126389041660020
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 183fddc5567e8b8479fcb1618e73496c, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 4
+            maxQuantity: 6
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126389041660021
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+        count: 2
+        radius: 8
+        hunt: 1
+    - rid: 2623126389041660022
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 7e69e97c2a5edf149a174a57b97507dc, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 0.35
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 3
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}

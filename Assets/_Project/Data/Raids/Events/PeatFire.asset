@@ -1,0 +1,96 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: PeatFire
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: PeatFire
+  displayName: The Peat Fire
+  weight: 1
+  earliestSeconds: 50
+  latestSecondsLeft: 100
+  minimumStage: 0
+  warning: The air tastes of smoke, and the ground ahead is warm under your feet.
+  warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
+  sitePrefab: {fileID: 7940016432191105948, guid: b01ec636f436a3042a158d37e927ab5a, type: 3}
+  siteDistance: {x: 35, y: 70}
+  nearWater: 0
+  siteText: The peat is burning underneath, a wide black patch breathing smoke. The peat cutters' path runs straight across it. Round it is the long way.
+  artwork: {fileID: 21300000, guid: 741631dfe2fb3fd46bb8e2df528cdca7, type: 3}
+  stakes:
+    loot: 0
+    danger: 1
+    time: 2
+  onStart: []
+  choices:
+  - label: Cross it fast
+    detail: 'Straight over: it burns (a fifth of your health), but you save the long way round.'
+    cost: []
+    requires: []
+    hiddenUntilMet: 0
+    result: You run. The crust cracks under you, and you're over, smoking.
+    outcomes:
+    - rid: 2623126389041660050
+    - rid: 2623126389041660051
+  - label: Cut a firebreak
+    detail: 40 seconds' digging. The peat cutters will remember.
+    cost: []
+    requires:
+    - rid: 2623126389041660052
+    hiddenUntilMet: 0
+    result: You cut a trench across the cutters' path. The fire won't cross it.
+    outcomes:
+    - rid: 2623126389041660053
+    - rid: 2623126389041660054
+  - label: Go round
+    detail: Free. The long way.
+    cost: []
+    requires: []
+    hiddenUntilMet: 0
+    result: The long way, then.
+    outcomes:
+    - rid: 2623126389041660055
+  needsMark: 
+  blockedByMark: 
+  oncePerSave: 0
+  moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126389041660050
+      type: {class: ChangeHealthOutcome, ns: , asm: SafeHaven}
+      data:
+        share: -0.2
+    - rid: 2623126389041660051
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: 25
+    - rid: 2623126389041660052
+      type: {class: SkillAtLeast, ns: , asm: SafeHaven}
+      data:
+        skill: {fileID: 11400000, guid: 71d286514cbbbe149ba663b354b4f1ae, type: 2}
+        level: 20
+    - rid: 2623126389041660053
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -40
+    - rid: 2623126389041660054
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:peat:firebreak
+    - rid: 2623126389041660055
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: Smoke follows you along the edge of the fire.
+        kind: 0

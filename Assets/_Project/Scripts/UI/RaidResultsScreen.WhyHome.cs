@@ -18,8 +18,9 @@ public sealed partial class RaidResultsScreen
         ("needed_at_home", "Needed at home", "House"),
     };
 
-    private const float ReasonWidth = 92f;
-    private const float ReasonPicture = 64f;
+    // Small enough that the five fit the right-hand panel at 16:9 (about 470 wide).
+    private const float ReasonWidth = 78f;
+    private const float ReasonPicture = 50f;
     private RectTransform whyHome;
 
     private static bool AsksWhyHome => CheatSettings.Current != null && CheatSettings.Current.IsAvailable
@@ -35,8 +36,13 @@ public sealed partial class RaidResultsScreen
         UIStyle style = UIStyle.Current;
         float width = Reasons.Length * (ReasonWidth + 8f) + 24f;
         float height = ReasonPicture + 40f + 56f;
-        whyHome = CodeUI.Box("Why Home", content.transform.parent, new Vector2(0.03f, 0.07f), new Vector2(width, height), Vector2.zero);
-        whyHome.pivot = Vector2.zero;
+        // In the right-hand panel over the button (the haul's panel holds the top left now), the facts making room above it.
+        whyHome = CodeUI.Box("Why Home", content.transform, new Vector2(0.5f, 0f), new Vector2(width, height), new Vector2(0f, FactsBottom - 14f));
+        whyHome.pivot = new Vector2(0.5f, 0f);
+        if (reportRect != null)
+        {
+            reportRect.offsetMin = new Vector2(reportRect.offsetMin.x, FactsBottom + WhyHomeRoom);
+        }
         HearthKit.Card(whyHome, "Back", 0f, 0f, width, height, 0.5f, HearthKit.Faded(style.Panel, 0.92f));
         TMP_Text title = CodeUI.Label("Title", whyHome, 12f, 8f, width - 24f, 28f, 20f, style.AccentBright, TextAlignmentOptions.Left);
         title.text = "Why home?  <size=70%><color=" + style.MutedHex + ">playtest: one tap</color></size>";
@@ -60,6 +66,11 @@ public sealed partial class RaidResultsScreen
         {
             Destroy(whyHome.gameObject);
             whyHome = null;
+        }
+
+        if (reportRect != null)
+        {
+            reportRect.offsetMin = new Vector2(reportRect.offsetMin.x, FactsBottom);
         }
     }
 }

@@ -22,6 +22,7 @@ MonoBehaviour:
   warningSound: {fileID: 11400000, guid: 53fe372285257d84faf9ea69968a9b0f, type: 2}
   sitePrefab: {fileID: 8216466046246968194, guid: c01d4d922b5f33041ba5c004979e6d57, type: 3}
   siteDistance: {x: 35, y: 70}
+  nearWater: 0
   siteText: A pedlar lies pinned under a fallen spruce, his pack just out of his reach. "Please. They'll smell me soon."
   artwork: {fileID: 21300000, guid: 28e3fb90cff3ffa499b1fb7a6e27529f, type: 3}
   stakes:
@@ -34,6 +35,7 @@ MonoBehaviour:
     detail: Costs you 45 seconds, and it's loud work.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: He limps off into the trees, but not before pressing his purse into your hand.
     outcomes:
     - rid: 287758281410609252
@@ -44,6 +46,7 @@ MonoBehaviour:
     detail: Quick. You'll carry it with you for a while.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: You don't look back. His voice follows you for a long time.
     outcomes:
     - rid: 287758281410609255
@@ -54,6 +57,7 @@ MonoBehaviour:
     cost: []
     requires:
     - rid: 2623126383268724766
+    hiddenUntilMet: 0
     result: One good heave in the right place and the log rolls. He presses his purse into your hand.
     outcomes:
     - rid: 2623126383268724767
@@ -63,6 +67,8 @@ MonoBehaviour:
   blockedByMark: 
   oncePerSave: 0
   moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2

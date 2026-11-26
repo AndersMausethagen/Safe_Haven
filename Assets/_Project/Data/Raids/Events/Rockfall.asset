@@ -22,6 +22,7 @@ MonoBehaviour:
   warningSound: {fileID: 11400000, guid: 10f67b83128cc194c8187151a24531c4, type: 2}
   sitePrefab: {fileID: 7940016432191105948, guid: bcf91ba8fe006f3489cb84b9503bb13f, type: 3}
   siteDistance: {x: 35, y: 70}
+  nearWater: 0
   siteText: Fresh scree across the ledge. Under it, a crushed pack frame, a broken pick and the corner of a sack. Above, the slope still trickles.
   artwork: {fileID: 21300000, guid: ddc785f5c118ab640a992cfb66de964e, type: 3}
   stakes:
@@ -34,6 +35,7 @@ MonoBehaviour:
     detail: Costs you 40 seconds of loud digging.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: 'Stone by stone, until the sack comes free. Ore, mostly: someone had a good day before this one.'
     outcomes:
     - rid: 2623126381840826368
@@ -43,6 +45,7 @@ MonoBehaviour:
     detail: Quick, but the slope above is still loose.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: You grab what sticks out of the stones.
     outcomes:
     - rid: 2623126381840826371
@@ -51,6 +54,8 @@ MonoBehaviour:
   blockedByMark: 
   oncePerSave: 0
   moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2

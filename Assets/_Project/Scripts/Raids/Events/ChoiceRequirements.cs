@@ -129,6 +129,27 @@ public sealed class HourIs : ChoiceRequirement
     }
 }
 
+/// <summary>In the saddle: riding a horse now (to ride with the Oskorei).</summary>
+[Serializable]
+public sealed class Mounted : ChoiceRequirement
+{
+    public override string DisplayName => "Mounted";
+    public override string Reason => "Needs a horse under you";
+
+    public override bool IsMet(GameObject player, RaidSession session) =>
+        player != null && player.GetComponentInParent<PlayerRiding>() is PlayerRiding riding && riding.IsRiding;
+}
+
+/// <summary>On foot: a raft or a wisp's path takes no horse (CrossOutcome), so the choice is greyed while riding, not paid for and lost.</summary>
+[Serializable]
+public sealed class NotMounted : ChoiceRequirement
+{
+    public override string DisplayName => "Not Mounted";
+    public override string Reason => "Not with a horse under you";
+
+    public override bool IsMet(GameObject player, RaidSession session) => !new Mounted().IsMet(player, session);
+}
+
 /// <summary>Something the character knows: a mark in the journal (a plan read, a place seen, a choice made before).</summary>
 [Serializable]
 public sealed class KnowsMark : ChoiceRequirement

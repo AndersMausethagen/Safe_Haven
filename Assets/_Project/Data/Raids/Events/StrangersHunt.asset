@@ -1,0 +1,84 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: StrangersHunt
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: StrangersHunt
+  displayName: The Stranger's Hunt
+  weight: 3
+  earliestSeconds: 40
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: Something is following you, and it isn't hungry. It was sent.
+  warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
+  sitePrefab: {fileID: 5231722663379009252, guid: eb150ca2a9fe8dd42a5b3278c781c95d, type: 3}
+  siteDistance: {x: 35, y: 70}
+  nearWater: 0
+  siteText: '"You refused me. The forest keeps the old bargains, even when you don''t." He points, and the trees answer.'
+  artwork: {fileID: 21300000, guid: 507ded645b3d522438aa61fcdfa0fc34, type: 3}
+  stakes:
+    loot: 0
+    danger: 2
+    time: 0
+  onStart: []
+  choices:
+  - label: Pay now, double
+    detail: Silver, and it's over.
+    cost:
+    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+      amount: 8
+    requires: []
+    hiddenUntilMet: 0
+    result: He takes it without counting. "Done."
+    outcomes:
+    - rid: 2623126389041660073
+    - rid: 2623126389041660074
+  - label: Face what he sends
+    detail: The forest's hunters, set on you.
+    cost: []
+    requires: []
+    hiddenUntilMet: 0
+    result: He steps back into the trees, and they step out.
+    outcomes:
+    - rid: 2623126389041660075
+    - rid: 2623126389041660076
+  needsMark: event:stranger:refused
+  blockedByMark: event:stranger:ended
+  oncePerSave: 0
+  moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126389041660073
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: The trees are only trees again.
+        kind: 0
+    - rid: 2623126389041660074
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:stranger:ended
+    - rid: 2623126389041660075
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+        count: 3
+        radius: 8
+        hunt: 1
+    - rid: 2623126389041660076
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:stranger:ended

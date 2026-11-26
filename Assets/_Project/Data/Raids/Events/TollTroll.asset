@@ -22,6 +22,7 @@ MonoBehaviour:
   warningSound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
   sitePrefab: {fileID: 3364091344855052720, guid: 129b9139513b1754f98d0d115c6ede3d, type: 3}
   siteDistance: {x: 35, y: 70}
+  nearWater: 0
   siteText: A troll sits across the way, chin on its fists. "Toll," it says. "Or riddle. What runs and never walks, has a bed and never sleeps?"
   artwork: {fileID: 21300000, guid: 390f841f37daf3f4c96afdc728c3344d, type: 3}
   stakes:
@@ -36,6 +37,7 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: 4f80b5d6098abc64b903316903de5b64, type: 2}
       amount: 3
     requires: []
+    hiddenUntilMet: 0
     result: It crunches them thoughtfully and points out every way through the woods.
     outcomes:
     - rid: 287758281410609273
@@ -44,6 +46,7 @@ MonoBehaviour:
     detail: An answer.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: It laughs until moss falls off it, and tosses you something from its pile.
     outcomes:
     - rid: 287758281410609275
@@ -51,6 +54,7 @@ MonoBehaviour:
     detail: An answer.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: '"No," it says, and stands up.'
     outcomes:
     - rid: 287758281410609276
@@ -59,6 +63,7 @@ MonoBehaviour:
     detail: It won't move. Its children might.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: It whistles through its teeth, and the rocks around you get up.
     outcomes:
     - rid: 287758281410609278
@@ -68,13 +73,26 @@ MonoBehaviour:
     cost: []
     requires:
     - rid: 2623126383268724775
+    hiddenUntilMet: 0
     result: He looks at the tusk a long while, then at you, and waves you through.
     outcomes:
     - rid: 2623126383268724776
+    - rid: 2623126389041659993
+  - label: '"You again."'
+    detail: He remembers the tusk. Free passage, and a word about the road.
+    cost: []
+    requires:
+    - rid: 2623126389041660093
+    hiddenUntilMet: 1
+    result: '"Bridge ahead''s rotten. Go by the stones."'
+    outcomes:
+    - rid: 2623126389041660094
   needsMark: 
   blockedByMark: 
   oncePerSave: 0
   moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2
@@ -164,3 +182,17 @@ MonoBehaviour:
             toTier: 0
             fixedAmount: 0
             onlyInRaid: {fileID: 0}
+    - rid: 2623126389041659993
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:toll:pleased
+    - rid: 2623126389041660093
+      type: {class: KnowsMark, ns: , asm: SafeHaven}
+      data:
+        mark: event:toll:pleased
+        called: to have pleased a toll troll
+    - rid: 2623126389041660094
+      type: {class: RevealMapOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 60
+        showExits: 1

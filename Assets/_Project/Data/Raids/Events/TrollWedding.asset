@@ -22,6 +22,7 @@ MonoBehaviour:
   warningSound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
   sitePrefab: {fileID: 7940016432191105948, guid: 11ffd51ad4390f1449181f5337bd653a, type: 3}
   siteDistance: {x: 35, y: 70}
+  nearWater: 0
   siteText: Two clans of trolls at the ring of stones, and a bride in a crown of rough trollstone. Nobody has seen you yet.
   artwork: {fileID: 21300000, guid: ea7a080aae9929e408f5fba0825b33b0, type: 3}
   stakes:
@@ -35,6 +36,7 @@ MonoBehaviour:
     cost: []
     requires:
     - rid: 2623126385950982186
+    hiddenUntilMet: 0
     result: Nobody sees you come or go.
     outcomes:
     - rid: 2623126385950982187
@@ -43,13 +45,16 @@ MonoBehaviour:
     detail: Hold the stones for 45 seconds while the guests come for you.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: You walk into the ring. The drums stop.
     outcomes:
     - rid: 2623126385950982189
+    - rid: 2623126389041659979
   - label: Leave them to it
     detail: A cup of wedding ale left by the path is yours.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: You drink to the couple from a safe distance.
     outcomes:
     - rid: 2623126385950982195
@@ -57,6 +62,8 @@ MonoBehaviour:
   blockedByMark: 
   oncePerSave: 1
   moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: Two troll clans met at the ring of stones at dusk, and a bride in a crown of rough trollstone. Few have seen it, and fewer came home to tell it.
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2
@@ -162,3 +169,7 @@ MonoBehaviour:
           op: 0
           value: 20
         seconds: 300
+    - rid: 2623126389041659979
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:troll:wedding:crashed

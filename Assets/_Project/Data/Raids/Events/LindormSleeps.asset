@@ -22,6 +22,7 @@ MonoBehaviour:
   warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
   sitePrefab: {fileID: 7940016432191105948, guid: d036618c37fe2194eb629bf220831bef, type: 3}
   siteDistance: {x: 35, y: 70}
+  nearWater: 0
   siteText: The lindorm's back, arch after arch of it, out of the black water. Beyond, on an islet, something glints. It's asleep.
   artwork: {fileID: 21300000, guid: 461dc144cac014a4faa54dd9134aff8b, type: 3}
   stakes:
@@ -34,6 +35,7 @@ MonoBehaviour:
     detail: Costs 45 seconds. Don't wake it.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: You step from coil to coil.
     outcomes:
     - rid: 2623126385950982196
@@ -42,6 +44,7 @@ MonoBehaviour:
     detail: One lies loose in the moss.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: It's as big as a shield and lighter than it looks.
     outcomes:
     - rid: 2623126385950982204
@@ -49,6 +52,7 @@ MonoBehaviour:
     detail: Some things are best not woken.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: You go round, a long way round.
     outcomes:
     - rid: 2623126385950982205
@@ -56,6 +60,10 @@ MonoBehaviour:
   blockedByMark: 
   oncePerSave: 1
   moreLikelyWhen: []
+  moreLikelyWithMark:
+  - mark: event:lindorm:heard
+    times: 4
+  legendPage: The Lindorm sleeps in the Moss Marsh, coiled through the black water with moss in the joins of its scales. It breathes once a minute. It has not woken. Yet.
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2

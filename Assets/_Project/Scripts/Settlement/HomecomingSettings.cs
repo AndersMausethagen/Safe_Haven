@@ -21,6 +21,27 @@ public sealed class HomecomingSettings : GameSettings<HomecomingSettings>
         [Min(0f)] public float weight = 1f;
     }
 
+    /// <summary>
+    /// Someone met in a raid comes by the Haven's gate while the player is away, once (Docs/RaidEventsPlan_2026-11-26.md E4, the user's
+    /// answer: a consequence may show at home, small and rare): the pedlar freed, the dairymaid brought out.
+    /// </summary>
+    [Serializable]
+    public sealed class MarkVisit
+    {
+        [Tooltip("The journal mark that brings them (a raid choice's Set Mark).")]
+        public string needsMark;
+        [Tooltip("Set once they have come: never twice.")]
+        public string doneMark;
+        public ItemDefinition item;
+        [Min(1)] public int amount = 1;
+        [TextArea(1, 3)] public string line = "Someone you met out there came by the gate and left something.";
+    }
+
+    [Tooltip("Visits a raid's choices bring to the gate: the first one due comes, on the next homecoming.")]
+    [SerializeField] private List<MarkVisit> visits = new List<MarkVisit>();
+
+    public IReadOnlyList<MarkVisit> Visits => visits;
+
     [Tooltip("How likely a gift is on coming home from a raid.")]
     [SerializeField, Range(0f, 1f)] private float chance = 0.6f;
     [SerializeField] private List<Gift> gifts = new List<Gift>();
@@ -102,6 +123,44 @@ public static class AwayGifts
 
             string name = who.Resident != null ? who.Resident.DisplayName : "Someone";
             return $"{gift.line.Replace("{name}", name)} (+{given} {gift.item.DisplayName})";
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// The first visit due (its mark held, not yet come): its item put in the chests and its line, with what it left; the done mark
+    /// noted. Null when none is due. Plain apart from the stash and the marks it is handed; HomecomingTests.
+    /// </summary>
+    public static string Visit(HomecomingSettings settings, StashStorage stash, Func<string, bool> hasMark, Action<string> noteMark)
+    {
+        if (settings == null || stash == null || hasMark == null || noteMark == null)
+        {
+            return null;
+        }
+
+        foreach (HomecomingSettings.MarkVisit visit in settings.Visits)
+        {
+            if (visit == null || string.IsNullOrEmpty(visit.needsMark) || !hasMark(visit.needsMark)
+                || (!string.IsNullOrEmpty(visit.doneMark) && hasMark(visit.doneMark)))
+            {
+                continue;
+            }
+
+            // What they leave goes in first: chests too full to take it, and they come again another time (the visit isn't spent on nothing).
+            int given = visit.item != null ? stash.Items.Add(visit.item, visit.amount) : 0;
+            if (visit.item != null && given <= 0)
+            {
+                continue;
+            }
+
+            if (!string.IsNullOrEmpty(visit.doneMark))
+            {
+                noteMark(visit.doneMark);
+            }
+
+            PlaytestLogger.Note(PlaytestLog.CameHome, "Visit", given, visit.needsMark);
+            return given > 0 ? $"{visit.line} (+{given} {visit.item.DisplayName})" : visit.line;
         }
 
         return null;

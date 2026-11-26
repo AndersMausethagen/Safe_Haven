@@ -134,6 +134,18 @@ public static class Homecoming
             }
         }
 
+        // Someone met out there came by the gate (a raid choice's mark), heading the card above all.
+        JournalRecord journal = GameSession.Progress.Journal;
+        string visit = AwayGifts.Visit(gifts, GameSession.Stash, journal.HasNoticed, mark => journal.NoteNoticed(mark));
+        if (visit != null)
+        {
+            lines.Insert(0, visit);
+            if (lines.Count > MostLines)
+            {
+                lines.RemoveAt(lines.Count - 1);
+            }
+        }
+
         if (lines.Count == 0)
         {
             return false;

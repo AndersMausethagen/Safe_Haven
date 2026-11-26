@@ -22,6 +22,7 @@ MonoBehaviour:
   warningSound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
   sitePrefab: {fileID: 6647756069553415008, guid: f84594aad344c594abcb806f91dfb737, type: 3}
   siteDistance: {x: 35, y: 70}
+  nearWater: 0
   siteText: Something of stone and antler sits across the way, older than the trolls, its jaw resting on its knees. "Everyone pays the Jaw-keeper," it says. "Iron, or a memory. Or try to pass, and see what the valley thinks of you."
   artwork: {fileID: 21300000, guid: 390f841f37daf3f4c96afdc728c3344d, type: 3}
   stakes:
@@ -36,6 +37,7 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
       amount: 5
     requires: []
+    hiddenUntilMet: 0
     result: It takes the ore in one stone hand and crushes it like bread. "The way is yours," it says, and shows you all of it.
     outcomes:
     - rid: 2623126268168110234
@@ -43,6 +45,7 @@ MonoBehaviour:
     detail: Something you would rather keep. It costs time to find what it wants.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: It reaches into your thoughts and takes a morning you liked. You stand blinking while the light moves. "Fair," it says, and something of its own goes into your pack.
     outcomes:
     - rid: 2623126268168110235
@@ -51,6 +54,7 @@ MonoBehaviour:
     detail: It won't stop you. The valley might.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: It does not move. The rocks round it do.
     outcomes:
     - rid: 2623126268168110237
@@ -59,6 +63,8 @@ MonoBehaviour:
   blockedByMark: 
   oncePerSave: 0
   moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2

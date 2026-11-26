@@ -22,6 +22,7 @@ MonoBehaviour:
   warningSound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
   sitePrefab: {fileID: 1745827551758765297, guid: c3220598a4d922b4cb9f391a54f9ebd3, type: 3}
   siteDistance: {x: 35, y: 70}
+  nearWater: 0
   siteText: 'Three runestones stand where the path should be. One is green with fresh moss. One is warm to the touch. One is scored with claw marks. Old rhyme: "Moss grows slow, so moss won''t lie."'
   artwork: {fileID: 21300000, guid: b3c0ce1e315ba624d9bb1b8df0ae46bc, type: 3}
   stakes:
@@ -34,6 +35,7 @@ MonoBehaviour:
     detail: It hasn't moved in a long time.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: The path opens, and it leads somewhere shorter than it should.
     outcomes:
     - rid: 287758281410609285
@@ -42,6 +44,7 @@ MonoBehaviour:
     detail: Something is under it. Could be good.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: You put your shoulder to it.
     outcomes:
     - rid: 287758281410609287
@@ -49,6 +52,7 @@ MonoBehaviour:
     detail: Something else went this way.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: The path closes behind you, and the cold comes up out of the ground.
     outcomes:
     - rid: 287758281410609292
@@ -58,6 +62,7 @@ MonoBehaviour:
     cost: []
     requires:
     - rid: 2623126383268724782
+    hiddenUntilMet: 0
     result: The runes say it plainly, if you can read them.
     outcomes:
     - rid: 2623126383268724783
@@ -66,6 +71,8 @@ MonoBehaviour:
   blockedByMark: 
   oncePerSave: 0
   moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2

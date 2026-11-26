@@ -22,6 +22,7 @@ MonoBehaviour:
   warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
   sitePrefab: {fileID: 3059714547979966575, guid: 2ebf1cc60013d0a4380d52fcd6cc5dd4, type: 3}
   siteDistance: {x: 35, y: 70}
+  nearWater: 0
   siteText: A stone-framed door into the mound. Silver in the dark, and an old smell. Whoever lies in there has not been disturbed in a long time.
   artwork: {fileID: 21300000, guid: fd21f62745909f740be7b6128c06ce18, type: 3}
   stakes:
@@ -34,6 +35,7 @@ MonoBehaviour:
     detail: Barrow silver and grave iron. The owner may mind.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: Your fingers close on cold metal. Behind it, something breathes in.
     outcomes:
     - rid: 287758281410609297
@@ -44,6 +46,7 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
       amount: 2
     requires: []
+    hiddenUntilMet: 0
     result: A cold breath passes over you, and it feels like thanks.
     outcomes:
     - rid: 287758281410609299
@@ -52,14 +55,27 @@ MonoBehaviour:
     cost: []
     requires:
     - rid: 2623126383268724785
+    hiddenUntilMet: 0
     result: You cut the marks into the lintel stone. The cold breath from the door stops.
     outcomes:
     - rid: 2623126383268724786
     - rid: 2623126383268724787
+    - rid: 2623126389041659998
+  - label: Take the grave gift
+    detail: The dead know who sealed the last barrow. They let you take, and stay quiet.
+    cost: []
+    requires:
+    - rid: 2623126389041660097
+    hiddenUntilMet: 1
+    result: Nothing stirs as you reach in.
+    outcomes:
+    - rid: 2623126389041660098
   needsMark: 
   blockedByMark: 
   oncePerSave: 0
   moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2
@@ -139,6 +155,29 @@ MonoBehaviour:
             resource: {fileID: 0}
             minQuantity: 1
             maxQuantity: 1
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126389041659998
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:barrow:sealed
+    - rid: 2623126389041660097
+      type: {class: KnowsMark, ns: , asm: SafeHaven}
+      data:
+        mark: event:barrow:sealed
+        called: to have sealed a barrow
+    - rid: 2623126389041660098
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 3
+            maxQuantity: 6
             probability: 1
             fromTier: 0
             toTier: 0

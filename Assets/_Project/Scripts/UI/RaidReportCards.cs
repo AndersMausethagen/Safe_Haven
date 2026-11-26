@@ -140,28 +140,28 @@ public static class RaidReportCards
             return height + Gap + second.Show("Used up", "Hourglass", style.Danger, "-", report.ItemsLost, report.ResourcesLost, null, 1);
         }
 
-        // A lost cart is told above the cards: "nothing was lost" under it would be wrong.
-        bool cartLost = !string.IsNullOrEmpty(report.TransportLine) && !report.TransportHome;
-        if (lostAny || !cartLost)
+        // What was kept first, then what was lost (Darkest Dungeon, Hades: "you still have this" reads before the loss).
+        float kept = 0f;
+        if (gainedAny)
         {
-            height = first.Show("Lost" + Worth(report.ValueLost, RaidReportText.Loss), "Skull", style.Danger, "-",
-                report.ItemsLost, report.ResourcesLost, "You carried nothing, so nothing was lost.", rows);
+            kept = first.Show("Saved in your safe pocket", "Lock", style.Good, "+", report.ItemsGained, report.ResourcesGained, null, 1) + Gap;
         }
         else
         {
             first.Hide();
-            height = 0f;
         }
 
-        if (!gainedAny)
+        // A lost cart is told with the facts: "nothing was lost" under it would be wrong.
+        bool cartLost = !string.IsNullOrEmpty(report.TransportLine) && !report.TransportHome;
+        if (!lostAny && cartLost)
         {
             second.Hide();
-            return height;
+            return Mathf.Max(0f, kept - Gap);
         }
 
-        float gap = height > 0f ? Gap : 0f;
-        second.Top = top + height + gap;
-        return height + gap + second.Show("Saved in your safe pocket", "Lock", style.Good, "+", report.ItemsGained, report.ResourcesGained, null, 1);
+        second.Top = top + kept;
+        return kept + second.Show("Lost" + Worth(report.ValueLost, RaidReportText.Loss), "Skull", style.Danger, "-",
+            report.ItemsLost, report.ResourcesLost, "You carried nothing, so nothing was lost.", rows);
     }
 
     private static string Worth(int value, string colour) =>

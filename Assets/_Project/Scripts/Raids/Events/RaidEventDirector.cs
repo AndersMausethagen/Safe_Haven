@@ -37,6 +37,9 @@ public sealed class RaidEventDirector : MonoBehaviour
     // The map's event rooms already given an event (indices into RaidMap.Places).
     private readonly HashSet<int> roomsTaken = new HashSet<int>();
     private const float RoomStretch = 1.6f;
+    // After a shore isn't found near the player, shore events wait this long (seconds) before looking again.
+    private const float ShorePause = 20f;
+    private float shoreAgainAt;
     private RaidMap map;
 
     private RaidMap Map => map != null ? map : map = FindAnyObjectByType<RaidMap>();
@@ -225,7 +228,8 @@ public sealed class RaidEventDirector : MonoBehaviour
             states.Add(RaidEventState.ForestAngry);
         }
 
-        if (Homecoming.LastOutcome == RaidOutcome.Died)
+        // From the journal's raids, which the save keeps: after a reload Homecoming knows of no last raid.
+        if (Homecoming.LastOutcome == RaidOutcome.Died || RaidReportText.FellLastRaid(GameSession.Progress.Journal))
         {
             states.Add(RaidEventState.FellLastRaid);
         }
@@ -250,6 +254,25 @@ public sealed class RaidEventDirector : MonoBehaviour
         // own distance (RoomStretch) still wins over open forest: the rooms lie inward, on the way to the exits.
         IReadOnlyList<RaidPlace> places = Map != null ? Map.Places : null;
         Vector2 reach = definition.SiteDistance;
+        // A shore's event (a ferryman's raft) stands at the water, facing it; no room is made for one.
+        if (definition.SitePrefab != null && definition.NearWater)
+        {
+            // Far from water a shore is looked for at a cost: not again for a while after one isn't found.
+            if (Time.time < shoreAgainAt)
+            {
+                return false;
+            }
+
+            if (!RaidSpots.TryFindShore(from, reach.x, reach.y * RoomStretch, random, path, out position, out Vector3 toWater))
+            {
+                shoreAgainAt = Time.time + ShorePause;
+                return false;
+            }
+
+            Place(definition, position, open, Quaternion.LookRotation(toWater, Vector3.up));
+            return true;
+        }
+
         if (definition.SitePrefab != null
             && !RaidSpots.TryTakeRoom(places, from, reach.x, reach.y, roomsTaken, random, path, out position)
             && !RaidSpots.TryTakeRoom(places, from, reach.y, reach.y * RoomStretch, roomsTaken, random, path, out position)
@@ -315,7 +338,7 @@ public sealed class RaidEventDirector : MonoBehaviour
         }
     }
 
-    private void Place(RaidEventDefinition definition, Vector3 position, List<RaidEventSite> sites)
+    private void Place(RaidEventDefinition definition, Vector3 position, List<RaidEventSite> sites, Quaternion? facing = null)
     {
         RaidEventContext context = ContextAt(position);
         used.Add(definition);
@@ -327,7 +350,7 @@ public sealed class RaidEventDirector : MonoBehaviour
         }
         if (definition.SitePrefab != null)
         {
-            RaidEventSite site = Spawn(definition, context, Quaternion.Euler(0f, (float)random.NextDouble() * 360f, 0f));
+            RaidEventSite site = Spawn(definition, context, facing ?? Quaternion.Euler(0f, (float)random.NextDouble() * 360f, 0f));
             if (site != null)
             {
                 sites.Add(site);

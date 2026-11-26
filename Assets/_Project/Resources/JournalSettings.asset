@@ -1287,3 +1287,7 @@ MonoBehaviour:
     line: 'The forest beyond the Ward: why you go in, and why you must come back.'
     afterQuest: {fileID: 0}
     afterRaid: {fileID: 11400000, guid: 4c3002f5090022648994d853c2583c8b, type: 2}
+  legends:
+  - {fileID: 11400000, guid: 5fed4c6f5cd2697468727f9ee728ea25, type: 2}
+  - {fileID: 11400000, guid: 1d7870d052b1fbb4184d4b855a9335d9, type: 2}
+  - {fileID: 11400000, guid: 22896ee66dd596a41a67a75551c5576f, type: 2}

@@ -1,0 +1,148 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: ClansGrudge
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: ClansGrudge
+  displayName: The Clan's Grudge
+  weight: 3
+  earliestSeconds: 60
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: Trolls across the path ahead, waiting in a line. They know who spoiled the wedding.
+  warningSound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
+  sitePrefab: {fileID: 7940016432191105948, guid: 11ffd51ad4390f1449181f5337bd653a, type: 3}
+  siteDistance: {x: 35, y: 70}
+  nearWater: 0
+  siteText: A clan of trolls, the bride among them with her trollstone crown askew. They haven't forgotten you.
+  artwork: {fileID: 21300000, guid: 5e270afeae2235446895e5cd670f1d05, type: 3}
+  stakes:
+    loot: 2
+    danger: 2
+    time: 1
+  onStart: []
+  choices:
+  - label: Make amends
+    detail: A troll's tusk for the bride. They'll let it go.
+    cost:
+    - item: {fileID: 11400000, guid: 6261219cf8a21464e85fb1f5dee1d79c, type: 2}
+      amount: 1
+    requires: []
+    hiddenUntilMet: 0
+    result: The bride takes the tusk, and the line opens.
+    outcomes:
+    - rid: 2623126389041660077
+    - rid: 2623126389041660078
+  - label: Hold the stones
+    detail: Stand at the rock while they come. If you hold, they honour it.
+    cost: []
+    requires: []
+    hiddenUntilMet: 0
+    result: You put your back to the rock.
+    outcomes:
+    - rid: 2623126389041660079
+    - rid: 2623126389041660080
+  - label: Slip past
+    detail: Quietly, round the back of the rocks.
+    cost: []
+    requires:
+    - rid: 2623126389041660084
+    hiddenUntilMet: 0
+    result: They never see you go.
+    outcomes:
+    - rid: 2623126389041660085
+    - rid: 2623126389041660086
+  needsMark: event:troll:wedding:crashed
+  blockedByMark: event:troll:wedding:grudge
+  oncePerSave: 0
+  moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126389041660077
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: '"Go."'
+        kind: 0
+    - rid: 2623126389041660078
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:troll:wedding:grudge
+    - rid: 2623126389041660079
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:troll:wedding:grudge
+    - rid: 2623126389041660080
+      type: {class: DefendOutcome, ns: , asm: SafeHaven}
+      data:
+        label: Hold the rock
+        radius: 5
+        seconds: 40
+        waveEvery: 15
+        eachWave:
+        - rid: 2623126389041660081
+        onHeld:
+        - rid: 2623126389041660082
+        - rid: 2623126389041660083
+    - rid: 2623126389041660081
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 6267209934607442583, guid: 3c524ee8a21d0aa48b70eb5f371bba06, type: 3}
+        count: 2
+        radius: 9
+        hunt: 1
+    - rid: 2623126389041660082
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: The clan steps back. One of them leaves something at your feet.
+        kind: 1
+    - rid: 2623126389041660083
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 5
+            maxQuantity: 8
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+          - item: {fileID: 11400000, guid: 6261219cf8a21464e85fb1f5dee1d79c, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 0.5
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+            onlyInRaid: {fileID: 0}
+    - rid: 2623126389041660084
+      type: {class: SkillAtLeast, ns: , asm: SafeHaven}
+      data:
+        skill: {fileID: 11400000, guid: cada299a42945b04b8c891d31b0c5351, type: 2}
+        level: 20
+    - rid: 2623126389041660085
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: Behind you, a troll sniffs the wind.
+        kind: 0
+    - rid: 2623126389041660086
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:troll:wedding:grudge

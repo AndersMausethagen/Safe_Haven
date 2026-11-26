@@ -90,13 +90,22 @@ public sealed partial class RaidResultsScreen
     // Once the window's dress is on (a frame after it starts): its colour and its leather made see-through.
     private void SeeThrough()
     {
-        var face = content.GetComponent<Image>();
+        SeeThrough(content.transform);
+        if (haulPanel != null)
+        {
+            SeeThrough(haulPanel);
+        }
+    }
+
+    private static void SeeThrough(Transform panel)
+    {
+        var face = panel.GetComponent<Image>();
         if (face != null)
         {
             face.color = Faded(face.color, PanelAlpha);
         }
 
-        Transform ground = content.transform.Find("Hearthline Ground");
+        Transform ground = panel.Find("Hearthline Ground");
         if (ground != null)
         {
             foreach (Image layer in ground.GetComponentsInChildren<Image>(true))

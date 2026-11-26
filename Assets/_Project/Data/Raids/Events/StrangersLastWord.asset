@@ -1,0 +1,77 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: StrangersLastWord
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: StrangersLastWord
+  displayName: The Stranger's Last Word
+  weight: 3
+  earliestSeconds: 40
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: At the crossroads, the hooded stranger again. This time he's waiting for you.
+  warningSound: {fileID: 11400000, guid: 53fe372285257d84faf9ea69968a9b0f, type: 2}
+  sitePrefab: {fileID: 5231722663379009252, guid: eb150ca2a9fe8dd42a5b3278c781c95d, type: 3}
+  siteDistance: {x: 35, y: 70}
+  nearWater: 0
+  siteText: '"You paid what you owed. Few do. I''ll not come again, but take this for the road."'
+  artwork: {fileID: 21300000, guid: 00db09665465c664d8361f14d5a19337, type: 3}
+  stakes:
+    loot: 2
+    danger: 0
+    time: 0
+  onStart: []
+  choices:
+  - label: Take it
+    detail: A gift from someone who keeps old bargains.
+    cost: []
+    requires: []
+    hiddenUntilMet: 0
+    result: A small thing, wrapped in grey cloth. It's warm.
+    outcomes:
+    - rid: 2623126389041660069
+    - rid: 2623126389041660070
+  - label: Ask who he is
+    detail: He may answer.
+    cost: []
+    requires: []
+    hiddenUntilMet: 0
+    result: '"Someone who keeps the old bargains. As you did." He shows you the land, as a bird sees it.'
+    outcomes:
+    - rid: 2623126389041660071
+    - rid: 2623126389041660072
+  needsMark: event:stranger:settled
+  blockedByMark: event:stranger:ended
+  oncePerSave: 0
+  moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126389041660069
+      type: {class: GiveRelicOutcome, ns: , asm: SafeHaven}
+      data: 
+    - rid: 2623126389041660070
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:stranger:ended
+    - rid: 2623126389041660071
+      type: {class: RevealMapOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 90
+        showExits: 1
+    - rid: 2623126389041660072
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:stranger:ended

@@ -221,7 +221,11 @@ public static class JournalContent
         return new List<HavenShelf> { met, unknown };
     }
 
-    public static List<HavenShelf> Raids(CharacterProgress progress, out string summary)
+    public static List<HavenShelf> Raids(CharacterProgress progress, out string summary) => Raids(progress, JournalSettings.Current, out summary);
+
+    /// <summary>The raids gone on, newest first, and above them the Strange Things met: the legends, each once in a save
+    /// (Docs/RaidEventsPlan_2026-11-26.md E6), with their painting and page.</summary>
+    public static List<HavenShelf> Raids(CharacterProgress progress, JournalSettings settings, out string summary)
     {
         IReadOnlyList<RaidRecord> raids = progress.Journal.Raids;
         var shelf = new HavenShelf("Newest first");
@@ -232,7 +236,57 @@ public static class JournalContent
 
         int home = raids.Count(r => r.Outcome == "Extracted!");
         summary = raids.Count == 0 ? "None yet" : $"{raids.Count} set out, {home} came home";
-        return new List<HavenShelf> { shelf };
+        var shelves = new List<HavenShelf>();
+        HavenShelf strange = StrangeThings(settings, progress.Journal, out int met, out int all);
+        if (met > 0)
+        {
+            shelves.Add(strange);
+            summary += $"  ·  {met} of {all} strange things";
+        }
+
+        shelves.Add(shelf);
+        return shelves;
+    }
+
+    /// <summary>The legends met, by the mark each leaves once reached (RaidEventDefinition.OnceMark).</summary>
+    public static HavenShelf StrangeThings(JournalSettings settings, JournalRecord journal, out int met, out int all)
+    {
+        var shelf = new HavenShelf("Strange things");
+        met = 0;
+        all = 0;
+        if (settings == null)
+        {
+            return shelf;
+        }
+
+        foreach (RaidEventDefinition legend in settings.Legends)
+        {
+            if (legend == null)
+            {
+                continue;
+            }
+
+            all++;
+            if (!journal.HasNoticed(legend.OnceMark))
+            {
+                continue;
+            }
+
+            met++;
+            shelf.Entries.Add(new HavenEntry
+            {
+                Key = "legend:" + legend.Id,
+                Name = legend.DisplayName,
+                Line = "Seen once, and never again",
+                Badge = "",
+                State = HavenEntryState.Good,
+                Status = "A strange thing, met on a raid",
+                Description = legend.LegendPage,
+                Icon = legend.Artwork,
+            });
+        }
+
+        return shelf;
     }
 
     private static HavenEntry EntryOf(RaidRecord raid, int number)

@@ -787,6 +787,96 @@
           "prompt": "The back of a huge sleeping lindorm, a Norse serpent dragon, rising out of black bog mud in three great scaly coils like a row of low arches, dark green-black scales with a pale ridge of spines along its spine, moss and reeds growing on the coils, no head visible, the ends of the coils sinking into the mud. Everything grown together into one solid piece, nothing loose or floating."
         }
       ]
+    },
+    {
+      "asset": "Half-felled Cedar",
+      "width": 2.6,
+      "max_height": 4.6,
+      "texture_size": 2048,
+      "lod0_triangles": 9000,
+      "view_scale": 3,
+      "lod0_floor": 5000,
+      "shape_deviation": 0.008,
+      "shape_silhouette": 0.98,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7411,
+          "prompt": "The lower part of a giant ancient cedar trunk, as thick as a man is tall, its top broken off jaggedly above the height of two men, a deep wedge-shaped axe notch cut halfway through the trunk near the ground with pale fresh wood chips scattered on the roots, a woodcutter's long-handled axe still stuck in the cut, thick mossy roots gripping the ground. Everything grown together into one solid piece, nothing loose or floating."
+        }
+      ]
+    },
+    {
+      "asset": "Felled Cedar",
+      "width": 7.5,
+      "max_height": 1.7,
+      "texture_size": 2048,
+      "lod0_triangles": 9000,
+      "view_scale": 3,
+      "lod0_floor": 5000,
+      "shape_deviation": 0.008,
+      "shape_silhouette": 0.98,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7412,
+          "prompt": "A huge felled cedar trunk lying flat on the ground, as thick as a man is tall, a few stubs of broken branches, one end a pale splintered axe-cut face, grey-brown furrowed bark with patches of green moss, crushed ferns under it. Everything grown together into one solid piece, nothing loose or floating."
+        }
+      ]
+    },
+    {
+      "asset": "Snare Post",
+      "width": 0.9,
+      "max_height": 1.4,
+      "texture_size": 2048,
+      "lod0_triangles": 9000,
+      "view_scale": 3,
+      "lod0_floor": 5000,
+      "shape_deviation": 0.008,
+      "shape_silhouette": 0.98,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7413,
+          "prompt": "A trapper's marker post, a split birch stake driven into mossy ground with loops of braided cord snares hanging from it and a small bundle of grey rabbit pelts tied on with a strip of faded red cloth, a bent willow sapling snare beside it. Everything grown together into one solid piece, nothing loose or floating."
+        }
+      ]
+    },
+    {
+      "asset": "Ferryman's Raft",
+      "width": 3.2,
+      "max_height": 2.5,
+      "texture_size": 2048,
+      "lod0_triangles": 9000,
+      "view_scale": 3,
+      "lod0_floor": 5000,
+      "shape_deviation": 0.008,
+      "shape_silhouette": 0.98,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7414,
+          "prompt": "A small rough raft of lashed grey logs pulled up on a muddy riverbank, a tall thin old ferryman in a long hooded grey cloak standing on it leaning on a long punting pole, a small iron lantern hanging from a short post at the raft's corner, a coil of old rope on the logs. Everything grown together into one solid piece, nothing loose or floating."
+        }
+      ]
+    },
+    {
+      "asset": "Smouldering Peat",
+      "width": 3.0,
+      "max_height": 0.6,
+      "texture_size": 2048,
+      "lod0_triangles": 9000,
+      "view_scale": 3,
+      "lod0_floor": 5000,
+      "shape_deviation": 0.008,
+      "shape_silhouette": 0.98,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7415,
+          "prompt": "A low patch of burnt black peat ground with deep orange-red cracks of smouldering embers, charred grass tussocks and a few blackened roots sticking out, grey ash drifted in the hollows. Everything grown together into one solid piece, nothing loose or floating."
+        }
+      ]
     }
   ]
 }

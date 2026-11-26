@@ -22,6 +22,7 @@ MonoBehaviour:
   warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
   sitePrefab: {fileID: 7940016432191105948, guid: 7205d1f5181860f459166d85ef72d918, type: 3}
   siteDistance: {x: 35, y: 70}
+  nearWater: 0
   siteText: Someone the bog has kept for a very long time. The ring is green bronze, the hand as soft as old leather. The water around it is very still.
   artwork: {fileID: 21300000, guid: 48c2f4fd9287ae14bbb26892ac2b71ac, type: 3}
   stakes:
@@ -34,6 +35,7 @@ MonoBehaviour:
     detail: What the bog keeps, it keeps for a reason.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: The ring slides off easily. Too easily.
     outcomes:
     - rid: 2623126381840826386
@@ -42,6 +44,7 @@ MonoBehaviour:
     detail: Costs 40 seconds. The dead remember kindness.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: You fold the peat back over them. The water stirs, once, and is still.
     outcomes:
     - rid: 2623126381840826390
@@ -52,6 +55,8 @@ MonoBehaviour:
   blockedByMark: 
   oncePerSave: 0
   moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2

@@ -75,6 +75,10 @@ public sealed class JournalSettings : GameSettings<JournalSettings>
     [Tooltip("The cinematics that can be watched again, in story order: in the journal once the character has reached each, " +
              "and in the main menu once it has been seen on this computer.")]
     [SerializeField] private List<JournalCinematic> cinematics = new List<JournalCinematic>();
+    [Tooltip("The raids' legends (Once Per Save events), in the Raids tab's Strange Things once met: their painting and page.")]
+    [SerializeField] private List<RaidEventDefinition> legends = new List<RaidEventDefinition>();
+
+    public IReadOnlyList<RaidEventDefinition> Legends => legends;
 
     public IReadOnlyList<JournalPage> Backstory => backstory;
     public IReadOnlyList<JournalCinematic> Cinematics => cinematics;

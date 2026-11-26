@@ -799,6 +799,11 @@ reviews). When adding something, go through these, and the tests say when one is
   defaults) and the haul, and `SceneTransition.Preload`s Safe Haven while the player reads. Continue activates it.
   Player state and the arrival point stay in `GameSession` across the extra scene. `RaidSummaryWindow` is only the
   fallback when `RaidResults` isn't in Build Settings.
+  - **Layout (UX pass of 2026-11-26):** built in code by `RaidResultsScreen.BuildLayout`.
+    - A haul panel at the top left holds the status word, the raid and time, the haul as pictures (`RaidReportCards`; on a fall, what was kept comes before what was lost), what was learned and the companion.
+    - On the right, `RaidReportFacts` rows are drawn by `KitFactList`: a picture or icon, a title, at most one line, grouped into What happened, To see to at home and On the way. Events show their own paintings (`RaidReportFacts.EventPicture`).
+    - The button and the playtest card sit at the bottom right. The panels fade in one after the other.
+    - It lays out again when the screen size changes. `RaidReportText.Describe` is no longer shown there. Tests: `RaidResultsLayoutTests1126`.
 - **Raid layouts:** each raid has a per-raid `RaidSession.Seed`. `RaidGenerator` (an `ISceneSetup` on "Raid Layout") gives
   every `SpawnGroup` its own seed from that seed and the group's path, so editing one group never reshuffles another.
   A group fills *min–max of its hand-placed points* (child transforms) with prefabs rolled from a `SpawnTable`
@@ -905,6 +910,14 @@ a pool of `RaidEventDefinition`s, first delay, interval, a budget per raid and a
   - `RaidEventDefinition` › More Likely When (`RaidEventState`: bag mostly full, forest angry, fell last raid, night) multiplies the weight. `RaidEventDirector.StatesNow` reads them.
   - `RaidEventSettings` › Conditions (`RaidEventCondition`) roll at most one kind of day from the seed (`ConditionFor`). It boosts a few events and shows as the "Today" card in the preparation briefing, from the same seed.
   - Tests: `RaidEventsMemoryTests1126`.
+- **More tasks (2026-11-26, the rest of the plan):**
+  - `TrackOutcome` puts a `TrackTask` down: signs show one by one along a NavMesh path to a hidden place 60-120 m off, and `TrackLeader` (an animal prefab, e.g. White Hart Leader) walks on ahead to each. On Found at the end.
+  - `EscortOutcome` spawns an `EscortFollower` prefab (NavMeshAgent, Damageable, Combatant): it follows and can fall (On Lost). On Delivered fires when it stands in an open exit's circle.
+  - `CrossOutcome` moves the player near the farthest or nearest exit. `ShowSitePartOutcome` shows the site's "After" child. `EaseBlightOutcome` eases `SettlementState.Blight`.
+  - Requirement `Mounted`. A choice can be `hiddenUntilMet`.
+  - `RaidEventDefinition` has `nearWater` (`RaidSpots.TryFindShore`; the site faces the water), `moreLikelyWithMark` and `legendPage`.
+  - At home, `HomecomingSettings` › Visits (`AwayGifts.Visit`): someone met in a raid comes by the gate once, and their mark is set.
+  - `JournalSettings` › Legends feeds the journal's Raids › Strange Things (`JournalContent.StrangeThings`).
 - **Site models:** generated props in `Art/World/Props/<name>` each have their own Layered Lit `<name>.mat`, and the prefabs use it, not the FBX's material. `PropMapImport` imports their normal and data maps (`PropMaterialTests`).
 Content: `AgentScripts/BuildRaidEvents.cs` (sites are placeholder shapes in `Prefabs/Raids/Events/Sites`). The older prefabs
 in `Prefabs/Raids/Events` are static scenery for the Event Sites spawn list; they are not raid events.

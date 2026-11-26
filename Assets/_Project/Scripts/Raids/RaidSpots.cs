@@ -175,4 +175,65 @@ public static class RaidSpots
 
         return false;
     }
+
+    // How far from a shore spot the water is looked for, and in how many directions.
+    private static readonly float[] ShoreReach = { 3f, 6.5f };
+    private const int ShoreDirections = 8;
+
+    /// <summary>
+    /// Like <see cref="TryFindSpot"/>, but on a shore: dry where it stands, with open water a few steps off (a ferryman's raft, a wisp
+    /// over the pools). <paramref name="toWater"/> is the flat direction to the nearest water, for the site to face. More tries: shores
+    /// are rarer than ground.
+    /// </summary>
+    public static bool TryFindShore(Vector3 from, float minDistance, float maxDistance, System.Random random, NavMeshPath path, out Vector3 spot,
+        out Vector3 toWater, int attempts = 64)
+    {
+        spot = from;
+        toWater = Vector3.forward;
+        if (!NavMesh.SamplePosition(from, out NavMeshHit start, NavMeshSnap, NavMesh.AllAreas))
+        {
+            return false;
+        }
+
+        // The cheap tests first (on the NavMesh, dry, water near), the dear ones (out of sight, a path back) only for a shore.
+        for (int attempt = 0; attempt < attempts; attempt++)
+        {
+            float angle = (float)random.NextDouble() * Mathf.PI * 2f;
+            float distance = Mathf.Lerp(minDistance, maxDistance, (float)random.NextDouble());
+            Vector3 candidate = from + new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * distance;
+            if (!NavMesh.SamplePosition(Grounded(candidate), out NavMeshHit hit, NavMeshSnap, NavMesh.AllAreas) || !IsDryEnough(hit.position)
+                || !WaterNear(hit.position, out Vector3 way) || IsVisible(hit.position)
+                || !NavMesh.CalculatePath(hit.position, start.position, NavMesh.AllAreas, path) || path.status != NavMeshPathStatus.PathComplete)
+            {
+                continue;
+            }
+
+            spot = hit.position;
+            toWater = way;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>True when open water lies within a few metres of <paramref name="point"/>; <paramref name="direction"/> points to the nearest.</summary>
+    public static bool WaterNear(Vector3 point, out Vector3 direction)
+    {
+        direction = Vector3.forward;
+        foreach (float reach in ShoreReach)
+        {
+            for (int i = 0; i < ShoreDirections; i++)
+            {
+                float angle = i * Mathf.PI * 2f / ShoreDirections;
+                var way = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
+                if (!IsDryEnough(Grounded(point + way * reach)))
+                {
+                    direction = way;
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }

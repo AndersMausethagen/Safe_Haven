@@ -1,0 +1,84 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: FerrymansDue
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: FerrymansDue
+  displayName: The Ferryman's Due
+  weight: 3
+  earliestSeconds: 40
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: 'Wet footsteps behind you, and an old voice: "You owe for a crossing."'
+  warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
+  sitePrefab: {fileID: 7940016432191105948, guid: 963835c011853d642b9b0cb576a7e6e8, type: 3}
+  siteDistance: {x: 35, y: 70}
+  nearWater: 1
+  siteText: The ferryman, soaked through, his raft gone. Behind him in the black water, pale faces. "Pay what you owe, or they collect it."
+  artwork: {fileID: 21300000, guid: 91870b3669103b54985511029dc7f8a8, type: 3}
+  stakes:
+    loot: 0
+    danger: 2
+    time: 0
+  onStart: []
+  choices:
+  - label: Pay what you owe
+    detail: 'Twice the fare: it was his raft.'
+    cost:
+    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+      amount: 6
+    requires: []
+    hiddenUntilMet: 0
+    result: He counts it, nods, and walks into the river.
+    outcomes:
+    - rid: 2623126389041660036
+    - rid: 2623126389041660037
+  - label: Refuse
+    detail: The drowned come up out of the water for you.
+    cost: []
+    requires: []
+    hiddenUntilMet: 0
+    result: '"So be it." The water stirs.'
+    outcomes:
+    - rid: 2623126389041660038
+    - rid: 2623126389041660039
+  needsMark: event:ferryman:robbed
+  blockedByMark: event:ferryman:due
+  oncePerSave: 0
+  moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: 
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126389041660036
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: The faces in the water sink away.
+        kind: 0
+    - rid: 2623126389041660037
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:ferryman:due
+    - rid: 2623126389041660038
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+        count: 2
+        radius: 6
+        hunt: 1
+    - rid: 2623126389041660039
+      type: {class: SetMarkOutcome, ns: , asm: SafeHaven}
+      data:
+        mark: event:ferryman:due

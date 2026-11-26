@@ -22,6 +22,7 @@ MonoBehaviour:
   warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
   sitePrefab: {fileID: 7940016432191105948, guid: d9e6a00382989314087e5d6db46c94fa, type: 3}
   siteDistance: {x: 35, y: 70}
+  nearWater: 0
   siteText: Your own pack from the last time, torn open, half of it still there. Whatever did it may not have gone far.
   artwork: {fileID: 21300000, guid: 907c7a2b9eaa04449a4e46e25e68e407, type: 3}
   stakes:
@@ -34,6 +35,7 @@ MonoBehaviour:
     detail: What killed you is still close.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: You stuff what's left into your bag.
     outcomes:
     - rid: 2623126385950982176
@@ -42,6 +44,7 @@ MonoBehaviour:
     detail: Let it be a lesson.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: You leave it where it fell.
     outcomes:
     - rid: 2623126385950982178
@@ -51,6 +54,8 @@ MonoBehaviour:
   moreLikelyWhen:
   - state: 2
     times: 40
+  moreLikelyWithMark: []
+  legendPage: 
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2

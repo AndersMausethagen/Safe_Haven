@@ -22,6 +22,7 @@ MonoBehaviour:
   warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
   sitePrefab: {fileID: 7940016432191105948, guid: f09e46c3967dd714d8cecbea99415542, type: 3}
   siteDistance: {x: 35, y: 70}
+  nearWater: 0
   siteText: A pure white hart, still as frost. It turns and walks a few steps away, and looks back, as if it waits.
   artwork: {fileID: 21300000, guid: 028b9b6ee20c7284c890a62a6e5c0cff, type: 3}
   stakes:
@@ -31,19 +32,19 @@ MonoBehaviour:
   onStart: []
   choices:
   - label: Follow it
-    detail: Costs 40 seconds. It never hurries.
+    detail: It never hurries, and never lets you near.
     cost: []
     requires: []
-    result: It leads you to a hollow where the first oak grew, and is gone.
+    hiddenUntilMet: 0
+    result: It turns and walks away into the trees, looking back.
     outcomes:
-    - rid: 2623126385950982179
-    - rid: 2623126385950982180
-    - rid: 2623126385950982181
+    - rid: 2623126389041660087
   - label: Hunt it
     detail: One clean arrow.
     cost: []
     requires:
     - rid: 2623126385950982182
+    hiddenUntilMet: 0
     result: It falls without a sound. The forest goes very quiet.
     outcomes:
     - rid: 2623126385950982183
@@ -52,6 +53,7 @@ MonoBehaviour:
     detail: Some things are not for keeping.
     cost: []
     requires: []
+    hiddenUntilMet: 0
     result: It looks at you a long moment, then walks into the mist.
     outcomes:
     - rid: 2623126385950982185
@@ -59,26 +61,12 @@ MonoBehaviour:
   blockedByMark: 
   oncePerSave: 1
   moreLikelyWhen: []
+  moreLikelyWithMark: []
+  legendPage: A white hart in the Misty Woods that would not be caught, only followed. It led to the hollow where they say the first oak grew, and was gone. The old folk say it shows itself once in a life.
   raisesWhenChosen: {fileID: 0}
   references:
     version: 2
     RefIds:
-    - rid: 2623126385950982179
-      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
-      data:
-        seconds: -40
-    - rid: 2623126385950982180
-      type: {class: GiveRelicOutcome, ns: , asm: SafeHaven}
-      data: 
-    - rid: 2623126385950982181
-      type: {class: GiveBoonOutcome, ns: , asm: SafeHaven}
-      data:
-        name: Hart's Grace
-        bonuses:
-        - stat: 16
-          op: 0
-          value: 0.1
-        seconds: 600
     - rid: 2623126385950982182
       type: {class: SkillAtLeast, ns: , asm: SafeHaven}
       data:
@@ -119,3 +107,33 @@ MonoBehaviour:
           op: 0
           value: 20
         seconds: 300
+    - rid: 2623126389041660087
+      type: {class: TrackOutcome, ns: , asm: SafeHaven}
+      data:
+        label: Follow the hart
+        distance: {x: 70, y: 120}
+        signEvery: 14
+        sign: {fileID: 0}
+        leader: {fileID: 4450986390094221322, guid: a0e03911cb1022e4db959b2e8b12fc72, type: 3}
+        endPrefab: {fileID: 0}
+        onFound:
+        - rid: 2623126389041660088
+        - rid: 2623126389041660089
+        - rid: 2623126389041660090
+    - rid: 2623126389041660088
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: It leads you to a hollow where they say the first oak grew, and is gone.
+        kind: 1
+    - rid: 2623126389041660089
+      type: {class: GiveRelicOutcome, ns: , asm: SafeHaven}
+      data: 
+    - rid: 2623126389041660090
+      type: {class: GiveBoonOutcome, ns: , asm: SafeHaven}
+      data:
+        name: Hart's Grace
+        bonuses:
+        - stat: 16
+          op: 0
+          value: 0.1
+        seconds: 600
