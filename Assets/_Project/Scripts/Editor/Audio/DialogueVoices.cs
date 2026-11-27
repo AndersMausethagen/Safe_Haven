@@ -38,6 +38,8 @@ public static class DialogueVoices
         "id", "displayName", "description", "speakerName", "question", "ask", "askText", "acceptText", "name", "homeScene",
         "statusText", "endingStatus", "waitingForLeaderText", "interactionName", "prompt", "title", "label", "note", "tooltip",
         "job", "role", "story", "summary", "requirement",
+        // A resident's wish for a home as its label on the card ("Water close", "Lit lane"): read, never said.
+        "likes",
     };
 
     /// <summary>A line someone says: its recording's name (id), who says it, the words, what kind of line it is and where it was found.</summary>

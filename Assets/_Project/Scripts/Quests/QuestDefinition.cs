@@ -92,6 +92,9 @@ public sealed class QuestDefinition : ScriptableObject
     [Header("Objectives")]
     [Tooltip("Off: objectives can be done in any order. On: each one only counts once the one above it is done.")]
     [SerializeField] private bool objectivesInOrder;
+    [Tooltip("Steps were taken off the end of this quest (moved to a quest of their own): a save made when it had this many keeps the " +
+             "progress of the steps it still has, rather than starting them again. 0: never changed so.")]
+    [SerializeField, Min(0)] private int formerStepCount;
     [SerializeField] private List<QuestObjective> objectives = new List<QuestObjective>();
 
     [Header("Teaches when it starts")]
@@ -165,6 +168,7 @@ public sealed class QuestDefinition : ScriptableObject
     public IReadOnlyList<GameEventDefinition> OnStarted => onStarted;
     public IReadOnlyList<GameEventDefinition> OnCompleted => onCompleted;
     public bool ObjectivesInOrder => objectivesInOrder;
+    public int FormerStepCount => formerStepCount;
     public IReadOnlyList<QuestObjective> Objectives => objectives;
     /// <summary>
     /// Handed in rather than completed on the spot: ticked here, or a rescue (<see cref="BroughtHome"/>), which is always handed

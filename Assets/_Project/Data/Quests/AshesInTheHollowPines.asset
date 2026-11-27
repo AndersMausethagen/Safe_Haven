@@ -25,6 +25,7 @@ MonoBehaviour:
   prerequisites:
   - {fileID: 11400000, guid: 22c52c196cd7f01478e77e31ccc726a4, type: 2}
   - {fileID: 11400000, guid: bb2c787a2de76634ba9260ee402850fc, type: 2}
+  - {fileID: 11400000, guid: c7535789ff7f13f4f8940597f31f837d, type: 2}
   startedFirst: []
   start: 2
   startEvent: {fileID: 0}

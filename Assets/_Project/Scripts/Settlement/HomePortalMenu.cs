@@ -72,6 +72,7 @@ public sealed class HomePortalMenu
         }
 
         AddOtherHavens(page, user);
+        AddOldWays(page, user);
         if (station != null && station.Usable)
         {
             page.Add(new MenuAction("Make Portal Sparks", "Queue them at the portal's own fire", true, () => station.OpenMenu(user), closesMenu: true) { Icon = "Spark" });
@@ -142,6 +143,35 @@ public sealed class HomePortalMenu
                 page.Add(new MenuAction("Walk home", "Back through to your own Haven", true, () => coop.Leave(), closesMenu: true));
                 break;
         }
+    }
+
+    // Out to a lit boundary stone (each knows the way home, BoundaryStone): a land remembered isn't walked again. One row, its stones on
+    // a page of their own, so eleven of them don't make the portal's window tall.
+    private void AddOldWays(MenuPage page, GameObject user)
+    {
+        if (HavenVisit.IsVisiting || BoundaryStone.Lit().Count == 0)
+        {
+            return;
+        }
+
+        page.Add(new MenuAction("Walk the old ways", "Out to the stone of a land you have remembered", true,
+            () => ActionMenuWindow.Current.Open(() => OldWaysPage(user), user, portal.transform), closesMenu: true) { Icon = "Lead" });
+    }
+
+    private MenuPage OldWaysPage(GameObject user)
+    {
+        var page = new MenuPage { Title = "The Old Ways", Body = "Every stone you lit remembers the path to my fire. Name one, and walk it." };
+        bool open = HavenTravel.IsOpen && !GameStateManager.InCombat;
+        string shut = GameStateManager.InCombat ? "Not with something at your heels." : "Not during a breach.";
+        foreach (BoundaryStone stone in BoundaryStone.Lit())
+        {
+            BoundaryStone to = stone;
+            page.Add(new MenuAction($"To {to.Region}'s stone", open ? "The hearth's own path." : shut, open,
+                () => HavenTravel.GoTo(to.transform), closesMenu: true) { Icon = "Lead" });
+        }
+
+        page.Add(new MenuAction("Back", null, true, () => { ActionMenuWindow.Current.Close(); PortalWindow.Show(() => Build(user), user, portal.transform, 6f); }));
+        return page;
     }
 
     private static void CallFriends(CoopSession coop)

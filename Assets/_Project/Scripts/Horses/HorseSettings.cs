@@ -20,6 +20,9 @@ public sealed class HorseSettings : GameSettings<HorseSettings>
     [Header("The first horse")]
     [Tooltip("If the player has no horse by this in-game day, a calm one comes to graze near the Haven, and the journal says so.")]
     [SerializeField, Min(1)] private int firstHorseByDay = 3;
+    [Tooltip("Or sooner: once this quest is done (the first walk out, Smoke in the Grey Pines), so the horse comes before the long walks " +
+             "to the old places begin (the user, 2026-11-27: \"now we have a reason to get the horse\"). Empty: only by the day.")]
+    [SerializeField] private QuestDefinition firstHorseAfter;
     [Tooltip("Metres from the Haven's heart the first horse grazes: near enough to find, out of the yard.")]
     [SerializeField] private Vector2 firstHorseRing = new Vector2(45f, 70f);
     [Tooltip("Who tells the player of it (a resident's name), and what they say.")]
@@ -172,6 +175,11 @@ public sealed class HorseSettings : GameSettings<HorseSettings>
     public HorseDefinition WildHorse => wildHorse;
     public IReadOnlyList<HorseDefinition> SpecialHorses => specialHorses;
     public int FirstHorseByDay => firstHorseByDay;
+    public QuestDefinition FirstHorseAfter => firstHorseAfter;
+
+    /// <summary>True once the first horse is due: the day has come, or the quest it follows is done.</summary>
+    public bool FirstHorseDue(float today, QuestLog log) =>
+        today >= firstHorseByDay || firstHorseAfter != null && log != null && log.StatusOf(firstHorseAfter) == QuestStatus.Completed;
     public Vector2 FirstHorseRing => firstHorseRing;
     public string FirstHorseTeller => firstHorseTeller;
     public string FirstHorseLine => firstHorseLine;

@@ -383,7 +383,10 @@ public sealed class QuestLog
         // Saved before the quest's steps changed (a step added or taken out): counts kept by place would land on the wrong
         // steps (review 2026-11-16: Smith's Request's new "Raise the Smithy"). They start again from nothing instead; what
         // is already owned or built is counted again once the scene is in (QuestManager.RecountOwned).
-        bool stepsChanged = counts != null && counts.Count != entry.Counts.Length && status != QuestStatus.Completed;
+        // Unless steps were only taken off its end (Former Step Count: A Horse of Your Own's Stable, 2026-11-27): the first ones are
+        // the same steps, so their counts stay.
+        bool trimmed = counts != null && quest.FormerStepCount == counts.Count && counts.Count > entry.Counts.Length;
+        bool stepsChanged = counts != null && counts.Count != entry.Counts.Length && status != QuestStatus.Completed && !trimmed;
         for (int i = 0; !stepsChanged && i < entry.Counts.Length && counts != null && i < counts.Count; i++)
         {
             entry.Counts[i] = Math.Max(0, counts[i]);

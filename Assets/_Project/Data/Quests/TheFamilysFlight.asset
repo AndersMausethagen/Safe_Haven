@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: thefamilysflight
   displayName: The Family's Flight
-  description: 'The seed under the hearthstone was sealed for sowing, not for a winter: the family meant to come back. A burnt fence line runs off from the yard into the pines, to the south-east.'
+  description: 'The seed under the hearthstone was sealed for sowing, not for a winter: the family meant to come back. A burnt fence line runs off from the yard into the pines, to the south-east. Whatever is at the end of it will want looking after: take two rough planks.'
   chain: Asa
   journalNotes: Follow the burnt fence where it runs out of the yard, south-east into the pines. What they dropped shows the way. Bring 2 Rough Planks to mend what is broken.
   rank: 1
@@ -114,7 +114,7 @@ MonoBehaviour:
     otherPerson: {fileID: 0}
     mark: {fileID: 0}
   - type: 11
-    description: Mend the hurdle round the grave
+    description: Mend the hurdle round the grave (2 Rough Planks)
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}

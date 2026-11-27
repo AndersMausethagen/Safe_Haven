@@ -198,7 +198,7 @@ public sealed class HorseHerd : MonoBehaviour
             return false;
         }
 
-        if (PlantedTrees.Today < settings.FirstHorseByDay)
+        if (!settings.FirstHorseDue(PlantedTrees.Today, GameSession.Quests))
         {
             return false;
         }

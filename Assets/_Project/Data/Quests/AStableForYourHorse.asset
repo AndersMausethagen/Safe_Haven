@@ -1,0 +1,107 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
+  m_Name: AStableForYourHorse
+  m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
+  id: astableforyourhorse
+  displayName: A Stable for Your Horse
+  description: 'A horse left out in the open is a horse the night can take. Give yours a Stable to come home to: there it is safe from what comes in the dark, mends its hurts and gets its breath back, and two kept together may foal.'
+  chain: 
+  journalNotes: A Stable keeps a horse safe at night; two in one can foal.
+  rank: 1
+  availableObjective: 
+  announceStart: 1
+  announceCompletion: 1
+  showTimerInHud: 0
+  prerequisites:
+  - {fileID: 11400000, guid: c7535789ff7f13f4f8940597f31f837d, type: 2}
+  - {fileID: 11400000, guid: 8de8a5d687692334d85f5fe6c7d944c3, type: 2}
+  startedFirst: []
+  start: 0
+  startEvent: {fileID: 0}
+  startWhen:
+    type: 10
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 11400000, guid: 4565b885a8575db41bfbc11bf823e166, type: 2}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
+  closedBy: {fileID: 0}
+  startDelay: 0
+  startsInAFight: 0
+  startsWithoutWaiting: 0
+  onStarted: []
+  objectivesInOrder: 0
+  objectives:
+  - type: 7
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 11400000, guid: 08a3177177c32de4fa1bcd278a16ee86, type: 2}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 11400000, guid: 20219ccaaa4651f46944bf5d351c2583, type: 2}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
+  unlocksBuildings: []
+  unlocksModules: []
+  turnInToGiver: 0
+  turnInTo: 
+  rewardItems: []
+  rewardResources: []
+  rewardRecipes: []
+  rewardSkills: []
+  teachesAtStart: []
+  rewardEnchantments: []
+  rewardWorkFor: {fileID: 0}
+  rewardWork: 0
+  rewardPassion: 0
+  rewardMark: {fileID: 0}
+  experience: 0
+  completionEvent: {fileID: 0}
+  onCompleted: []

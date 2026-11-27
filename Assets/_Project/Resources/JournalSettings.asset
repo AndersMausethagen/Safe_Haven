@@ -1199,6 +1199,7 @@ MonoBehaviour:
     - '[{key:Feed}] Barley when it tosses its head'
   creatures:
   - {fileID: 11400000, guid: afbf4a58442496641826a078787f7e2e, type: 2}
+  - {fileID: 11400000, guid: d81409527c39f9649b8213dbfa7fdf7c, type: 2}
   - {fileID: 11400000, guid: e646ff37405b36e43a4fa710a23060e2, type: 2}
   - {fileID: 11400000, guid: b22c293353a041944aa0e1f4eb3bcb99, type: 2}
   - {fileID: 11400000, guid: 87ebac26be444f642bbd6de5b4fa2766, type: 2}

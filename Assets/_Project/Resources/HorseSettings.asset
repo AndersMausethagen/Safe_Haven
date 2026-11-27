@@ -53,9 +53,11 @@ MonoBehaviour:
     panic: 0.45
     description: 'Stands its ground: hurt, it strikes back instead of running.'
   firstHorseByDay: 3
+  firstHorseAfter: {fileID: 11400000, guid: 3c76010d130fc6a4e9f113f148b849ef, type: 2}
   firstHorseRing: {x: 45, y: 70}
   firstHorseTeller: Sigrid
-  firstHorseLine: There's a horse grazing out past the yard. A quiet one. Take a lasso and some barley, and keep low.
+  firstHorseLine: The old places are a long walk on foot. There's a horse grazing out past the yard, a quiet one. Take a lasso and some barley, and keep low.
+  firstHorseHowTo: 'To tame it: a Lasso (made by hand from 4 Nettle Cord and 1 Rough Hide) and 4 Barley (a Farm Plot grows it; caches and barrels in the woods hold some). It is marked on your map.'
   wildHorseMet: {fileID: 11400000, guid: 84982ddea87b5c347a9942d18f748b2f, type: 2}
   horseTamed: {fileID: 11400000, guid: 342b8d4395c06ef48bc3f5fb0893378b, type: 2}
   metWithin: 20
@@ -67,6 +69,7 @@ MonoBehaviour:
   bondPerKilometre: 6
   bondLostPerIdleDay: 2
   bondWhenTamed: 10
+  bondPerBreakingFeed: 2
   staminaAtFullBond: 0.2
   calmerAtFullBond: 0.7
   throwsBelowBond: 20

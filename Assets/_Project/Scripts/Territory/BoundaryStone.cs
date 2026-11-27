@@ -116,6 +116,23 @@ public sealed class BoundaryStone : MonoBehaviour, IInteractionName
         ActionMenuWindow.Current.Open(() => Page(user), user, transform);
     }
 
+    /// <summary>The stones of remembered lands in this scene, in their regions' names' order.</summary>
+    public static System.Collections.Generic.List<BoundaryStone> Lit()
+    {
+        TerritoryState state = GameSession.Here.Territory;
+        var lit = new System.Collections.Generic.List<BoundaryStone>();
+        foreach (BoundaryStone stone in FindObjectsByType<BoundaryStone>(FindObjectsInactive.Exclude))
+        {
+            if (state.IsClaimed(stone.region))
+            {
+                lit.Add(stone);
+            }
+        }
+
+        lit.Sort((a, b) => string.CompareOrdinal(a.region, b.region));
+        return lit;
+    }
+
     private MenuPage Page(GameObject user)
     {
         TerritorySettings settings = TerritorySettings.Current;
@@ -155,22 +172,22 @@ public sealed class BoundaryStone : MonoBehaviour, IInteractionName
             page.Add(new MenuAction("Offer a Pact Rune", can ? $"Hold +{settings.RuneHold:0} (you have {runes})." : why, can, () => Territory.Offer(region, user)));
         }
 
+        bool open = HavenTravel.IsOpen && !GameStateManager.InCombat;
+        string shut = GameStateManager.InCombat ? "Not with something at your heels." : "Not during a breach.";
+        // A lit stone knows the way home from the first one lit, and the portal knows the way back out to it (HomePortalMenu): a land
+        // remembered isn't walked again (the user, 2026-11-27: "walking for several minutes is not fun").
+        if (state.IsClaimed(region) && HomePortal.Current != null && !HavenVisit.IsVisiting)
+        {
+            page.Add(new MenuAction("Walk the old way home", open ? "The hearth's own path, back to the portal." : shut,
+                open, () => HavenTravel.GoTo(HomePortal.Current.transform), true) { Icon = "Lead" });
+        }
+
         // The ways between the lit stones (Westwood remembered): to any other stone of a remembered land, in their names' order; not
         // with something at your heels (no running from the Old Grey) nor during a breach.
         if (state.IsClaimed(region) && HavenRegionSettings.Current.StoneTravelOpen)
         {
-            var others = new System.Collections.Generic.List<BoundaryStone>();
-            foreach (BoundaryStone other in FindObjectsByType<BoundaryStone>(FindObjectsInactive.Exclude))
-            {
-                if (other != this && state.IsClaimed(other.region))
-                {
-                    others.Add(other);
-                }
-            }
-
-            others.Sort((a, b) => string.CompareOrdinal(a.region, b.region));
-            bool open = HavenTravel.IsOpen && !GameStateManager.InCombat;
-            string shut = GameStateManager.InCombat ? "Not with something at your heels." : "Not during a breach.";
+            var others = Lit();
+            others.Remove(this);
             foreach (BoundaryStone other in others)
             {
                 BoundaryStone to = other;

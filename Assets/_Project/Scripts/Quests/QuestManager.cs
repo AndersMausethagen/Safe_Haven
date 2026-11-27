@@ -638,8 +638,10 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         RaiseAuthoredEvents(quest.OnCompleted, quest);
 
         RaiseChanged();
-        // The next quests of a chain may be waiting for this one.
+        // The next quests of a chain may be waiting for this one; and one whose event came before this was done (a wild horse met
+        // before the clamp was lit, A Horse of Your Own) starts now, not at the next scene.
         StartAvailableQuests();
+        StartQuestsWhoseEventHappened();
     }
 
     private string GiveRewards(QuestDefinition quest)

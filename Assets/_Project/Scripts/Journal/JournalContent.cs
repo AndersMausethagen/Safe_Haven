@@ -180,7 +180,7 @@ public static class JournalContent
 
         foreach (QuestWaypoint waypoint in QuestWaypoint.Active)
         {
-            if (waypoint != null && waypoint.Quest == quest && waypoint.IsWanted(log))
+            if (waypoint != null && waypoint.Quest == quest && waypoint.IsWanted(log) && waypoint.CanGoThere)
             {
                 HavenTravel.AddGoTo(shown, waypoint.transform);
                 return;

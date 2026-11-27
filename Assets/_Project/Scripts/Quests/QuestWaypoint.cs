@@ -53,6 +53,22 @@ public sealed class QuestWaypoint : MonoBehaviour
 
     public ResourceNode UntilGathered => untilGathered;
 
+    // Set at runtime by HavenQuestWaypoints: the journal's "Go there" takes the player only to a place they have walked to before (the
+    // first walk out is the finding; the next ones needn't be walked again). Empty with Walk First: never by the journal.
+    private string foundFirst;
+    private bool walkFirst;
+
+    /// <summary>Lets the journal's "Go there" take the player here only once the place <paramref name="placeId"/> is found; with
+    /// none, never (the player walks there).</summary>
+    public void GoThereOnceFound(string placeId)
+    {
+        walkFirst = true;
+        foundFirst = placeId;
+    }
+
+    /// <summary>True when the journal may take the player straight here.</summary>
+    public bool CanGoThere => !walkFirst || !string.IsNullOrEmpty(foundFirst) && GameSession.Progress.Journal.HasDiscovered(foundFirst);
+
     // A waypoint on an objective to drink at open water ("Strength for the Road") shows the nearest water instead of where
     // it was put: regenerating the Haven moves its rivers and lakes, and one placed by hand went stale (the user, 2026-11-15).
     private bool followsWater;

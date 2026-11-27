@@ -24,6 +24,7 @@ MonoBehaviour:
   showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: 43d140c7ce0db8248af73e619971f999, type: 2}
+  - {fileID: 11400000, guid: c7535789ff7f13f4f8940597f31f837d, type: 2}
   startedFirst: []
   start: 2
   startEvent: {fileID: 0}
