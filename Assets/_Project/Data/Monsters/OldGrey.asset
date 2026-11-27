@@ -1,0 +1,307 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e5c6da77934e8439571a13e158376a, type: 3}
+  m_Name: OldGrey
+  m_EditorClassIdentifier: Assembly-CSharp::MonsterDefinition
+  id: old_grey
+  displayName: The Old Grey
+  description: The wolf the watch fled from, grey to the muzzle and twice the size of any in the pack. The Wolfwood's oldest story, and still hunting.
+  combatStats: {fileID: 11400000, guid: 8c6276288b08a8c42abf045683121e77, type: 2}
+  faction: 1
+  lootTable: {fileID: 11400000, guid: ce8b069f2cb8dee4cb88e47f7f080247, type: 2}
+  drops:
+    entries: []
+  unlocksRecipes: []
+  animatorController: {fileID: 0}
+  prefab: {fileID: 6254916435909010154, guid: 36c1791cd7cea6744bd31805f58c1890, type: 3}
+  experience: 0
+  neverElite: 1
+  attack: {fileID: 11400000, guid: dc3220cad0306084fa0ab8acc5561f48, type: 2}
+  attackDamage: 27
+  attackCooldown: 1
+  moveSpeed: 5.8
+  detectionRange: 12
+  chaseRange: 18
+  leashRange: 16
+  sightAngle: 140
+  closeSenseRange: 3
+  hearing: 1.4
+  alertness: 1.1
+  huntsHorses: 2.5
+  frightensHorses: 0
+  attacks:
+  - attack: {fileID: 11400000, guid: 004e4a57fd53f6445af07fdede80cf21, type: 2}
+    kind: 3
+    damage: 0
+    minimumRange: 0
+    maximumRange: 10
+    priority: 20
+    opener: 0
+    weight: 0
+    whenFoe: 0
+    heavy: 0
+    cooldown: 14
+    interruptible: 1
+    reelWhenBroken: 0
+    sound: {fileID: 11400000, guid: d2b68a9637836884a89327fada25cb8c, type: 2}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    untilPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 0
+    toppleAfter: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    breakAway: 0
+    breakAwayDelay: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 1
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 1
+    onSpotted: 1
+    alarmRadius: 18
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: dc3220cad0306084fa0ab8acc5561f48, type: 2}
+    kind: 0
+    damage: 18
+    minimumRange: 0
+    maximumRange: 1.53
+    priority: 10
+    opener: 0
+    weight: 1
+    whenFoe: 0
+    heavy: 0
+    cooldown: 1
+    interruptible: 1
+    reelWhenBroken: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    untilPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 0
+    toppleAfter: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    breakAway: 3.5
+    breakAwayDelay: 0.3
+    breakAwaySeconds: {x: 0.8, y: 1.4}
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: 338b303d0c8fffe46b6611fad4aff38b, type: 2}
+    kind: 2
+    damage: 21.6
+    minimumRange: 3.5
+    maximumRange: 10
+    priority: 15
+    opener: 0
+    weight: 0.6
+    whenFoe: 6
+    heavy: 0
+    cooldown: 7
+    interruptible: 0
+    reelWhenBroken: 0
+    sound: {fileID: 0}
+    leadTarget: 0.35
+    fromTier: 2
+    fromPhase: 0
+    untilPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 0
+    toppleAfter: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    breakAway: 0
+    breakAwayDelay: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 18
+    chargeDistance: 10.5
+    exposedSeconds: 0.9
+    leapHeight: 1.4
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
+    lobSeconds: 1.1
+    lobScatter: 2
+  movementTactic: 0
+  temperament: 1
+  preferredDistance: 7
+  distanceTolerance: 1.5
+  fleeHealthFraction: 0.25
+  fleeDistance: 10
+  defensiveRadius: 8
+  hoverHeight: 0
+  idleWanderRadius: 10
+  idlePauseSeconds: {x: 3, y: 8}
+  idleWalkSpeed: 0.45
+  idleGrazeChance: 0
+  idleSleepChance: 0.3
+  idleSleepAttention: 0.3
+  swims: 0
+  timid: 0
+  boltSeconds: 7
+  thief: 0
+  stealReach: 1.5
+  escapeDistance: 40
+  corneredSeconds: 4
+  canBeFinished: 0
+  flankSpread: 1
+  flanksFromTier: 1
+  flankSound: {fileID: 0}
+  breaksWalls: 0
+  spottedPause: 0
+  guardAfterBlows: 0
+  guardWithin: 2
+  guardSeconds: 1
+  guardLetsThrough: 0.3
+  guardFromTier: 2
+  hurtBelow: 0.3
+  hurtMood: 1
+  arrowDodge: 0
+  poise: 0
+  parryResponse: 0
+  poiseRecoveryDelay: 0
+  toppleSeconds: 0
+  poiseGrowth: 0
+  toppleStrike: 0
+  toppleBreaksArmour: 0
+  toppleSound: {fileID: 0}
+  openWhileStriking: 1
+  parriesBackstabs: 0
+  shieldArc: 0
+  shieldLetsThrough: 0.25
+  bleeds: 1
+  bloodColor: {r: 0.32, g: 0.015, b: 0.02, a: 0.95}
+  ragdollOnDeath: 1
+  fallsByAnimation: 0
+  canBeSmashed: 1
+  canLoseLimbs: 1
+  hitMaterial: 0
+  limpBelow: 0.3
+  limpSpeed: 0.75
+  bleedTrailBelow: 0.5
+  armourChips: 0
+  armourPerChip: 0.12
+  chipFromShare: 0.07
+  armourParts: []
+  sizeVariation: 0.08
+  shadeVariation: 0.14
+  portrait: {fileID: 21300000, guid: 3d1695c02a14ecf4bb127f270293a6cc, type: 3}
+  journalLore: Runa says these were ordinary wolves once. The curse got into them through the prey they ate, and they kept the pack and lost the fear of fire. They hunt the same paths your people must walk home.
+  journalAdvice: They come in packs and take turns at you, so keep them in front of you and watch for the lunge. A tier II wolf learns to pounce. Parry the bite, and don't chase one that backs away, as that is how the others get behind you. Bring down the one that howls, the biggest of them, and the rest will run.
+  journalHabitat: The paths of the Misty Woods and Troll Valley, in packs
+  journalKillsToKnow: 3
+  deathSound: {fileID: 11400000, guid: 32f397f6c4f79ca459a23ff2f1b6bb8e, type: 2}
+  hurtSound: {fileID: 11400000, guid: e57999aa2bfc8524b98a2a03ae588f69, type: 2}
+  attackSound: {fileID: 11400000, guid: d6475ceec23a7f8409dbb26eeaf1085a, type: 2}

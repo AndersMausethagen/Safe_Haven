@@ -116,17 +116,22 @@ public sealed class HavenPlaceScenesTests
         }
     }
 
-    [TestCase("WhereThePactStonesWereCut", "RavenwoodRemembered", "Ravenwood")]
-    [TestCase("AshesInTheHollowPines", "TheHollowPinesRemembered", "The Hollow Pines")]
-    [TestCase("NetsAtTheFishersRest", "StillwaterRemembered", "Stillwater")]
-    public void ANearRingArc_LeadsFromSomeoneHome_ToTheirRegion_RememberedAtItsStone(string first, string last, string region)
+    [TestCase("WhereThePactStonesWereCut", "RavenwoodRemembered", "Ravenwood", "TheColdStones", true)]
+    [TestCase("AshesInTheHollowPines", "TheHollowPinesRemembered", "The Hollow Pines", "TheColdStones", true)]
+    [TestCase("NetsAtTheFishersRest", "StillwaterRemembered", "Stillwater", "TheColdStones", true)]
+    [TestCase("WhereThePactWasSworn", "EastwoodRemembered", "Eastwood", "TheRoadNorth", false)]
+    [TestCase("TheWatchThatFled", "WolfwoodRemembered", "The Wolfwood", "TheRoadNorth", false)]
+    [TestCase("MarksForTheWay", "WestwoodRemembered", "Westwood", "TheRoadNorth", false)]
+    [TestCase("AWayAcrossTheFen", "TheDrowningFenRemembered", "The Drowning Fen", "TheRoadNorth", false)]
+    [TestCase("TheFarewellStones", "GreyfellRemembered", "Greyfell", "WhatSigridKnows", false)]
+    public void ARegionsArc_LeadsFromSomeoneHome_ToTheirRegion_RememberedAtItsStone(string first, string last, string region, string opens, bool worked)
     {
         var hook = AssetDatabase.LoadAssetAtPath<QuestDefinition>($"Assets/_Project/Data/Quests/{first}.asset");
         var end = AssetDatabase.LoadAssetAtPath<QuestDefinition>($"Assets/_Project/Data/Quests/{last}.asset");
         Assert.IsTrue(hook.HeldForHomecoming, "the hook waits for a homecoming (Story Pacing: two at most)");
         Assert.AreEqual(ObjectiveType.TalkTo, hook.Objectives[0].Type);
         Assert.IsNotNull(hook.Objectives[0].Person, "someone home tells of the place");
-        Assert.That(hook.Prerequisites.Select(p => p.name), Does.Contain("TheColdStones"), "the near ring opens with the Cold Stones");
+        Assert.That(hook.Prerequisites.Select(p => p.name), Does.Contain(opens), $"{region}'s ring opens with {opens}");
 
         // Walk the chain from the hook to the end: each quest follows the last, and every place and thing it asks for is there.
         HavenPlaceVerbs verbs = Verbs;
@@ -162,8 +167,60 @@ public sealed class HavenPlaceScenesTests
             }
         }
 
-        Assert.IsTrue(verbs.Scenes.Any(s => s.stages.Any(st => st.quest == end && st.gate == HavenPlaceVerbs.Gate.QuestDone)), "remembered, a place is worked");
-        Assert.IsTrue(verbs.Finds.Any(f => f.quest == end && f.everyDays > 0), "and gives back every few days");
+        Assert.IsTrue(verbs.Scenes.Any(s => s.stages.Any(st => st.quest == end && st.gate == HavenPlaceVerbs.Gate.QuestDone)), "remembered, the place shows it");
+        if (worked)
+        {
+            Assert.IsTrue(verbs.Finds.Any(f => f.quest == end && f.everyDays > 0), "the near ring's places are worked and give back every few days");
+        }
+    }
+
+    [Test]
+    public void TheOldGrey_KeepsItsDen_UntilItIsBroughtDown()
+    {
+        var quest = AssetDatabase.LoadAssetAtPath<QuestDefinition>("Assets/_Project/Data/Quests/TheOldGrey.asset");
+        MonsterDefinition grey = quest.Objectives.Single(o => o.Type == ObjectiveType.KillMonster).Monster;
+        var wolf = AssetDatabase.LoadAssetAtPath<MonsterDefinition>("Assets/_Project/Data/Monsters/ForestBittenWolf.asset");
+        Assert.AreNotEqual(wolf, grey, "the Old Grey, not any wolf of the pack");
+        Assert.AreEqual(grey, grey.Prefab.GetComponentInChildren<MonsterAI>(true).Definition, "its body is its own: a kill counts as the Old Grey");
+        Assert.Greater(grey.Prefab.transform.localScale.x, 1.2f, "bigger than the pack");
+
+        HavenPlaceVerbs.PlaceScene den = Verbs.SceneOf("haven.wolf_den.0");
+        HavenPlaceVerbs.Stage keeps = den.stages.Single(s => s.creature != null);
+        Assert.AreEqual(grey.Prefab, keeps.creature);
+        Assert.AreEqual(HavenPlaceVerbs.Gate.QuestStarted, keeps.gate);
+        Assert.AreEqual(quest, keeps.quest);
+        Assert.IsTrue(den.stages.Any(s => s.gate == HavenPlaceVerbs.Gate.QuestDone && s.quest == quest && s.hidesEarlier), "once it is down, it doesn't come back");
+    }
+
+    [Test]
+    public void TheLastMemory_IsAtTheTarnByNight_AndEndsWithHightarnRemembered()
+    {
+        var first = AssetDatabase.LoadAssetAtPath<QuestDefinition>("Assets/_Project/Data/Quests/TheLastMemory.asset");
+        var end = AssetDatabase.LoadAssetAtPath<QuestDefinition>("Assets/_Project/Data/Quests/HightarnRemembered.asset");
+        Assert.That(first.Prerequisites.Select(p => p.name), Is.SupersetOf(new[] { "WhatSigridKnows", "TheRoomBeneathTheRoad" }), "Act II's end");
+        HavenPlaceVerbs.Find memory = Verbs.Finds.Single(f => f.quest == first && f.questTarget != null);
+        Assert.AreEqual(HavenPlaceVerbs.When.Night, memory.when, "the tarn shows it only at night");
+        Assert.AreEqual(HavenRegionSettings.Current.LookOf("Hightarn").stoneTarget, end.Objectives.Last().Target);
+        Assert.IsTrue(HavenRegionSettings.Current.Openings.Any(o => o.ring == 3 && o.residentHome != null), "Hightarn opens with the last one home");
+    }
+
+    [Test]
+    public void TheLitStones_LeadToOneAnother_OnlyOnceWestwoodIsRemembered()
+    {
+        var regions = AssetDatabase.LoadAssetAtPath<HavenRegionSettings>("Assets/_Project/Resources/HavenRegionSettings.asset");
+        var after = new SerializedObject(regions).FindProperty("stoneTravelAfter").objectReferenceValue as QuestDefinition;
+        Assert.AreEqual("WestwoodRemembered", after != null ? after.name : null, "the cairn-builders' ways");
+        GameSession.StartNewGame();
+        Assert.IsFalse(regions.StoneTravelOpen, "not before");
+    }
+
+    [Test]
+    public void ThePlanksForTheFen_AreUsedUp()
+    {
+        HavenPlaceVerbs.Find planks = Verbs.Finds.Single(f => f.placeId == "haven.authored.sunken_causeway" && f.costItem != null);
+        Assert.AreEqual("HardwoodPlank", planks.costItem.name);
+        Assert.GreaterOrEqual(planks.costAmount, 4, "a causeway's worth of boards");
+        Assert.IsNull(planks.item, "nothing taken: it is laid");
     }
 
     [Test]

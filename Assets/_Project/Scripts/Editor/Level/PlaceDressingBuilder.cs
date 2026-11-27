@@ -217,6 +217,33 @@ public static class PlaceDressingBuilder
             D("Scorch", 1.1f, 1.8f, 1.6f, 1.6f),
         },
 
+        // The Wolfwood remembered (Wolfwood Remembered): the watch kept again at the ruined tower, a fire and its wood.
+        ["Watch Fire"] = new[]
+        {
+            P(R("Cut Stone A"), -0.5f, 0.6f, 0f, 0.5f, -0.05f),
+            P(R("Cut Stone B"), 0.6f, 0.5f, 70f, 0.5f, -0.05f),
+            P(R("Cut Stone C"), 0f, -0.6f, 140f, 0.5f, -0.05f),
+            D("Scorch", 0f, 0f, 1.8f, 1.8f),
+            L(0f, 0f, 0.6f, new Color(1f, 0.62f, 0.3f), 8f, 1.6f),
+            P(R("Log Pile"), 2.4f, 1.2f, 30f),
+            P(R("Old Barrel"), -2f, 1.4f, 0f),
+            P(R("Stick Fence"), -0.5f, 3f, 90f),
+        },
+
+        // The Drowning Fen (A Way Across the Fen): the causeway laid again, dry boards in a line across the bog.
+        ["Sunken Causeway Mended"] = new[]
+        {
+            P(World + "Set Pieces/Boardwalk.prefab", -2f, -9.5f, 30f, 1f, 0.05f),
+            P(World + "Set Pieces/Boardwalk.prefab", 0f, -6f, 30f, 1f, 0.05f),
+            P(World + "Set Pieces/Boardwalk.prefab", 2f, -2.5f, 30f, 1f, 0.05f),
+            P(World + "Set Pieces/Boardwalk.prefab", 4f, 1f, 30f, 1f, 0.05f),
+            P(World + "Set Pieces/Boardwalk.prefab", 6f, 4.5f, 30f, 1f, 0.05f),
+            P(World + "Set Pieces/Boardwalk.prefab", 8f, 8f, 30f, 1f, 0.05f),
+            P(R("Plank"), -1.5f, -4.4f, 30f, 1f, -1.2f, -82f),
+            P(R("Plank"), 5.4f, 6.8f, 30f, 1f, -1.2f, -84f),
+            P(World + "Set Pieces/Peat Stack.prefab", -3.5f, 2.5f, 15f),
+        },
+
         // Happenings (HavenHappenings): a pedlar resting on the old road, by a small fire.
         ["Pedlar's Camp"] = new[]
         {

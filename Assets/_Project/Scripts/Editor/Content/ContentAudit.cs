@@ -76,6 +76,8 @@ public static class ContentAudit
         "BuildingDefinition.wallTorchCost",
         // A building module's price (BuildingModules.Fit).
         "BuildingModuleDefinition.cost",
+        // What doing a thing at a Haven place takes from the bag (PlaceFind: planks laid across the fen).
+        "HavenPlaceVerbs.finds[].costItem",
     };
 
     private static readonly string[] ItemNeither =

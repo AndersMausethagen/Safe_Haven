@@ -152,6 +152,20 @@ public sealed class BoundaryStone : MonoBehaviour, IInteractionName
             page.Add(new MenuAction("Offer a Pact Rune", can ? $"Hold +{settings.RuneHold:0} (you have {runes})." : why, can, () => Territory.Offer(region, user)));
         }
 
+        // The ways between the lit stones (Westwood remembered): to any other stone of a remembered land.
+        if (state.IsClaimed(region) && HavenRegionSettings.Current.StoneTravelOpen)
+        {
+            foreach (BoundaryStone other in FindObjectsByType<BoundaryStone>(FindObjectsInactive.Exclude))
+            {
+                if (other != this && state.IsClaimed(other.region))
+                {
+                    bool open = HavenTravel.IsOpen;
+                    page.Add(new MenuAction($"Walk the old way to {other.region}'s stone", open ? "The cairn-builders' marks lead there." : "Not during a breach.",
+                        open, () => HavenTravel.GoTo(other.transform), true));
+                }
+            }
+        }
+
         if (IsPushed)
         {
             bool watching = StoneDefence.Current != null;

@@ -197,6 +197,8 @@ MonoBehaviour:
     quest: {fileID: 0}
     everyDays: 0
     when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
   - placeId: haven.old_quarry.1
     name: Cut granite
     verb: Take
@@ -212,6 +214,8 @@ MonoBehaviour:
     quest: {fileID: 0}
     everyDays: 0
     when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
   - placeId: haven.woodland_camp.2
     name: The burners' clamp
     verb: Light
@@ -227,6 +231,8 @@ MonoBehaviour:
     quest: {fileID: 11400000, guid: 3c76010d130fc6a4e9f113f148b849ef, type: 2}
     everyDays: 0
     when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
   - placeId: haven.woodland_camp.2
     name: Charcoal from the clamp
     verb: Take
@@ -242,6 +248,8 @@ MonoBehaviour:
     quest: {fileID: 11400000, guid: 3c76010d130fc6a4e9f113f148b849ef, type: 2}
     everyDays: 2
     when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
   - placeId: haven.old_quarry.0
     name: The half-cut stone
     verb: Read the marks
@@ -257,6 +265,8 @@ MonoBehaviour:
     quest: {fileID: 11400000, guid: ddec661597421b24185a35a14896a28c, type: 2}
     everyDays: 0
     when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
   - placeId: haven.old_quarry.0
     name: Squared stone
     verb: Take
@@ -272,6 +282,8 @@ MonoBehaviour:
     quest: {fileID: 11400000, guid: e4198f41e072322478873d87c9852ccc, type: 2}
     everyDays: 3
     when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
   - placeId: haven.burnt_farmstead.0
     name: The cracked hearthstone
     verb: Lift
@@ -287,6 +299,8 @@ MonoBehaviour:
     quest: {fileID: 11400000, guid: 53e34a73f89dac640ab91738fbc66874, type: 2}
     everyDays: 0
     when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
   - placeId: haven.burnt_farmstead.0
     name: A child's sling
     verb: Take
@@ -302,6 +316,8 @@ MonoBehaviour:
     quest: {fileID: 11400000, guid: c02abb0f34687e841b484a01d52b7be5, type: 2}
     everyDays: 0
     when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
   - placeId: haven.burnt_farmstead.0
     name: Seed from Asa's field
     verb: Take
@@ -317,6 +333,8 @@ MonoBehaviour:
     quest: {fileID: 11400000, guid: 7fd51412ce7494e4394efdf6c6ebd5a6, type: 2}
     everyDays: 3
     when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
   - placeId: haven.fisher_s_rest.0
     name: The fishers' old nets
     verb: Take
@@ -332,6 +350,8 @@ MonoBehaviour:
     quest: {fileID: 11400000, guid: cf2545313771e9a4288fcb71d5a9f678, type: 2}
     everyDays: 0
     when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
   - placeId: haven.fisher_s_rest.1
     name: The fishers' lantern
     verb: Light
@@ -347,6 +367,8 @@ MonoBehaviour:
     quest: {fileID: 11400000, guid: d4977cc14786c464184618e1aba5cfa8, type: 2}
     everyDays: 0
     when: 2
+    costItem: {fileID: 0}
+    costAmount: 1
   - placeId: haven.fisher_s_rest.0
     name: Smoked fish
     verb: Take
@@ -362,6 +384,144 @@ MonoBehaviour:
     quest: {fileID: 11400000, guid: c4c19733c3b2411499cb991d0c3f3788, type: 2}
     everyDays: 2
     when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
+  - placeId: haven.standing_stones.0
+    name: The pact's words
+    verb: Read by starlight
+    item: {fileID: 0}
+    amount: 1
+    taken: 'By starlight the cuts fill with frost and read: keep the fire, and the wood keeps faith. Let it go cold, and it takes back what it gave.'
+    offset: {x: 5, y: -3}
+    marker: {fileID: 1987186056636952893, guid: 9c63895aedf974b41ac19d55902cc357, type: 3}
+    markerScale: 0.7
+    markerTurn: 20
+    questTarget: {fileID: 11400000, guid: 8b151818105b4e445b07d4c7aee951a3, type: 2}
+    gate: 1
+    quest: {fileID: 11400000, guid: 8de6b00eb89a80440b18cba9f68d6638, type: 2}
+    everyDays: 0
+    when: 2
+    costItem: {fileID: 0}
+    costAmount: 1
+  - placeId: haven.ruined_watchtower.0
+    name: The watch's last tally
+    verb: Read
+    item: {fileID: 0}
+    amount: 1
+    taken: 'Scratched into the stone by the door: seven strokes, a wolf''s head, then nothing.'
+    offset: {x: 4, y: 2}
+    marker: {fileID: 6205942061878126552, guid: 1d47d031ba81f524784f8df59c15347c, type: 3}
+    markerScale: 1
+    markerTurn: 20
+    questTarget: {fileID: 11400000, guid: e46b26913b23d7442a0c496d4962559d, type: 2}
+    gate: 1
+    quest: {fileID: 11400000, guid: 70d1495488c1f1343bba03ac7eedce1d, type: 2}
+    everyDays: 0
+    when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
+  - placeId: haven.lookout_cairn.0
+    name: The cairn's stone
+    verb: Add a stone
+    item: {fileID: 0}
+    amount: 1
+    taken: One more stone on the cairn. The way remembers itself a little.
+    offset: {x: 3, y: -2}
+    marker: {fileID: 5599622994095362584, guid: b670b983db86e784c96b2642a11d6a46, type: 3}
+    markerScale: 0.5
+    markerTurn: 20
+    questTarget: {fileID: 11400000, guid: 947bfedfe952252428293762c2884749, type: 2}
+    gate: 1
+    quest: {fileID: 11400000, guid: 368885b39fb47ac438073d5978b8c2ab, type: 2}
+    everyDays: 0
+    when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
+  - placeId: haven.lookout_cairn.1
+    name: The cairn's stone
+    verb: Add a stone
+    item: {fileID: 0}
+    amount: 1
+    taken: One more stone on the cairn. From here the next one shows on the skyline.
+    offset: {x: 3, y: -2}
+    marker: {fileID: 5599622994095362584, guid: b670b983db86e784c96b2642a11d6a46, type: 3}
+    markerScale: 0.5
+    markerTurn: 20
+    questTarget: {fileID: 11400000, guid: f1c91ef5a88373b44ae89440bc554bdb, type: 2}
+    gate: 1
+    quest: {fileID: 11400000, guid: 368885b39fb47ac438073d5978b8c2ab, type: 2}
+    everyDays: 0
+    when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
+  - placeId: haven.authored.sunken_causeway
+    name: The sunken boards
+    verb: Lay new planks
+    item: {fileID: 0}
+    amount: 1
+    taken: Board by board, the way across is dry again.
+    offset: {x: 2, y: -2}
+    marker: {fileID: 6231777615466203854, guid: f8379ecb10a71ca45a5b23df5efdf906, type: 3}
+    markerScale: 1
+    markerTurn: 20
+    questTarget: {fileID: 11400000, guid: c3ae31c7e3dfea7478557faf75c2b61f, type: 2}
+    gate: 1
+    quest: {fileID: 11400000, guid: d24516d183974e244b5c643e63b34347, type: 2}
+    everyDays: 0
+    when: 0
+    costItem: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
+    costAmount: 8
+  - placeId: haven.wayfarer_s_stones.3
+    name: The names in the stones
+    verb: Read
+    item: {fileID: 0}
+    amount: 1
+    taken: 'Names, a whole village of them, cut deep, and the same words under each: we go north to find the door. The last name is cut shallow, as if in a hurry.'
+    offset: {x: 3, y: 2}
+    marker: {fileID: 1987186056636952893, guid: 9c63895aedf974b41ac19d55902cc357, type: 3}
+    markerScale: 0.6
+    markerTurn: 20
+    questTarget: {fileID: 11400000, guid: 55033df2638165d41819ee2b225a9c14, type: 2}
+    gate: 1
+    quest: {fileID: 11400000, guid: d1ae8213d90f5bc4a9797e93484eefb2, type: 2}
+    everyDays: 0
+    when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
+  - placeId: haven.authored.tarn_shrine
+    name: The tarn's memory
+    verb: Look into the tarn
+    item: {fileID: 0}
+    amount: 1
+    taken: The tarn shows a man in grey at this shrine, years ago, with a lantern and no fire behind him. The winter's mist had taken his wife and his child, and he asked the tarn for a door to them. The hearth below went cold while he was gone, and the pact with it. He is looking still.
+    offset: {x: 0, y: -3}
+    marker: {fileID: 7115005062286561332, guid: 8ea1636a9e145c14daea56dafda6919e, type: 3}
+    markerScale: 0.7
+    markerTurn: 20
+    questTarget: {fileID: 11400000, guid: caba935f36654ea47a5fc92297900f61, type: 2}
+    gate: 1
+    quest: {fileID: 11400000, guid: 1367dde89e95d714bbac19728a1bc16e, type: 2}
+    everyDays: 0
+    when: 2
+    costItem: {fileID: 0}
+    costAmount: 1
+  - placeId: haven.old_barrow.0
+    name: The barrow stone
+    verb: Cut their names
+    item: {fileID: 0}
+    amount: 1
+    taken: Two names, and his under them. Whatever he opens, they're remembered here.
+    offset: {x: 4, y: 0}
+    marker: {fileID: 1987186056636952893, guid: 9c63895aedf974b41ac19d55902cc357, type: 3}
+    markerScale: 0.8
+    markerTurn: 20
+    questTarget: {fileID: 11400000, guid: e2ef7ef98b2a29440866992415d91f45, type: 2}
+    gate: 1
+    quest: {fileID: 11400000, guid: 95be29b0e6fb030498e96b32f6d73aea, type: 2}
+    everyDays: 0
+    when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
   targets:
   - placeId: haven.old_quarry.0
     target: {fileID: 11400000, guid: 452286aed8706314fbb93b4d23abab81, type: 2}
@@ -373,6 +533,20 @@ MonoBehaviour:
     target: {fileID: 11400000, guid: 8c95358a1b055254f812958eecc25e97, type: 2}
   - placeId: haven.fisher_s_rest.0
     target: {fileID: 11400000, guid: 464f786004dea1c4eb0cfbf441b6e72d, type: 2}
+  - placeId: haven.standing_stones.0
+    target: {fileID: 11400000, guid: 9c6a52e41c46c2d4f89a4e8e2548ca34, type: 2}
+  - placeId: haven.ruined_watchtower.0
+    target: {fileID: 11400000, guid: d3b8256848879f14caecdc5e2ea4c3ac, type: 2}
+  - placeId: haven.wolf_den.0
+    target: {fileID: 11400000, guid: e82917211c27cd74fb630c8f5d1c8bb9, type: 2}
+  - placeId: haven.authored.sunken_causeway
+    target: {fileID: 11400000, guid: 2ff07bc37553dd94eb0665cc40d08273, type: 2}
+  - placeId: haven.wayfarer_s_stones.3
+    target: {fileID: 11400000, guid: e6b6e50f880b86646a9cf1e4ff59fdac, type: 2}
+  - placeId: haven.authored.tarn_shrine
+    target: {fileID: 11400000, guid: 883ff86eecaefeb48b21a8235bd0b337, type: 2}
+  - placeId: haven.old_barrow.0
+    target: {fileID: 11400000, guid: cd5d9928808463c46a5b6f353935cf4b, type: 2}
   scenes:
   - placeId: haven.woodland_camp.2
     thoughts:
@@ -394,6 +568,7 @@ MonoBehaviour:
       worker: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
       workHours: {x: 18, y: 21.5}
       workAt: {x: -2, y: -1.5}
+      creature: {fileID: 0}
   - placeId: haven.burnt_farmstead.0
     thoughts: []
     stages:
@@ -411,6 +586,7 @@ MonoBehaviour:
       worker: {fileID: 0}
       workHours: {x: 14, y: 18}
       workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
     - note: 'The Hollow Pines remembered: Asa''s field, sown with the family''s seed.'
       gate: 2
       quest: {fileID: 11400000, guid: 7fd51412ce7494e4394efdf6c6ebd5a6, type: 2}
@@ -426,6 +602,7 @@ MonoBehaviour:
       worker: {fileID: 11400000, guid: ec38b2d8e58d6d84899dfeda6a4f8aeb, type: 2}
       workHours: {x: 18, y: 21.5}
       workAt: {x: 0, y: -1.5}
+      creature: {fileID: 0}
   - placeId: haven.authored.familys_grave
     thoughts: []
     stages:
@@ -443,6 +620,7 @@ MonoBehaviour:
       worker: {fileID: 0}
       workHours: {x: 14, y: 18}
       workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
     - note: 'The family found: the grave tended.'
       gate: 2
       quest: {fileID: 11400000, guid: c02abb0f34687e841b484a01d52b7be5, type: 2}
@@ -458,6 +636,7 @@ MonoBehaviour:
       worker: {fileID: 0}
       workHours: {x: 14, y: 18}
       workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
   - placeId: haven.authored.old_steading
     thoughts: []
     stages:
@@ -475,6 +654,7 @@ MonoBehaviour:
       worker: {fileID: 0}
       workHours: {x: 14, y: 18}
       workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
   - placeId: haven.authored.empty_hall
     thoughts: []
     stages:
@@ -492,6 +672,7 @@ MonoBehaviour:
       worker: {fileID: 0}
       workHours: {x: 14, y: 18}
       workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
   - placeId: haven.authored.alder_spring
     thoughts: []
     stages:
@@ -509,6 +690,7 @@ MonoBehaviour:
       worker: {fileID: 0}
       workHours: {x: 14, y: 18}
       workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
   - placeId: haven.authored.tarn_shrine
     thoughts: []
     stages:
@@ -526,6 +708,23 @@ MonoBehaviour:
       worker: {fileID: 0}
       workHours: {x: 14, y: 18}
       workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
+    - note: 'Hightarn remembered: the tarn is only water.'
+      gate: 2
+      quest: {fileID: 11400000, guid: 2ff21f94c2dcf4c4db8b14b299b0a393, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts:
+      - The tarn is only water now, and the lights don't come.
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0.6, z: 0}
+      clearsMist: 0
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
   - placeId: haven.authored.sunken_causeway
     thoughts: []
     stages:
@@ -543,6 +742,23 @@ MonoBehaviour:
       worker: {fileID: 0}
       workHours: {x: 14, y: 18}
       workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
+    - note: 'The causeway laid again (A Way Across the Fen): dry boards across the bog.'
+      gate: 2
+      quest: {fileID: 11400000, guid: d24516d183974e244b5c643e63b34347, type: 2}
+      dressing: {fileID: 2098734053819838956, guid: 7227cab61aac9d14daa7b69ec0f941aa, type: 3}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts:
+      - Dry boards across the fen. Tor says it would hold a cart.
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0.6, z: 0}
+      clearsMist: 0
+      hidesEarlier: 1
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
   - placeId: haven.old_quarry.0
     thoughts: []
     stages:
@@ -561,6 +777,7 @@ MonoBehaviour:
       worker: {fileID: 11400000, guid: f8b63bb3e2db2fb44947d33b612f80f3, type: 2}
       workHours: {x: 18, y: 21.5}
       workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
   - placeId: haven.fisher_s_rest.0
     thoughts: []
     stages:
@@ -579,6 +796,137 @@ MonoBehaviour:
       worker: {fileID: 11400000, guid: 9f83966b2e3c8fe42a58fd9d130cb08e, type: 2}
       workHours: {x: 18, y: 21.5}
       workAt: {x: 1, y: -1.5}
+      creature: {fileID: 0}
+  - placeId: haven.standing_stones.0
+    thoughts: []
+    stages:
+    - note: 'Eastwood remembered: the stones hum; Liv reads them of an evening.'
+      gate: 2
+      quest: {fileID: 11400000, guid: 8f16e042b4be01943ae65daf63d8e29c, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 4, y: -2}
+      turn: 0
+      thoughts:
+      - The stones hum when you pass. Liv says that is how they always were.
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0.6, z: 0}
+      clearsMist: 0
+      hidesEarlier: 0
+      worker: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
+  - placeId: haven.wolf_den.0
+    thoughts: []
+    stages:
+    - note: The Old Grey keeps its den while its quest is under way.
+      gate: 1
+      quest: {fileID: 11400000, guid: 60b5c903101d6e040bfc8b4625f143a7, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts:
+      - Bones, old and new, and one set of tracks bigger than all the rest.
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0.6, z: 0}
+      clearsMist: 0
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 6254916435909010154, guid: 36c1791cd7cea6744bd31805f58c1890, type: 3}
+    - note: 'The Old Grey brought down: the den is quiet.'
+      gate: 2
+      quest: {fileID: 11400000, guid: 60b5c903101d6e040bfc8b4625f143a7, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts:
+      - The den is quiet. The Wolfwood will remember who did it.
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0.6, z: 0}
+      clearsMist: 0
+      hidesEarlier: 1
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
+  - placeId: haven.ruined_watchtower.0
+    thoughts: []
+    stages:
+    - note: 'The Wolfwood remembered: Eirik keeps the watch at the tower.'
+      gate: 2
+      quest: {fileID: 11400000, guid: d00d40fb8b8689542893e0fa2a427f62, type: 2}
+      dressing: {fileID: 8009323159920151065, guid: 7c5870ae4eaf09249a8439efd30d443c, type: 3}
+      offset: {x: 6, y: -5}
+      turn: 0
+      thoughts:
+      - A fire at the tower's foot again. Somebody is keeping the watch.
+      smokeRise: 8
+      smokeAt: {x: 0, y: 0.6, z: 0}
+      clearsMist: 0
+      hidesEarlier: 0
+      worker: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
+  - placeId: haven.lookout_cairn.1
+    thoughts: []
+    stages:
+    - note: 'Westwood remembered: the cairn line stands, and the lit stones lead to one another.'
+      gate: 2
+      quest: {fileID: 11400000, guid: b081c1e8118da03499dab7818ac2ea12, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts:
+      - Every cairn on the line stands again. Runa says a stone here is a stone at home.
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0.6, z: 0}
+      clearsMist: 0
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
+  - placeId: haven.wayfarer_s_stones.3
+    thoughts: []
+    stages:
+    - note: 'Greyfell remembered: the road north begins at home.'
+      gate: 2
+      quest: {fileID: 11400000, guid: 6717aefd0b55c0c499b47ee9c39ce066, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts:
+      - The names are still cut deep. The road north starts here, and comes back here too.
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0.6, z: 0}
+      clearsMist: 0
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
+  - placeId: haven.drowned_stones.0
+    thoughts: []
+    stages:
+    - note: 'The Drowning Fen remembered: the drowned road is a road.'
+      gate: 2
+      quest: {fileID: 11400000, guid: d811f217b358d1f46ad557876fb4d667, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts:
+      - The stones that drowned stand clear of the water now, and the bog smells of cloudberries, not of rot.
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0, z: 0}
+      clearsMist: 0
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 0, y: 0}
+      workAt: {x: 0, y: 0}
+      creature: {fileID: 0}
   smoke: {fileID: 2100000, guid: e0dc5fdfe4f83b44294848291dbc9ed2, type: 2}
   lookoutReveal: 110
   lookoutSees: 180

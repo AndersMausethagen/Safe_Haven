@@ -49,6 +49,12 @@ public sealed class HavenRegionSettings : GameSettings<HavenRegionSettings>
 
     [SerializeField] private List<RegionLook> regions = new List<RegionLook>();
     [SerializeField] private List<RingOpening> openings = new List<RingOpening>();
+    [Tooltip("Once this quest is done, a lit boundary stone takes the player to any other lit stone (Westwood's cairn-builders marked " +
+             "the ways between them). Empty: never.")]
+    [SerializeField] private QuestDefinition stoneTravelAfter;
+
+    /// <summary>True when the lit stones take the player between them.</summary>
+    public bool StoneTravelOpen => stoneTravelAfter != null && GameSession.Quests.StatusOf(stoneTravelAfter) == QuestStatus.Completed;
 
     [Header("Forgotten land")]
     [Tooltip("How grey forgotten land is (0 as painted, 1 grey).")]

@@ -164,6 +164,8 @@ public sealed class QuestObjective
     public BuildingDefinition Building => building;
     public GameEventDefinition QuestEvent => questEvent;
     public ResidentDefinition Person => person;
+    /// <summary>The monster a Kill Monster objective asks for (null: any of its faction).</summary>
+    public MonsterDefinition Monster => monster;
     public QuestTargetDefinition Target => target;
     public JobDefinition Job => job;
     public WardBreachDefinition Breach => breach;

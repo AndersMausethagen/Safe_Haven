@@ -110,6 +110,7 @@ MonoBehaviour:
     questStarted: {fileID: 0}
     residentHome: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
     notYet: This is the oldest of the forgetting. The stone waits for the one who led you here.
+  stoneTravelAfter: {fileID: 11400000, guid: b081c1e8118da03499dab7818ac2ea12, type: 2}
   forgottenDesaturation: 0.7
   forgottenDarkening: 0.12
   forgottenColor: {r: 0.78, g: 0.82, b: 0.88, a: 1}

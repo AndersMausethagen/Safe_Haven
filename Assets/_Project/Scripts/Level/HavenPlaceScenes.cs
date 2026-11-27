@@ -189,6 +189,18 @@ public sealed class HavenPlaceScenes : MonoBehaviour
         }
 
         holder.SetActive(true);
+        if (stage.creature != null)
+        {
+            // Not under the stage (its body, once killed, is the player's to loot), but taken away with it while it lives.
+            GameObject made = Instantiate(stage.creature, holder.transform.position, holder.transform.rotation);
+            foreach (MonsterAI monster in made.GetComponentsInChildren<MonsterAI>())
+            {
+                monster.ResetHome();
+            }
+
+            holder.AddComponent<StageCreature>().Keep(made);
+        }
+
         return holder;
     }
 

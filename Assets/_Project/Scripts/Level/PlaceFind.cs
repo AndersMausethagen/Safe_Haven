@@ -88,6 +88,13 @@ public sealed class PlaceFind : MonoBehaviour, IInteractionName, IInteractionVer
             return false;
         }
 
+        // What it takes (planks to lay), carried in the bag.
+        if (find.costItem != null && Player.Current.Bag.Container.Count(find.costItem) < find.costAmount)
+        {
+            reason = $"It takes {find.costAmount} {find.costItem.DisplayName}.";
+            return false;
+        }
+
         return true;
     }
 
@@ -103,9 +110,15 @@ public sealed class PlaceFind : MonoBehaviour, IInteractionName, IInteractionVer
     {
         Player player = Player.Current;
         if (find == null || player == null || (find.item != null && player.Bag.Container.SpaceFor(find.item) < find.amount)
+            || (find.costItem != null && player.Bag.Container.Count(find.costItem) < find.costAmount)
             || !GameSession.Progress.MarkStoneUsed(KeyOf(place, find)))
         {
             return;
+        }
+
+        if (find.costItem != null)
+        {
+            player.Bag.Container.Remove(find.costItem, find.costAmount);
         }
 
         // What is taken for good counts as this span's yield of the same thing at the same place: the clamp just lit was raked out

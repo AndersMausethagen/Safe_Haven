@@ -77,6 +77,9 @@ public sealed class HavenPlaceVerbs : ScriptableObject
         [Min(0)] public int everyDays;
         [Tooltip("Only at these hours (night from 20 to 6, as a place's sounds): a lantern lit after dark.")]
         public When when = When.Always;
+        [Tooltip("What doing it takes from the bag, used up (planks laid across the fen). Empty: nothing.")]
+        public ItemDefinition costItem;
+        [Min(1)] public int costAmount = 1;
     }
 
     /// <summary>
@@ -125,6 +128,9 @@ public sealed class HavenPlaceVerbs : ScriptableObject
         public Vector2 workHours = new Vector2(14f, 18f);
         [Tooltip("Where they stand to work, from the stage's centre (x, z).")]
         public Vector2 workAt = new Vector2(1.5f, -1.5f);
+        [Tooltip("A creature that keeps this place while the stage shows (the Old Grey at its den): stood at the stage's centre, at home " +
+                 "there. Gone with the stage only while it lives: a body killed keeps its loot.")]
+        public GameObject creature;
     }
 
     [Serializable]

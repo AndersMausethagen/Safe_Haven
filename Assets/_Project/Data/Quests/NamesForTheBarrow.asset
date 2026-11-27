@@ -1,0 +1,132 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
+  m_Name: NamesForTheBarrow
+  m_EditorClassIdentifier: SafeHaven::QuestDefinition
+  id: namesforthebarrow
+  displayName: Names for the Barrow
+  description: The hearth's keeper left it to find his wife and child, and the hearth went cold behind him, and the pact with it. The man in grey has been opening doors for them ever since. Their names belong with the others in the Old Barrow, where the hearth-keepers lie.
+  chain: The Last Memory
+  journalNotes: The Old Barrow lies far south-west, in the Wolfwood.
+  rank: 4
+  availableObjective: 
+  announceStart: 1
+  announceCompletion: 1
+  showTimerInHud: 0
+  prerequisites:
+  - {fileID: 11400000, guid: 1367dde89e95d714bbac19728a1bc16e, type: 2}
+  startedFirst: []
+  start: 0
+  startEvent: {fileID: 0}
+  startWhen:
+    type: 0
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
+  closedBy: {fileID: 0}
+  startDelay: 3
+  startsInAFight: 0
+  startsWithoutWaiting: 1
+  onStarted: []
+  objectivesInOrder: 1
+  objectives:
+  - type: 10
+    description: Walk out to the Old Barrow
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 0
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 11400000, guid: cd5d9928808463c46a5b6f353935cf4b, type: 2}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 0
+    tier: 0
+    bringHome: 0
+    countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 0
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
+  - type: 11
+    description: Cut their names on the barrow stone
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 0
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 11400000, guid: e2ef7ef98b2a29440866992415d91f45, type: 2}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 0
+    tier: 0
+    bringHome: 0
+    countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 0
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
+  unlocksBuildings: []
+  unlocksModules: []
+  turnInToGiver: 0
+  turnInTo: 
+  rewardItems: []
+  rewardResources: []
+  rewardRecipes: []
+  rewardSkills: []
+  teachesAtStart: []
+  rewardEnchantments: []
+  rewardWorkFor: {fileID: 0}
+  rewardWork: 0
+  rewardPassion: 0
+  rewardMark: {fileID: 0}
+  experience: 0
+  completionEvent: {fileID: 0}
+  onCompleted: []
