@@ -110,6 +110,55 @@ public sealed class SkillAimTests
         Assert.AreEqual(0f, PlayerSkills.HoldsStillFor(Skill("ReapingArc")), "nothing drawn at the feet: free to walk");
     }
 
+    // The hold on a real player: it plants the feet, outlasts a quicker circle, and is let go when the circle is gone, by a dodge, and
+    // by a lunge (review 2026-11-27: a lunge carried the caster out and left it frozen where it landed).
+    [Test]
+    public void TheCirclesHold_PlantsTheFeet_AndIsLetGo()
+    {
+        var player = new GameObject("Held Player");
+        try
+        {
+            var skills = player.AddComponent<PlayerSkills>();
+            var movement = player.GetComponent<PlayerMovement>();
+            Call(skills, "Awake");
+            SkillDefinition winter = Skill("Fimbulwinter"), rune = Skill("FrostRune"), lunge = Skill("WolfsLunge");
+            float hold = PlayerSkills.HoldsStillFor(winter);
+            Assert.Greater(hold, PlayerSkills.HoldsStillFor(rune), "the test needs a quicker circle than the ultimate's");
+            bool Held() => System.Linq.Enumerable.Contains(movement.SpeedScaleHolders, skills);
+
+            Plant(skills, winter, 10f);
+            Assert.IsTrue(Held(), "cast: the feet are planted");
+            Plant(skills, rune, 10.1f);
+            Keep(skills, 10f + hold - 0.05f);
+            Assert.IsTrue(Held(), "a quicker circle cast inside it doesn't cut the first one short");
+            Keep(skills, 10f + hold + 0.05f);
+            Assert.IsFalse(Held(), "the circle gone: free to walk");
+
+            Plant(skills, winter, 20f);
+            Call(skills, "CancelCast", true);
+            Assert.IsFalse(Held(), "a dodge breaks free");
+
+            Plant(skills, winter, 30f);
+            Plant(skills, lunge, 30.2f);
+            Assert.IsFalse(Held(), "a lunge out of the circle lets go");
+
+            Plant(skills, winter, 40f);
+            Call(skills, "OnDisable");
+            Assert.IsFalse(Held(), "put away: let go");
+        }
+        finally
+        {
+            Object.DestroyImmediate(player);
+        }
+    }
+
+    private static void Plant(PlayerSkills skills, SkillDefinition skill, float now) => Call(skills, "PlantFeet", skill, now);
+
+    private static void Keep(PlayerSkills skills, float now) => Call(skills, "KeepFeet", now);
+
+    private static void Call(object target, string method, params object[] args) =>
+        target.GetType().GetMethod(method, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(target, args);
+
     // The user, 2026-11-25: "Weapon art should change description based on which weapon we are holding": every art has its own words.
     [Test]
     public void EveryWeaponArtAndRuneArt_HasItsOwnWords()

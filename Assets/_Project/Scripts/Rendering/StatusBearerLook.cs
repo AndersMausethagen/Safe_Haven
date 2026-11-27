@@ -236,7 +236,8 @@ public sealed class StatusBearerLook : MonoBehaviour
         look.transform.localPosition = middle;
         look.transform.localRotation = Quaternion.identity;
         // The effects simulate in their own space: undo the creature's scale (an elite is grown), so Radius and sizes stay in metres.
-        look.transform.localScale = Vector3.one / Mathf.Max(0.0001f, Mathf.Abs(transform.lossyScale.x));
+        // The look's own scale kept: the VFX pack's copies are sized by their root (Pack Bleeding at 0.4 bled 2.5 times too big).
+        look.transform.localScale = effect.Look.transform.localScale / Mathf.Max(0.0001f, Mathf.Abs(transform.lossyScale.x));
         foreach (VisualEffect visual in look.GetComponentsInChildren<VisualEffect>())
         {
             if (visual.TryGetComponent(out VfxValues values))

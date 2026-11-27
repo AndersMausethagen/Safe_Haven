@@ -453,10 +453,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             }
         }
 
-        if (heldStillUntil >= 0f && (Time.time >= heldStillUntil || !health.IsAlive))
-        {
-            LetGoOfFeet();
-        }
+        KeepFeet(Time.time);
 
         if (pendingCry != null && (!health.IsAlive || Time.time >= pendingCryAt))
         {
@@ -812,12 +809,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         // Feet planted in its rune circle until the circle is gone (the user, 2026-11-27: "keep the player centered in the runic circle
         // until after the effect is done"): walking off mid-cast left the circle, and the blow, behind. A dodge still breaks free
         // (a dash isn't scaled by speed, and it ends the cast: CancelCast).
-        float still = HoldsStillFor(skill);
-        if (still > 0f)
-        {
-            heldStillUntil = now + still;
-            movement.SetSpeedScale(this, 0f);
-        }
+        PlantFeet(skill, now);
 
         float hitAfter = 0f;
         if (skill.LungeDistance > 0f)
@@ -882,6 +874,35 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     /// own ground last (SkillLook.CasterGroundSeconds), and never for a lunge or a leap, whose whole point is the move.</summary>
     public static float HoldsStillFor(SkillDefinition skill) =>
         skill == null || skill.Look == null || skill.LungeDistance > 0f ? 0f : skill.Look.CasterGroundSeconds;
+
+    // Held from the cast until its circle is gone; never shortened by a quicker circle cast inside it. A lunge or a leap lets go at once:
+    // carried out of the circle, the player was left frozen where it landed until the old circle's time ran out (review 2026-11-27).
+    private void PlantFeet(SkillDefinition skill, float now)
+    {
+        if (skill != null && skill.LungeDistance > 0f)
+        {
+            LetGoOfFeet();
+            return;
+        }
+
+        float still = HoldsStillFor(skill);
+        if (still <= 0f)
+        {
+            return;
+        }
+
+        heldStillUntil = Mathf.Max(heldStillUntil, now + still);
+        movement.SetSpeedScale(this, 0f);
+    }
+
+    // Let go once the circle is gone, or the caster has fallen.
+    private void KeepFeet(float now)
+    {
+        if (heldStillUntil >= 0f && (now >= heldStillUntil || !health.IsAlive))
+        {
+            LetGoOfFeet();
+        }
+    }
 
     private void LetGoOfFeet()
     {

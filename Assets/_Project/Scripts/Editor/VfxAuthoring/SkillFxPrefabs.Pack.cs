@@ -185,7 +185,9 @@ public static partial class SkillFxPrefabs
             return null;
         }
 
-        var copy = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+        // Made in a preview scene: the open scene isn't touched, so no save prompt is left behind (review 2026-11-27).
+        UnityEngine.SceneManagement.Scene stage = UnityEditor.SceneManagement.EditorSceneManager.NewPreviewScene();
+        var copy = (GameObject)PrefabUtility.InstantiatePrefab(prefab, stage);
         try
         {
             PrefabUtility.UnpackPrefabInstance(copy, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
@@ -239,6 +241,7 @@ public static partial class SkillFxPrefabs
         finally
         {
             Object.DestroyImmediate(copy);
+            UnityEditor.SceneManagement.EditorSceneManager.ClosePreviewScene(stage);
         }
     }
 

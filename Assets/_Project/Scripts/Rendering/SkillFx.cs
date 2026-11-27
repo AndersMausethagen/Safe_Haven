@@ -343,7 +343,30 @@ public sealed class SkillFx : MonoBehaviour
         }
 
         yield return new WaitForSeconds(cue.seconds);
+        // A looping one (a snowstorm, flames) stops emitting and its last particles finish, rather than all vanishing at once.
+        if (effect != null && StopLoops(effect))
+        {
+            yield return new WaitForSeconds(LoopFadeSeconds);
+        }
+
         Give(effect);
+    }
+
+    private const float LoopFadeSeconds = 1f;
+
+    private static bool StopLoops(GameObject effect)
+    {
+        bool any = false;
+        foreach (ParticleSystem system in effect.GetComponentsInChildren<ParticleSystem>())
+        {
+            if (system.main.loop && system.isEmitting)
+            {
+                system.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+                any = true;
+            }
+        }
+
+        return any;
     }
 
     private GameObject Take(GameObject prefab)
