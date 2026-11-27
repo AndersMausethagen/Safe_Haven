@@ -7,7 +7,7 @@ using UnityEngine;
 /// <summary>
 /// Getting out to the old places without minutes of walking (the user, 2026-11-27: "walking for several minutes is not fun", "now we have a
 /// reason to get the horse, so lets get the quest to unlock it before the second walking quest"): the horse comes after the first walk out
-/// and every region arc waits for it; the tracker points at every arc's place, thing or stone (HavenQuestWaypoints); the journal's
+/// and every region arc waits for it; the tracker points at every arc's place, thing or stone (QuestTargetWaypoints); the journal's
 /// "Go there" goes only to a place already found; a lit stone knows the way home and the portal the way back out.
 /// </summary>
 public sealed class HavenWayOutTests
@@ -84,7 +84,7 @@ public sealed class HavenWayOutTests
         var holder = new GameObject("Ways");
         try
         {
-            var ways = holder.AddComponent<HavenQuestWaypoints>();
+            var ways = holder.AddComponent<QuestTargetWaypoints>();
             ways.Begin(atlas, HavenPlaceVerbs.Current);
             var none = new BoundaryStone[0];
             int found = 0;
@@ -127,7 +127,7 @@ public sealed class HavenWayOutTests
         {
             QuestDefinition spring = Quest("TheHealersSpring");
             Assert.IsTrue(GameSession.Quests.TryStart(spring, true));
-            var ways = holder.AddComponent<HavenQuestWaypoints>();
+            var ways = holder.AddComponent<QuestTargetWaypoints>();
             ways.Begin(WorldAtlas.For("SafeHaven"), HavenPlaceVerbs.Current);
             ways.Refresh();
             QuestWaypoint walk = ways.Made.FirstOrDefault(w => w.Quest == spring && w.Objective == 1);
@@ -173,5 +173,119 @@ public sealed class HavenWayOutTests
         QuestDefinition other = Quest("SmokeInTheGreyPines");
         log.Restore(other, QuestStatus.Active, new[] { 1, 1, 1 });
         CollectionAssert.AreEqual(new[] { 0, 0 }, log.Get(other).Counts, "a quest whose steps changed otherwise starts them again");
+    }
+
+    // ----- 2026-11-27, later: "do 1, and all quests with a target should be shown on the map. not just tracked. do 4, 5" -----
+
+    private static QuestDefinition TalkToQuest(QuestTargetDefinition target)
+    {
+        var quest = ScriptableObject.CreateInstance<QuestDefinition>();
+        quest.name = "Talk to the thing";
+        var data = new SerializedObject(quest);
+        SerializedProperty objectives = data.FindProperty("objectives");
+        objectives.arraySize = 1;
+        SerializedProperty objective = objectives.GetArrayElementAtIndex(0);
+        objective.FindPropertyRelative("type").intValue = (int)ObjectiveType.TalkTo;
+        objective.FindPropertyRelative("amount").intValue = 1;
+        objective.FindPropertyRelative("target").objectReferenceValue = target;
+        data.ApplyModifiedPropertiesWithoutUndo();
+        return quest;
+    }
+
+    [Test]
+    public void EveryQuestUnderWay_WhoseTargetIsInTheScene_IsMarked_TrackedOrNot()
+    {
+        GameSession.StartNewGame();
+        var target = ScriptableObject.CreateInstance<QuestTargetDefinition>();
+        target.name = "Old Well";
+        QuestDefinition quest = TalkToQuest(target);
+        var holder = new GameObject("Ways");
+        var thing = new GameObject("The old well");
+        try
+        {
+            thing.transform.position = new Vector3(12f, 0f, -7f);
+            thing.AddComponent<Interactable>();
+            var talkable = thing.AddComponent<Talkable>();
+            var data = new SerializedObject(talkable);
+            data.FindProperty("questTarget").objectReferenceValue = target;
+            data.ApplyModifiedPropertiesWithoutUndo();
+
+            var ways = holder.AddComponent<QuestTargetWaypoints>();
+            ways.Refresh();
+            Assert.IsFalse(ways.Made.Any(w => w.Quest == quest), "not started: no mark");
+
+            Assert.IsTrue(GameSession.Quests.TryStart(quest, true));
+            QuestTrackerView.Shown.Clear();
+            // A waypoint placed by hand for before the quest and its hand-in (the prologue's "Sigrid" pair) doesn't show while it is under
+            // way, so it mustn't keep the made one away (QuestWaypoint.Active is filled by OnEnable, which edit mode doesn't run).
+            var before = new GameObject("By hand, before").AddComponent<QuestWaypoint>();
+            before.Configure(quest, 0, "Giver", QuestWaypointWhen.Available);
+            before.transform.SetParent(thing.transform);
+            var active = (List<QuestWaypoint>)typeof(QuestWaypoint).GetField("active", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static).GetValue(null);
+            active.Add(before);
+            ways.Refresh();
+            active.Remove(before);
+            QuestWaypoint mark = ways.Made.FirstOrDefault(w => w.Quest == quest && w.Objective == 1);
+            Assert.IsNotNull(mark, "under way and not tracked, what it asks for is still marked (the map and minimap show every wanted waypoint)");
+            Assert.AreEqual(0f, Vector3.Distance(mark.transform.position, thing.transform.position), 0.01f);
+            Assert.IsTrue(mark.IsWanted(GameSession.Quests));
+            Assert.IsTrue(ways.Trips.TryRead(mark, out _, out string detail), "and the way there is timed for the playtest log");
+            StringAssert.StartsWith("Old Well; ", detail);
+
+            GameSession.Quests.ForceComplete(quest);
+            ways.Refresh();
+            Assert.IsFalse(ways.Made.Any(w => w != null && w.Quest == quest), "done: the mark goes");
+            Assert.IsFalse(ways.Trips.TryRead(mark, out _, out _), "and so does its clock");
+        }
+        finally
+        {
+            Object.DestroyImmediate(holder);
+            Object.DestroyImmediate(thing);
+            Object.DestroyImmediate(quest);
+            Object.DestroyImmediate(target);
+            GameSession.StartNewGame();
+        }
+    }
+
+    [Test]
+    public void ATrip_CountsItsPlayedTime_TheShareRidden_AndTheJumps()
+    {
+        var trips = new PlaytestTrips();
+        var waypoint = new GameObject("Way").AddComponent<QuestWaypoint>();
+        try
+        {
+            trips.Begin(waypoint, "Alder Spring");
+            trips.Tick(30f, riding: true);
+            trips.Tick(10f, riding: false);
+            trips.Jumped();
+            Assert.IsTrue(trips.TryRead(waypoint, out int seconds, out string detail));
+            Assert.AreEqual(40, seconds);
+            StringAssert.Contains("rode 75%", detail);
+            StringAssert.Contains("jumps 1", detail);
+            trips.End(waypoint, null, 1, done: false);
+            Assert.AreEqual(0, trips.Open, "a trip given up leaves nothing open");
+        }
+        finally
+        {
+            Object.DestroyImmediate(waypoint.gameObject);
+        }
+    }
+
+    [Test]
+    public void ACanterOnARoad_IsQuicker_ButNeverPastItsGallop()
+    {
+        HorseSettings settings = HorseSettings.Current;
+        // The Haven's roads and trails are painted with this layer (HavenWorldGenerator: haven.PathGround).
+        float road = settings.GroundSpeedOf("Haven Path", out _, out bool isRoad);
+        Assert.IsTrue(isRoad, "the Haven's roads count as roads");
+        settings.GroundSpeedOf("Muddy Bank", out _, out bool mudIsRoad);
+        Assert.IsFalse(mudIsRoad);
+        Assert.Greater(settings.RoadCanter, 1f, "a canter on a road goes quicker again");
+        foreach (string guid in AssetDatabase.FindAssets("t:HorseDefinition"))
+        {
+            var kind = AssetDatabase.LoadAssetAtPath<HorseDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            Assert.Less(kind.CanterSpeed * road * settings.RoadCanter, kind.GallopSpeed.x * road,
+                $"{kind.name}: on a road the free canter stays under even its slowest gallop, so galloping still means faster");
+        }
     }
 }

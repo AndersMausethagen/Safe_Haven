@@ -549,6 +549,43 @@ public sealed class HorseMotion : MonoBehaviour
         }
     }
 
+    /// <summary>Set down at <paramref name="at"/> at once, standing still (HavenTravel: it goes the old ways with its rider, or
+    /// follows them there). Not for a horse in its stall or dead. False when it can't be.</summary>
+    public bool PutAt(Vector3 at, Quaternion facing)
+    {
+        // A friend's horse shown here moves as their game says: its agent stays off.
+        if (mode == Idle.Dead || mode == Idle.Stall || horse.IsPuppet)
+        {
+            return false;
+        }
+
+        jumping = false;
+        swimming = false;
+        galloping = false;
+        pace = 0f;
+        Velocity = Vector3.zero;
+        agent.enabled = true;
+        // Warp works from off the NavMesh too (a follower swimming at a bank, a ridden horse mid-jump); set only by hand, the agent
+        // stayed off it at the other end, and the horse stood stuck.
+        if (agent.Warp(at))
+        {
+            if (mode != Idle.Ridden)
+            {
+                agent.ResetPath();
+            }
+        }
+        else
+        {
+            transform.position = at;
+        }
+
+        transform.rotation = facing;
+        // Not counted as ridden or walked: it didn't go the way between.
+        lastPlace = transform.position;
+        home = transform.position;
+        return true;
+    }
+
     /// <summary>The rider's wish this frame: a direction on the ground (length up to 1) and a gait (-1 walk, 0 trot,
     /// 1 gallop while its stamina lasts, 2 canter: free).</summary>
     public void Ride(Vector3 direction, int gait)
@@ -699,6 +736,16 @@ public sealed class HorseMotion : MonoBehaviour
         galloping = rideGait == 1 && wanted > 0.1f && horse.Stamina > 0.5f && !breaking;
         float speed = rideGait < 0 ? kind.WalkSpeed * 1.4f : galloping ? horse.Stats.gallopSpeed : rideGait == 2 && !breaking ? kind.CanterSpeed : kind.TrotSpeed;
         speed *= horse.SpeedScale * HorseHitch.SpeedScaleFor(horse) * GroundScale();
+        // The roads are the quick way: a canter on one goes about a gallop's pace, with no breath spent.
+        if (onRoad && rideGait == 2 && !galloping && !breaking)
+        {
+            speed *= HorseSettings.Current.RoadCanter;
+            if (!roadTold && horse.Rider != null && wish.sqrMagnitude > 0.01f)
+            {
+                roadTold = true;
+                GameMessages.Post("On a road a canter is nearly a gallop, and doesn't tire your horse.", MessageKind.Info);
+            }
+        }
         if (galloping)
         {
             float enduring = horse.Stats.Has(HorseTrait.Enduring) ? 0.85f : 1f;
@@ -822,13 +869,24 @@ public sealed class HorseMotion : MonoBehaviour
 
     // Its speed over the ground under it (paths quicker, mud and rock slower) and up the slope ahead. A bog-strider
     // doesn't slow in mud; a sure-footed horse doesn't slow on rough ground.
+    // On a road (HorseSettings › Grounds), as GroundScale last read it.
+    private bool onRoad;
+    // Said once a session, the first time a canter on a road goes quicker.
+    private static bool roadTold;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => roadTold = false;
+
+    /// <summary>True while it goes on a road, where a canter is quicker (HorseSettings › Road Canter).</summary>
+    public bool OnRoad => onRoad;
+
     private float GroundScale()
     {
         if (Time.time >= nextGround)
         {
             nextGround = Time.time + 0.25f;
             HorseSettings settings = HorseSettings.Current;
-            float ground = settings.GroundSpeedOf(HorseGround.LayerAt(transform.position), out bool soft);
+            float ground = settings.GroundSpeedOf(HorseGround.LayerAt(transform.position), out bool soft, out onRoad);
             float grade = HorseGround.GradeAhead(transform.position, transform.forward, 1.5f);
             roughGround = ground < 1f && !soft || grade > 0.25f;
             if (soft && horse.Definition.Has(HorseAbility.BogStrider) || !soft && horse.Stats.Has(HorseTrait.SureFooted))

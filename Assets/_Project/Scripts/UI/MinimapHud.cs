@@ -692,7 +692,7 @@ public sealed class MinimapHud : MonoBehaviour
         QuestLog log = GameSession.Quests;
         foreach (QuestWaypoint waypoint in QuestWaypoint.Active)
         {
-            if (waypoint != null && waypoint.IsWanted(log))
+            if (waypoint != null && waypoint.IsWanted(log) && !waypoint.RepeatsAnEarlier(log))
             {
                 Color colour = waypoint.Quest != null ? QuestMarkerSettings.Current.RankColor(waypoint.Quest.Rank) : style.Accent;
                 Add(waypoint.transform, style.QuestMark, colour, 16f, pinned: true);

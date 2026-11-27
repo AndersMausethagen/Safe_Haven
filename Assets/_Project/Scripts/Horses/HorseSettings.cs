@@ -99,6 +99,9 @@ public sealed class HorseSettings : GameSettings<HorseSettings>
     [Tooltip("How fast a horse goes over each ground (the terrain layer under it, by a word in its name, first match wins): " +
              "quicker on paths, slower in mud and bog, a little slower on rock and forest floor.")]
     [SerializeField] private List<GroundSpeed> grounds = new List<GroundSpeed>();
+    [Tooltip("On a road (a ground marked Road), a canter goes this much faster again: about a gallop's pace with no breath spent, so the " +
+             "roads are the quick way out to the old places (the user, 2026-11-27: \"walking for several minutes is not fun\").")]
+    [SerializeField, Range(1f, 1.5f)] private float roadCanter = 1.1f;
     [Tooltip("Uphill: the speed left at the steepest climb it takes (a 1 in 1 grade).")]
     [SerializeField, Range(0.2f, 1f)] private float steepClimb = 0.55f;
 
@@ -211,9 +214,13 @@ public sealed class HorseSettings : GameSettings<HorseSettings>
     public float LeadReach => leadReach;
 
     /// <summary>How fast a horse goes over a ground (a terrain layer's name), 1 for one not listed.</summary>
-    public float GroundSpeedOf(string ground, out bool soft)
+    public float GroundSpeedOf(string ground, out bool soft) => GroundSpeedOf(ground, out soft, out _);
+
+    /// <summary>As above, and whether the ground is a road (a canter there goes <see cref="RoadCanter"/> faster again).</summary>
+    public float GroundSpeedOf(string ground, out bool soft, out bool road)
     {
         soft = false;
+        road = false;
         if (!string.IsNullOrEmpty(ground))
         {
             foreach (GroundSpeed kind in grounds)
@@ -221,6 +228,7 @@ public sealed class HorseSettings : GameSettings<HorseSettings>
                 if (!string.IsNullOrEmpty(kind.word) && ground.IndexOf(kind.word, System.StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     soft = kind.soft;
+                    road = kind.road;
                     return kind.speed;
                 }
             }
@@ -228,6 +236,9 @@ public sealed class HorseSettings : GameSettings<HorseSettings>
 
         return 1f;
     }
+
+    /// <summary>A canter on a road goes this much faster again, on top of the road's own speed.</summary>
+    public float RoadCanter => roadCanter;
     public float MountSeconds => mountSeconds;
 
     /// <summary>The rider's offset from the saddle (xyz, in their own size) and turn (w, degrees) a share of the way through
@@ -368,4 +379,6 @@ public struct GroundSpeed
     [Range(0.3f, 1.5f)] public float speed;
     [Tooltip("Mud and bog: a bog-strider doesn't slow on it.")]
     public bool soft;
+    [Tooltip("A road or path: a canter on it goes HorseSettings › Road Canter faster again, so riding keeps to the roads.")]
+    public bool road;
 }

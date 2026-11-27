@@ -52,8 +52,31 @@ public sealed class QuestWaypoint : MonoBehaviour
     }
 
     public ResourceNode UntilGathered => untilGathered;
+    /// <summary>When it shows: before the quest, while it is under way, or once it is ready to hand in.</summary>
+    public QuestWaypointWhen When => when;
 
-    // Set at runtime by HavenQuestWaypoints: the journal's "Go there" takes the player only to a place they have walked to before (the
+    /// <summary>True when an earlier wanted waypoint with the same label stands within a metre: someone two quests ask for (Tor, for
+    /// Past the Ridge and the Woodcutter's Lodge) gets one mark on the map and minimap, not two on one spot.</summary>
+    public bool RepeatsAnEarlier(QuestLog log)
+    {
+        foreach (QuestWaypoint other in active)
+        {
+            if (other == this)
+            {
+                return false;
+            }
+
+            if (other != null && other.quest != null && other.Label == Label && other.IsWanted(log)
+                && (other.transform.position - transform.position).sqrMagnitude < 1f)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Set at runtime by QuestTargetWaypoints: the journal's "Go there" takes the player only to a place they have walked to before (the
     // first walk out is the finding; the next ones needn't be walked again). Empty with Walk First: never by the journal.
     private string foundFirst;
     private bool walkFirst;
@@ -66,8 +89,21 @@ public sealed class QuestWaypoint : MonoBehaviour
         foundFirst = placeId;
     }
 
+    // On someone who walks about (QuestTargetWaypoints): the journal goes to them only while they are in the Haven's yard, wherever
+    // they stood when the mark was made; out at a worked place, the land is walked first.
+    private bool onlyInTheYard;
+
+    /// <summary>Lets the journal's "Go there" take the player here only while it stands in the Haven's yard.</summary>
+    public void GoThereOnlyInTheYard()
+    {
+        onlyInTheYard = true;
+        walkFirst = false;
+    }
+
     /// <summary>True when the journal may take the player straight here.</summary>
-    public bool CanGoThere => !walkFirst || !string.IsNullOrEmpty(foundFirst) && GameSession.Progress.Journal.HasDiscovered(foundFirst);
+    public bool CanGoThere => onlyInTheYard
+        ? HomePortal.Current != null && HomePortal.Current.InBuildLand(transform.position)
+        : !walkFirst || !string.IsNullOrEmpty(foundFirst) && GameSession.Progress.Journal.HasDiscovered(foundFirst);
 
     // A waypoint on an objective to drink at open water ("Strength for the Road") shows the nearest water instead of where
     // it was put: regenerating the Haven moves its rivers and lakes, and one placed by hand went stale (the user, 2026-11-15).

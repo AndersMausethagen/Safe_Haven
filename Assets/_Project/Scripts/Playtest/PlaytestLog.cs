@@ -183,6 +183,12 @@ public static class PlaytestLog
     /// <summary>Loot left on a creature's body (BodyLootSettings): subject its name, amount the stacks and resources it still held, detail
     /// "faded" (its time ran out) or "left" (the scene ended first).</summary>
     public const string LootLeft = "LootLeft";
+    // Getting about the Haven's land (the user, 2026-11-27: "walking for several minutes is not fun"):
+    /// <summary>A quest's objective with a waypoint done (PlaytestTrips): subject "questId#objective", amount the played seconds from its
+    /// waypoint showing to done, detail what it was, metres off at the start, the share ridden and the old ways / Go there taken.</summary>
+    public const string Trip = "Trip";
+    /// <summary>The old ways or the journal's Go there taken (HavenTravel): subject "rode" or "on foot", amount the metres not walked.</summary>
+    public const string Travel = "Travel";
 
     public static string Folder => Path.Combine(Application.persistentDataPath, "Playtests");
 

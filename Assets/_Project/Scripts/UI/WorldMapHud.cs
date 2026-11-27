@@ -369,7 +369,7 @@ public sealed class WorldMapHud : MonoBehaviour
         marked.Clear();
         foreach (QuestWaypoint waypoint in QuestWaypoint.Active)
         {
-            if (waypoint != null && waypoint.Quest != null && waypoint.IsWanted(log))
+            if (waypoint != null && waypoint.Quest != null && waypoint.IsWanted(log) && !waypoint.RepeatsAnEarlier(log))
             {
                 marked.Add(waypoint.transform.position);
                 ShowMark(used++, waypoint.transform.position, settings.RankColor(waypoint.Quest.Rank), UIStyle.Current.QuestMark,

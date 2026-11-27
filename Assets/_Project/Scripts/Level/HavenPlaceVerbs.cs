@@ -288,8 +288,9 @@ public sealed class HavenPlaceVerbs : ScriptableObject
         stood.AddComponent<HavenPlaceScenes>().Begin(atlas, verbs);
         // And what is going on out there this span (HavenHappenings): a swarm, a fish run, a pedlar on the old road.
         stood.AddComponent<HavenHappeningsKeeper>().Begin(atlas);
-        // And the way out to where the quests under way go on: the tracker's arrow (HavenQuestWaypoints).
-        stood.AddComponent<HavenQuestWaypoints>().Begin(atlas, verbs);
+        // And the way out to where the quests under way go on, on the map and under the tracker's arrow (QuestTargetWaypoints):
+        // the scene's own, which now knows the land's places too.
+        QuestTargetWaypoints.Ensure(stood.transform).Begin(atlas, verbs);
     }
 
     private static void Stand(WorldAtlas.Place place, Kind kind, string[] thoughts, Vector3 at, HavenPlaceVerbs verbs)

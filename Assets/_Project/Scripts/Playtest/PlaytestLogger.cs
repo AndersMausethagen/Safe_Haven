@@ -53,6 +53,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
             ExperienceTracker.Gained += OnGained;
             Damageable.AnyDamaged += OnAnyDamaged;
             ResourceSource.Harvested += OnHarvested;
+            HavenTravel.Arrived += OnTravelled;
             // Boss fights: a Boss row at each moment, a BossTry row as each try ends.
             BossTryLog.Listen();
         }
@@ -760,6 +761,10 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         }
     }
 
+    // The old ways or Go there: how far it saved walking, and whether the horse came along.
+    private void OnTravelled(Vector3 from, Vector3 to, bool rode) =>
+        Write(PlaytestLog.Travel, rode ? "rode" : "on foot", Mathf.RoundToInt(new Vector2(to.x - from.x, to.z - from.z).magnitude));
+
     // A run helped along says so, so it isn't read as how the game plays.
     private void OnCheat(string cheat) => Write(PlaytestLog.Cheat, cheat);
 
@@ -777,6 +782,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         ExperienceTracker.Gained -= OnGained;
         Damageable.AnyDamaged -= OnAnyDamaged;
         ResourceSource.Harvested -= OnHarvested;
+        HavenTravel.Arrived -= OnTravelled;
         FlushSkillXp();
         combat.Unfollow();
         EndSession();

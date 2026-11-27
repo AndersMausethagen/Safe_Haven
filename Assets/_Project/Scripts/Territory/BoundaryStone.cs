@@ -176,7 +176,7 @@ public sealed class BoundaryStone : MonoBehaviour, IInteractionName
         string shut = GameStateManager.InCombat ? "Not with something at your heels." : "Not during a breach.";
         // A lit stone knows the way home from the first one lit, and the portal knows the way back out to it (HomePortalMenu): a land
         // remembered isn't walked again (the user, 2026-11-27: "walking for several minutes is not fun").
-        if (state.IsClaimed(region) && HomePortal.Current != null && !HavenVisit.IsVisiting)
+        if (state.IsClaimed(region) && Place.InOwnHaven)
         {
             page.Add(new MenuAction("Walk the old way home", open ? "The hearth's own path, back to the portal." : shut,
                 open, () => HavenTravel.GoTo(HomePortal.Current.transform), true) { Icon = "Lead" });

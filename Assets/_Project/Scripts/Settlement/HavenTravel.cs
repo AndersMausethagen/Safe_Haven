@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -10,6 +11,8 @@ public static class HavenTravel
     private const float StandOff = 1.4f;
     private const float GroundSearch = 6f;
     private const float RayHeight = 30f;
+    // How near a following horse must be to come along.
+    private const float FollowerReach = 20f;
 
     /// <summary>True while going somewhere is allowed.</summary>
     public static bool IsOpen => WardBreachDirector.Current == null || !WardBreachDirector.Current.IsActive;
@@ -28,18 +31,100 @@ public static class HavenTravel
             return;
         }
 
-        // In the saddle or a boat the seat puts the body back the next frame: get down first.
+        // A horse under the player goes with them (the user, 2026-11-27: the horse is the answer to the long walks, so it mustn't
+        // be left behind at the stone); a boat's seat would put the body back the next frame: get down first.
+        Horse ridden = null;
         if (player.TryGetComponent(out PlayerMovement movement) && movement.IsSeated)
         {
-            GameMessages.Post("Get down first to go there.", MessageKind.Warning);
-            return;
+            if (!CanTakeHorse(player, out ridden, out string why))
+            {
+                GameMessages.Post(why, MessageKind.Warning);
+                return;
+            }
         }
 
-        Vector3 spot = SpotBeside(target, player.transform.position);
+        Vector3 from = player.transform.position;
+        List<Horse> following = Following(player, from);
+        if (ridden != null)
+        {
+            player.GetComponent<PlayerRiding>().Dismount(thrown: true);
+        }
+
+        Vector3 spot = SpotBeside(target, from);
         Vector3 facing = target.position - spot;
         facing.y = 0f;
         float yaw = facing.sqrMagnitude > 0.01f ? Quaternion.LookRotation(facing).eulerAngles.y : player.transform.eulerAngles.y;
         persistence.MoveTo(new PlayerPose(spot, yaw));
+        Quaternion turned = Quaternion.Euler(0f, yaw, 0f);
+        if (ridden != null && ridden.Motion.PutAt(HorseSpot(spot, turned, 0), turned))
+        {
+            PlayerRiding.For(player.gameObject).Mount(ridden, animate: false);
+        }
+
+        for (int i = 0; i < following.Count; i++)
+        {
+            following[i].Motion.PutAt(HorseSpot(spot, turned, i + 1), turned);
+        }
+
+        Arrived?.Invoke(from, spot, ridden != null);
+    }
+
+    /// <summary>Someone went somewhere this way: where from, where to, and whether in the saddle (PlaytestLogger).</summary>
+    public static event System.Action<Vector3, Vector3, bool> Arrived;
+
+    // Entering Play doesn't reload scripts in this project: a listener left from the last session would carry over.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Arrived = null;
+
+    // Seated: on a tamed horse of theirs, settled, with nothing hitched behind it, it comes along; anything else (a boat, a horse
+    // being broken in, a cart behind) and they get down first.
+    private static bool CanTakeHorse(Player player, out Horse horse, out string why)
+    {
+        horse = null;
+        why = "Get down first to go there.";
+        if (!player.TryGetComponent(out PlayerRiding riding) || riding.Riding == null || riding.IsMounting)
+        {
+            return false;
+        }
+
+        Horse under = riding.Riding;
+        if (!under.IsAlive || !under.IsTamed || !under.IsMine || under.Taming != null && under.Taming.IsBreaking || under.Motion.IsSwimming)
+        {
+            return false;
+        }
+
+        if (HorseHitch.Pulling(under) != null)
+        {
+            why = "Unhitch the cart first to go there.";
+            return false;
+        }
+
+        horse = under;
+        return true;
+    }
+
+    // The player's own horses following them nearby come too: on foot, so the horse is there when they arrive.
+    private static List<Horse> Following(Player player, Vector3 from)
+    {
+        var found = new List<Horse>();
+        foreach (Horse horse in Horse.All)
+        {
+            if (horse != null && horse.IsAlive && horse.IsTamed && horse.IsMine && horse.Rider == null && !horse.IsStabled
+                && horse.Order == Horse.Orders.Follow && HorseHitch.Pulling(horse) == null && CoopHorses.HeldByFriend(horse) == null
+                && (horse.transform.position - from).sqrMagnitude <= FollowerReach * FollowerReach)
+            {
+                found.Add(horse);
+            }
+        }
+
+        return found;
+    }
+
+    // Beside the player on walkable ground: the ridden one (0) at their side, followers a step behind it.
+    private static Vector3 HorseSpot(Vector3 spot, Quaternion facing, int index)
+    {
+        Vector3 at = spot + facing * new Vector3(index == 0 ? 1.6f : -2f, 0f, -2.5f * index);
+        return NavMesh.SamplePosition(at, out NavMeshHit hit, GroundSearch, NavMesh.AllAreas) ? hit.position : spot;
     }
 
     /// <summary>The spot just outside what stands at the target, towards the player, on walkable ground when there is some.</summary>
