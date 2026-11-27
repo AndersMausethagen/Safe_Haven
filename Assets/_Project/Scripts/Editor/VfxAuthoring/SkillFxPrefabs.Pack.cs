@@ -117,6 +117,8 @@ public static partial class SkillFxPrefabs
         Plan("Steel Ring", MakeFromPack("Pack Wind Circle", "FX - Dissolving Magic Circle/Prefabs/FX_DMagicCircle_Wind.prefab", 1.6f, Wind), 1, SkillFxPlace.CasterGround);
         log.Append(SetLook("Poison", MakeFromPack("Pack Poison", "FX - Buff Vol2/Prefabs/FX_Buff_Poison.prefab", 0.7f, Venom)));
         log.Append(SetLook("Heartrot", MakeFromPack("Pack Heartrot", "FX - Buff Vol2/Prefabs/FX_Buff_Poison.prefab", 0.7f, Rot)));
+        // The third group: the guard, the cast circles, the bolts, the fire arrow, the dead (SkillFxPrefabs.PackRest).
+        swaps.AddRange(PlanTheRest(log));
 
         foreach ((string ours, GameObject pack, int most, SkillFxPlace? place) in swaps)
         {

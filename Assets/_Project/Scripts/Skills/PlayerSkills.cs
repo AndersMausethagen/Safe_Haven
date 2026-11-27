@@ -872,11 +872,22 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
     /// <summary>How long casting <paramref name="skill"/> plants the caster's feet: as long as the marks its cast draws on the caster's
     /// own ground last (SkillLook.CasterGroundSeconds), and never for a lunge or a leap, whose whole point is the move.</summary>
-    public static float HoldsStillFor(SkillDefinition skill) =>
-        skill == null || skill.Look == null || skill.LungeDistance > 0f ? 0f : Mathf.Min(skill.Look.CasterGroundSeconds, LongestHold);
+    public static float HoldsStillFor(SkillDefinition skill)
+    {
+        if (skill == null || skill.Look == null || skill.LungeDistance > 0f)
+        {
+            return 0f;
+        }
 
-    // The longest the feet stay planted: as long as our own circles last (Huldra's 1.6 s). The VFX pack's circles dissolve for seconds
-    // more, round a player already walking: held all that while, a quick blessing stood the player still for six (2026-11-27).
+        // Through the cast and its blow, and a moment after; never past the circle, nor past the longest hold.
+        float blow = skill.Attack != null ? skill.Attack.HitDelay : 0f;
+        return Mathf.Min(skill.Look.CasterGroundSeconds, Mathf.Max(skill.CastTime, blow) + AfterTheCast, LongestHold);
+    }
+
+    // The VFX pack's circles dissolve for seconds after the spell is out: held all that while, a quick blessing stood the player still
+    // for six (2026-11-27). So the feet go once the cast and its blow are done and a moment more, at most as long as our own circles
+    // lasted (Huldra's 1.6 s): Frost Rune holds as before (1.1 s), Elf-Shot no longer for the whole 1.6.
+    private const float AfterTheCast = 0.5f;
     private const float LongestHold = 1.6f;
 
     // Held from the cast until its circle is gone; never shortened by a quicker circle cast inside it. A lunge or a leap lets go at once:

@@ -178,12 +178,12 @@ MonoBehaviour:
   look:
     showArea: 1
     cast:
-    - prefab: {fileID: 6071590681812878017, guid: 94154eda488c5c5439cf0c3b6b52f315, type: 3}
+    - prefab: {fileID: 8789309146565494972, guid: 2e5788c86d90c4d4eab6f4260304701e, type: 3}
       place: 1
       count: 1
       delay: 0
       stepDelay: 0
-      seconds: 1.1
+      seconds: 3.5
       scale: 1
     - prefab: {fileID: 7111475273592852384, guid: ddfa773ec994cab4a8cd975371e75aa5, type: 3}
       place: 0

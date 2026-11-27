@@ -214,6 +214,32 @@ public sealed class SkillLookTests
         CollectionAssert.IsEmpty(wrong);
     }
 
+    // The other way round: what PrefabPool spawns (a bolt's impact, a Draug's rising smoke) hands itself back only with a PooledEffect;
+    // without one, every bolt left a copy behind for good.
+    [Test]
+    public void ImpactsAndRisings_ReturnToThePool()
+    {
+        var spawned = new List<(string where, GameObject effect)>();
+        foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/_Project/Prefabs" }))
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(guid));
+            foreach (var (component, field) in new[] { (typeof(MonsterProjectile), "impactEffect"), (typeof(RisesAgain), "riseEffect") })
+            {
+                Component on = prefab.GetComponent(component);
+                if (on != null && new SerializedObject(on).FindProperty(field).objectReferenceValue is GameObject effect)
+                {
+                    spawned.Add(($"{prefab.name}.{field}", effect));
+                }
+            }
+        }
+
+        Assert.IsNotEmpty(spawned, "the bolts and the Draug have their effects (else this checks nothing)");
+        foreach ((string where, GameObject effect) in spawned)
+        {
+            Assert.IsNotNull(effect.GetComponent<PooledEffect>(), $"{where}: {effect.name} goes back to the pool");
+        }
+    }
+
     [Test]
     public void TheSchoolsStatuses_ShowOnTheirBearer_WithAnEffectThatKeepsGoing()
     {

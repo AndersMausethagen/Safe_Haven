@@ -62,6 +62,14 @@ public sealed class ArrowProjectile : MonoBehaviour
     // Made here rather than in each arrow's prefab: every arrow flies the same.
     private void StartTrail(bool perfect)
     {
+        // A particle trail of the arrow's own (the fire arrow's flames, from the VFX pack): from the start each flight.
+        particles ??= GetComponentsInChildren<ParticleSystem>(true);
+        foreach (ParticleSystem system in particles)
+        {
+            system.Clear(true);
+            system.Play(true);
+        }
+
         CombatFeelSettings feel = CombatFeelSettings.Current;
         if (feel.ArrowTrailSeconds <= 0f || feel.TelegraphMaterial == null)
         {
@@ -95,7 +103,18 @@ public sealed class ArrowProjectile : MonoBehaviour
         {
             trail.emitting = false;
         }
+
+        // Stuck or put away: no more flames streaming behind it; the last ones die out.
+        if (particles != null)
+        {
+            foreach (ParticleSystem system in particles)
+            {
+                system.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+            }
+        }
     }
+
+    private ParticleSystem[] particles;
 
     // Stuck in a body: when that dies, the arrow may be recovered with what it leaves.
     private void AwaitDeathOf(IDamageable victim)

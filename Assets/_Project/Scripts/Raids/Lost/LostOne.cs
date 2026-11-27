@@ -176,11 +176,14 @@ public sealed class LostOne : MonoBehaviour, ICopyAware
         ai.Roam(fleeTo);
     }
 
+    private const float VanishEffectSeconds = 5f;
+
     private void Vanish()
     {
         if (settings.VanishEffect != null)
         {
-            Instantiate(settings.VanishEffect, transform.position, Quaternion.identity);
+            // Taken away once played: the VFX pack's smoke doesn't destroy itself.
+            Destroy(Instantiate(settings.VanishEffect, transform.position, Quaternion.identity), VanishEffectSeconds);
         }
 
         if (settings.VanishSound != null)

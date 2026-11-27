@@ -13,9 +13,20 @@ public sealed class MonsterProjectile : MonoBehaviour
     private float remaining;
     private GameObject hazard;
     private readonly RaycastHit[] hits = new RaycastHit[32];
+    [Tooltip("Played where it strikes or comes down (a pooled effect with PooledEffect; empty plays none).")]
+    [SerializeField] private GameObject impactEffect;
+    // Its flying look's particles (a bolt from the VFX pack), restarted each flight: a pooled copy came back with last flight's trail.
+    private ParticleSystem[] systems;
 
     public void Initialize(Combatant source, MonsterAttack action, Vector3 aim, CastVolley cast = null, bool visual = false)
     {
+        systems ??= GetComponentsInChildren<ParticleSystem>(true);
+        foreach (ParticleSystem system in systems)
+        {
+            system.Clear(true);
+            system.Play(true);
+        }
+
         visualOnly = visual;
         volley = cast;
         owner = source;
@@ -31,6 +42,12 @@ public sealed class MonsterProjectile : MonoBehaviour
     // Where it comes down, it leaves its hazard (a pool of bile), on the ground beneath.
     private void Splash(Vector3 at)
     {
+        if (impactEffect != null)
+        {
+            Vector3 back = -direction;
+            PrefabPool.Spawn(impactEffect, at, back.sqrMagnitude > 0.0001f ? Quaternion.LookRotation(back) : Quaternion.identity);
+        }
+
         if (hazard != null && owner != null)
         {
             GroundHazard.Spawn(hazard, at, owner);

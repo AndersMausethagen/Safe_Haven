@@ -53,7 +53,7 @@ MonoBehaviour:
   fleeBelow: 0.3
   fleeSeconds: 3
   fleeDistance: 25
-  vanishEffect: {fileID: 0}
+  vanishEffect: {fileID: 4412319369331812712, guid: ae5ee7d2951b6ef478507716be3d40bb, type: 3}
   vanishSound: {fileID: 0}
   scentSound: {fileID: 0}
   labelColour: {r: 0.78, g: 0.86, b: 0.95, a: 1}

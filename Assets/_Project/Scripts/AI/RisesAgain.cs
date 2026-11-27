@@ -19,6 +19,8 @@ public sealed class RisesAgain : MonoBehaviour, ICopyAware
     [SerializeField] private string fallText = "falls, but the dead do not stay down. Finish it, or burn it!";
     [Tooltip("Said when it stands again, after its name.")]
     [SerializeField] private string riseText = "rises again!";
+    [Tooltip("Played where it stands again (a pooled effect with PooledEffect; empty plays none).")]
+    [SerializeField] private GameObject riseEffect;
 
     private Damageable health;
     private MonsterAI ai;
@@ -122,6 +124,11 @@ public sealed class RisesAgain : MonoBehaviour, ICopyAware
         risen = true;
         Release();
         health.SetHealthFraction(riseWith);
+        if (riseEffect != null)
+        {
+            PrefabPool.Spawn(riseEffect, transform.position, Quaternion.identity);
+        }
+
         if (ai != null)
         {
             GameMessages.Post($"{ai.Definition.DisplayName} {riseText}", MessageKind.Warning);

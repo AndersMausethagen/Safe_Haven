@@ -120,9 +120,9 @@ MonoBehaviour:
   hitEffect: {fileID: 836404731205364634, guid: 00f4ddb150118ee44a10d859899ed65d, type: 3}
   criticalHitEffect: {fileID: 4114814629758809842, guid: c816334457ab9004d8edfadf6445ad77, type: 3}
   structureHitEffect: {fileID: 8295756250413705008, guid: 45368d8d22cd2124d91815e3daa02143, type: 3}
-  blockEffect: {fileID: 6609181195610218049, guid: 222ec1a8f47dc7846b95698a1d0d5401, type: 3}
-  parryEffect: {fileID: 446000042892583350, guid: 91d732e0cc1abbd46aef1892f15e5fbb, type: 3}
-  staggerEffect: {fileID: 3448059979457001899, guid: 14ad6f4879c11a64da0187a81c7a5b91, type: 3}
+  blockEffect: {fileID: 6402747125169936699, guid: 07a359afb29f3934088a01fef6fc244e, type: 3}
+  parryEffect: {fileID: 7728612950556614477, guid: 5f8368e69622a3645a33a4909ab02111, type: 3}
+  staggerEffect: {fileID: 3154029305796114103, guid: b28e0f8a92e204d44941b6584bef6d03, type: 3}
   perfectDodgeEffect: {fileID: 1787437530139827587, guid: 86a01c434ea7768488bace9e1a63ad52, type: 3}
   parryCueEffect: {fileID: 2567207178870873406, guid: 3c1734e30b572104ea3954b443333234, type: 3}
   parryCueLead: 0.12

@@ -1050,6 +1050,8 @@ MonoBehaviour:
   speedDampTime: 0.1
   flinchShare: 0.04
   strideSpeed: 2
+  walkStrideSpeed: 0
+  strideMeasuredScale: 0
   swingsLikeThePlayer: 0
   strikeClips:
   - state: Strike Chop
@@ -1066,6 +1068,8 @@ MonoBehaviour:
     length: 1.8
   walkClipSpeed: 0.66
   runClipSpeed: 3.5
+  pounceLaunchAt: 0.44
+  pounceLandAt: 0.89
 --- !u!114 &165592971757474411
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1172,6 +1176,7 @@ MonoBehaviour:
   liesFor: 4
   fallText: falls, but the dead do not stay down. Finish it, or burn it!
   riseText: rises again!
+  riseEffect: {fileID: 2332191871550499525, guid: 097e7080fbdb7ed4cacdbd1e1e27e87f, type: 3}
 --- !u!1001 &2501747107637357074
 PrefabInstance:
   m_ObjectHideFlags: 0

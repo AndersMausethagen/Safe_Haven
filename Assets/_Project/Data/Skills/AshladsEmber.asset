@@ -66,12 +66,12 @@ MonoBehaviour:
   look:
     showArea: 1
     cast:
-    - prefab: {fileID: 788833295576599580, guid: eccc6062461ba05468450c85d04dd1e7, type: 3}
+    - prefab: {fileID: 8795787846172366234, guid: 5e9bc8e29b7439b4e9d52f1034592ac4, type: 3}
       place: 1
       count: 1
       delay: 0
       stepDelay: 0
-      seconds: 1
+      seconds: 5.7
       scale: 1
     - prefab: {fileID: 4292152318981631149, guid: 3a334c7af0b22574ba17e80a4867838b, type: 3}
       place: 0
