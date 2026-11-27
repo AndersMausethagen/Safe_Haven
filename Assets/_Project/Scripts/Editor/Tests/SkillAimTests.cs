@@ -155,6 +155,40 @@ public sealed class SkillAimTests
         }
     }
 
+    // The user, 2026-11-27: "some grouping of the skills in order of type or element". Every skill once, each section of one type
+    // (in the bar's order) or one element (in the schools' order).
+    [TestCase(false)]
+    [TestCase(true)]
+    public void TheSkillBook_GroupsEverySkillOnce_ByTypeOrElement(bool byElement)
+    {
+        var all = new System.Collections.Generic.List<SkillDefinition>();
+        foreach (string guid in AssetDatabase.FindAssets("t:SkillDefinition"))
+        {
+            all.Add(AssetDatabase.LoadAssetAtPath<SkillDefinition>(AssetDatabase.GUIDToAssetPath(guid)));
+        }
+
+        System.Collections.Generic.List<SkillGroup> groups = SkillGroups.Of(all, byElement);
+        var shown = new System.Collections.Generic.List<SkillDefinition>();
+        int lastOrder = -1;
+        foreach (SkillGroup group in groups)
+        {
+            Assert.IsNotEmpty(group.Skills, $"{group.Name}: no empty sections");
+            int order = byElement ? (int)group.Skills[0].School : System.Array.IndexOf(new[] { SkillKind.Ultimate, SkillKind.Power, SkillKind.Technique, SkillKind.Art }, group.Skills[0].Kind);
+            Assert.Greater(order, lastOrder, $"{group.Name} comes in its place");
+            lastOrder = order;
+            foreach (SkillDefinition skill in group.Skills)
+            {
+                Assert.AreEqual(byElement ? (int)group.Skills[0].School : (int)group.Skills[0].Kind, byElement ? (int)skill.School : (int)skill.Kind,
+                    $"{skill.name} belongs in {group.Name}");
+            }
+
+            shown.AddRange(group.Skills);
+        }
+
+        Assert.Greater(groups.Count, 1, "more than one section");
+        CollectionAssert.AreEquivalent(all, shown, "every skill shown once");
+    }
+
     private static void Plant(PlayerSkills skills, SkillDefinition skill, float now) => Call(skills, "PlantFeet", skill, now);
 
     private static void Keep(PlayerSkills skills, float now) => Call(skills, "KeepFeet", now);

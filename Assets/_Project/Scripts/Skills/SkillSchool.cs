@@ -44,6 +44,16 @@ public static class SkillSchools
         }
     }
 
+    /// <summary>One short line on what the school draws on (beside its heading in the skill window).</summary>
+    public static string Explain(SkillSchool school) => school switch
+    {
+        SkillSchool.Beast => "Wolves, bears and ravens.",
+        SkillSchool.Frost => "Rune magic of ice and winter.",
+        SkillSchool.Ember => "The Ash Lad's embers and hearth-fire.",
+        SkillSchool.Wyrd => "The hidden folk's gifts: healing and luck.",
+        _ => "Steel and muscle.",
+    };
+
     public static string Rich(SkillSchool school)
     {
         return $"<color=#{ColorUtility.ToHtmlStringRGB(ColorOf(school))}>{school}</color>";

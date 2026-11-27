@@ -46,7 +46,8 @@ public static partial class SkillFxPrefabs
         log.Append(SetPrefabField("Assets/_Project/Prefabs/Enemies/Draug.prefab", typeof(RisesAgain), "riseEffect",
             MakeFromPack("Pack Grave Smoke", "FX - Six Elements Pack/FX_Dark Skill/Prefabs/FX_DarkSkill_SmokeExplosion.prefab", 0.5f, Grave, pooled: true)));
         GameObject vanish = MakeFromPack("Pack Vanish Smoke", "FX - Six Elements Pack/FX_Dark Skill/Prefabs/FX_DarkSkill_Hit02.prefab", 0.6f, Grave);
-        foreach (string guid in AssetDatabase.FindAssets("t:LostOneSettings"))
+        // Without the pack (a checkout from git alone) nothing is made: the effect set before is kept, not cleared.
+        foreach (string guid in vanish != null ? AssetDatabase.FindAssets("t:LostOneSettings") : new string[0])
         {
             var data = new SerializedObject(AssetDatabase.LoadAssetAtPath<LostOneSettings>(AssetDatabase.GUIDToAssetPath(guid)));
             data.FindProperty("vanishEffect").objectReferenceValue = vanish;

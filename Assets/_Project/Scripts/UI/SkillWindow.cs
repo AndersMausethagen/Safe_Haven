@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -9,7 +10,8 @@ using UnityEngine.UI;
 /// slot to equip it (it swaps with what was there, or moves if it was already slotted), drag between bar slots to
 /// rearrange, and drag a bar skill back into the book to take it off. Right-click a known skill to slot it in the first
 /// free slot (or take it off when it is slotted); right-click a bar slot to empty it. Everything shown comes from the
-/// player's PlayerSkills.
+/// player's PlayerSkills. Since 2026-11-27 the frame is larger and the book scrolls in sections (SkillGroups: by type or by element,
+/// two tabs), each skill a picture card with its name under it.
 /// </summary>
 public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
 {
@@ -23,15 +25,37 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
     [SerializeField] private ItemTooltipView tooltip;
     [Tooltip("Follows the pointer while a skill is dragged. Should not block raycasts.")]
     [SerializeField] private Image dragIcon;
-    [Tooltip("Columns of the book grid.")]
-    [SerializeField, Min(1)] private int bookColumns = 8;
-    [Tooltip("Rows always shown in the book, so it reads as a grid even with few skills.")]
-    [SerializeField, Min(1)] private int bookMinimumRows = 2;
+    // The window's size since 2026-11-27 (the user: "We need a larger frame, and maybe some grouping of the skills in order of type or
+    // element"): the nine bar slots at full size, and the book scrolling in sections of picture cards, each skill's name under it.
+    private const float WindowWidth = 1040f;
+    private const float WindowHeight = 700f;
+    private const float Margin = 24f;
+    private const float BarTop = 96f;
+    private const float BookTop = 222f;
+    private const float FooterHeight = 40f;
+    private const float CardWidth = 96f;
+    private const float CardHeight = 122f;
+    private const float CardGap = 10f;
+    private const float CardPicture = 72f;
+    private const float SectionHeading = 34f;
+    private const float SectionGap = 14f;
+    private const string GroupingKey = "SkillWindow.GroupByElement";
+    // Kept clear above and below the window: a margin, and the HUD's skill bar.
+    private const float ScreenTop = 24f;
+    private const float ScreenBottom = 96f;
+    private float windowHeight = WindowHeight;
 
     private readonly List<ItemSlotView> barSlots = new List<ItemSlotView>();
     private readonly List<ItemSlotView> bookSlots = new List<ItemSlotView>();
+    // The known skills in the order the book shows them (by type or by element), which a book card's Index points into.
+    private readonly List<SkillDefinition> bookOrder = new List<SkillDefinition>();
     private ItemSlotView dragSource;
     private ItemSlotView hovered;
+    private bool laidOut;
+    private bool byElement;
+    private RectTransform bookContent;
+    private (TMP_Text label, Image shown) byTypeTab;
+    private (TMP_Text label, Image shown) byElementTab;
 
     private void OnEnable()
     {
@@ -41,6 +65,11 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
             Debug.LogError("SkillWindow is missing a reference (player skills, bar grid, book grid, slot prefab, tooltip or drag icon).", this);
             enabled = false;
             return;
+        }
+
+        if (!laidOut)
+        {
+            LayOut();
         }
 
         skills.Loadout.SlotChanged += OnLoadoutChanged;
@@ -216,7 +245,7 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
             return skills.Loadout.Get(slot.Index);
         }
 
-        return slot.Index < skills.KnownSkills.Count ? skills.KnownSkills[slot.Index] : null;
+        return slot.Index < bookOrder.Count ? bookOrder[slot.Index] : null;
     }
 
     private void ShowTooltip(ItemSlotView slot)
@@ -265,15 +294,143 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
         RefreshAll();
     }
 
-    private void RebuildBook()
+    // The frame made larger and the prefab's parts put in their places once, before it is first filled; the book's grid becomes a
+    // scrolling view of sections.
+    private void LayOut()
     {
-        int rows = Mathf.Max(bookMinimumRows, Mathf.CeilToInt(skills.KnownSkills.Count / (float)bookColumns));
-        int count = rows * bookColumns;
-        if (bookSlots.Count != count)
+        laidOut = true;
+        byElement = PlayerPrefs.GetInt(GroupingKey, 0) == 1;
+        // As tall as the screen allows, above the HUD's skill bar at the bottom (a small game view cut its title off).
+        var window = (RectTransform)transform;
+        Canvas canvas = GetComponentInParent<Canvas>();
+        float screen = canvas != null ? ((RectTransform)canvas.rootCanvas.transform).rect.height : WindowHeight + ScreenTop + ScreenBottom;
+        windowHeight = Mathf.Clamp(screen - ScreenTop - ScreenBottom, 480f, WindowHeight);
+        window.sizeDelta = new Vector2(WindowWidth, windowHeight);
+        window.anchoredPosition = new Vector2(window.anchoredPosition.x, (ScreenBottom - ScreenTop) * 0.5f);
+
+        float barWidth = SkillLoadout.SlotCount * 64f + (SkillLoadout.SlotCount - 1) * 6f;
+        Place(barGrid, Margin, BarTop, barWidth, 64f);
+        Place(Child("Bar Hint"), Margin + barWidth + 20f, BarTop, WindowWidth - barWidth - Margin * 2f - 20f, 64f);
+        Place(Child("Book Title"), Margin, BookTop - 42f, 300f, 26f);
+        Place(Child("Book Hint"), Margin, windowHeight - FooterHeight + 8f, WindowWidth - Margin * 2f, 22f);
+
+        // Two framed tabs at the right of the book's title: its sections by type (what slot takes it) or by element.
+        UIStyle style = UIStyle.Current;
+        const float tabWidth = 150f;
+        float tabX = WindowWidth - Margin - tabWidth * 2f - 8f;
+        Button type = CodeUI.AddTab("By Type", transform, tabX, BookTop - 48f, tabWidth, 38f, style, out TMP_Text typeLabel, out Image typeShown);
+        typeLabel.text = "By Type";
+        type.onClick.AddListener(() => GroupBy(false));
+        Button element = CodeUI.AddTab("By Element", transform, tabX + tabWidth + 8f, BookTop - 48f, tabWidth, 38f, style, out TMP_Text elementLabel, out Image elementShown);
+        elementLabel.text = "By Element";
+        element.onClick.AddListener(() => GroupBy(true));
+        byTypeTab = (typeLabel, typeShown);
+        byElementTab = (elementLabel, elementShown);
+
+        // The book: the prefab's grid, now the viewport of a scroll of sections.
+        if (bookGrid.TryGetComponent(out GridLayoutGroup grid))
         {
-            BuildGrid(bookGrid, count, bookColumns, bookSlots, "Skill ");
+            DestroyImmediate(grid);
         }
 
+        Place(bookGrid, Margin, BookTop, WindowWidth - Margin * 2f, windowHeight - BookTop - FooterHeight);
+        var scroll = bookGrid.gameObject.AddComponent<ScrollRect>();
+        scroll.horizontal = false;
+        scroll.movementType = ScrollRect.MovementType.Clamped;
+        scroll.scrollSensitivity = 40f;
+        bookGrid.gameObject.AddComponent<RectMask2D>();
+        // A clear graphic lets the wheel scroll over the gaps between cards.
+        bookGrid.gameObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0f);
+        bookContent = CodeUI.At("Sections", bookGrid, 0f, 0f, WindowWidth - Margin * 2f, 0f);
+        scroll.content = bookContent;
+        scroll.viewport = bookGrid;
+        ShowGrouping();
+    }
+
+    private RectTransform Child(string name) => transform.Find(name) as RectTransform;
+
+    // A part placed from the window's top left corner.
+    private static void Place(RectTransform part, float x, float y, float width, float height)
+    {
+        if (part == null)
+        {
+            return;
+        }
+
+        part.anchorMin = part.anchorMax = new Vector2(0f, 1f);
+        part.pivot = new Vector2(0f, 1f);
+        part.anchoredPosition = new Vector2(x, -y);
+        part.sizeDelta = new Vector2(width, height);
+    }
+
+    private void GroupBy(bool element)
+    {
+        if (byElement == element)
+        {
+            return;
+        }
+
+        byElement = element;
+        PlayerPrefs.SetInt(GroupingKey, element ? 1 : 0);
+        ShowGrouping();
+        RebuildBook();
+    }
+
+    private void ShowGrouping()
+    {
+        UIStyle style = UIStyle.Current;
+        byTypeTab.shown.enabled = !byElement;
+        byTypeTab.label.color = byElement ? style.Text : style.Accent;
+        byElementTab.shown.enabled = byElement;
+        byElementTab.label.color = byElement ? style.Accent : style.Text;
+    }
+
+    // The book in sections: by type (Ultimates, Powers, Techniques, Weapon Arts: what each bar slot takes), each by element within; or
+    // by element (Steel, Beast, Frost, Ember, Wyrd), each by type within. A card is the skill's picture with its name under it.
+    private void RebuildBook()
+    {
+        for (int i = bookContent.childCount - 1; i >= 0; i--)
+        {
+            Destroy(bookContent.GetChild(i).gameObject);
+        }
+
+        bookSlots.Clear();
+        bookOrder.Clear();
+        UIStyle style = UIStyle.Current;
+        float width = bookContent.sizeDelta.x;
+        int columns = Mathf.Max(1, Mathf.FloorToInt((width + CardGap) / (CardWidth + CardGap)));
+        float y = 0f;
+        foreach (SkillGroup group in SkillGroups.Of(skills.KnownSkills, byElement))
+        {
+            TMP_Text heading = CodeUI.Heading(group.Name, bookContent, 0f, y, width * 0.5f, style);
+            heading.color = group.Colour ?? style.Accent;
+            TMP_Text note = CodeUI.Label("Note", bookContent, width * 0.5f, y + 4f, width * 0.5f, 22f, 14f, style.Muted, TextAlignmentOptions.Right);
+            note.text = group.Note;
+            y += SectionHeading;
+            for (int i = 0; i < group.Skills.Count; i++)
+            {
+                SkillDefinition skill = group.Skills[i];
+                float x = (i % columns) * (CardWidth + CardGap);
+                float top = y + (i / columns) * (CardHeight + CardGap);
+                RectTransform card = CodeUI.At(skill.name, bookContent, x, top, CardWidth, CardHeight);
+                ItemSlotView slot = Instantiate(slotPrefab, card);
+                var rect = (RectTransform)slot.transform;
+                rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 1f);
+                rect.anchoredPosition = Vector2.zero;
+                rect.sizeDelta = new Vector2(CardPicture, CardPicture);
+                slot.name = "Skill " + bookOrder.Count;
+                slot.Bind(this, bookOrder.Count);
+                TMP_Text name = CodeUI.Paragraph("Name", card, 0f, CardPicture + 6f, CardWidth, CardHeight - CardPicture - 6f, 14f, style.Text);
+                name.alignment = TextAlignmentOptions.Top;
+                name.text = SkillText.Name(skill);
+                bookSlots.Add(slot);
+                bookOrder.Add(skill);
+            }
+
+            y += Mathf.CeilToInt(group.Skills.Count / (float)columns) * (CardHeight + CardGap) + SectionGap;
+        }
+
+        bookContent.sizeDelta = new Vector2(width, y);
         RefreshAll();
     }
 
@@ -326,7 +483,7 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
 
         for (int i = 0; i < bookSlots.Count; i++)
         {
-            SkillDefinition skill = i < skills.KnownSkills.Count ? skills.KnownSkills[i] : null;
+            SkillDefinition skill = i < bookOrder.Count ? bookOrder[i] : null;
             int equipped = skills.Loadout.IndexOf(skill);
             bookSlots[i].Show(skill != null ? skill.Icon : null, Tint(skill), equipped >= 0 ? PlayerInputHandler.SkillKeyLabel(equipped) : "");
         }

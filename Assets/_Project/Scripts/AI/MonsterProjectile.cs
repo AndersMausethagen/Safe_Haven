@@ -40,9 +40,11 @@ public sealed class MonsterProjectile : MonoBehaviour
     }
 
     // Where it comes down, it leaves its hazard (a pool of bile), on the ground beneath.
-    private void Splash(Vector3 at)
+    // struck: it met something (else it ran out of reach in the air, where no impact shows). A friend's bolt drawn here (co-op) shows
+    // none: it has no owner to pass by, so it stops on bodies the real one flies past (review 2026-11-27).
+    private void Splash(Vector3 at, bool struck)
     {
-        if (impactEffect != null)
+        if (impactEffect != null && struck && !visualOnly)
         {
             Vector3 back = -direction;
             PrefabPool.Spawn(impactEffect, at, back.sqrMagnitude > 0.0001f ? Quaternion.LookRotation(back) : Quaternion.identity);
@@ -75,6 +77,12 @@ public sealed class MonsterProjectile : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             Collider collider = contacts[i].collider;
+            // A friend's bolt has no owner to pass by: what it starts inside (the friend's own body) it doesn't stop on.
+            if (visualOnly && contacts[i].distance <= 0f)
+            {
+                continue;
+            }
+
             if ((owner != null && collider.transform.IsChildOf(owner.transform)) || collider.transform.IsChildOf(transform))
             {
                 continue;
@@ -107,7 +115,7 @@ public sealed class MonsterProjectile : MonoBehaviour
                 AttackResolver.Landed(owner, attack, victim, info, result);
                 WebLasso.AfterHit(attack, victim, owner, result);
             }
-            Splash(victim is Component splashed && splashed != null ? splashed.transform.position : hit.point);
+            Splash(victim is Component splashed && splashed != null ? splashed.transform.position : hit.point, true);
             PrefabPool.Release(gameObject);
             return;
         }
@@ -115,7 +123,7 @@ public sealed class MonsterProjectile : MonoBehaviour
         remaining -= step;
         if (remaining <= 0f)
         {
-            Splash(transform.position);
+            Splash(transform.position, false);
             PrefabPool.Release(gameObject);
         }
     }
