@@ -3974,5 +3974,767 @@
   "text": "You never saw it. You were asleep.",
   "mood": "Neutral",
   "by": "kind"
+ },
+ "5126444bf008": {
+  "speaker": "Asa",
+  "text": "Water near, for the beds and the flax.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "eb8532f723a2": {
+  "speaker": "Asa",
+  "text": "I was found guarding seed at a burnt farm in the deep woods. There's another in the Hollow",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "cda7ef5b93a2": {
+  "speaker": "Asa",
+  "text": "It came up. Their seed, in their field. I'll keep it for them.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "f0786dceff4d": {
+  "speaker": "Asa",
+  "text": "Light the Hollow Pines' stone, and I'll sow their seed where they meant to.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "3f5619fea345": {
+  "speaker": "Asa",
+  "text": "South, in the Hollow Pines. A longhouse with no roof. Look at their hearth.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "7cd351dc3d17": {
+  "speaker": "Asa",
+  "text": "They meant to come back. Follow the burnt fence and see how far they got. Take planks: wha",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "cd19ac6125f3": {
+  "speaker": "Asa",
+  "text": "I planted a row of the old barley. From home. Only six seeds were left.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "14b6072bbff7": {
+  "speaker": "Asa",
+  "text": "The short way is round. Round the beds.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "df4386427e87": {
+  "speaker": "Asa",
+  "text": "We'll eat it together. My mother would have liked you.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "41442971a9b5": {
+  "speaker": "Asa",
+  "text": "Your boots were in my beds again. The flax won't stand now.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "ca7642649ac7": {
+  "speaker": "Bjarne",
+  "text": "Smoke's going straight up. Fair day, then.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "d5effd4b4256": {
+  "speaker": "Bjarne",
+  "text": "Someone saw Ingrid out there, walking in circles. Walking. Do you understand? Go and look.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "794c8a691765": {
+  "speaker": "Bjarne",
+  "text": "A smith's bones like a warm house. The forge is warm enough by day.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "fdfafd146519": {
+  "speaker": "Bjarne",
+  "text": "My grandfather cut stone before he ever worked iron. The boundary stones came out of a qua",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "75f8549dd10e": {
+  "speaker": "Bjarne",
+  "text": "Ravenwood again. I'll go up of an evening and cut what they started. Iron can wait an hour",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "27c31588e933": {
+  "speaker": "Bjarne",
+  "text": "Light Ravenwood's stone. It stands by the path through the wood.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "c8f567581e80": {
+  "speaker": "Bjarne",
+  "text": "The Old Quarry, north. Two copper ingots for the wedges, and the stone they never finished",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "744b610a8d6f": {
+  "speaker": "Bjarne",
+  "text": "Iron is best worked at dawn. Always has been.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "c2b8e4e43e86": {
+  "speaker": "Bjarne",
+  "text": "It is soft. That's why it needs good nails.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "f4032754b41d": {
+  "speaker": "Bjarne",
+  "text": "My iron cracks because it's cold. Not because of your scratching.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "d0ceab442098": {
+  "speaker": "Bjarne",
+  "text": "Then cut slowly, old man.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "872650f11493": {
+  "speaker": "Bjarne",
+  "text": "Then sleep further from the forge.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "c2b201f562db": {
+  "speaker": "Bjarne",
+  "text": "You've been at my anvil with chalk again.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "e5cba270c717": {
+  "speaker": "Eirik",
+  "text": "A lit way home. I've seen what waits in the dark.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "1caf39fba96b": {
+  "speaker": "Eirik",
+  "text": "A watch that leaves its post has a reason. The old tower stands on the edge of the Wolfwoo",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "0d52b6e42cc3": {
+  "speaker": "Eirik",
+  "text": "The Old Grey. My grandfather would have stood a round for whoever did it. I'll keep the fi",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "d58af43b01c7": {
+  "speaker": "Eirik",
+  "text": "Light the Wolfwood's stone. Then I keep the watch out there.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "646435f8d228": {
+  "speaker": "Eirik",
+  "text": "The den is north-east of the tower, back toward home. Bring the old one down. Come ready.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "a4c3381bb37d": {
+  "speaker": "Eirik",
+  "text": "The Ruined Watchtower, south-west. Read what they left by the door.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "cd9ea77ddd58": {
+  "speaker": "Eirik",
+  "text": "It's a wall. It'll be leaned on worse than that.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "2c7cfd47d886": {
+  "speaker": "Eirik",
+  "text": "Next time I'll let it eat the flax.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "66978c3b73ef": {
+  "speaker": "Eirik",
+  "text": "Then I'll go back for anyone. Tell them that.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "dc8ea3c78d2e": {
+  "speaker": "Eirik",
+  "text": "There was something by the fence at night. I went the short way.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "3ab5533839b2": {
+  "speaker": "Eirik",
+  "text": "Walls don't stop what's coming. People at walls do.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "e2052de6b079": {
+  "speaker": "Eirik",
+  "text": "You were busy holding the rest of us together.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "6f5fa6173a95": {
+  "speaker": "Gunnar",
+  "text": "Too many fires in this place. A man can't hear the woods.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "2e149edd21fb": {
+  "speaker": "Gunnar",
+  "text": "Not far to the lodge. Meat won't cure itself.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "e6dc7f3bbf6d": {
+  "speaker": "Gunnar",
+  "text": "I always go alone. That's why I come back.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "bca14ef0b77a": {
+  "speaker": "Gunnar",
+  "text": "I had a roof over my head for twenty years. The trees.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "bdf8fe99041e": {
+  "speaker": "Gunnar",
+  "text": "Nobody taught me. Everything that didn't learn it is dead.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "035464731c06": {
+  "speaker": "Gunnar",
+  "text": "One more set is a crowd. Fine. Tonight.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "04d88ab0be9f": {
+  "speaker": "Gunnar",
+  "text": "You felled the old pine by the east path. The deer used it.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "a954cd40cee8": {
+  "speaker": "Gunnar",
+  "text": "Your rule. The woods have their own.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "f3b6032b3bc6": {
+  "speaker": "Hild",
+  "text": "Close to the stone. Every walk is a block not cut.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "a3ecaa1ffced": {
+  "speaker": "Hild",
+  "text": "By trolls. Not by the Haven's own warden.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "5ffb1d38ace6": {
+  "speaker": "Hild",
+  "text": "I've been watching how you set a beam. You were right about the snow.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "32ac40bf99f9": {
+  "speaker": "Hild",
+  "text": "Once. That was the once.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "8618ba0d90a6": {
+  "speaker": "Hild",
+  "text": "You leaned your shield on my new wall. It's not dry.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "c529a2921fc1": {
+  "speaker": "Ingrid",
+  "text": "Clean water close by, for the work and for washing it off.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "2b915da75072": {
+  "speaker": "Ingrid",
+  "text": "Somebody here knew what grows by alders, and what it is good for. There's a spring house i",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "efd9ed07f2e8": {
+  "speaker": "Ingrid",
+  "text": "Water in the basin again. Their herbs remember where they were planted.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "401106460c5d": {
+  "speaker": "Ingrid",
+  "text": "Alder Mere, west of the meadows, above the water. The spring is choked with silt and stone",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "87aa3d91bf2f": {
+  "speaker": "Ingrid",
+  "text": "Light Alder Mere's stone. I'll keep the beds.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "ce4782d82895": {
+  "speaker": "Ingrid",
+  "text": "I borrowed it for an hour. The draught needed a wide pot.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "159ab2240a32": {
+  "speaker": "Ingrid",
+  "text": "Mine is cracked. Would you rather I let them bleed?",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "8da637d69805": {
+  "speaker": "Ingrid",
+  "text": "Then we argue. Together, at the altar, tomorrow.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "4f416042f772": {
+  "speaker": "Ingrid",
+  "text": "You read the stones better than I ever did. Tell me what they say about the curse.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "bb9473d7018f": {
+  "speaker": "Liv",
+  "text": "Mist's thick in the hollows today. Mind your step.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "11cd160aea0e": {
+  "speaker": "Liv",
+  "text": "Somewhere to sit and read the stones.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "b30e7f354442": {
+  "speaker": "Liv",
+  "text": "Every rune you bring home is about the pact, and not one says what it was. The standing st",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "c70a353ce3f2": {
+  "speaker": "Liv",
+  "text": "Keep the fire, and the wood keeps faith. I'll cut a rune at the stones now and then. They'",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "c1df16ec2048": {
+  "speaker": "Liv",
+  "text": "Light Eastwood's stone. I want to read them myself, of an evening.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "f3a7683230f0": {
+  "speaker": "Liv",
+  "text": "North-east, in Eastwood. After dark, with a Hearth Ember.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "c70b2cd685dc": {
+  "speaker": "Liv",
+  "text": "Bring the old book. And don't hide the last page this time.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "1928ab74bd05": {
+  "speaker": "Liv",
+  "text": "That it remembers. Like us. That it can be argued with.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "c18854984447": {
+  "speaker": "Liv",
+  "text": "The marks on it were wrong. Your iron cracks because of them.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "3b3fa4b65e57": {
+  "speaker": "Liv",
+  "text": "Then explain the three blades that broke on the same mark.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "157aa6e09a6e": {
+  "speaker": "Runa",
+  "text": "A light on the path. I come home late.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "1694012cc39f": {
+  "speaker": "Runa",
+  "text": "I walked those cairns once for a man in grey, counting stones. Now I want each to have one",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "b942ddfd66e0": {
+  "speaker": "Runa",
+  "text": "The old ways are open. Touch any lit stone, and it knows the way to the others.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "d02a5cd40342": {
+  "speaker": "Runa",
+  "text": "Light Westwood's stone, and the ways run between the lit stones again.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "88833bfa3a65": {
+  "speaker": "Runa",
+  "text": "West, on the knolls. A stone on each cairn.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "d58d00daa3d9": {
+  "speaker": "Runa",
+  "text": "I come home at dawn. I sleep at dawn.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "5924e7e3029d": {
+  "speaker": "Runa",
+  "text": "The hammering starts before light. Every day.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "a6e7d2c9c82e": {
+  "speaker": "Runa",
+  "text": "Then walk with me tonight. Two sets of eyes.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "8a2b4c30ea8d": {
+  "speaker": "Runa",
+  "text": "You walk like the woods taught you. Quiet on the outside of the foot.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "bca8090f566c": {
+  "speaker": "Runa",
+  "text": "Horses, running flat out, and not from us. Off the road!",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "afa0d2294e77": {
+  "speaker": "Sigrid",
+  "text": "Count heads. Then count them again.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "2bea6e1035d8": {
+  "speaker": "Sigrid",
+  "text": "Then don't expect anyone to come looking.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "061da90fd740": {
+  "speaker": "Sigrid",
+  "text": "Light on the lanes. People should see their way home.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "49cc61e444ff": {
+  "speaker": "Sigrid",
+  "text": "I led us north because I'd read of a road out of the Haven that the old ones took. It bega",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "e19cbec4773d": {
+  "speaker": "Sigrid",
+  "text": "Our names under theirs. Whoever comes after will know we went, and that we came back.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "08255571bd2f": {
+  "speaker": "Sigrid",
+  "text": "Light Greyfell's stone. The road starts at home again.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "9717cbe4edf2": {
+  "speaker": "Sigrid",
+  "text": "North-west, in Greyfell. Read their names, then cut ours under them.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "72cc97e6c78b": {
+  "speaker": "Sigrid",
+  "text": "I'm thanking you now.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "bf98b6955672": {
+  "speaker": "Sigrid",
+  "text": "We go out together and come back together. That's the rule here.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "9f0ffb05de9c": {
+  "speaker": "Sigrid",
+  "text": "When the stones broke, you went back for Liv. I never thanked you.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "bc32e7ca5922": {
+  "speaker": "Sigrid",
+  "text": "You went past the north stones alone again.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "02cd44fdbc0a": {
+  "speaker": "The Portal",
+  "text": "Bring what my stones ask and lay it in me, then raise me. The deeper woods are waiting, an",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "03ee5f3c4364": {
+  "speaker": "The Portal",
+  "text": "Listen, little one. The guardian is old wood, and old wood fears one thing: fire. The tree",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "d347273db359": {
+  "speaker": "The Portal",
+  "text": "There is one memory the forest kept back from me, little one: who let my hearth go cold. T",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "3c9a1f0067e1": {
+  "speaker": "The Portal",
+  "text": "You came back to me torn, little one. I caught you, as I catch all of mine. But you met th",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "960305955248": {
+  "speaker": "The Portal",
+  "text": "Feel my stones: loose, where the roots held them for so long. I am a door that opens only ",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "8d887773b37b": {
+  "speaker": "The Portal",
+  "text": "Further in, the mist is older. What lives there is stronger and hungrier, and so is what i",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "8d8e2d7bd61a": {
+  "speaker": "The Portal",
+  "text": "Little one. You have gone through me and come home, again and again. Each time you go, I h",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "351cc93756d5": {
+  "speaker": "The Portal",
+  "text": "Once I am raised, the choice is yours each time you set out: the near woods, or the deeper",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "e9c2f9d61e37": {
+  "speaker": "The Portal",
+  "text": "Steady my stones. Bring what they ask and lay it in me, here, and raise me. Each time I am",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "d2cd3b667a71": {
+  "speaker": "The Portal",
+  "text": "Strength, which you will give me. And this: what is strong draws the hungry. The deeper I ",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "c65dc509609a": {
+  "speaker": "The Portal",
+  "text": "I can open the deeper way. But not as I am.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "0dfb7cf2aef3": {
+  "speaker": "Tor",
+  "text": "A good joint takes the time it takes.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "231f28cc8bb9": {
+  "speaker": "Tor",
+  "text": "Best hour of the day, this. Nobody talking.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "f3a6edf06918": {
+  "speaker": "Tor",
+  "text": "I keep looking for Tor at the fire.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "599000671959": {
+  "speaker": "Tor",
+  "text": "Up early? The portal hums louder before the sun.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "259cc3d8f1e1": {
+  "speaker": "Tor",
+  "text": "A bench by the door, for the evening and my leg.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "d385b42e6837": {
+  "speaker": "Tor",
+  "text": "The trees round the fire won't grow back as fast as we cut them. There are old cuttings pa",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "109a7b7777ef": {
+  "speaker": "Tor",
+  "text": "There's a causeway sinking in the Drowning Fen, south, and good boards going to waste unde",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "b72317d50837": {
+  "speaker": "Tor",
+  "text": "Dry boards across the bog. Somebody will walk them who isn't running.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "b5cdbbd8414a": {
+  "speaker": "Tor",
+  "text": "Light the fen's stone. A road is only a road if it's remembered.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "ef2e29ccadc8": {
+  "speaker": "Tor",
+  "text": "South, in the fen. Eight hardwood planks.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "088703c19d98": {
+  "speaker": "Tor",
+  "text": "The Haven's Lands. Pick who goes and where; they come home on their own.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "d64f367615e3": {
+  "speaker": "Tor",
+  "text": "And look how warm that kept you.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "34bb4c91dea4": {
+  "speaker": "Tor",
+  "text": "Say that again. Slowly. I want to remember it.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "9901456c7812": {
+  "speaker": "Tor",
+  "text": "The Haven used it. For a roof over your head.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "9568f89923a5": {
+  "speaker": "Tor",
+  "text": "Then I'll build you something stone can't do. A boat.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "0e631611bc03": {
+  "speaker": "Tor",
+  "text": "Thirty years I've cut wood. You're the first smith who didn't call it soft.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "7356677aa53d": {
+  "speaker": "Tor",
+  "text": "You'll have my best oak for your hammer handles. Till I'm dead.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "ab7630fd0aca": {
+  "speaker": "Yrsa",
+  "text": "Mist's thick in the hollows today. Mind your step.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "ed84eb31f1da": {
+  "speaker": "Yrsa",
+  "text": "A warm hearth. A cook can't abide a cold house.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "43199455a999": {
+  "speaker": "Yrsa",
+  "text": "A cook is only as good as her fish, and the old fishers of Stillwater were the best the Ha",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "51d503090fbb": {
+  "speaker": "Yrsa",
+  "text": "Smoke in the reeds again. I'll keep the racks full.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "d04b40efbc88": {
+  "speaker": "Yrsa",
+  "text": "Light Stillwater's stone, and the rest is ours.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "51344db3061c": {
+  "speaker": "Yrsa",
+  "text": "The Fisher's Rest, east, on the shore. Their nets, and three fish.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "3de5b7cd40bb": {
+  "speaker": "Yrsa",
+  "text": "They lit a lantern for their dead at the Netmender's Rest, south of the other, so the dead",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "2283e6b7bd85": {
+  "speaker": "Yrsa",
+  "text": "Everyone's mother liked me. It was the stew.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "fccf05163ee0": {
+  "speaker": "Yrsa",
+  "text": "My pot is for food. Your swamp water goes in your own.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "1e438f5f74ac": {
+  "speaker": "Yrsa",
+  "text": "Something in my pot smelled of bog this morning.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "9eaede9dc958": {
+  "speaker": "Yrsa",
+  "text": "Then the first loaf from it is yours, and nobody else's.",
+  "mood": "Neutral",
+  "by": "kind"
  }
 }

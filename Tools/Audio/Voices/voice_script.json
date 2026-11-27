@@ -22,6 +22,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/asa/acba48946a3c.wav"
  },
  {
+  "id": "5126444bf008",
+  "voice": "asa",
+  "text": "Water near, for the beds and the flax.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/asa/5126444bf008.wav"
+ },
+ {
   "id": "bbfa99a3a8b6",
   "voice": "asa",
   "text": "You're not from the village. Doesn't matter. Help me with this sack.",
@@ -31,6 +42,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/asa/bbfa99a3a8b6.wav"
+ },
+ {
+  "id": "eb8532f723a2",
+  "voice": "asa",
+  "text": "I was found guarding seed at a burnt farm in the deep woods. There's another in the Hollow Pines, my grandmother said: burnt the night the hearth went out, and somebody kept a fire going there after the roof was gone. I want to know what for.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/asa/eb8532f723a2.wav"
  },
  {
   "id": "0161287aa162",
@@ -55,6 +77,28 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/asa/d8e9e13983a7.wav"
  },
  {
+  "id": "8eae39b913cd",
+  "voice": "asa",
+  "text": "Water by the beds. The barley drinks, and I don't carry it as far.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/asa/8eae39b913cd.wav"
+ },
+ {
+  "id": "cda7ef5b93a2",
+  "voice": "asa",
+  "text": "It came up. Their seed, in their field. I'll keep it for them.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/asa/cda7ef5b93a2.wav"
+ },
+ {
   "id": "c3f14d9279d0",
   "voice": "asa",
   "text": "A Farm Plot. Turn the earth somewhere it gets the sun.",
@@ -66,6 +110,28 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/asa/c3f14d9279d0.wav"
  },
  {
+  "id": "f0786dceff4d",
+  "voice": "asa",
+  "text": "Light the Hollow Pines' stone, and I'll sow their seed where they meant to.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/asa/f0786dceff4d.wav"
+ },
+ {
+  "id": "3f5619fea345",
+  "voice": "asa",
+  "text": "South, in the Hollow Pines. A longhouse with no roof. Look at their hearth.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/asa/3f5619fea345.wav"
+ },
+ {
   "id": "345a4553aa08",
   "voice": "asa",
   "text": "The Tailor's Shop at Tier II, four Linen, and the Weaver's work for me.",
@@ -75,6 +141,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/asa/345a4553aa08.wav"
+ },
+ {
+  "id": "7cd351dc3d17",
+  "voice": "asa",
+  "text": "They meant to come back. Follow the burnt fence and see how far they got. Take planks: whatever they left will be falling down.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/asa/7cd351dc3d17.wav"
  },
  {
   "id": "99f7b795e89b",
@@ -97,6 +174,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/asa/531244df7403.wav"
+ },
+ {
+  "id": "cd19ac6125f3",
+  "voice": "asa",
+  "text": "I planted a row of the old barley. From home. Only six seeds were left.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/asa/cd19ac6125f3.wav"
  },
  {
   "id": "73c326f41797",
@@ -132,15 +220,37 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/asa/ba95f43a46e8.wav"
  },
  {
-  "id": "8eae39b913cd",
+  "id": "14b6072bbff7",
   "voice": "asa",
-  "text": "Water by the beds. The barley drinks, and I don't carry it as far.",
+  "text": "The short way is round. Round the beds.",
   "engine": "acted",
   "mood": "Neutral",
   "effects": {
    "pause": 0.4
   },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/asa/8eae39b913cd.wav"
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/asa/14b6072bbff7.wav"
+ },
+ {
+  "id": "df4386427e87",
+  "voice": "asa",
+  "text": "We'll eat it together. My mother would have liked you.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/asa/df4386427e87.wav"
+ },
+ {
+  "id": "41442971a9b5",
+  "voice": "asa",
+  "text": "Your boots were in my beds again. The flax won't stand now.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/asa/41442971a9b5.wav"
  },
  {
   "id": "feb2e590d94e",
@@ -400,6 +510,28 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/cef0a0574320.wav"
  },
  {
+  "id": "ca7642649ac7",
+  "voice": "bjarne",
+  "text": "Smoke's going straight up. Fair day, then.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/ca7642649ac7.wav"
+ },
+ {
+  "id": "d5effd4b4256",
+  "voice": "bjarne",
+  "text": "Someone saw Ingrid out there, walking in circles. Walking. Do you understand? Go and look.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/d5effd4b4256.wav"
+ },
+ {
   "id": "8e380ffa97a7",
   "voice": "bjarne",
   "text": "Where's the anvil? No, don't tell me. I'll find it.",
@@ -422,6 +554,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/28b3e35db35c.wav"
  },
  {
+  "id": "794c8a691765",
+  "voice": "bjarne",
+  "text": "A smith's bones like a warm house. The forge is warm enough by day.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/794c8a691765.wav"
+ },
+ {
   "id": "2036e6375a75",
   "voice": "bjarne",
   "text": "You took your time. Mind the hammer.",
@@ -442,6 +585,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/ecfb5a5d49a3.wav"
+ },
+ {
+  "id": "fdfafd146519",
+  "voice": "bjarne",
+  "text": "My grandfather cut stone before he ever worked iron. The boundary stones came out of a quarry in Ravenwood, he said, north of here, and the masons cut more than names into them. They left one half done. Take two ingots of copper for wedges, and finish it.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/fdfafd146519.wav"
  },
  {
   "id": "f61877092b58",
@@ -477,6 +631,28 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/d35c809ee389.wav"
  },
  {
+  "id": "778130c87a94",
+  "voice": "bjarne",
+  "text": "Warm through, for once. My bones thank you before I do.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/778130c87a94.wav"
+ },
+ {
+  "id": "75f8549dd10e",
+  "voice": "bjarne",
+  "text": "Ravenwood again. I'll go up of an evening and cut what they started. Iron can wait an hour.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/75f8549dd10e.wav"
+ },
+ {
   "id": "c2ed830ae672",
   "voice": "bjarne",
   "text": "A Smithy, and the Smith's work. Then bring me something worn and see what half the cost looks like.",
@@ -497,6 +673,28 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/3ad7d2f68436.wav"
+ },
+ {
+  "id": "27c31588e933",
+  "voice": "bjarne",
+  "text": "Light Ravenwood's stone. It stands by the path through the wood.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/27c31588e933.wav"
+ },
+ {
+  "id": "c8f567581e80",
+  "voice": "bjarne",
+  "text": "The Old Quarry, north. Two copper ingots for the wedges, and the stone they never finished.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/c8f567581e80.wav"
  },
  {
   "id": "e5ff6efd0141",
@@ -536,6 +734,17 @@
   }
  },
  {
+  "id": "744b610a8d6f",
+  "voice": "bjarne",
+  "text": "Iron is best worked at dawn. Always has been.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/744b610a8d6f.wav"
+ },
+ {
   "id": "e18d5429f84b",
   "voice": "bjarne",
   "text": "It is now. I'm the one with the hammer.",
@@ -545,6 +754,28 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/e18d5429f84b.wav"
+ },
+ {
+  "id": "c2b8e4e43e86",
+  "voice": "bjarne",
+  "text": "It is soft. That's why it needs good nails.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/c2b8e4e43e86.wav"
+ },
+ {
+  "id": "f4032754b41d",
+  "voice": "bjarne",
+  "text": "My iron cracks because it's cold. Not because of your scratching.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/f4032754b41d.wav"
  },
  {
   "id": "845402b4fd82",
@@ -558,15 +789,37 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/845402b4fd82.wav"
  },
  {
-  "id": "778130c87a94",
+  "id": "d0ceab442098",
   "voice": "bjarne",
-  "text": "Warm through, for once. My bones thank you before I do.",
+  "text": "Then cut slowly, old man.",
   "engine": "acted",
   "mood": "Neutral",
   "effects": {
    "pause": 0.4
   },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/778130c87a94.wav"
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/d0ceab442098.wav"
+ },
+ {
+  "id": "872650f11493",
+  "voice": "bjarne",
+  "text": "Then sleep further from the forge.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/872650f11493.wav"
+ },
+ {
+  "id": "c2b201f562db",
+  "voice": "bjarne",
+  "text": "You've been at my anvil with chalk again.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/c2b201f562db.wav"
  },
  {
   "id": "29785ea6db14",
@@ -1102,6 +1355,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/642add613889.wav"
  },
  {
+  "id": "e5cba270c717",
+  "voice": "eirik",
+  "text": "A lit way home. I've seen what waits in the dark.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/e5cba270c717.wav"
+ },
+ {
   "id": "026f1f260873",
   "voice": "eirik",
   "text": "Don't look at me like that. I was resting. ...Thank you.",
@@ -1181,6 +1445,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/bce3accf463e.wav"
  },
  {
+  "id": "1caf39fba96b",
+  "voice": "eirik",
+  "text": "A watch that leaves its post has a reason. The old tower stands on the edge of the Wolfwood, south-west past the fen. Find out what theirs was.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/1caf39fba96b.wav"
+ },
+ {
   "id": "c8b74fbd9dcb",
   "voice": "eirik",
   "text": "I kept watch for the expedition until there was nothing left to watch. Let me do it here. A post with a view of the old path, and the ward holds longer when it breaks.",
@@ -1225,6 +1500,28 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/0be8f8a05d89.wav"
  },
  {
+  "id": "ca8cb734373f",
+  "voice": "eirik",
+  "text": "A lit way home. I walk it slower now, and that's a good thing.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/ca8cb734373f.wav"
+ },
+ {
+  "id": "0d52b6e42cc3",
+  "voice": "eirik",
+  "text": "The Old Grey. My grandfather would have stood a round for whoever did it. I'll keep the fire at the tower.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/0d52b6e42cc3.wav"
+ },
+ {
   "id": "5d96dc43928f",
   "voice": "eirik",
   "text": "A camp half under the snow in Troll Valley. A red thread. Bring it to the portal.",
@@ -1247,6 +1544,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/148dad1a35cc.wav"
  },
  {
+  "id": "d58af43b01c7",
+  "voice": "eirik",
+  "text": "Light the Wolfwood's stone. Then I keep the watch out there.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/d58af43b01c7.wav"
+ },
+ {
   "id": "339b9b8adc63",
   "voice": "eirik",
   "text": "The Brukam's tusk, and the Watch Post at Tier III to hang it on. Then we hold the next breach.",
@@ -1256,6 +1564,28 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/339b9b8adc63.wav"
+ },
+ {
+  "id": "646435f8d228",
+  "voice": "eirik",
+  "text": "The den is north-east of the tower, back toward home. Bring the old one down. Come ready.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/646435f8d228.wav"
+ },
+ {
+  "id": "a4c3381bb37d",
+  "voice": "eirik",
+  "text": "The Ruined Watchtower, south-west. Read what they left by the door.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/a4c3381bb37d.wav"
  },
  {
   "id": "2e4237600687",
@@ -1313,6 +1643,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/02b4edd8e62a.wav"
  },
  {
+  "id": "cd9ea77ddd58",
+  "voice": "eirik",
+  "text": "It's a wall. It'll be leaned on worse than that.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/cd9ea77ddd58.wav"
+ },
+ {
   "id": "420a6dec547e",
   "voice": "eirik",
   "text": "Never alone. That's the whole point of a wall.",
@@ -1322,6 +1663,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/420a6dec547e.wav"
+ },
+ {
+  "id": "2c7cfd47d886",
+  "voice": "eirik",
+  "text": "Next time I'll let it eat the flax.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/2c7cfd47d886.wav"
  },
  {
   "id": "9570f4b877e6",
@@ -1335,6 +1687,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/9570f4b877e6.wav"
  },
  {
+  "id": "66978c3b73ef",
+  "voice": "eirik",
+  "text": "Then I'll go back for anyone. Tell them that.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/66978c3b73ef.wav"
+ },
+ {
   "id": "9ce633f01a78",
   "voice": "eirik",
   "text": "Then I'll stand at the end of it tonight.",
@@ -1344,6 +1707,39 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/9ce633f01a78.wav"
+ },
+ {
+  "id": "dc8ea3c78d2e",
+  "voice": "eirik",
+  "text": "There was something by the fence at night. I went the short way.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/dc8ea3c78d2e.wav"
+ },
+ {
+  "id": "3ab5533839b2",
+  "voice": "eirik",
+  "text": "Walls don't stop what's coming. People at walls do.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/3ab5533839b2.wav"
+ },
+ {
+  "id": "e2052de6b079",
+  "voice": "eirik",
+  "text": "You were busy holding the rest of us together.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/e2052de6b079.wav"
  },
  {
   "id": "2cfa0e55e972",
@@ -1615,17 +2011,6 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/35cf24431724.wav"
  },
  {
-  "id": "ca8cb734373f",
-  "voice": "eirik",
-  "text": "A lit way home. I walk it slower now, and that's a good thing.",
-  "engine": "acted",
-  "mood": "Neutral",
-  "effects": {
-   "pause": 0.4
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/ca8cb734373f.wav"
- },
- {
   "id": "29cb4d135ccb",
   "voice": "gunnar",
   "text": "Fire's lit. Come and sit, if you've a moment.",
@@ -1635,6 +2020,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/gunnar/29cb4d135ccb.wav"
+ },
+ {
+  "id": "6f5fa6173a95",
+  "voice": "gunnar",
+  "text": "Too many fires in this place. A man can't hear the woods.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/gunnar/6f5fa6173a95.wav"
  },
  {
   "id": "4fce6c3e4d95",
@@ -1657,6 +2053,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/gunnar/baff5d14427f.wav"
+ },
+ {
+  "id": "2e149edd21fb",
+  "voice": "gunnar",
+  "text": "Not far to the lodge. Meat won't cure itself.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/gunnar/2e149edd21fb.wav"
  },
  {
   "id": "4e8a945d6f2f",
@@ -1712,6 +2119,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/gunnar/c39bfce59519.wav"
+ },
+ {
+  "id": "a4633f9f4ec9",
+  "voice": "gunnar",
+  "text": "The lodge is close. The meat will thank you, and so do I.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/gunnar/a4633f9f4ec9.wav"
  },
  {
   "id": "1e35a8794408",
@@ -1791,6 +2209,50 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/gunnar/901fcd1e5037.wav"
  },
  {
+  "id": "e6dc7f3bbf6d",
+  "voice": "gunnar",
+  "text": "I always go alone. That's why I come back.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/gunnar/e6dc7f3bbf6d.wav"
+ },
+ {
+  "id": "bca14ef0b77a",
+  "voice": "gunnar",
+  "text": "I had a roof over my head for twenty years. The trees.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/gunnar/bca14ef0b77a.wav"
+ },
+ {
+  "id": "bdf8fe99041e",
+  "voice": "gunnar",
+  "text": "Nobody taught me. Everything that didn't learn it is dead.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/gunnar/bdf8fe99041e.wav"
+ },
+ {
+  "id": "035464731c06",
+  "voice": "gunnar",
+  "text": "One more set is a crowd. Fine. Tonight.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/gunnar/035464731c06.wav"
+ },
+ {
   "id": "d4a7ddbdb8db",
   "voice": "gunnar",
   "text": "Something walked past the lodge last night. Big, and quiet.",
@@ -1800,6 +2262,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/gunnar/d4a7ddbdb8db.wav"
+ },
+ {
+  "id": "04d88ab0be9f",
+  "voice": "gunnar",
+  "text": "You felled the old pine by the east path. The deer used it.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/gunnar/04d88ab0be9f.wav"
  },
  {
   "id": "9a7fdfe1d37d",
@@ -1813,15 +2286,15 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/gunnar/9a7fdfe1d37d.wav"
  },
  {
-  "id": "a4633f9f4ec9",
+  "id": "a954cd40cee8",
   "voice": "gunnar",
-  "text": "The lodge is close. The meat will thank you, and so do I.",
+  "text": "Your rule. The woods have their own.",
   "engine": "acted",
   "mood": "Neutral",
   "effects": {
    "pause": 0.4
   },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/gunnar/a4633f9f4ec9.wav"
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/gunnar/a954cd40cee8.wav"
  },
  {
   "id": "1d76bba37159",
@@ -1857,6 +2330,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/hild/668e374da7f3.wav"
  },
  {
+  "id": "f3b6032b3bc6",
+  "voice": "hild",
+  "text": "Close to the stone. Every walk is a block not cut.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/hild/f3b6032b3bc6.wav"
+ },
+ {
   "id": "42fc5176f1e2",
   "voice": "hild",
   "text": "Mind the coping. It's the only level thing for a mile.",
@@ -1888,6 +2372,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/hild/be3d3e6e2fe0.wav"
+ },
+ {
+  "id": "a497e41dc9df",
+  "voice": "hild",
+  "text": "The stone's close. That's a block a day I'd have spent walking.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/hild/a497e41dc9df.wav"
  },
  {
   "id": "14a17cbe8445",
@@ -1923,6 +2418,28 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/hild/32305c3f0df1.wav"
  },
  {
+  "id": "a3ecaa1ffced",
+  "voice": "hild",
+  "text": "By trolls. Not by the Haven's own warden.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/hild/a3ecaa1ffced.wav"
+ },
+ {
+  "id": "5ffb1d38ace6",
+  "voice": "hild",
+  "text": "I've been watching how you set a beam. You were right about the snow.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/hild/5ffb1d38ace6.wav"
+ },
+ {
   "id": "900317dd4f1e",
   "voice": "hild",
   "text": "My wall is the only straight thing in this valley. Your roof leans.",
@@ -1932,6 +2449,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/hild/900317dd4f1e.wav"
+ },
+ {
+  "id": "32ac40bf99f9",
+  "voice": "hild",
+  "text": "Once. That was the once.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/hild/32ac40bf99f9.wav"
  },
  {
   "id": "4481b2eb03b0",
@@ -1967,15 +2495,15 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/hild/a7ca4bc1125f.wav"
  },
  {
-  "id": "a497e41dc9df",
+  "id": "8618ba0d90a6",
   "voice": "hild",
-  "text": "The stone's close. That's a block a day I'd have spent walking.",
+  "text": "You leaned your shield on my new wall. It's not dry.",
   "engine": "acted",
   "mood": "Neutral",
   "effects": {
    "pause": 0.4
   },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/hild/a497e41dc9df.wav"
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/hild/8618ba0d90a6.wav"
  },
  {
   "id": "413107a4ebca",
@@ -2334,6 +2862,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/a746957e8f6d.wav"
  },
  {
+  "id": "c529a2921fc1",
+  "voice": "ingrid",
+  "text": "Clean water close by, for the work and for washing it off.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/c529a2921fc1.wav"
+ },
+ {
   "id": "74d04f438ff6",
   "voice": "ingrid",
   "text": "That's all of it. My grandmother would be appalled, and proud. Keep bringing me the curse; I'll keep it clean.",
@@ -2393,6 +2932,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/c8eac53c1f13.wav"
  },
  {
+  "id": "2b915da75072",
+  "voice": "ingrid",
+  "text": "Somebody here knew what grows by alders, and what it is good for. There's a spring house in Alder Mere, west, gone dry. Clear it, and I'll have herbs the raids never bring me.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/2b915da75072.wav"
+ },
+ {
   "id": "b1b67024b543",
   "voice": "ingrid",
   "text": "The altar cleans. Now something that heals. Build me a cauldron, and I'll brew you draughts that close a wound on the road. Make three and keep them close.",
@@ -2413,6 +2963,39 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/d0bb136e5fd0.wav"
+ },
+ {
+  "id": "3766d6677420",
+  "voice": "ingrid",
+  "text": "Water a few steps off. I can wash the work off before supper now.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/3766d6677420.wav"
+ },
+ {
+  "id": "efd9ed07f2e8",
+  "voice": "ingrid",
+  "text": "Water in the basin again. Their herbs remember where they were planted.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/efd9ed07f2e8.wav"
+ },
+ {
+  "id": "401106460c5d",
+  "voice": "ingrid",
+  "text": "Alder Mere, west of the meadows, above the water. The spring is choked with silt and stones.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/401106460c5d.wav"
  },
  {
   "id": "d4b3537adc40",
@@ -2446,6 +3029,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/2b126d5e2483.wav"
+ },
+ {
+  "id": "87aa3d91bf2f",
+  "voice": "ingrid",
+  "text": "Light Alder Mere's stone. I'll keep the beds.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/87aa3d91bf2f.wav"
  },
  {
   "id": "1d52ffe512e2",
@@ -2485,6 +3079,17 @@
   }
  },
  {
+  "id": "ce4782d82895",
+  "voice": "ingrid",
+  "text": "I borrowed it for an hour. The draught needed a wide pot.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/ce4782d82895.wav"
+ },
+ {
   "id": "39d6e88576ea",
   "voice": "ingrid",
   "text": "It hums the way a kettle does before it sings. Or cracks.",
@@ -2494,6 +3099,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/39d6e88576ea.wav"
+ },
+ {
+  "id": "159ab2240a32",
+  "voice": "ingrid",
+  "text": "Mine is cracked. Would you rather I let them bleed?",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/159ab2240a32.wav"
  },
  {
   "id": "5208a983ad7b",
@@ -2507,15 +3123,26 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/5208a983ad7b.wav"
  },
  {
-  "id": "3766d6677420",
+  "id": "8da637d69805",
   "voice": "ingrid",
-  "text": "Water a few steps off. I can wash the work off before supper now.",
+  "text": "Then we argue. Together, at the altar, tomorrow.",
   "engine": "acted",
   "mood": "Neutral",
   "effects": {
    "pause": 0.4
   },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/3766d6677420.wav"
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/8da637d69805.wav"
+ },
+ {
+  "id": "4f416042f772",
+  "voice": "ingrid",
+  "text": "You read the stones better than I ever did. Tell me what they say about the curse.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/4f416042f772.wav"
  },
  {
   "id": "1fbcff1954ea",
@@ -2786,6 +3413,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/6dab6365b0fe.wav"
  },
  {
+  "id": "bb9473d7018f",
+  "voice": "liv",
+  "text": "Mist's thick in the hollows today. Mind your step.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/bb9473d7018f.wav"
+ },
+ {
   "id": "c31f49e71de1",
   "voice": "liv",
   "text": "Your ward is a promise too. Did anyone tell you?",
@@ -2808,6 +3446,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/68c7bc7eddb7.wav"
  },
  {
+  "id": "11cd160aea0e",
+  "voice": "liv",
+  "text": "Somewhere to sit and read the stones.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/11cd160aea0e.wav"
+ },
+ {
   "id": "1541b0517f14",
   "voice": "liv",
   "text": "The stones broke along a line. A line! Do you understand what that means?",
@@ -2821,6 +3470,17 @@
    "surprised": 0.35,
    "happy": 0.15
   }
+ },
+ {
+  "id": "b30e7f354442",
+  "voice": "liv",
+  "text": "Every rune you bring home is about the pact, and not one says what it was. The standing stones in Eastwood would. Whoever first made it, the Haven swore to it there. They read only by starlight, and cold stone wants warming: take a Hearth Ember.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/b30e7f354442.wav"
  },
  {
   "id": "7f3a2f9c1d32",
@@ -2845,6 +3505,28 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/09ca8b3cf128.wav"
  },
  {
+  "id": "02c8510434b1",
+  "voice": "liv",
+  "text": "Somewhere to sit. The stones read better when my feet are still.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/02c8510434b1.wav"
+ },
+ {
+  "id": "c70a353ce3f2",
+  "voice": "liv",
+  "text": "Keep the fire, and the wood keeps faith. I'll cut a rune at the stones now and then. They'll know what it's for.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/c70a353ce3f2.wav"
+ },
+ {
   "id": "7a017c9b3722",
   "voice": "liv",
   "text": "Ask me about enchanting, then carve a mark at the Purification Altar.",
@@ -2867,6 +3549,28 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/44d8f196bd85.wav"
  },
  {
+  "id": "c1df16ec2048",
+  "voice": "liv",
+  "text": "Light Eastwood's stone. I want to read them myself, of an evening.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/c1df16ec2048.wav"
+ },
+ {
+  "id": "f3a7683230f0",
+  "voice": "liv",
+  "text": "North-east, in Eastwood. After dark, with a Hearth Ember.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/f3a7683230f0.wav"
+ },
+ {
   "id": "3787acaeb6a6",
   "voice": "liv",
   "text": "The stones broke along a line, straight as a chalk mark. Stones don't break straight. Somebody drew that line, and I want to know who.",
@@ -2882,6 +3586,17 @@
   }
  },
  {
+  "id": "c70b2cd685dc",
+  "voice": "liv",
+  "text": "Bring the old book. And don't hide the last page this time.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/c70b2cd685dc.wav"
+ },
+ {
   "id": "bc57e68db8a6",
   "voice": "liv",
   "text": "That isn't comforting.",
@@ -2891,6 +3606,28 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/bc57e68db8a6.wav"
+ },
+ {
+  "id": "1928ab74bd05",
+  "voice": "liv",
+  "text": "That it remembers. Like us. That it can be argued with.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/1928ab74bd05.wav"
+ },
+ {
+  "id": "c18854984447",
+  "voice": "liv",
+  "text": "The marks on it were wrong. Your iron cracks because of them.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/c18854984447.wav"
  },
  {
   "id": "cfbb07bf4e20",
@@ -2904,15 +3641,15 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/cfbb07bf4e20.wav"
  },
  {
-  "id": "02c8510434b1",
+  "id": "3b3fa4b65e57",
   "voice": "liv",
-  "text": "Somewhere to sit. The stones read better when my feet are still.",
+  "text": "Then explain the three blades that broke on the same mark.",
   "engine": "acted",
   "mood": "Neutral",
   "effects": {
    "pause": 0.4
   },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/02c8510434b1.wav"
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/3b3fa4b65e57.wav"
  },
  {
   "id": "2594ae66254b",
@@ -3380,6 +4117,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/bc1cd1f6f652.wav"
  },
  {
+  "id": "157aa6e09a6e",
+  "voice": "runa",
+  "text": "A light on the path. I come home late.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/157aa6e09a6e.wav"
+ },
+ {
   "id": "4be15bcea6e9",
   "voice": "runa",
   "text": "I counted our steps to the exit. I'd rather not count that close again.",
@@ -3476,6 +4224,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/a4c4e00dd602.wav"
  },
  {
+  "id": "1694012cc39f",
+  "voice": "runa",
+  "text": "I walked those cairns once for a man in grey, counting stones. Now I want each to have one more from home, or the way forgets itself. The Lookout Cairn, then the Raven Cairn.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/1694012cc39f.wav"
+ },
+ {
   "id": "216857293aed",
   "voice": "runa",
   "text": "Something small takes from the camps and is gone before you turn. A tusse. Track one, and catch it before it slips away.",
@@ -3485,6 +4244,28 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/216857293aed.wav"
+ },
+ {
+  "id": "af8e98033bab",
+  "voice": "runa",
+  "text": "Light on my path. I came home late and saw every step of it.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/af8e98033bab.wav"
+ },
+ {
+  "id": "b942ddfd66e0",
+  "voice": "runa",
+  "text": "The old ways are open. Touch any lit stone, and it knows the way to the others.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/b942ddfd66e0.wav"
  },
  {
   "id": "cca98f02b6eb",
@@ -3498,6 +4279,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/cca98f02b6eb.wav"
  },
  {
+  "id": "d02a5cd40342",
+  "voice": "runa",
+  "text": "Light Westwood's stone, and the ways run between the lit stones again.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/d02a5cd40342.wav"
+ },
+ {
   "id": "fca9cd112dcd",
   "voice": "runa",
   "text": "One tusse. They run the moment they see you.",
@@ -3507,6 +4299,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/fca9cd112dcd.wav"
+ },
+ {
+  "id": "88833bfa3a65",
+  "voice": "runa",
+  "text": "West, on the knolls. A stone on each cairn.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/88833bfa3a65.wav"
  },
  {
   "id": "003935ca6989",
@@ -3553,6 +4356,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/a6ee7fb39e1f.wav"
  },
  {
+  "id": "d58d00daa3d9",
+  "voice": "runa",
+  "text": "I come home at dawn. I sleep at dawn.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/d58d00daa3d9.wav"
+ },
+ {
   "id": "575cc9b30e95",
   "voice": "runa",
   "text": "I saw where it stopped to rest. Twice.",
@@ -3575,6 +4389,28 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/0f2deb265a41.wav"
  },
  {
+  "id": "5924e7e3029d",
+  "voice": "runa",
+  "text": "The hammering starts before light. Every day.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/5924e7e3029d.wav"
+ },
+ {
+  "id": "a6e7d2c9c82e",
+  "voice": "runa",
+  "text": "Then walk with me tonight. Two sets of eyes.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/a6e7d2c9c82e.wav"
+ },
+ {
   "id": "dc6d581cdf11",
   "voice": "runa",
   "text": "There's a path past the north stones I don't like.",
@@ -3584,6 +4420,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/dc6d581cdf11.wav"
+ },
+ {
+  "id": "8a2b4c30ea8d",
+  "voice": "runa",
+  "text": "You walk like the woods taught you. Quiet on the outside of the foot.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/8a2b4c30ea8d.wav"
  },
  {
   "id": "54116c754e87",
@@ -3682,18 +4529,6 @@
   }
  },
  {
-  "id": "6220934ca767",
-  "voice": "runa",
-  "text": "Boar, running flat out, and not from us. Off the road!",
-  "engine": "acted",
-  "mood": "Yelling",
-  "effects": {
-   "gain": 3.0,
-   "pause": 0.4
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/6220934ca767.wav"
- },
- {
   "id": "03b14bc0c556",
   "voice": "runa",
   "text": "Hold up. That's Byarna's handcart, tipped off the road. Have a look; I'll watch the trees.",
@@ -3703,6 +4538,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/03b14bc0c556.wav"
+ },
+ {
+  "id": "bca8090f566c",
+  "voice": "runa",
+  "text": "Horses, running flat out, and not from us. Off the road!",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/bca8090f566c.wav"
  },
  {
   "id": "8a27c131194d",
@@ -3817,17 +4663,6 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/416711decc01.wav"
- },
- {
-  "id": "af8e98033bab",
-  "voice": "runa",
-  "text": "Light on my path. I came home late and saw every step of it.",
-  "engine": "acted",
-  "mood": "Neutral",
-  "effects": {
-   "pause": 0.4
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/af8e98033bab.wav"
  },
  {
   "id": "534359605b4e",
@@ -4190,6 +5025,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/391fef0a2269.wav"
  },
  {
+  "id": "afa0d2294e77",
+  "voice": "sigrid",
+  "text": "Count heads. Then count them again.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/afa0d2294e77.wav"
+ },
+ {
   "id": "8226c9c84657",
   "voice": "sigrid",
   "text": "Heard the deer down by the trees at first light.",
@@ -4232,6 +5078,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/db123fc78aab.wav"
+ },
+ {
+  "id": "2bea6e1035d8",
+  "voice": "sigrid",
+  "text": "Then don't expect anyone to come looking.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/2bea6e1035d8.wav"
  },
  {
   "id": "9ba84fd6bc3d",
@@ -4438,6 +5295,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/c83427a9275f.wav"
  },
  {
+  "id": "061da90fd740",
+  "voice": "sigrid",
+  "text": "Light on the lanes. People should see their way home.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/061da90fd740.wav"
+ },
+ {
   "id": "7ee8dc1bcfc1",
   "voice": "sigrid",
   "text": "A retreat is only a defeat if you learn nothing. What did we learn?",
@@ -4531,6 +5399,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/8d7201ed9080.wav"
  },
  {
+  "id": "49cc61e444ff",
+  "voice": "sigrid",
+  "text": "I led us north because I'd read of a road out of the Haven that the old ones took. It began at the Farewell Stones in Greyfell, I think, and whoever left by it cut their names there. Read them. Then cut ours under them.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/49cc61e444ff.wav"
+ },
+ {
   "id": "87ca890dbd1b",
   "voice": "sigrid",
   "text": "Seven went in. Ask them what they remember of the woods, each of them. I need to know what I'm not being told.",
@@ -4542,6 +5421,28 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/87ca890dbd1b.wav"
  },
  {
+  "id": "fc0bff85ab99",
+  "voice": "sigrid",
+  "text": "Light on the lanes. People find their way home now. So do I.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/fc0bff85ab99.wav"
+ },
+ {
+  "id": "e19cbec4773d",
+  "voice": "sigrid",
+  "text": "Our names under theirs. Whoever comes after will know we went, and that we came back.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/e19cbec4773d.wav"
+ },
+ {
   "id": "bc9586fe2cfe",
   "voice": "sigrid",
   "text": "Ingrid, Byarna, Tor, Liv, Eirik and Runa. Ask each of them.",
@@ -4551,6 +5452,28 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/bc9586fe2cfe.wav"
+ },
+ {
+  "id": "08255571bd2f",
+  "voice": "sigrid",
+  "text": "Light Greyfell's stone. The road starts at home again.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/08255571bd2f.wav"
+ },
+ {
+  "id": "9717cbe4edf2",
+  "voice": "sigrid",
+  "text": "North-west, in Greyfell. Read their names, then cut ours under them.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/9717cbe4edf2.wav"
  },
  {
   "id": "a3666481082c",
@@ -4617,6 +5540,50 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/1340afcac7aa.wav"
+ },
+ {
+  "id": "72cc97e6c78b",
+  "voice": "sigrid",
+  "text": "I'm thanking you now.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/72cc97e6c78b.wav"
+ },
+ {
+  "id": "bf98b6955672",
+  "voice": "sigrid",
+  "text": "We go out together and come back together. That's the rule here.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/bf98b6955672.wav"
+ },
+ {
+  "id": "9f0ffb05de9c",
+  "voice": "sigrid",
+  "text": "When the stones broke, you went back for Liv. I never thanked you.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/9f0ffb05de9c.wav"
+ },
+ {
+  "id": "bc32e7ca5922",
+  "voice": "sigrid",
+  "text": "You went past the north stones alone again.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/bc32e7ca5922.wav"
  },
  {
   "id": "869a001ac1cc",
@@ -4953,17 +5920,6 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/9c66c89507e9.wav"
  },
  {
-  "id": "fc0bff85ab99",
-  "voice": "sigrid",
-  "text": "Light on the lanes. People find their way home now. So do I.",
-  "engine": "acted",
-  "mood": "Neutral",
-  "effects": {
-   "pause": 0.4
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/fc0bff85ab99.wav"
- },
- {
   "id": "1555250c2ce9",
   "voice": "man_in_grey",
   "text": "I opened a door like this once. I thought I could pull them through. The hunger came out instead.",
@@ -5104,6 +6060,18 @@
   "direction": "Calm"
  },
  {
+  "id": "02cd44fdbc0a",
+  "voice": "portal_g_mysterious",
+  "text": "Bring what my stones ask and lay it in me, then raise me. The deeper woods are waiting, and so are the ones lost in them.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/02cd44fdbc0a.wav",
+  "direction": "Calm"
+ },
+ {
   "id": "88f636b3e644",
   "voice": "portal_g_mysterious",
   "text": "Come and sit by me, little one. There is something I should have told you before you went to that hollow.",
@@ -5149,6 +6117,18 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/ce1a588e9f04.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "03ee5f3c4364",
+  "voice": "portal_g_mysterious",
+  "text": "Listen, little one. The guardian is old wood, and old wood fears one thing: fire. The trees out there weep a black sap when they fall. Boil it down around an ember from your hearth, and every blow you strike will burn.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/03ee5f3c4364.wav",
   "direction": "Calm"
  },
  {
@@ -5428,6 +6408,30 @@
   "direction": "Calm"
  },
  {
+  "id": "d347273db359",
+  "voice": "portal_g_mysterious",
+  "text": "There is one memory the forest kept back from me, little one: who let my hearth go cold. The high tarn has it, and shows it only at night.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/d347273db359.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "3c9a1f0067e1",
+  "voice": "portal_g_mysterious",
+  "text": "You came back to me torn, little one. I caught you, as I catch all of mine. But you met the dark with your mouth shut. The hird that built your hearths never did. Stand here and roar with me: let them be the ones who are afraid.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/3c9a1f0067e1.wav",
+  "direction": "Calm"
+ },
+ {
   "id": "d0af44ce40a0",
   "voice": "portal_g_mysterious",
   "text": "A hundred winters I kept this clearing alone. I had forgotten how loud a home is. Do not stop.",
@@ -5548,6 +6552,18 @@
   "direction": "Calm"
  },
  {
+  "id": "960305955248",
+  "voice": "portal_g_mysterious",
+  "text": "Feel my stones: loose, where the roots held them for so long. I am a door that opens only a little way, into the near woods, where the mist is thin and young.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/960305955248.wav",
+  "direction": "Calm"
+ },
+ {
   "id": "308885cfe7e0",
   "voice": "portal_g_mysterious",
   "text": "Find one of the places a stone remembers, so that it knows you, then lay your hand on it. The first will answer to my fire alone. The rest want a Pact Rune, the pact's own mark, scattered through the woods since it broke.",
@@ -5557,6 +6573,18 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/308885cfe7e0.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "8d887773b37b",
+  "voice": "portal_g_mysterious",
+  "text": "Further in, the mist is older. What lives there is stronger and hungrier, and so is what it keeps: better ore, older wood, and people who have waited longer than the ones you have found.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/8d887773b37b.wav",
   "direction": "Calm"
  },
  {
@@ -5764,6 +6792,18 @@
   "direction": "Calm"
  },
  {
+  "id": "8d8e2d7bd61a",
+  "voice": "portal_g_mysterious",
+  "text": "Little one. You have gone through me and come home, again and again. Each time you go, I hold the way open behind you. Each time, it costs me.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/8d8e2d7bd61a.wav",
+  "direction": "Calm"
+ },
+ {
   "id": "c0a6b1358ea0",
   "voice": "portal_g_mysterious",
   "text": "Look, now that there is light to see by. Three of my stones, choked in roots. And the roots are moving, little one. Slowly. Towards me.",
@@ -5785,6 +6825,18 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/c600954f71c6.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "351cc93756d5",
+  "voice": "portal_g_mysterious",
+  "text": "Once I am raised, the choice is yours each time you set out: the near woods, or the deeper ones. Go deeper when you are ready for what lives there, not before.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/351cc93756d5.wav",
   "direction": "Calm"
  },
  {
@@ -5833,6 +6885,30 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/b6a6632ac669.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "e9c2f9d61e37",
+  "voice": "portal_g_mysterious",
+  "text": "Steady my stones. Bring what they ask and lay it in me, here, and raise me. Each time I am raised, a deeper tier of the woods opens, and I hold the way home open longer while you are out there.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/e9c2f9d61e37.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "d2cd3b667a71",
+  "voice": "portal_g_mysterious",
+  "text": "Strength, which you will give me. And this: what is strong draws the hungry. The deeper I open, the more the forest will feel this fire. Keep your walls in good repair.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/d2cd3b667a71.wav",
   "direction": "Calm"
  },
  {
@@ -6352,6 +7428,18 @@
   "direction": "Calm"
  },
  {
+  "id": "c65dc509609a",
+  "voice": "portal_g_mysterious",
+  "text": "I can open the deeper way. But not as I am.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/c65dc509609a.wav",
+  "direction": "Calm"
+ },
+ {
   "id": "f3110aac1411",
   "voice": "portal_g_mysterious",
   "text": "That is what you killed. I am sorry. Someone had to.",
@@ -6645,6 +7733,28 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/97d4e5dedbe4.wav"
  },
  {
+  "id": "0dfb7cf2aef3",
+  "voice": "tor",
+  "text": "A good joint takes the time it takes.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/0dfb7cf2aef3.wav"
+ },
+ {
+  "id": "231f28cc8bb9",
+  "voice": "tor",
+  "text": "Best hour of the day, this. Nobody talking.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/231f28cc8bb9.wav"
+ },
+ {
   "id": "1e1f86ee91ad",
   "voice": "tor",
   "text": "Fire's lit. Come and sit, if you've a moment.",
@@ -6654,6 +7764,28 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/1e1f86ee91ad.wav"
+ },
+ {
+  "id": "f3a6edf06918",
+  "voice": "tor",
+  "text": "I keep looking for Tor at the fire.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/f3a6edf06918.wav"
+ },
+ {
+  "id": "599000671959",
+  "voice": "tor",
+  "text": "Up early? The portal hums louder before the sun.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/599000671959.wav"
  },
  {
   "id": "97287dc8882b",
@@ -6676,6 +7808,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/266b9cf5a88a.wav"
+ },
+ {
+  "id": "259cc3d8f1e1",
+  "voice": "tor",
+  "text": "A bench by the door, for the evening and my leg.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/259cc3d8f1e1.wav"
  },
  {
   "id": "3c10de8801a3",
@@ -6726,6 +7869,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/8c0448184ada.wav"
  },
  {
+  "id": "d385b42e6837",
+  "voice": "tor",
+  "text": "The trees round the fire won't grow back as fast as we cut them. There are old cuttings past where the portal takes you. Send two of us out with food for the road, and we'll bring back what we can carry.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/d385b42e6837.wav"
+ },
+ {
   "id": "6843c0b9675a",
   "voice": "tor",
   "text": "The ward keeps out the worst. Not all of it. Four lengths of palisade between the fire and the trees, and we sleep better.",
@@ -6735,6 +7889,39 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/6843c0b9675a.wav"
+ },
+ {
+  "id": "109a7b7777ef",
+  "voice": "tor",
+  "text": "There's a causeway sinking in the Drowning Fen, south, and good boards going to waste under it. Eight hardwood planks and it carries a cart again.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/109a7b7777ef.wav"
+ },
+ {
+  "id": "b2cc4064e667",
+  "voice": "tor",
+  "text": "A bench by the door. I'll sit there tonight and admire your work. And mine.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/b2cc4064e667.wav"
+ },
+ {
+  "id": "b72317d50837",
+  "voice": "tor",
+  "text": "Dry boards across the bog. Somebody will walk them who isn't running.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/b72317d50837.wav"
  },
  {
   "id": "e6cfe01e34cc",
@@ -6759,6 +7946,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/cee7554b6bb9.wav"
  },
  {
+  "id": "b5cdbbd8414a",
+  "voice": "tor",
+  "text": "Light the fen's stone. A road is only a road if it's remembered.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/b5cdbbd8414a.wav"
+ },
+ {
   "id": "59c35d1b6c2b",
   "voice": "tor",
   "text": "My lodge at Tier II, then the Wainwright's Yard, then a barrow from it.",
@@ -6768,6 +7966,28 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/59c35d1b6c2b.wav"
+ },
+ {
+  "id": "ef2e29ccadc8",
+  "voice": "tor",
+  "text": "South, in the fen. Eight hardwood planks.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/ef2e29ccadc8.wav"
+ },
+ {
+  "id": "088703c19d98",
+  "voice": "tor",
+  "text": "The Haven's Lands. Pick who goes and where; they come home on their own.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/088703c19d98.wav"
  },
  {
   "id": "219d7393afff",
@@ -6796,6 +8016,17 @@
   }
  },
  {
+  "id": "d64f367615e3",
+  "voice": "tor",
+  "text": "And look how warm that kept you.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/d64f367615e3.wav"
+ },
+ {
   "id": "797e659100d6",
   "voice": "tor",
   "text": "My roof leans on purpose. The snow slides off.",
@@ -6805,6 +8036,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/797e659100d6.wav"
+ },
+ {
+  "id": "34bb4c91dea4",
+  "voice": "tor",
+  "text": "Say that again. Slowly. I want to remember it.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/34bb4c91dea4.wav"
  },
  {
   "id": "0c5f12f9c65a",
@@ -6818,6 +8060,39 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/0c5f12f9c65a.wav"
  },
  {
+  "id": "9901456c7812",
+  "voice": "tor",
+  "text": "The Haven used it. For a roof over your head.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/9901456c7812.wav"
+ },
+ {
+  "id": "9568f89923a5",
+  "voice": "tor",
+  "text": "Then I'll build you something stone can't do. A boat.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/9568f89923a5.wav"
+ },
+ {
+  "id": "0e631611bc03",
+  "voice": "tor",
+  "text": "Thirty years I've cut wood. You're the first smith who didn't call it soft.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/0e631611bc03.wav"
+ },
+ {
   "id": "af670c90f47a",
   "voice": "tor",
   "text": "We both have hammers, Byarna.",
@@ -6827,6 +8102,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/af670c90f47a.wav"
+ },
+ {
+  "id": "7356677aa53d",
+  "voice": "tor",
+  "text": "You'll have my best oak for your hammer handles. Till I'm dead.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/7356677aa53d.wav"
  },
  {
   "id": "6415ebd315c5",
@@ -6840,15 +8126,15 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/6415ebd315c5.wav"
  },
  {
-  "id": "b2cc4064e667",
-  "voice": "tor",
-  "text": "A bench by the door. I'll sit there tonight and admire your work. And mine.",
+  "id": "ab7630fd0aca",
+  "voice": "yrsa",
+  "text": "Mist's thick in the hollows today. Mind your step.",
   "engine": "acted",
   "mood": "Neutral",
   "effects": {
    "pause": 0.4
   },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/b2cc4064e667.wav"
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/ab7630fd0aca.wav"
  },
  {
   "id": "4fb7976a0979",
@@ -6873,6 +8159,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/5283bcdeb24a.wav"
  },
  {
+  "id": "ed84eb31f1da",
+  "voice": "yrsa",
+  "text": "A warm hearth. A cook can't abide a cold house.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/ed84eb31f1da.wav"
+ },
+ {
   "id": "4fbeb1dbec14",
   "voice": "yrsa",
   "text": "Mind the pot. If you've come to eat, you'll carry.",
@@ -6882,6 +8179,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/4fbeb1dbec14.wav"
+ },
+ {
+  "id": "43199455a999",
+  "voice": "yrsa",
+  "text": "A cook is only as good as her fish, and the old fishers of Stillwater were the best the Haven had. Their rest is still on the shore, east. Bring me their nets, and three fish from that water.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/43199455a999.wav"
  },
  {
   "id": "afd3ec7405a9",
@@ -6906,6 +8214,28 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/2f1a20d3b4f7.wav"
  },
  {
+  "id": "9ee0d96b99f8",
+  "voice": "yrsa",
+  "text": "A warm hearth. Come by later: the first loaf from it is yours.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/9ee0d96b99f8.wav"
+ },
+ {
+  "id": "51d503090fbb",
+  "voice": "yrsa",
+  "text": "Smoke in the reeds again. I'll keep the racks full.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/51d503090fbb.wav"
+ },
+ {
   "id": "259c50caaa36",
   "voice": "yrsa",
   "text": "A Forager's Broth from the Kitchen. Eat it before the portal.",
@@ -6917,6 +8247,28 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/259c50caaa36.wav"
  },
  {
+  "id": "d04b40efbc88",
+  "voice": "yrsa",
+  "text": "Light Stillwater's stone, and the rest is ours.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/d04b40efbc88.wav"
+ },
+ {
+  "id": "51344db3061c",
+  "voice": "yrsa",
+  "text": "The Fisher's Rest, east, on the shore. Their nets, and three fish.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/51344db3061c.wav"
+ },
+ {
   "id": "a70ef1a860fb",
   "voice": "yrsa",
   "text": "The Kitchen. Byarna's Smithy has to stand first, for the pots.",
@@ -6926,6 +8278,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/a70ef1a860fb.wav"
+ },
+ {
+  "id": "3de5b7cd40bb",
+  "voice": "yrsa",
+  "text": "They lit a lantern for their dead at the Netmender's Rest, south of the other, so the dead could find the isle. Go after dark.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/3de5b7cd40bb.wav"
  },
  {
   "id": "d7e03bb9f000",
@@ -6961,6 +8324,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/da3219fe6ac4.wav"
  },
  {
+  "id": "2283e6b7bd85",
+  "voice": "yrsa",
+  "text": "Everyone's mother liked me. It was the stew.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/2283e6b7bd85.wav"
+ },
+ {
   "id": "b8b745005eff",
   "voice": "yrsa",
   "text": "I cooked for a jarl once. He never once complained about the boar.",
@@ -6970,6 +8344,28 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/b8b745005eff.wav"
+ },
+ {
+  "id": "fccf05163ee0",
+  "voice": "yrsa",
+  "text": "My pot is for food. Your swamp water goes in your own.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/fccf05163ee0.wav"
+ },
+ {
+  "id": "1e438f5f74ac",
+  "voice": "yrsa",
+  "text": "Something in my pot smelled of bog this morning.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/1e438f5f74ac.wav"
  },
  {
   "id": "fa4b6b1eb741",
@@ -6983,14 +8379,14 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/fa4b6b1eb741.wav"
  },
  {
-  "id": "9ee0d96b99f8",
+  "id": "9eaede9dc958",
   "voice": "yrsa",
-  "text": "A warm hearth. Come by later: the first loaf from it is yours.",
+  "text": "Then the first loaf from it is yours, and nobody else's.",
   "engine": "acted",
   "mood": "Neutral",
   "effects": {
    "pause": 0.4
   },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/9ee0d96b99f8.wav"
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/9eaede9dc958.wav"
  }
 ]
