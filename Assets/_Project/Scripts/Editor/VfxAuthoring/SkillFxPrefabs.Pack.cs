@@ -456,9 +456,14 @@ public static partial class SkillFxPrefabs
                 {
                     if (cue.prefab != null && (cue.prefab.name == ours || cue.prefab == pack))
                     {
+                        // As long as the pack's effect plays (ours were timed for our effects); set when the effect changes
+                        // only, so a time tuned by hand afterwards stays.
+                        if (cue.prefab != pack)
+                        {
+                            cue.seconds = length;
+                        }
+
                         cue.prefab = pack;
-                        // As long as the pack's effect plays (ours were timed for our effects).
-                        cue.seconds = length;
                         cue.count = Mathf.Min(cue.count, mostCopies);
                         if (place.HasValue)
                         {
@@ -543,10 +548,35 @@ public static partial class SkillFxPrefabs
             }
 
             ParticleSystem.MainModule main = system.main;
-            length = Mathf.Max(length, main.startDelay.constantMax + (main.loop ? 2f : EmitsFor(system)) + main.startLifetime.constantMax);
+            length = Mathf.Max(length, main.startDelay.constantMax + (main.loop ? 2f : EmitsFor(system)) + Longest(main.startLifetime));
         }
 
         return Mathf.Min(length, 6f);
+    }
+
+    // The longest a particle can live: a curve's constantMax is only its multiplier, its keys may reach past 1.
+    private static float Longest(ParticleSystem.MinMaxCurve life)
+    {
+        if (life.mode != ParticleSystemCurveMode.Curve && life.mode != ParticleSystemCurveMode.TwoCurves)
+        {
+            return life.constantMax;
+        }
+
+        float most = 0f;
+        foreach (AnimationCurve curve in new[] { life.curveMin, life.curveMax })
+        {
+            if (curve == null)
+            {
+                continue;
+            }
+
+            foreach (Keyframe key in curve.keys)
+            {
+                most = Mathf.Max(most, key.value);
+            }
+        }
+
+        return most * life.curveMultiplier;
     }
 
     // How long a system goes on making particles: its whole duration if it emits over time, else until its last burst.
@@ -562,6 +592,11 @@ public static partial class SkillFxPrefabs
         for (int i = 0; i < emission.burstCount; i++)
         {
             ParticleSystem.Burst burst = emission.GetBurst(i);
+            if (burst.cycleCount == 0)
+            {
+                return system.main.duration; // repeats until the duration is over
+            }
+
             last = Mathf.Max(last, burst.time + Mathf.Max(0, burst.cycleCount - 1) * burst.repeatInterval);
         }
 

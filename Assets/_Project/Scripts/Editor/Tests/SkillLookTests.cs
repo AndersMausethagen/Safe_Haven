@@ -197,6 +197,20 @@ public sealed class SkillLookTests
             Check(attack.name, attack.Look);
         }
 
+        // A status's look (kept while it lasts) and its burst are made by Instantiate and Destroy: one that handed itself to the pool
+        // would be destroyed half a second in.
+        foreach (string guid in AssetDatabase.FindAssets("t:StatusEffectDefinition"))
+        {
+            var status = AssetDatabase.LoadAssetAtPath<StatusEffectDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            foreach (GameObject look in new[] { status.Look, status.ConsumeLook })
+            {
+                if (look != null && look.GetComponentInChildren<PooledEffect>(true) != null)
+                {
+                    wrong.Add($"{status.name}: {look.name}");
+                }
+            }
+        }
+
         CollectionAssert.IsEmpty(wrong);
     }
 

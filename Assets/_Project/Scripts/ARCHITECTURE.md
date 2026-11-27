@@ -3325,6 +3325,11 @@ sample textures and flames are in `Art/Effects/VFX Graph/Additions` (Unity Compa
   glows damped, copies capped per cue; our own frost/fire/earth layers toned once (importer marker). The pack itself
   (`Assets/Game VFX Mega Pack(URP)`) is gitignored and kept in Plastic; its shaders were renamed `Eric/...` (they shadowed built-ins).
   `SkillFx` restarts a pooled effect's particle systems; `StatusBearerLook` stops a status's particles emitting and lets them fade.
+  Second group (same day): Combat Feel's hit and critical sparks (pooled copies with `PooledEffect`; the skills' sparks a separate
+  unpooled copy, `SkillLookTests.NoSkillOrArtCue_UsesAnEffectMadeForTheBlowsPool`), Phys Slash for skills and weapon arts (turned
+  flat inside a root of our own: `MakeFromPack`'s `turn`), gold and wind rune circles (Huldra's Blessing, Elf-Shot, Whirling Steel),
+  Poison and Heartrot looks. A swapped cue runs as long as the pack effect draws (`PlayLength`, bursts measured to the last one).
+  Weather stays ours. A circle's hold is capped at 1.6 s (`PlayerSkills.LongestHold`).
 - **Dressed so far** (`SkillFxPrefabs`, Safe Haven › Tools › Effects › Dress the First Skills; prefabs in `Art/Effects/Skills/Prefabs`):
   Frost Rune (frost rune circle, hand mist; spikes, shards and mist racing along a lance now 25° wide; chills, and
   `AttackDefinition.OnRepeatStatus` freezes what is already chilled: Frozen, 1.5 s rooted, 4 s before again), the Ash Lad's Ember (ember
