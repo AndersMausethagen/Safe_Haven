@@ -41,6 +41,50 @@ public sealed class PlaytestRunSummary
     public float?[] MilestoneMinutes;
 }
 
+/// <summary>How the abilities were used over a set of runs (PlaytestLog.SkillUse), for the Playtest Runs window's skill table.</summary>
+public sealed class PlaytestSkillUse
+{
+    public sealed class Skill
+    {
+        public string Id;
+        public int InLoadouts;
+        public int Casts;
+        public int Damage;
+    }
+
+    /// <summary>Raids begun (Loadout rows), fighting minutes, and skill damage in all.</summary>
+    public int Loadouts;
+    public int FightingMinutes;
+    public int Damage;
+    public readonly Dictionary<string, Skill> Skills = new Dictionary<string, Skill>();
+
+    public Skill Of(string id)
+    {
+        if (!Skills.TryGetValue(id, out Skill skill))
+        {
+            skill = new Skill { Id = id };
+            Skills[id] = skill;
+        }
+
+        return skill;
+    }
+
+    /// <summary>Share of raids that began with it on the bar (0 with none logged).</summary>
+    public float LoadoutShare(Skill skill) => Loadouts > 0 ? (float)skill.InLoadouts / Loadouts : 0f;
+    public float DamageShare(Skill skill) => Damage > 0 ? (float)skill.Damage / Damage : 0f;
+    public float CastsPerFightingMinute(Skill skill) => FightingMinutes > 0 ? (float)skill.Casts / FightingMinutes : 0f;
+
+    /// <summary>Why the skill is no real choice, or null (Docs/SkillChoiceResearch_2026-11-27.md 3.7, after Riot's thresholds): on over
+    /// 80% of bars or doing over 40% of skill damage it is a default; on under 5% of bars it has no reason to be picked.</summary>
+    public string Flag(Skill skill)
+    {
+        if (Loadouts >= 5 && LoadoutShare(skill) > 0.8f) return "on almost every bar";
+        if (Damage > 0 && DamageShare(skill) > 0.4f) return "most of the skill damage";
+        if (Loadouts >= 5 && LoadoutShare(skill) < 0.05f) return "hardly ever chosen";
+        return null;
+    }
+}
+
 /// <summary>
 /// The playtest log file: one CSV per run in Playtests next to the saves, readable in any spreadsheet. Writing is done
 /// by PlaytestLogger; reading and summarising by the Run Comparison window. Add columns only at the end.
@@ -189,6 +233,98 @@ public static class PlaytestLog
     public const string Trip = "Trip";
     /// <summary>The old ways or the journal's Go there taken (HavenTravel): subject "rode" or "on foot", amount the metres not walked.</summary>
     public const string Travel = "Travel";
+    /// <summary>The skill bar as a raid begins (Docs/SkillChoiceResearch_2026-11-27.md 3.7): subject the skill ids in slots 1-5 joined
+    /// by "|" ("-" for none), amount how many skills, detail the weapon in hand.</summary>
+    public const string Loadout = "Loadout";
+
+    /// <summary>A Loadout row's subject: slots 1-5's skill ids joined by "|", "-" for an empty one.</summary>
+    public static string LoadoutSubject(SkillLoadout loadout)
+    {
+        var ids = new string[SkillLoadout.SkillSlotCount];
+        for (int i = 0; i < ids.Length; i++)
+        {
+            SkillDefinition skill = loadout.Get(i);
+            ids[i] = skill != null ? skill.Id : "-";
+        }
+
+        return string.Join("|", ids);
+    }
+
+    /// <summary>How many of slots 1-5 hold a skill.</summary>
+    public static int SkillsIn(SkillLoadout loadout)
+    {
+        int count = 0;
+        for (int i = 0; i < SkillLoadout.SkillSlotCount; i++)
+        {
+            count += loadout.Get(i) != null ? 1 : 0;
+        }
+
+        return count;
+    }
+
+    /// <summary>
+    /// How each ability was used over runs (Docs/SkillChoiceResearch_2026-11-27.md 3.7): in how many raids' loadouts, how often cast
+    /// and how much damage it did, from the Loadout rows and the Combat rows (Skill.&lt;id&gt; casts, SkillDamage.&lt;id&gt;), with the
+    /// fighting minutes (played minutes with a Combat row). Runs with a Cheat row should be left out by the caller.
+    /// </summary>
+    public static PlaytestSkillUse SkillUse(IEnumerable<IReadOnlyList<PlaytestEntry>> runs)
+    {
+        var use = new PlaytestSkillUse();
+        foreach (IReadOnlyList<PlaytestEntry> entries in runs)
+        {
+            var minutes = new HashSet<int>();
+            foreach (PlaytestEntry entry in entries)
+            {
+                if (entry.Event == Loadout)
+                {
+                    use.Loadouts++;
+                    foreach (string id in (entry.Subject ?? "").Split('|'))
+                    {
+                        if (!string.IsNullOrEmpty(id) && id != "-")
+                        {
+                            use.Of(id).InLoadouts++;
+                        }
+                    }
+                }
+                else if (entry.Event == Combat && !string.IsNullOrEmpty(entry.Subject))
+                {
+                    minutes.Add(Mathf.FloorToInt(entry.PlayedSeconds / 60f - 0.001f));
+                    if (entry.Subject.StartsWith(CombatTally.SkillDamageOf, StringComparison.Ordinal))
+                    {
+                        int damage = Math.Max(0, entry.Amount);
+                        use.Of(entry.Subject.Substring(CombatTally.SkillDamageOf.Length)).Damage += damage;
+                        use.Damage += damage;
+                    }
+                    else if (entry.Subject.StartsWith(CombatTally.SkillOf, StringComparison.Ordinal) && !IsSkillTotal(entry.Subject))
+                    {
+                        use.Of(entry.Subject.Substring(CombatTally.SkillOf.Length)).Casts += Math.Max(0, entry.Amount);
+                    }
+                }
+            }
+
+            use.FightingMinutes += minutes.Count;
+        }
+
+        return use;
+    }
+
+    // The tally's own totals under "Skill.": casts in all, blows, damage, refusals.
+    private static bool IsSkillTotal(string subject) => subject == CombatTally.SkillCast || subject == CombatTally.SkillHit
+        || subject == CombatTally.SkillDamage || subject == CombatTally.SkillNoFocus;
+
+    /// <summary>True when the run was helped by cheats: its numbers aren't how the game plays.</summary>
+    public static bool Cheated(IReadOnlyList<PlaytestEntry> entries)
+    {
+        foreach (PlaytestEntry entry in entries)
+        {
+            if (entry.Event == Cheat)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     public static string Folder => Path.Combine(Application.persistentDataPath, "Playtests");
 

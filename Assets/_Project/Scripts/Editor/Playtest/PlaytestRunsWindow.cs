@@ -16,6 +16,9 @@ public sealed class PlaytestRunsWindow : EditorWindow
     private const float MilestoneWidth = 92f;
 
     private readonly List<PlaytestRunSummary> runs = new List<PlaytestRunSummary>();
+    // How the abilities were used over the runs without cheats (Docs/SkillChoiceResearch_2026-11-27.md 3.7).
+    private PlaytestSkillUse skillUse = new PlaytestSkillUse();
+    private int cheatedRuns;
     private Vector2 scroll;
     private string problem;
 
@@ -39,16 +42,78 @@ public sealed class PlaytestRunsWindow : EditorWindow
         IReadOnlyList<PlaytestMilestone> milestones = PlaytestSettings.Current.Milestones;
         var files = new List<string>(Directory.GetFiles(PlaytestLog.Folder, "*.csv"));
         files.Sort((a, b) => string.CompareOrdinal(b, a));
+        var clean = new List<IReadOnlyList<PlaytestEntry>>();
+        cheatedRuns = 0;
         foreach (string file in files)
         {
             try
             {
-                runs.Add(PlaytestLog.Summarise(Path.GetFileNameWithoutExtension(file), PlaytestLog.Read(file), milestones));
+                List<PlaytestEntry> entries = PlaytestLog.Read(file);
+                runs.Add(PlaytestLog.Summarise(Path.GetFileNameWithoutExtension(file), entries, milestones));
+                if (PlaytestLog.Cheated(entries))
+                {
+                    cheatedRuns++;
+                }
+                else
+                {
+                    clean.Add(entries);
+                }
             }
             catch (IOException exception)
             {
                 problem = exception.Message;
             }
+        }
+
+        skillUse = PlaytestLog.SkillUse(clean);
+        // Every ability has a row, so one never slotted shows as hardly ever chosen; the weapon art's entries are left out (slot 1 is
+        // theirs on every bar, and an art's casts are counted as swings, not skills).
+        foreach (string guid in AssetDatabase.FindAssets("t:SkillDefinition"))
+        {
+            var skill = AssetDatabase.LoadAssetAtPath<SkillDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            if (skill == null)
+            {
+                continue;
+            }
+
+            if (skill.Kind == SkillKind.Art)
+            {
+                skillUse.Skills.Remove(skill.Id);
+            }
+            else
+            {
+                skillUse.Of(skill.Id);
+            }
+        }
+    }
+
+    // Each ability over the runs without cheats: on how many bars, how often cast in a fight, its share of skill damage, and a flag when
+    // it is no real choice (a default, or never picked).
+    private void DrawSkills()
+    {
+        if (skillUse.Skills.Count == 0)
+        {
+            return;
+        }
+
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField($"Abilities: {skillUse.Loadouts} raids begun, {skillUse.FightingMinutes} fighting minutes"
+            + (cheatedRuns > 0 ? $" ({cheatedRuns} runs with cheats left out)" : ""), EditorStyles.boldLabel);
+        var rows = new List<PlaytestSkillUse.Skill>(skillUse.Skills.Values);
+        rows.Sort((a, b) => b.Damage != a.Damage ? b.Damage.CompareTo(a.Damage) : b.Casts.CompareTo(a.Casts));
+        foreach (PlaytestSkillUse.Skill skill in rows)
+        {
+            string flag = skillUse.Flag(skill);
+            Color previous = GUI.color;
+            if (flag != null)
+            {
+                GUI.color = new Color(1f, 0.65f, 0.2f);
+            }
+
+            EditorGUILayout.LabelField(skill.Id,
+                $"on {skillUse.LoadoutShare(skill):P0} of bars, {skillUse.CastsPerFightingMinute(skill):0.0} casts a fighting minute, "
+                + $"{skillUse.DamageShare(skill):P0} of skill damage" + (flag != null ? $"  ({flag})" : ""));
+            GUI.color = previous;
         }
     }
 
@@ -146,6 +211,7 @@ public sealed class PlaytestRunsWindow : EditorWindow
 
         EditorGUILayout.EndScrollView();
         DrawTiers();
+        DrawSkills();
         EditorGUILayout.HelpBox("Raids are extractions/total. Click a run to open its log. Times are played minutes, pauses excluded.", MessageType.None);
     }
 

@@ -172,15 +172,18 @@ public sealed class CombatTechniqueTests
         Object.DestroyImmediate(defaults);
     }
 
-    // Every ability and spell takes a circle; a weapon art's own skill takes none, as the art pays (PlayerCombat).
+    // Priced by kind since 2026-11-27 (SkillPriceTests): a technique none, a power one or two circles, an ultimate the full bar; a weapon
+    // art's own skill takes none, as the art pays (PlayerCombat).
     [Test]
-    public void EverySkill_TakesAFocusCircle()
+    public void EverySkill_TakesTheFocusOfItsKind()
     {
         int skills = 0;
         foreach (string guid in UnityEditor.AssetDatabase.FindAssets("t:SkillDefinition"))
         {
             var skill = UnityEditor.AssetDatabase.LoadAssetAtPath<SkillDefinition>(UnityEditor.AssetDatabase.GUIDToAssetPath(guid));
-            Assert.AreEqual(skill.WeaponArt != WeaponArtSlot.None ? 0 : 1, skill.FocusCircles, skill.name);
+            int least = skill.Kind == SkillKind.Power ? 1 : skill.Kind == SkillKind.Ultimate ? 3 : 0;
+            int most = skill.Kind == SkillKind.Power ? 2 : least;
+            Assert.That(skill.FocusCircles, Is.InRange(least, most), skill.name);
             skills++;
         }
 

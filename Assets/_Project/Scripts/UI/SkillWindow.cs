@@ -100,14 +100,24 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
             return;
         }
 
-        int free = skills.Loadout.FirstEmptySlot();
+        int free = skills.Loadout.FirstFittingEmpty(skill);
         if (free < 0)
         {
-            GameMessages.Post("The ability bar is full. Drag the ability onto a slot to replace one.", MessageKind.Warning);
+            GameMessages.Post($"No free {SkillKinds.Name(skill.Kind)} slot. Drag it onto one to swap.", MessageKind.Warning);
             return;
         }
 
         skills.Equip(free, skill);
+    }
+
+    /// <summary>Says why a skill can't go in a slot: each slot takes its own kind (SkillLoadout).</summary>
+    public static void SayDoesNotFit(int slot, SkillDefinition skill)
+    {
+        if (skill != null)
+        {
+            GameMessages.Post($"{PlayerInputHandler.SkillKeyLabel(slot)} takes a {SkillLoadout.SlotName(slot)}, not a {SkillKinds.Name(skill.Kind)}.",
+                MessageKind.Warning);
+        }
     }
 
     public void OnSlotDragStarted(ItemSlotView slot, PointerEventData eventData)
@@ -148,13 +158,23 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
         bool fromBar = IsBar(dragSource);
         if (IsBar(target))
         {
-            if (fromBar)
+            SkillDefinition moving = SkillOf(dragSource);
+            SkillDefinition there = skills.Loadout.Get(target.Index);
+            if (!SkillLoadout.Fits(target.Index, moving))
+            {
+                SayDoesNotFit(target.Index, moving);
+            }
+            else if (fromBar && !SkillLoadout.Fits(dragSource.Index, there))
+            {
+                SayDoesNotFit(dragSource.Index, there);
+            }
+            else if (fromBar)
             {
                 skills.Loadout.Move(dragSource.Index, target.Index);
             }
             else
             {
-                skills.Equip(target.Index, SkillOf(dragSource));
+                skills.Equip(target.Index, moving);
             }
         }
         else if (fromBar)
@@ -202,6 +222,19 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
     private void ShowTooltip(ItemSlotView slot)
     {
         SkillDefinition skill = SkillOf(slot);
+        if (skill == null && IsBar(slot) && slot.Index < SkillLoadout.SkillSlotCount && skills.Loadout.IsEmpty(slot.Index))
+        {
+            // An empty slot: what kind it takes, and what pays for that kind.
+            var words = new System.Text.StringBuilder();
+            foreach (SkillKind kind in SkillLoadout.SlotTakes(slot.Index))
+            {
+                words.Append(words.Length > 0 ? "\n" : "").Append($"{SkillKinds.Name(kind)}: {SkillKinds.Explain(kind)}");
+            }
+
+            tooltip.Show($"{PlayerInputHandler.SkillKeyLabel(slot.Index)}: {SkillLoadout.SlotName(slot.Index)}", UIStyle.Current.Accent, words.ToString());
+            return;
+        }
+
         if (skill == null)
         {
             tooltip.Hide();
@@ -288,6 +321,7 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
             ItemDefinition item = skills.Loadout.GetItem(i);
             // A consumable put on the bar from the bag (a skill key over it there).
             barSlots[i].Show(skill != null ? skill.Icon : item != null ? item.Icon : null, Tint(skill), PlayerInputHandler.SkillKeyLabel(i));
+            barSlots[i].SetPlaceholder(skill == null && item == null ? SkillLoadout.SlotBadge(i) : "");
         }
 
         for (int i = 0; i < bookSlots.Count; i++)

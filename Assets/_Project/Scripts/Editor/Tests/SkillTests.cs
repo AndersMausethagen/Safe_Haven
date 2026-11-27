@@ -31,38 +31,40 @@ public sealed class SkillTests
         var bread = ScriptableObject.CreateInstance<ItemDefinition>();
         try
         {
-            loadout.Equip(0, a);
-            Assert.IsTrue(loadout.EquipItem(0, potion), "an item takes a skill's slot");
-            Assert.IsNull(loadout.Get(0));
-            Assert.AreEqual(potion, loadout.GetItem(0));
-            Assert.AreEqual(1, loadout.FirstEmptySlot(), "a slot with an item isn't empty");
-
-            Assert.IsTrue(loadout.EquipItem(2, potion), "a slotted item moves");
-            Assert.IsNull(loadout.GetItem(0));
-            Assert.AreEqual(potion, loadout.GetItem(2));
-
-            loadout.Equip(3, b);
-            Assert.IsTrue(loadout.Move(2, 3), "an item and a skill swap places");
-            Assert.AreEqual(b, loadout.Get(2));
+            // a, b and c are powers (the default kind): slots 4 and 5 take them (SkillPriceTests has the kinds).
+            loadout.Equip(3, a);
+            Assert.IsTrue(loadout.EquipItem(3, potion), "an item takes a skill's slot");
+            Assert.IsNull(loadout.Get(3));
             Assert.AreEqual(potion, loadout.GetItem(3));
+            Assert.IsFalse(loadout.IsEmpty(3), "a slot with an item isn't empty");
 
-            Assert.IsTrue(loadout.Equip(3, c), "a skill takes an item's slot");
+            Assert.IsTrue(loadout.EquipItem(6, potion), "a slotted item moves");
             Assert.IsNull(loadout.GetItem(3));
+            Assert.AreEqual(potion, loadout.GetItem(6));
+
+            loadout.EquipItem(3, potion);
+            loadout.Equip(4, b);
+            Assert.IsTrue(loadout.Move(3, 4), "an item and a skill swap places");
+            Assert.AreEqual(b, loadout.Get(3));
+            Assert.AreEqual(potion, loadout.GetItem(4));
+
+            Assert.IsTrue(loadout.Equip(4, c), "a skill takes an item's slot");
+            Assert.IsNull(loadout.GetItem(4));
             Assert.AreEqual(-1, loadout.IndexOf(potion));
 
-            loadout.EquipItem(4, bread);
-            Assert.IsTrue(loadout.Clear(4));
-            Assert.IsNull(loadout.GetItem(4));
+            loadout.EquipItem(5, bread);
+            Assert.IsTrue(loadout.Clear(5));
+            Assert.IsNull(loadout.GetItem(5));
 
             // Restoring: skills first, then the items in the slots no skill took (duplicates dropped).
-            loadout.SetAll(new[] { a, null, null, null, null });
-            loadout.SetItems(new[] { potion, bread, bread, null, potion });
-            Assert.AreEqual(a, loadout.Get(0));
-            Assert.IsNull(loadout.GetItem(0), "a skill's slot keeps the skill");
+            loadout.SetAll(new[] { null, null, null, a, null });
+            loadout.SetItems(new[] { potion, bread, bread, potion, null });
+            Assert.AreEqual(a, loadout.Get(3));
+            Assert.IsNull(loadout.GetItem(3), "a skill's slot keeps the skill");
+            Assert.AreEqual(potion, loadout.GetItem(0));
             Assert.AreEqual(bread, loadout.GetItem(1));
             Assert.IsNull(loadout.GetItem(2), "only the first of a duplicate");
-            Assert.IsNull(loadout.GetItem(4));
-            CollectionAssert.AreEqual(new ItemDefinition[] { null, bread, null, null, null, null, null, null, null }, loadout.ToItemArray());
+            CollectionAssert.AreEqual(new ItemDefinition[] { potion, bread, null, null, null, null, null, null, null }, loadout.ToItemArray());
         }
         finally
         {
@@ -75,30 +77,30 @@ public sealed class SkillTests
     public void EquippingASlottedSkillMovesItAndSwaps()
     {
         var loadout = new SkillLoadout();
-        loadout.Equip(0, a);
-        loadout.Equip(1, b);
+        loadout.Equip(3, a);
+        loadout.Equip(4, b);
 
-        Assert.IsTrue(loadout.Equip(1, a));
-        Assert.AreEqual(a, loadout.Get(1));
-        Assert.AreEqual(b, loadout.Get(0));
-        Assert.AreEqual(1, loadout.IndexOf(a));
+        Assert.IsTrue(loadout.Equip(4, a));
+        Assert.AreEqual(a, loadout.Get(4));
+        Assert.AreEqual(b, loadout.Get(3));
+        Assert.AreEqual(4, loadout.IndexOf(a));
     }
 
     [Test]
     public void MoveSwapsAndClearEmpties()
     {
         var loadout = new SkillLoadout();
-        loadout.Equip(0, a);
+        loadout.Equip(3, a);
         int changes = 0;
         loadout.SlotChanged += _ => changes++;
 
-        Assert.IsTrue(loadout.Move(0, 3));
-        Assert.IsNull(loadout.Get(0));
-        Assert.AreEqual(a, loadout.Get(3));
+        Assert.IsTrue(loadout.Move(3, 4));
+        Assert.IsNull(loadout.Get(3));
+        Assert.AreEqual(a, loadout.Get(4));
         Assert.AreEqual(2, changes);
 
-        Assert.IsTrue(loadout.Clear(3));
-        Assert.IsFalse(loadout.Clear(3));
+        Assert.IsTrue(loadout.Clear(4));
+        Assert.IsFalse(loadout.Clear(4));
         Assert.IsFalse(loadout.Move(2, 4));
     }
 
@@ -106,10 +108,11 @@ public sealed class SkillTests
     public void SetAllDropsDuplicates()
     {
         var loadout = new SkillLoadout();
-        loadout.SetAll(new[] { a, a, b, null, c });
-        Assert.AreEqual(a, loadout.Get(0));
-        Assert.IsNull(loadout.Get(1));
-        Assert.AreEqual(b, loadout.Get(2));
+        loadout.SetAll(new[] { null, null, null, a, a });
+        Assert.AreEqual(a, loadout.Get(3));
+        Assert.IsNull(loadout.Get(4), "only the first of a duplicate");
+        loadout.SetAll(new[] { null, null, null, b, c });
+        Assert.AreEqual(b, loadout.Get(3));
         Assert.AreEqual(c, loadout.Get(4));
     }
 

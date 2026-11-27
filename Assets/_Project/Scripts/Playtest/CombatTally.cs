@@ -23,6 +23,8 @@ public sealed class CombatTally
     // fighting earned (rounded down, the rest carried to the next).
     public const string SkillCast = "Skill.Cast", SkillOf = "Skill.", SkillHit = "Skill.Hit", SkillDamage = "Skill.Damage",
         SkillNoFocus = "Skill.NoFocus", FocusEarned = "Focus.Earned";
+    /// <summary>Damage by skill, "SkillDamage.&lt;id&gt;" (2026-11-27): not under "Skill." so those rows stay casts by skill.</summary>
+    public const string SkillDamageOf = "SkillDamage.";
     // The move inside a kind (Docs/CombatFeelAnalysis_2026-11-26.md §3.8: charged blows, follow-ups and backsteps were all counted as
     // light swings), on top of the kind's own count so Swing.Light stays comparable with older runs. And why a swing whiffed: with
     // the focused enemy within its reach (it stepped aside, or the aim was off), out of reach, or with nothing in focus.
@@ -60,6 +62,7 @@ public sealed class CombatTally
     private PlayerFocus focus;
     private PlayerFocusTarget focusTarget;
     private float skillDamageCarry;
+    private readonly Dictionary<string, float> skillDamageBy = new Dictionary<string, float>();
     private float focusCarry;
 
     /// <summary>The weapon the player held when the last count was made (the rows' detail).</summary>
@@ -83,6 +86,7 @@ public sealed class CombatTally
     {
         counts.Clear();
         skillDamageCarry = 0f;
+        skillDamageBy.Clear();
         focusCarry = 0f;
     }
 
@@ -245,12 +249,41 @@ public sealed class CombatTally
             int whole = Mathf.FloorToInt(skillDamageCarry);
             skillDamageCarry -= whole;
             Note(SkillDamage, whole);
+            // And by skill (Docs/SkillChoiceResearch_2026-11-27.md 3.7: a skill doing over 40% of skill damage is a default, not a choice).
+            SkillDefinition skill = SkillOfAttack(damage.Attack);
+            if (skill != null)
+            {
+                skillDamageBy.TryGetValue(skill.Id, out float carried);
+                carried += result.Damage;
+                int part = Mathf.FloorToInt(carried);
+                skillDamageBy[skill.Id] = carried - part;
+                Note(SkillDamageOf + skill.Id, part);
+            }
         }
         else if ((damage.Technique & HitTechnique.Spell) != 0) Note(StaffHit);
         if (victim.TryGetComponent(out MonsterAI monster) && monster.LastHitAmbushed)
         {
             Note(result.Killed ? AmbushKill : Ambush);
         }
+    }
+
+    // The known skill whose blow this was, by its attack; null for none (an art, a staff's bolt).
+    private SkillDefinition SkillOfAttack(AttackDefinition attack)
+    {
+        if (attack == null || skills == null)
+        {
+            return null;
+        }
+
+        foreach (SkillDefinition skill in skills.KnownSkills)
+        {
+            if (skill != null && skill.Attack == attack)
+            {
+                return skill;
+            }
+        }
+
+        return null;
     }
 
     private void OnSpotted(MonsterAI monster, string how) => Note(SpottedBy + how);

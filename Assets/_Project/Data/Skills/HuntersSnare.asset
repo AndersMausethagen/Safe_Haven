@@ -1,0 +1,99 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9139778d2cece034ba4eeb23169bbba8, type: 3}
+  m_Name: HuntersSnare
+  m_EditorClassIdentifier: Assembly-CSharp::SkillDefinition
+  displayName: Hunter's Snare
+  description: 'A weighted snare thrown at a foe''s legs: held fast where it stands, for the arrows. A hammer''s Earthbreaker tears the held loose.'
+  icon: {fileID: 21300000, guid: 279284beccb25b64a844a0855afe0a30, type: 3}
+  school: 1
+  kind: 1
+  cooldown: 12
+  staminaCost: 0
+  focusCircles: 0
+  castTime: 0.66666675
+  lungeDistance: 0
+  lungeDuration: 0.242
+  channelSeconds: 0
+  channelTick: 0.3
+  foesStatus: {fileID: 0}
+  foesRadius: 7
+  foesDelay: 0.55
+  weapons: 0a000000i
+  needsWeapon: 1
+  favouredDamage: 1.25
+  combos: []
+  options: []
+  leaves: {fileID: 0}
+  leavesCount: 3
+  attack: {fileID: 11400000, guid: 86390fc27b58fc14fa2f613775bff7e6, type: 2}
+  heal: 0
+  buffs:
+  - stat: 17
+    op: 0
+    value: 0.2
+  buffDuration: 6
+  buffName: Hunter's Patience
+  playAttackAnimation: 1
+  animationState: KI 1H Backhand
+  animationSpeed: 1
+  look:
+    showArea: 0
+    cast:
+    - prefab: {fileID: 4047249316231547844, guid: 470b560476fcda647a51ec6ad778232e, type: 3}
+      place: 1
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 0.7
+      scale: 1
+    - prefab: {fileID: 2681584111135180071, guid: 3944ddcf25c73224393184634d06ba50, type: 3}
+      place: 1
+      count: 1
+      delay: 0.055
+      stepDelay: 0
+      seconds: 1
+      scale: 1
+    release:
+    - prefab: {fileID: 2203060802714908154, guid: 8dce18523c46f7a4aa7f08b0e559b780, type: 3}
+      place: 0
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 0.4
+      scale: 1
+    struck:
+    - prefab: {fileID: 2681584111135180071, guid: 3944ddcf25c73224393184634d06ba50, type: 3}
+      place: 5
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 1
+      scale: 1
+    - prefab: {fileID: 9094924754952946362, guid: f6aa8ea3f98f40f49909360b12272fcb, type: 3}
+      place: 5
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 0.3
+      scale: 1
+    light: {r: 0, g: 0, b: 0, a: 0}
+    lightIntensity: 6
+    lightRange: 8
+    lightSeconds: 0.35
+    shake: 0.2
+    hitStop: 0.04
+    kick: 0.08
+    castSound: {fileID: 11400000, guid: f863ead39fc8d3d4d907ef6cddc3d6a2, type: 2}
+    releaseSound: {fileID: 0}
+    releaseSoundDelay: 0
+  weaponArt: 0

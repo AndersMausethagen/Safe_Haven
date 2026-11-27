@@ -25,3 +25,15 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  weaponTechniques:
+  - {fileID: 11400000, guid: 13728d10373538c41b1351d572a393a9, type: 2}
+  - {fileID: 11400000, guid: e30f0159f046e3249945f3cf1123396c, type: 2}
+  - {fileID: 11400000, guid: 96b386ef2827f5c468060fffa9a00acc, type: 2}
+  - {fileID: 11400000, guid: 6b5d0509f85cad745abe021e77c086dc, type: 2}
+  - {fileID: 11400000, guid: e01d9c8c4e0c7d04f86576ee47bc3254, type: 2}
+  - {fileID: 11400000, guid: 586344847bcbbc749a583c0aa4420aea, type: 2}
+  - {fileID: 11400000, guid: fd482999517e26c47bab3f1ad1e36f5b, type: 2}
+  - {fileID: 11400000, guid: 536438740f1668a4b882abac06d4448c, type: 2}
+  - {fileID: 11400000, guid: 232cded6c08cb2b45aa9aabed31be4cf, type: 2}
+  - {fileID: 11400000, guid: f448b69bf7eeb1c49bdda55ba0c17292, type: 2}
+  learnAtTier: 2

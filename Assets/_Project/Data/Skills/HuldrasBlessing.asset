@@ -16,6 +16,7 @@ MonoBehaviour:
   description: The hidden folk of the forest remember kindness. Their gift closes wounds and hardens the skin.
   icon: {fileID: 21300000, guid: b429c2969f88a2a4cb4b2b065be172af, type: 3}
   school: 4
+  kind: 0
   cooldown: 20
   staminaCost: 0
   focusCircles: 1

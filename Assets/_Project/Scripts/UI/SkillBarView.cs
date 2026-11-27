@@ -114,7 +114,16 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
         {
             int from = dragFrom;
             EndBarDrag();
-            if (skills.Loadout.Move(from, target.Index))
+            SkillDefinition moving = skills.Loadout.Get(from), there = skills.Loadout.Get(target.Index);
+            if (!SkillLoadout.Fits(target.Index, moving))
+            {
+                SkillWindow.SayDoesNotFit(target.Index, moving);
+            }
+            else if (!SkillLoadout.Fits(from, there))
+            {
+                SkillWindow.SayDoesNotFit(from, there);
+            }
+            else if (skills.Loadout.Move(from, target.Index))
             {
                 GameMessages.Post($"Moved to {PlayerInputHandler.SkillKeyLabel(target.Index)} on the skill bar.", MessageKind.Info);
             }
@@ -293,14 +302,17 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
             // A consumable: its icon and how many are carried (greyed when none).
             int carried = inventory != null ? inventory.CountCarried(item) : 0;
             slots[index].view.Show(item.Icon, Color.clear, PlayerInputHandler.SkillKeyLabel(index), carried.ToString(), isLocked: carried <= 0);
+            slots[index].view.SetPlaceholder("");
             slots[index].shownCount = carried;
         }
         else
         {
+            // An empty skill slot says what kind goes there (it is only seen while the bar is being arranged).
             slots[index].view.Show(
                 skill != null ? skill.Icon : null,
                 skill != null ? SkillSchools.ColorOf(skill.School) : Color.clear,
                 PlayerInputHandler.SkillKeyLabel(index));
+            slots[index].view.SetPlaceholder(skill == null ? SkillLoadout.SlotBadge(index) : "");
             slots[index].shownCount = -1;
         }
 
@@ -351,7 +363,9 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
 
         // Empty slots, in a Contextual HUD, only while something could go into them (dragged, or the skills window open): four empty
         // frames sat beside five filled ones all game (the HUD review of 2026-11-18). Faded, not removed, so every key keeps its place.
-        bool showEmpty = HudRules.ShowsEverything || ItemDrag.Active || SkillsWindow.IsOpen;
+        // The ability book (K, UIWindowId.Skills) too: that is where the bar is arranged, and its empty slots say what kind they take.
+        bool showEmpty = HudRules.ShowsEverything || ItemDrag.Active || SkillsWindow.IsOpen
+            || (UIStateManager.Current != null && UIStateManager.Current.IsOpen(UIWindowId.Skills));
         for (int i = 0; i < slots.Length; i++)
         {
             UpdateSlot(slots[i], skills.Loadout.Get(i));
@@ -409,7 +423,9 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
         // Grey while no Focus circle is full to pay for it (an art's free follow-up needs none): it showed ready until pressed.
         bool followUp = skill != null && skill.WeaponArt == WeaponArtSlot.Own && combat != null && combat.ArtFollowUpOpen;
         bool unpaid = skill != null && focus != null && !followUp
-            && (skill.WeaponArt != WeaponArtSlot.None ? !focus.HasCircle : focus.Circles < skill.FocusCircles);
+            && (skill.WeaponArt != WeaponArtSlot.None ? !focus.HasCircle : focus.Circles < PlayerSkills.CirclesFor(skill));
+        // And while a weapon's own technique hasn't its weapon in hand (swapped away with Z).
+        unpaid |= skill != null && !skill.CastsWith(combat != null ? combat.Weapon : null);
         if (slot.view != null && unpaid != slot.dimmed)
         {
             slot.dimmed = unpaid;

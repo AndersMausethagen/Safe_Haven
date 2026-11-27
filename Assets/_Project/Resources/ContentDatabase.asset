@@ -634,16 +634,29 @@ MonoBehaviour:
   - {fileID: 11400000, guid: bed09cebf09c4e146b21f31b35f57caf, type: 2}
   skills:
   - {fileID: 11400000, guid: da09e366badb315479c32e7da86ea251, type: 2}
+  - {fileID: 11400000, guid: 13728d10373538c41b1351d572a393a9, type: 2}
+  - {fileID: 11400000, guid: 586344847bcbbc749a583c0aa4420aea, type: 2}
+  - {fileID: 11400000, guid: 728aad6a1bc2e0b409b54269e0456784, type: 2}
   - {fileID: 11400000, guid: bfd515b7dfa209443b9f7e30787ee61e, type: 2}
+  - {fileID: 11400000, guid: e01d9c8c4e0c7d04f86576ee47bc3254, type: 2}
   - {fileID: 11400000, guid: ea2ebfef3d35eae42a29237e4b273b5d, type: 2}
+  - {fileID: 11400000, guid: 7b406cecc5e5f324fbbf14ff3517a3ad, type: 2}
   - {fileID: 11400000, guid: c501c71f1498b884a8fbf9cfcac656f0, type: 2}
+  - {fileID: 11400000, guid: f448b69bf7eeb1c49bdda55ba0c17292, type: 2}
+  - {fileID: 11400000, guid: 232cded6c08cb2b45aa9aabed31be4cf, type: 2}
   - {fileID: 11400000, guid: 1ed16a27aed704c4fbcf6235fb0e823d, type: 2}
+  - {fileID: 11400000, guid: e30f0159f046e3249945f3cf1123396c, type: 2}
+  - {fileID: 11400000, guid: 6b5d0509f85cad745abe021e77c086dc, type: 2}
+  - {fileID: 11400000, guid: 536438740f1668a4b882abac06d4448c, type: 2}
   - {fileID: 11400000, guid: df741c0d1e4c5604ea961c3a33afb8fd, type: 2}
+  - {fileID: 11400000, guid: fd482999517e26c47bab3f1ad1e36f5b, type: 2}
+  - {fileID: 11400000, guid: 96b386ef2827f5c468060fffa9a00acc, type: 2}
   - {fileID: 11400000, guid: 9218ba12b9f62314ea6a1c8c1469fdd4, type: 2}
   - {fileID: 11400000, guid: 8f48b8411eaf29845b33f493a27649e5, type: 2}
   - {fileID: 11400000, guid: a8e3eb9e42951db4589859c6bd82c89c, type: 2}
   - {fileID: 11400000, guid: 8fb575f0789285a4c93fa8cbf4fc7697, type: 2}
   - {fileID: 11400000, guid: d96fe82c89a21d04499ac123e4fd7e76, type: 2}
+  - {fileID: 11400000, guid: 3e08cf7da3f5e624183792e519255e41, type: 2}
   - {fileID: 11400000, guid: 4d3aed2e971f1f44d9fb3b8cc1585b5c, type: 2}
   - {fileID: 11400000, guid: 0e59706e0c7a7504c96c67b8c18daee3, type: 2}
   modules:

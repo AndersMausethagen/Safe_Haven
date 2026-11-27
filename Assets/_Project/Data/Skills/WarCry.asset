@@ -16,9 +16,10 @@ MonoBehaviour:
   description: Roar as the hird did before the shield wall broke. Foes near enough to hear it lose heart and strike weaker; your own blows bite harder for a while.
   icon: {fileID: 21300000, guid: 0b8fa4d989f90054696000f319f2d4e3, type: 3}
   school: 0
+  kind: 2
   cooldown: 30
   staminaCost: 0
-  focusCircles: 1
+  focusCircles: 3
   castTime: 1.35
   lungeDistance: 0
   lungeDuration: 0.3
@@ -46,7 +47,7 @@ MonoBehaviour:
     consumeInto: {fileID: 0}
   - id: cry_lungs
     displayName: Steady Lungs
-    description: 40% of its Focus circle comes back as it is cast.
+    description: 40% of its Focus comes back as it is cast.
     rank: 1
     damageScale: 1
     cooldownScale: 1
@@ -164,7 +165,7 @@ MonoBehaviour:
   - stat: 14
     op: 0
     value: 0.15
-  buffDuration: 8
+  buffDuration: 12
   buffName: Battle Fury
   playAttackAnimation: 1
   animationState: War Cry

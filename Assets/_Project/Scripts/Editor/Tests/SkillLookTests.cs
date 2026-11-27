@@ -87,6 +87,8 @@ public sealed class SkillLookTests
     {
         var settings = AssetDatabase.LoadAssetAtPath<PlayerSkillSettings>("Assets/_Project/Data/Player/PlayerSkillSettings.asset");
         var taught = new HashSet<SkillDefinition>(settings.StartingSkills);
+        // A weapon's own technique is taught by wielding one of its kind at copper or better (2026-11-27, SkillPriceTests).
+        taught.UnionWith(settings.WeaponTechniques);
         foreach (string guid in AssetDatabase.FindAssets("t:BossDefinition", new[] { "Assets/_Project" }))
         {
             taught.Add(AssetDatabase.LoadAssetAtPath<BossDefinition>(AssetDatabase.GUIDToAssetPath(guid)).RewardSkill);

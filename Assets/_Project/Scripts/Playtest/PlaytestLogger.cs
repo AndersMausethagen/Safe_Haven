@@ -127,6 +127,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         {
             kitLoggedFor = RaidDirector.Current;
             WriteKit("start");
+            WriteLoadout(Player.Current);
         }
 
         Player current = Player.Current;
@@ -759,6 +760,20 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
             {
             }
         }
+    }
+
+    // The skill bar a raid begins with (Docs/SkillChoiceResearch_2026-11-27.md 3.7): which skills are chosen, against the weapon held.
+    private void WriteLoadout(Player player)
+    {
+        PlayerSkills skills = player != null ? player.Skills : null;
+        if (skills == null)
+        {
+            return;
+        }
+
+        PlayerCombat fighter = player.GetComponent<PlayerCombat>();
+        Write(PlaytestLog.Loadout, PlaytestLog.LoadoutSubject(skills.Loadout), PlaytestLog.SkillsIn(skills.Loadout),
+            fighter != null && fighter.Weapon != null ? fighter.Weapon.name : "");
     }
 
     // The old ways or Go there: how far it saved walking, and whether the horse came along.

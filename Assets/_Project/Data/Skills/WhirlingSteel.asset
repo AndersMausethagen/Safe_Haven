@@ -16,9 +16,10 @@ MonoBehaviour:
   description: Spin with the blade outstretched, the way the old hird cleared a shield wall. Struck armour cracks.
   icon: {fileID: 21300000, guid: 648489a9874051c45ab0ba4b5a663897, type: 3}
   school: 0
-  cooldown: 6
+  kind: 1
+  cooldown: 8
   staminaCost: 0
-  focusCircles: 1
+  focusCircles: 0
   castTime: 0.5
   lungeDistance: 0
   lungeDuration: 0.22
@@ -27,6 +28,10 @@ MonoBehaviour:
   foesStatus: {fileID: 0}
   foesRadius: 7
   foesDelay: 0.5
+  weapons: 010000000400000002000000i
+  needsWeapon: 0
+  favouredDamage: 1.25
+  combos: []
   options: []
   leaves: {fileID: 0}
   leavesCount: 3

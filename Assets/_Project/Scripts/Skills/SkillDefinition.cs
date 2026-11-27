@@ -24,6 +24,9 @@ public sealed class SkillDefinition : ScriptableObject
     [SerializeField, TextArea(2, 5)] private string description;
     [SerializeField] private Sprite icon;
     [SerializeField] private SkillSchool school;
+    [Tooltip("What it is for, and so which bar slot takes it (SkillLoadout): a Technique (no Focus, on its cooldown), a Power (Focus), " +
+             "an Ultimate (a full Focus bar). A weapon art's entry is always an Art, whatever this says.")]
+    [SerializeField] private SkillKind kind = SkillKind.Power;
 
     [Header("Cost")]
     [Tooltip("Seconds before the skill can be cast again.")]
@@ -31,9 +34,9 @@ public sealed class SkillDefinition : ScriptableObject
     [Tooltip("Stamina paid when cast. An empty stamina pool refuses the skill. 0 for every ability since 2026-11-25: Focus is their " +
              "price, and stamina is kept for the dodge (SkillPayoffTests).")]
     [SerializeField, Min(0f)] private float staminaCost;
-    [Tooltip("Full Focus circles it needs and spends (the user, 2026-11-24: every ability and spell takes one). Focus is earned by " +
-             "fighting (hits, parries, perfect dodges, blocks, blows taken; faster in a crowd) and kept in circles above the skill bar. " +
-             "0: none (a weapon art's own skill, which the art pays for).")]
+    [Tooltip("Full Focus circles it needs and spends. Focus is earned by fighting (hits, parries, perfect dodges, blocks, blows taken; " +
+             "faster in a crowd) and kept in circles above the skill bar. By kind since 2026-11-27 (SkillPriceTests): a Technique 0, a Power " +
+             "1 (2 for the strongest), an Ultimate 3. 0 also for a weapon art's entry, which the art pays for.")]
     [SerializeField, Range(0, 3)] private int focusCircles = 1;
     [Tooltip("Seconds after casting before another skill can be cast.")]
     [SerializeField, Min(0f)] private float castTime = 0.45f;
@@ -55,6 +58,23 @@ public sealed class SkillDefinition : ScriptableObject
     [SerializeField, Min(0f)] private float foesRadius = 7f;
     [Tooltip("Seconds after the cast that it rings out: the roar's loudest moment in its animation.")]
     [SerializeField, Min(0f)] private float foesDelay = 0.5f;
+
+    [Header("Weapon (Docs/SkillChoiceResearch_2026-11-27.md 3.3)")]
+    [Tooltip("The kinds of weapon it belongs to, by their signature (Counter Chain: swords, Assassin: daggers, Guard Breaker: one-handed " +
+             "axes and clubs, Momentum: greataxes, Hyper Armour: greatswords, Crush: hammers, Anti Charge: spears, Flurry: fists, Channel: " +
+             "staves, Hunter's Mark: bows). Empty: no weapon in particular.")]
+    [SerializeField] private List<WeaponSignature> weapons = new List<WeaponSignature>();
+    [Tooltip("On: a weapon's own technique, cast only with one of those in hand, and learned by wielding one of Learn At Tier or better " +
+             "(PlayerSkillSettings). Off: any weapon will do, and one of those strikes Favoured Damage harder.")]
+    [SerializeField] private bool needsWeapon;
+    [SerializeField, Range(1f, 1.5f)] private float favouredDamage = 1.25f;
+
+    [Header("Set up and pay off (Docs/SkillChoiceResearch_2026-11-27.md 3.4)")]
+    [Tooltip("What it does to foes bearing a status, built in (as the altar's options do, and on top of them): one skill lays a status " +
+             "(its attack's Applies Status), another uses it up for a payoff (Consumes: a burst of Consume Damage times the blow, health " +
+             "back, another status). Uses Consumes, Consume Damage, Consume Heal, Consume Into and Adds Status, and Display Name for the " +
+             "call (\"Open the Vein!\").")]
+    [SerializeField] private List<SkillOption> combos = new List<SkillOption>();
 
     [Header("Choices at the altar (Docs/SkillsImprovementResearch_2026-11-24.md 3)")]
     [Tooltip("What the altar offers it, one choice per rank: rank I small tweaks, rank II ones that change how it plays, rank III two that redefine it.")]
@@ -102,6 +122,8 @@ public sealed class SkillDefinition : ScriptableObject
     public string Description => description;
     public Sprite Icon => icon;
     public SkillSchool School => school;
+    /// <summary>What it is for, and which bar slot takes it: a weapon art's entry is an Art.</summary>
+    public SkillKind Kind => weaponArt != WeaponArtSlot.None ? SkillKind.Art : kind;
     public float Cooldown => cooldown;
     public float StaminaCost => staminaCost;
     public int FocusCircles => focusCircles;
@@ -118,6 +140,19 @@ public sealed class SkillDefinition : ScriptableObject
     /// <summary>A thrown skill (its attack has a Cast Projectile: a boulder, a spear): it flies to what it hits, not a blow round the caster.</summary>
     public bool Throws => attack != null && attack.CastProjectile != null;
     public IReadOnlyList<SkillOption> Options => options;
+    /// <summary>The kinds of weapon it belongs to, by signature; empty for none in particular.</summary>
+    public IReadOnlyList<WeaponSignature> Weapons => weapons;
+    /// <summary>A weapon's own technique: cast only with one of <see cref="Weapons"/> in hand.</summary>
+    public bool NeedsWeapon => needsWeapon && weapons.Count > 0;
+    /// <summary>Its built-in set-ups and payoffs on what it strikes.</summary>
+    public IReadOnlyList<SkillOption> Combos => combos;
+
+    /// <summary>True when it can be cast with <paramref name="weapon"/> in hand (null: none).</summary>
+    public bool CastsWith(WeaponDefinition weapon) => !NeedsWeapon || weapon != null && weapons.Contains(weapon.Signature);
+
+    /// <summary>How much harder it strikes with <paramref name="weapon"/>: Favoured Damage with one it belongs to, 1 otherwise.</summary>
+    public float WeaponScale(WeaponDefinition weapon) =>
+        !needsWeapon && weapons.Count > 0 && weapon != null && weapons.Contains(weapon.Signature) ? favouredDamage : 1f;
     public StatusEffectDefinition FoesStatus => foesStatus;
     public float FoesRadius => foesRadius;
     public float FoesDelay => foesDelay;

@@ -1,0 +1,125 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9139778d2cece034ba4eeb23169bbba8, type: 3}
+  m_Name: OpenTheVein
+  m_EditorClassIdentifier: Assembly-CSharp::SkillDefinition
+  displayName: Open the Vein
+  description: 'A darting stab at one foe. On a bleeding foe it opens the wound wide: the bleeding is used up for a burst of more than half again the blow.'
+  icon: {fileID: 21300000, guid: 11d99fb98e7becf4e94ea17159872cb0, type: 3}
+  school: 0
+  kind: 1
+  cooldown: 8
+  staminaCost: 0
+  focusCircles: 0
+  castTime: 0.8166667
+  lungeDistance: 3
+  lungeDuration: 0.264
+  channelSeconds: 0
+  channelTick: 0.3
+  foesStatus: {fileID: 0}
+  foesRadius: 7
+  foesDelay: 0.6
+  weapons: 02000000i
+  needsWeapon: 1
+  favouredDamage: 1.25
+  combos:
+  - id: openthevein_payoff
+    displayName: Open the Vein
+    description: 
+    rank: 0
+    damageScale: 1
+    cooldownScale: 1
+    costScale: 1
+    buffScale: 1
+    heal: 0
+    extraLeaves: 0
+    foesRadiusScale: 1
+    addsStatus: {fileID: 0}
+    consumes: {fileID: 11400000, guid: a7f523403d490f3409dbe93f62cc2341, type: 2}
+    consumeHeal: 0
+    consumeDamage: 1.6
+    consumeInto: {fileID: 0}
+  options: []
+  leaves: {fileID: 0}
+  leavesCount: 3
+  attack: {fileID: 11400000, guid: 0ababc3e5b0e1044ebe695db0378d804, type: 2}
+  heal: 0
+  buffs:
+  - stat: 20
+    op: 0
+    value: 0.1
+  - stat: 3
+    op: 0
+    value: 0.1
+  buffDuration: 5
+  buffName: Blood-Drinker
+  playAttackAnimation: 1
+  animationState: KI Twin Cut
+  animationSpeed: 1
+  look:
+    showArea: 0
+    cast:
+    - prefab: {fileID: 5452306783253759216, guid: 51b518cd3d5ee044c8e13224eaa9fc9a, type: 3}
+      place: 1
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 0.8
+      scale: 1
+    - prefab: {fileID: 1616147937783209550, guid: 8b79baefabcb7fc4ea48f2b75485a424, type: 3}
+      place: 0
+      count: 1
+      delay: 0.06
+      stepDelay: 0
+      seconds: 0.5
+      scale: 1
+    release:
+    - prefab: {fileID: 5452306783253759216, guid: 51b518cd3d5ee044c8e13224eaa9fc9a, type: 3}
+      place: 1
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 0.9
+      scale: 1
+    - prefab: {fileID: 6681213866509498761, guid: be5271f288744d54a95ead89c19e56c0, type: 3}
+      place: 1
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 0.3
+      scale: 1
+    struck:
+    - prefab: {fileID: 4949841515135002252, guid: 1cfbce94292b32c4ca45ff82070f35aa, type: 3}
+      place: 5
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 0.8
+      scale: 1
+    - prefab: {fileID: 8509353883847779146, guid: 8abdb0aebf3f09847992abc018aa8e1c, type: 3}
+      place: 5
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 0.7
+      scale: 1
+    light: {r: 1, g: 0.5, b: 0.4, a: 1}
+    lightIntensity: 3
+    lightRange: 5
+    lightSeconds: 0.2
+    shake: 0.2
+    hitStop: 0.04
+    kick: 0.08
+    castSound: {fileID: 11400000, guid: 3a13086423537444aa766d9db0602564, type: 2}
+    releaseSound: {fileID: 0}
+    releaseSoundDelay: 0
+  weaponArt: 0

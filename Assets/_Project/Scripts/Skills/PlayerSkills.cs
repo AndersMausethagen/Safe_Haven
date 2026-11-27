@@ -14,6 +14,8 @@ public enum SkillCastResult
     NoFocus,
     /// <summary>An item's slot, and none of it is carried.</summary>
     NoneCarried,
+    /// <summary>A weapon's own technique, without one of its weapons in hand.</summary>
+    WrongWeapon,
 }
 
 /// <summary>
@@ -186,6 +188,53 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         {
             bagItems.ConsumableArrived += OnConsumableArrived;
         }
+
+        if (combat != null)
+        {
+            combat.WeaponChanged += OnWeaponChanged;
+        }
+    }
+
+    // A weapon of copper or better teaches its kind's own technique the first time it is wielded (PlayerSkillSettings › Weapon Techniques).
+    private void OnWeaponChanged(WeaponDefinition weapon) => LearnWeaponTechnique(weapon);
+
+    /// <summary>Learns the technique <paramref name="weapon"/>'s kind teaches, if it is of the tier that teaches it and the technique
+    /// isn't known yet. True when one was learned.</summary>
+    public bool LearnWeaponTechnique(WeaponDefinition weapon)
+    {
+        EnsureInitialised();
+        SkillDefinition technique = weapon != null && settings != null ? settings.TechniqueOf(weapon.Signature) : null;
+        if (technique == null || IsKnown(technique) || TierOf(weapon) < settings.LearnAtTier || !Learn(technique))
+        {
+            return false;
+        }
+
+        GameMessages.Post($"Your hands learn the way of {WeaponFamilies.Name(weapon.Signature)}: {technique.DisplayName}.", MessageKind.Gain);
+        return true;
+    }
+
+    // The item tier of a weapon: the one in hand, or the first item that is it. Bare fists are no item: always one's own, so they teach
+    // theirs the first time the player fights barehanded.
+    private int TierOf(WeaponDefinition weapon)
+    {
+        if (TryGetComponent(out PlayerEquipment equipment) && equipment.MainHand.Item != null && equipment.MainHand.Item.Weapon == weapon)
+        {
+            return equipment.MainHand.Item.Tier;
+        }
+
+        var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+        if (content != null)
+        {
+            foreach (ItemDefinition item in content.Items)
+            {
+                if (item != null && item.Weapon == weapon)
+                {
+                    return item.Tier;
+                }
+            }
+        }
+
+        return weapon.Signature == WeaponSignature.Flurry ? int.MaxValue : 0;
     }
 
     private ItemInventory bagItems;
@@ -273,6 +322,11 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             bagItems.ConsumableArrived -= OnConsumableArrived;
         }
 
+        if (combat != null)
+        {
+            combat.WeaponChanged -= OnWeaponChanged;
+        }
+
         pendingHit = null;
         pendingCry = null;
         foreach (SkillDefinition skill in activeBuffs.Keys)
@@ -354,7 +408,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             collectingStruck = true;
             try
             {
-                float multiplier = Power(skill) * runecraft * SkillChoices.For(skill).Damage;
+                float multiplier = Power(skill) * runecraft * SkillChoices.For(skill).Damage * skill.WeaponScale(combat != null ? combat.Weapon : null);
                 if (skill.Throws)
                 {
                     Throw(skill, weaponDamage, multiplier, kind);
@@ -418,14 +472,12 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         if (announce)
         {
             GameMessages.Post("New skill: " + skill.DisplayName, MessageKind.Gain);
-            // Seen at once: into the first free slot of 1-5 (the user, 2026-11-24: "the skills should be visible"); moved anywhere after.
-            for (int slot = 0; slot < 5; slot++)
+            // Seen at once: into the first free slot of 1-5 that takes its kind (the user, 2026-11-24: "the skills should be visible";
+            // 2026-11-27: each slot a kind); moved after to any other that takes it.
+            int free = loadout.IndexOf(skill) < 0 ? loadout.FirstFittingEmpty(skill) : -1;
+            if (free >= 0)
             {
-                if (loadout.Get(slot) == null && loadout.GetItem(slot) == null && loadout.IndexOf(skill) < 0)
-                {
-                    loadout.Equip(slot, skill);
-                    break;
-                }
+                loadout.Equip(free, skill);
             }
         }
 
@@ -478,8 +530,27 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             allowed[i] = IsKnown(slots[i]) ? slots[i] : null;
         }
 
-        loadout.SetAll(allowed);
+        loadout.SetAll(allowed, slotItems);
         loadout.SetItems(slotItems);
+        // Slot 1 takes only an art (2026-11-27): a bar saved without the weapon's art there (before 2026-11-24, or with something else
+        // on 1) gets it back, or the key would do nothing.
+        if (loadout.IsEmpty(0) && settings != null)
+        {
+            foreach (SkillDefinition starting in settings.StartingSkills)
+            {
+                if (starting != null && starting.WeaponArt == WeaponArtSlot.Own && IsKnown(starting) && loadout.IndexOf(starting) < 0)
+                {
+                    loadout.Equip(0, starting);
+                    break;
+                }
+            }
+        }
+
+        // A weapon wielded before this restore (a scene's start) is looked at again: a technique it taught then was replaced by the save's book.
+        if (combat != null)
+        {
+            LearnWeaponTechnique(combat.Weapon);
+        }
         KnownSkillsChanged?.Invoke();
     }
 
@@ -521,6 +592,13 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             return result;
         }
 
+        // A weapon's own technique wants one of its weapons in hand (2026-11-27).
+        if (result == SkillCastResult.Cast && !skill.CastsWith(combat != null ? combat.Weapon : null))
+        {
+            GameMessages.Post($"{skill.DisplayName} needs {WeaponFamilies.Names(skill.Weapons)} in hand.", MessageKind.Warning);
+            result = SkillCastResult.WrongWeapon;
+        }
+
         // Only a skill that may be cast is paid for. (An empty slot came on to here and read the missing skill's cost: every
         // press of an empty key threw, and the HUD never said the slot was empty: the user's build, 2026-11-25.)
         if (result == SkillCastResult.Cast)
@@ -543,7 +621,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     private SkillCastResult Pay(SkillDefinition skill)
     {
         PlayerFocus focus = GetComponent<PlayerFocus>();
-        int circles = skill.FocusCircles;
+        int circles = CirclesFor(skill);
         if (circles > 0 && focus != null && focus.Circles < circles)
         {
             focus.TrySpendCircles(circles); // refused: lets the HUD say so
@@ -723,6 +801,11 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         SkillChoices.For(skill).Cost * (skill.IsPhysical || combatant == null ? skill.StaminaCost
             : skill.StaminaCost * Mathf.Max(0.1f, 1f + combatant.Stats.Get(StatType.SpellStaminaCost)));
 
+    /// <summary>The Focus circles a cast spends: its own price, never more than the bar holds (CombatTechniqueSettings › Focus Circles),
+    /// so an ultimate's full bar stays reachable if the bar is ever made shorter.</summary>
+    public static int CirclesFor(SkillDefinition skill) =>
+        skill == null ? 0 : Mathf.Min(skill.FocusCircles, Mathf.Max(1, CombatTechniqueSettings.Current.FocusCircles));
+
     public static float CooldownOf(SkillDefinition skill) =>
         skill.Cooldown * (1f - EssenceSettings.Current.CooldownCutAt(GameSession.Progress.RankOf(skill))) * SkillChoices.For(skill).Cooldown;
 
@@ -816,7 +899,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         try
         {
             AttackResolver.Execute(combatant, channeling.Attack, weaponDamage, transform.position, pendingDirection, hitLayers,
-                Power(channeling) * runecraft * SkillChoices.For(channeling).Damage, 1f, kind);
+                Power(channeling) * runecraft * SkillChoices.For(channeling).Damage * channeling.WeaponScale(combat != null ? combat.Weapon : null), 1f, kind);
         }
         finally
         {
@@ -844,14 +927,16 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
     // The chosen altar options on what the skill struck (Docs/SkillsImprovementResearch_2026-11-24.md 4): a status laid, or one used
     // up for a payoff (health back, a burst of extra damage, another status in its place).
+    // And the skill's own built-in combos (SkillDefinition.Combos, Docs/SkillChoiceResearch_2026-11-27.md 3.4), with the same rules.
     private void AfterOptions(SkillDefinition skill, List<(Damageable foe, float took)> foes)
     {
         SkillChoices.Totals options = SkillChoices.For(skill);
-        if (options.Chosen.Count == 0 || foes.Count == 0)
+        if (options.Chosen.Count == 0 && skill.Combos.Count == 0 || foes.Count == 0)
         {
             return;
         }
 
+        var called = new HashSet<string>();
         foreach ((Damageable foe, float took) in foes)
         {
             if (foe == null || !foe.IsAlive)
@@ -859,12 +944,11 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
                 continue;
             }
 
-            foreach (SkillOption option in options.Chosen)
+            foreach (SkillOption option in Both(options.Chosen, skill.Combos))
             {
                 // Not on a friend's copy of the host's creature: the host keeps its statuses, so it would be used up here and tick on there.
                 if (option.consumes != null && foe.TryGetComponent(out StatusEffects effects) && !effects.IsCopy && effects.Has(option.consumes))
                 {
-                    effects.End(option.consumes);
                     if (option.consumeHeal > 0f)
                     {
                         health.Heal(option.consumeHeal);
@@ -872,23 +956,48 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
                     if (option.consumeDamage > 0f && foe.IsAlive)
                     {
-                        var burst = new DamageInfo(combatant, null, took * option.consumeDamage, skill.Attack.DamageType, false,
-                            foe.transform.position + Vector3.up, pendingDirection, 0f, HitTechnique.None);
+                        // The payoff staggers as it hurts (a Headsman's Drop on a Sundered foe topples it), and counts as the skill's
+                        // own damage in the playtest log (its attack and the Ability technique).
+                        var burst = new DamageInfo(combatant, skill.Attack, took * option.consumeDamage, skill.Attack.DamageType, false,
+                            foe.transform.position + Vector3.up, pendingDirection, skill.Attack.PoiseDamage * option.consumeDamage, HitTechnique.Ability);
                         combatant.ReportDamageDealt(foe, burst, foe.ApplyDamage(burst));
                     }
+
+                    // Used up after the burst, so the burst still has what the status gave (Sundered: takes more).
+                    effects.End(option.consumes);
 
                     if (option.consumeInto != null && foe.IsAlive)
                     {
                         StatusEffects.Apply(foe, option.consumeInto, combatant);
                     }
 
-                    GameMessages.Post(option.displayName + "!", MessageKind.Gain);
+                    // Said once a cast, however many it struck.
+                    if (called.Add(option.displayName))
+                    {
+                        GameMessages.Post(option.displayName + "!", MessageKind.Gain);
+                    }
                 }
 
                 if (option.addsStatus != null && foe.IsAlive)
                 {
                     StatusEffects.Apply(foe, option.addsStatus, combatant);
                 }
+            }
+        }
+    }
+
+    private static IEnumerable<SkillOption> Both(IReadOnlyList<SkillOption> chosen, IReadOnlyList<SkillOption> combos)
+    {
+        foreach (SkillOption option in chosen)
+        {
+            yield return option;
+        }
+
+        foreach (SkillOption option in combos)
+        {
+            if (option != null)
+            {
+                yield return option;
             }
         }
     }
@@ -1097,7 +1206,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             aimFocus = GetComponent<PlayerFocus>();
         }
 
-        bool refused = CheckCast(skill) == SkillCastResult.CoolingDown || (aimFocus != null && aimFocus.Circles < skill.FocusCircles);
+        bool refused = CheckCast(skill) == SkillCastResult.CoolingDown || (aimFocus != null && aimFocus.Circles < CirclesFor(skill));
         Color colour = refused ? new Color(0.55f, 0.55f, 0.55f, 0.6f) : SkillSchools.ColorOf(skill.School);
         // A throw is marked along its flight, out to where it can reach, as wide as its volley spreads; a blow by its own reach and arc.
         if (skill.Throws)

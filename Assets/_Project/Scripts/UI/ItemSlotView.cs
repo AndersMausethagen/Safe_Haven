@@ -118,6 +118,7 @@ public sealed class ItemSlotView : MonoBehaviour,
             tierLabel.color = filled ? Tiers.ColorOf(stack.Item.Tier) : Color.clear;
         }
 
+        HidePlaceholderOverIcon();
         UpdateFrame();
     }
 
@@ -140,7 +141,58 @@ public sealed class ItemSlotView : MonoBehaviour,
             tierLabel.color = new Color(0.92f, 0.87f, 0.74f, 1f);
         }
 
+        HidePlaceholderOverIcon();
         UpdateFrame();
+    }
+
+    // A faint word in the middle of an empty slot (what goes there): made on first use, from the count label's font.
+    private TMP_Text placeholder;
+
+    /// <summary>A faint word centred in the slot while it is empty, saying what goes there ("Tech", "Power"; the skill bar's kinds,
+    /// 2026-11-27). Kept on one line, shrunk to fit. Empty or null hides it; it never shows over an icon.</summary>
+    public void SetPlaceholder(string text)
+    {
+        bool show = !string.IsNullOrEmpty(text) && !filled;
+        if (placeholder == null)
+        {
+            if (!show || countLabel == null)
+            {
+                return;
+            }
+
+            var holder = new GameObject("Placeholder", typeof(RectTransform));
+            holder.transform.SetParent(transform, false);
+            var rect = (RectTransform)holder.transform;
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = new Vector2(3f, 3f);
+            rect.offsetMax = new Vector2(-3f, -3f);
+            var label = holder.AddComponent<TextMeshProUGUI>();
+            label.font = countLabel.font;
+            label.fontSharedMaterial = countLabel.fontSharedMaterial;
+            label.alignment = TextAlignmentOptions.Center;
+            label.textWrappingMode = TextWrappingModes.NoWrap;
+            label.enableAutoSizing = true;
+            label.fontSizeMin = 6f;
+            label.fontSizeMax = Mathf.Max(8f, countLabel.fontSize * 0.75f);
+            label.raycastTarget = false;
+            placeholder = label;
+        }
+
+        placeholder.text = show ? text : "";
+        Color muted = UIStyle.Current != null ? UIStyle.Current.Muted : new Color(0.7f, 0.65f, 0.55f);
+        muted.a = 0.75f;
+        placeholder.color = muted;
+        placeholder.enabled = show;
+    }
+
+    // Something now fills the slot: its placeholder word goes.
+    private void HidePlaceholderOverIcon()
+    {
+        if (placeholder != null && filled)
+        {
+            placeholder.enabled = false;
+        }
     }
 
     /// <summary>Greys the icon (a skill that can't be paid for yet), or shows it as Show left it.</summary>

@@ -5,7 +5,45 @@ is to just put all skills on the bar and spam the one that does the most damage.
 we balance them? Can we tie them more to weapon type or something else? research how safe haven handles this now and how other similar
 games handle it."
 
-Nothing here is built. It follows Docs/CombatSkillsResearch_2026-11-24.md (the V Rising-style plan) and
+**Phase 1 built 2026-11-27** (the user: "do as you recommend"): 3.1 (kinds and prices; techniques' damage cut but kept at 2.5 light swings or more, the floor from the 11-25 playtest; Trollsbane Wrath 110 + 4.4 x weapon, poise 80; War Cry's fury 12 s; Wolf's Lunge's "Light Step" became "Running Wolf", +50% haste, as a technique has no Focus to refund), 3.2 (the typed bar; empty slots say Art, Tech, Power, Ult) and 3.7 step 2 (the `Loadout` row, `SkillDamage.<id>` rows, the Playtest Runs window's ability table). The bar stays changeable anywhere (question 4's default). Phases 2-3 wait for a playtest.
+
+**New skills built 2026-11-27** (the user: "create new skills for each weapon type and a few magic abilities. make them tie nicely into
+each other. some can set up, while others do the damage"): 3.3 and 3.4 in full, ahead of the playtest.
+
+| Skill | Kind | Weapon | Sets up | Pays off (uses up, burst x the blow) |
+|---|---|---|---|---|
+| Crossing Cut | Technique | sword | Rend | |
+| Open the Vein | Technique | dagger | | Rend x1.6 |
+| Shield-Splitter | Technique | axe or club | Sundered | |
+| Reaping Arc | Technique | greataxe | | Rend x0.9 to all it sweeps |
+| Headsman's Drop | Technique | greatsword | | Sundered x1.4 |
+| Earthbreaker | Technique | hammer | | Roots x1.5, leaves them Hamstrung |
+| Run Through | Technique | spear | | Cowed x1.4, pierces two |
+| Rib-Breaker | Technique | fists | Cowed | |
+| Kindling Bolt | Technique | staff | Burning | |
+| Hunter's Snare | Technique | bow | Roots | |
+| Wildfire | Power (1 circle), Ember | any | | Burning x2 to all near (Yrsa's Stillwater Remembered) |
+| Hoarfrost | Power (1), Frost | any | Frostbite, then Frozen | (heavy blows shatter) (Liv's Eastwood Remembered) |
+| Elf-Shot | Power (1), Wyrd | any | Cowed | (Ingrid's Alder Mere Remembered) |
+
+- **Weapons.** A weapon's own technique is learned the first time one of copper (tier 2) or better is wielded
+  (`PlayerSkillSettings.WeaponTechniques`). It is cast only with that weapon in hand and greys on the bar after a swap. Fists teach the
+  first time the player fights barehanded. The four older techniques favour weapons (+25%): Whirling Steel sword, greataxe and dagger;
+  Wolf's Lunge dagger, spear and sword; Mountain Leap greatsword, hammer and greataxe; Troll's Hurl axe or club, hammer and fists.
+- **Older skills joined in.** The Ash Lad's Ember cauterises Rend (x1), and Mountain Leap lands on Sundered (x1, Crushing Landing).
+- **Rules.** Payoffs are `SkillDefinition.Combos`, run with the altar's options (`PlayerSkills.AfterOptions`). The burst lands before the
+  status is used up, so a Sundered foe takes its +15%. It staggers by the attack's poise times the factor, and counts as the skill's own
+  damage in the log. Thrown skills (Kindling Bolt, Hunter's Snare, Elf-Shot) only set up: their blow lands after the cast.
+- **Checked in Play** through the game's own payoff code on Draugr: each status was used up. The bursts came out different from the plain
+  factor, because a Draug's weaknesses and resistances apply to them: Wildfire 75 from a 20-point blow, Earthbreaker 45.
+- **Not yet seen:** the new techniques in a real fight. Their hit times are measured from each clip's contact, not watched.
+- **Icons:** eleven are Chroma1-HD. Open the Vein and Wildfire are Qwen-Image, because Chroma left white edges on them.
+- **Tests:** `SkillPriceTests`:
+  - every kind of weapon teaches exactly one technique;
+  - every status that is paid off can be laid in at least two ways;
+  - every status a weapon lays is paid off somewhere.
+
+It follows Docs/CombatSkillsResearch_2026-11-24.md (the V Rising-style plan) and
 Docs/SkillsImprovementResearch_2026-11-24.md (altar options, built on three skills). Numbers about other games come from wikis and
 guides; **[unverified]** marks claims no source confirmed.
 

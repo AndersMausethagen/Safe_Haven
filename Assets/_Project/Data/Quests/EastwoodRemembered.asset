@@ -60,6 +60,7 @@ MonoBehaviour:
   startsWithoutWaiting: 1
   onStarted: []
   objectivesInOrder: 1
+  formerStepCount: 0
   objectives:
   - type: 11
     description: Light Eastwood's boundary stone
@@ -94,7 +95,8 @@ MonoBehaviour:
   rewardItems: []
   rewardResources: []
   rewardRecipes: []
-  rewardSkills: []
+  rewardSkills:
+  - {fileID: 11400000, guid: 7b406cecc5e5f324fbbf14ff3517a3ad, type: 2}
   teachesAtStart: []
   rewardEnchantments: []
   rewardWorkFor: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}

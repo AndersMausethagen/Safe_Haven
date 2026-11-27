@@ -16,9 +16,10 @@ MonoBehaviour:
   description: Bring the hammer down hard enough to crack a troll's horn. Everything near is struck, its armour cracked.
   icon: {fileID: 21300000, guid: 4e4f0207309172442b1dfa3ac730c8fe, type: 3}
   school: 0
+  kind: 2
   cooldown: 40
   staminaCost: 0
-  focusCircles: 1
+  focusCircles: 3
   castTime: 1.26
   lungeDistance: 0
   lungeDuration: 0.308

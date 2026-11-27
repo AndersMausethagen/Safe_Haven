@@ -1,0 +1,115 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9139778d2cece034ba4eeb23169bbba8, type: 3}
+  m_Name: Earthbreaker
+  m_EditorClassIdentifier: Assembly-CSharp::SkillDefinition
+  displayName: Earthbreaker
+  description: 'The hammer comes down and the ground heaves. Foes held fast by roots or snares are torn loose: the hold is used up for a burst of half again the blow, and they stagger away lamed.'
+  icon: {fileID: 21300000, guid: 6653a6502cd20474ab637de208ec2241, type: 3}
+  school: 0
+  kind: 1
+  cooldown: 12
+  staminaCost: 0
+  focusCircles: 0
+  castTime: 0.7933372
+  lungeDistance: 0
+  lungeDuration: 0.44
+  channelSeconds: 0
+  channelTick: 0.3
+  foesStatus: {fileID: 0}
+  foesRadius: 7
+  foesDelay: 0.55
+  weapons: 06000000i
+  needsWeapon: 1
+  favouredDamage: 1.25
+  combos:
+  - id: earthbreaker_payoff
+    displayName: Earthbreaker
+    description: 
+    rank: 0
+    damageScale: 1
+    cooldownScale: 1
+    costScale: 1
+    buffScale: 1
+    heal: 0
+    extraLeaves: 0
+    foesRadiusScale: 1
+    addsStatus: {fileID: 0}
+    consumes: {fileID: 11400000, guid: 89bc0b3576e7cde40a48a2c27f924015, type: 2}
+    consumeHeal: 0
+    consumeDamage: 1.5
+    consumeInto: {fileID: 11400000, guid: 4172cd513ba7d834fb05def87aa42605, type: 2}
+  options: []
+  leaves: {fileID: 0}
+  leavesCount: 3
+  attack: {fileID: 11400000, guid: 1fa4863abf8c8f64999374ce532f7e46, type: 2}
+  heal: 0
+  buffs:
+  - stat: 7
+    op: 0
+    value: 20
+  buffDuration: 5
+  buffName: Rooted Stance
+  playAttackAnimation: 1
+  animationState: 2H Overhead
+  animationSpeed: 1
+  look:
+    showArea: 1
+    cast: []
+    release:
+    - prefab: {fileID: 9094924754952946362, guid: f6aa8ea3f98f40f49909360b12272fcb, type: 3}
+      place: 1
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 0.3
+      scale: 1
+    - prefab: {fileID: 53585801726910448, guid: 5933cc85a61640b44b94bc40a698cd28, type: 3}
+      place: 1
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 0.7
+      scale: 1
+    - prefab: {fileID: 2681584111135180071, guid: 3944ddcf25c73224393184634d06ba50, type: 3}
+      place: 1
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 1.3
+      scale: 1
+    - prefab: {fileID: 530393091379007461, guid: df231d18fb19ddc478cc3e8e82515538, type: 3}
+      place: 4
+      count: 6
+      delay: 0.02
+      stepDelay: 0
+      seconds: 0.8
+      scale: 1
+    struck:
+    - prefab: {fileID: 7695878944792941921, guid: 91c82be48bd6a2c46b2cbd1b38c5f670, type: 3}
+      place: 5
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 0.8
+      scale: 1
+    light: {r: 1, g: 0.85, b: 0.6, a: 1}
+    lightIntensity: 5
+    lightRange: 8
+    lightSeconds: 0.3
+    shake: 0.5
+    hitStop: 0.06
+    kick: 0.15
+    castSound: {fileID: 11400000, guid: f863ead39fc8d3d4d907ef6cddc3d6a2, type: 2}
+    releaseSound: {fileID: 11400000, guid: 97de70e3d99a8e343a7d791b67d95f2f, type: 2}
+    releaseSoundDelay: 0
+  weaponArt: 0

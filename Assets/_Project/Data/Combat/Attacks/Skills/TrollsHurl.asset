@@ -16,8 +16,8 @@ MonoBehaviour:
   description: 
   damageType: 0
   strike: 1
-  baseDamage: 50
-  weaponDamageRatio: 2.4
+  baseDamage: 20
+  weaponDamageRatio: 1.6
   powerScaling: 1
   structureDamageMultiplier: 1.5
   canCrit: 1

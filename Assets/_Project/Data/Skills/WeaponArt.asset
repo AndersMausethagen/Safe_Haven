@@ -16,6 +16,7 @@ MonoBehaviour:
   description: 'The art of the weapon in your hand: a sword''s dash, a thrown axe, a leap slam. It changes with what you hold, paid in Focus.'
   icon: {fileID: 21300000, guid: e9d68ba363004e84c92ac2f401c77306, type: 3}
   school: 0
+  kind: 0
   cooldown: 0
   staminaCost: 0
   focusCircles: 0
@@ -34,6 +35,7 @@ MonoBehaviour:
   heal: 0
   buffs: []
   buffDuration: 6
+  buffName: 
   playAttackAnimation: 1
   animationState: 
   animationSpeed: 1

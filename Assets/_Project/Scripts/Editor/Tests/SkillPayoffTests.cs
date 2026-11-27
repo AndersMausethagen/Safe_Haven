@@ -73,7 +73,11 @@ public sealed class SkillPayoffTests
         foreach (SkillDefinition skill in Abilities())
         {
             Assert.AreEqual(0f, skill.StaminaCost, $"{skill.name}: stamina is the dodge's");
-            Assert.GreaterOrEqual(skill.FocusCircles, 1, $"{skill.name} still takes a Focus circle");
+            // Since 2026-11-27 a technique is free of Focus, on its cooldown (SkillPriceTests); the rest spend it.
+            if (skill.Kind != SkillKind.Technique)
+            {
+                Assert.GreaterOrEqual(skill.FocusCircles, 1, $"{skill.name} still takes a Focus circle");
+            }
         }
     }
 

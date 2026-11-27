@@ -87,7 +87,11 @@ public sealed class QuickItemsTests
         {
             var skill = ScriptableObject.CreateInstance<SkillDefinition>();
             created.Add(skill);
-            skills.Loadout.Equip(i, skill);
+            // Each slot takes its kind (2026-11-27): the art, two techniques, two powers.
+            var data = new UnityEditor.SerializedObject(skill);
+            data.FindProperty(i == 0 ? "weaponArt" : "kind").intValue = i == 0 ? (int)WeaponArtSlot.Own : (int)(i < 3 ? SkillKind.Technique : SkillKind.Power);
+            data.ApplyModifiedPropertiesWithoutUndo();
+            Assert.IsTrue(skills.Loadout.Equip(i, skill));
         }
 
         Assert.AreEqual(5, skills.Loadout.FirstEmptySlot(), "1-5 are full");

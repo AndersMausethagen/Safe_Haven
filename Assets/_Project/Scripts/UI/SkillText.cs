@@ -105,6 +105,39 @@ public static class SkillText
             }
         }
 
+        // Its own set-ups and payoffs (Docs/SkillChoiceResearch_2026-11-27.md 3.4), in the statuses' names.
+        foreach (SkillOption combo in skill.Combos)
+        {
+            if (combo == null)
+            {
+                continue;
+            }
+
+            if (combo.consumes != null)
+            {
+                var payoff = new System.Collections.Generic.List<string>();
+                if (combo.consumeDamage > 0f) payoff.Add($"{combo.consumeDamage * 100f:0}% more damage and stagger");
+                if (combo.consumeHeal > 0f) payoff.Add($"{combo.consumeHeal:0} health back");
+                if (combo.consumeInto != null) payoff.Add($"{combo.consumeInto.DisplayName} in its place");
+                builder.Append($"\n<color={UIStyle.Current.GoodHex}>{combo.displayName}: on a foe {combo.consumes.DisplayName.ToLowerInvariant()}, uses it up for {string.Join(", ", payoff)}.</color>");
+            }
+
+            if (combo.addsStatus != null)
+            {
+                builder.Append($"\n<color={UIStyle.Current.AccentHex}>Also lays {Keyword(combo.addsStatus)}</color>");
+            }
+        }
+
+        if (skill.Weapons.Count > 0)
+        {
+            WeaponDefinition hand = Player.Current != null && Player.Current.TryGetComponent(out PlayerCombat fighter) ? fighter.Weapon : null;
+            bool fits = hand != null && System.Linq.Enumerable.Contains(skill.Weapons, hand.Signature);
+            string names = WeaponFamilies.Names(skill.Weapons);
+            builder.Append(skill.NeedsWeapon
+                ? $"\n<color={(fits ? UIStyle.Current.AccentHex : UIStyle.Current.DangerHex)}>Needs {names} in hand.</color>"
+                : $"\n<color={(fits ? UIStyle.Current.GoodHex : UIStyle.Current.MutedHex)}>Strikes harder with {names}.</color>");
+        }
+
         if (skill.FoesStatus != null)
         {
             builder.Append($"\n<color={UIStyle.Current.AccentHex}>Foes within {skill.FoesRadius:0.#} m: {Keyword(skill.FoesStatus)}</color>");
@@ -169,17 +202,18 @@ public static class SkillText
         return null;
     }
 
-    // What it takes to cast: its cooldown (an art's is the arts' own), its stamina, and the Focus circles it spends.
-    private static string Costs(SkillDefinition skill)
+    // What kind it is, and what it takes to cast: its cooldown (an art's is the arts' own), its stamina, and the Focus circles it spends.
+    public static string Costs(SkillDefinition skill)
     {
         bool art = skill.WeaponArt != WeaponArtSlot.None;
         var parts = new System.Collections.Generic.List<string>
         {
+            SkillKinds.Name(skill.Kind),
             $"Cooldown {(art ? CombatTechniqueSettings.Current.ArtCooldown : PlayerSkills.CooldownOf(skill)):0.#}s",
         };
         if (!art && skill.StaminaCost > 0f) parts.Add($"Stamina {skill.StaminaCost:0}");
         int circles = art ? 1 : skill.FocusCircles;
-        if (circles > 0) parts.Add(circles == 1 ? "1 Focus circle" : $"{circles} Focus circles");
+        parts.Add(circles <= 0 ? "No Focus" : circles >= 3 ? "Full Focus bar" : circles == 1 ? "1 Focus circle" : $"{circles} Focus circles");
         return string.Join("  ·  ", parts);
     }
 

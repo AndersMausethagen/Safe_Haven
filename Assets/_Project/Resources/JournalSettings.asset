@@ -896,10 +896,19 @@ MonoBehaviour:
     body: 'Your abilities are in the skill book ({key:Skills}). Drag one onto the bar to use it, and press {key:Skill1} to {key:Skill5} to use what is in each slot.
 
 
-      An ability spends one full Focus circle (the glowing circles above your skill bar), no stamina, and then has to cool down before it can be used again. Each grants you something for a few seconds after it lands, named on its card. A slot shows grey while no circle is full.
+      Each slot takes one kind, shown on it while you arrange the bar: {key:Skill1} your weapon''s art, {key:Skill2} and {key:Skill3} techniques, {key:Skill4} a power, {key:Skill5} a power or an ultimate.
 
 
-      Your weapon''s art sits on the first slot from the start and changes with what you hold. The people you bring home and the great foes you lay low teach more; each goes onto a free slot, and you can drag them anywhere. At the altar, Purified Essence deepens the ones you know, and each rank opens a choice of how it works. Use one often enough and the altar deepens it for nothing.
+      Techniques (a lunge, a leap, a spin, a throw) cost no Focus: use them whenever they are ready. Powers spend Focus (the glowing circles above your skill bar): one circle, two for the strongest. An ultimate takes the full bar. Each then has to cool down, and each grants you something for a few seconds after it lands, named on its card. A slot shows grey while there isn''t Focus enough.
+
+
+      Your weapon''s art sits on the first slot from the start and changes with what you hold. The people you bring home and the great foes you lay low teach more; each goes onto a free slot of its kind, and you can drag them to another slot of that kind. At the altar, Purified Essence deepens the ones you know, and each rank opens a choice of how it works. Use one often enough and the altar deepens it for nothing.
+
+
+      Every kind of weapon has a technique of its own, learned the first time you wield one of copper or better: it is cast only with that weapon in hand. Bare fists teach theirs the first time you fight without one.
+
+
+      Some skills set up and others pay off. One lays a mark (bleeding, broken armour, held fast, burning, cowed) and another uses it up for a burst of damage and a stagger: a sword''s Crossing Cut makes a foe bleed and a dagger''s Open the Vein opens the wound. Each card says what it lays and what it pays off.
 
 
       Dodge soon after casting one and your next swing carries its mark: frost, fire, a bleed. Some marks meet: fire on frost bursts into steam.
@@ -913,7 +922,7 @@ MonoBehaviour:
     unlockedBySkill: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
     unlockedByTechnique: 
     art: {fileID: 21300000, guid: d03cfd5169e5ca240a4efca33f4f72f5, type: 3}
-    summary: Strong moves and spells on the skill bar, each paid with a Focus circle. Your weapon's art is on the first slot; people and great foes teach more.
+    summary: 'Techniques, powers and an ultimate on the skill bar: techniques are free, powers and the ultimate spend Focus. Your weapon''s art is on the first slot; people and great foes teach more.'
     steps:
     - '[{key:Skills}] Open the skill book'
     - '[{key:Skill1}] Use what is in the first slot'

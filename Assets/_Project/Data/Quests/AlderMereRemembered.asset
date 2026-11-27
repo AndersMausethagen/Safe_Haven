@@ -60,6 +60,7 @@ MonoBehaviour:
   startsWithoutWaiting: 1
   onStarted: []
   objectivesInOrder: 1
+  formerStepCount: 0
   objectives:
   - type: 11
     description: Light Alder Mere's boundary stone
@@ -96,7 +97,8 @@ MonoBehaviour:
     amount: 3
   rewardResources: []
   rewardRecipes: []
-  rewardSkills: []
+  rewardSkills:
+  - {fileID: 11400000, guid: 728aad6a1bc2e0b409b54269e0456784, type: 2}
   teachesAtStart: []
   rewardEnchantments: []
   rewardWorkFor: {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}

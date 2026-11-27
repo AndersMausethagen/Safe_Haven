@@ -16,7 +16,7 @@ MonoBehaviour:
   description: 
   damageType: 0
   strike: 1
-  baseDamage: 60
+  baseDamage: 110
   weaponDamageRatio: 4.4
   powerScaling: 1
   structureDamageMultiplier: 1.5
@@ -26,7 +26,7 @@ MonoBehaviour:
   maxTargets: 10
   hitDelay: 0.868
   recoveryTime: 1.26
-  poiseDamage: 10
+  poiseDamage: 80
   impact: 2.4
   lunge: 0
   hop: 0
