@@ -33,12 +33,7 @@ public static partial class RaidMapGenerator
     /// </summary>
     public static void PlaceBarriers(RaidMap map, RaidLayoutPlan plan, IReadOnlyList<RaidMapSurface.LogObject> logs = null)
     {
-        Transform old = map.transform.Find(BarriersName);
-        if (old != null)
-        {
-            old.SetParent(null);
-            Object.Destroy(old.gameObject);
-        }
+        RemoveOld(map.transform, BarriersName);
 
         if (plan.Barriers.Count == 0)
         {

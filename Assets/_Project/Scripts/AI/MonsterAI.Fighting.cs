@@ -61,9 +61,19 @@ public sealed partial class MonsterAI
             return false;
         }
 
-        PlayerStateMachine swimmer = targetComponent.GetComponentInParent<PlayerStateMachine>();
+        // Looked up once per target, not every frame of the wait.
+        if (swimmerOf != targetComponent)
+        {
+            swimmerOf = targetComponent;
+            swimmer = targetComponent.GetComponentInParent<PlayerStateMachine>();
+        }
+
         return swimmer != null && swimmer.IsSwimming;
     }
+
+    // The target whose swimming is watched, and its state machine (WaitsAtShore).
+    private Component swimmerOf;
+    private PlayerStateMachine swimmer;
 
     private bool CanShoot
     {

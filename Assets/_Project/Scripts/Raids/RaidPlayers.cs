@@ -27,6 +27,39 @@ public static class RaidPlayers
         }
     }
 
+    /// <summary>
+    /// The nearest player still up to <paramref name="at"/> (this game's own unless down or dead, and friends' bodies), as something to
+    /// strike, and how far (squared, in full 3D); null and infinity for none. A boss waking and a creature choosing whom to go for ask this:
+    /// the boss kept its own copy, which took the host even when they lay downed, and its Engage was then refused (review 2026-11-27).
+    /// </summary>
+    public static IDamageable NearestUp(Player local, Vector3 at, out float sqrDistance)
+    {
+        IDamageable nearest = null;
+        sqrDistance = float.PositiveInfinity;
+        if (local != null && local.Health != null && local.Health.IsAlive && !CoopDowned.IsDown)
+        {
+            nearest = local.Health;
+            sqrDistance = (local.transform.position - at).sqrMagnitude;
+        }
+
+        foreach (FriendHitbox friend in FriendHitbox.Active)
+        {
+            if (friend == null || !friend.IsAlive)
+            {
+                continue;
+            }
+
+            float distance = (friend.transform.position - at).sqrMagnitude;
+            if (distance < sqrDistance)
+            {
+                sqrDistance = distance;
+                nearest = friend;
+            }
+        }
+
+        return nearest;
+    }
+
     /// <summary>The flat (XZ) squared distance from <paramref name="at"/> to the nearest of <paramref name="players"/>; infinity for none.</summary>
     public static float NearestFlatSqr(IReadOnlyList<Vector3> players, Vector3 at)
     {

@@ -100,7 +100,7 @@ public sealed class EscortFollower : RaidEventTask, IInteractionName
 
         foreach (ExtractionPoint exit in ExtractionPoint.Active)
         {
-            if (exit != null && exit.IsOpen && FlatDistance(exit.transform.position, transform.position) <= exit.HoldRadius)
+            if (exit != null && exit.IsOpen && exit.Inside(transform.position))
             {
                 IsDone = true;
                 GameMessages.Post($"{InteractionName} is safe at {(string.IsNullOrEmpty(exit.DisplayName) ? "the way out" : exit.DisplayName)}.", MessageKind.Gain);

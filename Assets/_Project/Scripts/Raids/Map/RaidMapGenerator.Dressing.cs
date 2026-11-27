@@ -17,12 +17,7 @@ public static partial class RaidMapGenerator
     /// <summary>Stands the plan's short flags and the heroes Scatter left as objects. Nothing (no holder) when there are none.</summary>
     public static void PlaceDressing(RaidMap map, RaidLayoutPlan plan, RaidLayoutRules rules, IReadOnlyList<RaidMapDefinition.HeroObject> heroes)
     {
-        Transform old = map.transform.Find(DressingName);
-        if (old != null)
-        {
-            old.SetParent(null);
-            Object.Destroy(old.gameObject);
-        }
+        RemoveOld(map.transform, DressingName);
 
         bool flags = plan.Flags.Count > 0 && rules.ShortFlags.Count > 0;
         if (!flags && (heroes == null || heroes.Count == 0))

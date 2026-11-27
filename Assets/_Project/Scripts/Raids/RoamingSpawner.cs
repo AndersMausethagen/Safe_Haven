@@ -218,6 +218,9 @@ public sealed class RoamingSpawner : MonoBehaviour
     private void Tidy(RoamingSpawnSettings settings, Vector3 player)
     {
         AliveCount = 0;
+        // Every player up (RaidPlayers): by the host's own alone, a pack searching near a guest vanished in front of them, and idle roamers
+        // were all sent across the map to the host (review 2026-11-27).
+        RaidPlayers.Positions(director.Player != null ? director.Player.gameObject : null, players);
         for (int i = roots.Count - 1; i >= 0; i--)
         {
             GameObject root = roots[i];
@@ -255,7 +258,8 @@ public sealed class RoamingSpawner : MonoBehaviour
             }
 
             position /= alive;
-            if (!busy && Flat(position - player) > settings.DespawnDistance && !RaidSpots.IsVisible(position, root.transform))
+            Vector3 nearest = NearestOf(players, position, player);
+            if (!busy && Flat(position - nearest) > settings.DespawnDistance && !RaidSpots.IsVisible(position, root.transform))
             {
                 spent = Mathf.Max(0, spent - alive);
                 nextHunt.Remove(root);
@@ -266,9 +270,9 @@ public sealed class RoamingSpawner : MonoBehaviour
 
             AliveCount += alive;
             // Idle roamers look around where they stopped for a while before heading for the player again.
-            if (!busy && idle && intensity.AllowsRoamers && Flat(position - player) > settings.HuntSpread && Time.time >= nextHunt[root])
+            if (!busy && idle && intensity.AllowsRoamers && Flat(position - nearest) > settings.HuntSpread && Time.time >= nextHunt[root])
             {
-                Hunt(root, player, settings);
+                Hunt(root, nearest, settings);
             }
         }
     }
@@ -291,7 +295,9 @@ public sealed class RoamingSpawner : MonoBehaviour
             }
 
             Vector3 point = hit.position;
-            if (Flat(point - player) < settings.MinDistance || !RaidSpots.IsDryEnough(point) || RaidSpots.IsVisible(point) || NearCreature(point, settings.CampClearance)
+            // Out of every player's reach (RaidPlayers), not the host's alone: a pack could appear in a guest's face.
+            RaidPlayers.Positions(director.Player != null ? director.Player.gameObject : null, players);
+            if (Mathf.Sqrt(RaidPlayers.NearestFlatSqr(players, point)) < settings.MinDistance || !RaidSpots.IsDryEnough(point) || RaidSpots.IsVisible(point) || NearCreature(point, settings.CampClearance)
                 || !NavMesh.CalculatePath(point, playerHit.position, NavMesh.AllAreas, path) || path.status != NavMeshPathStatus.PathComplete)
             {
                 continue;
@@ -371,6 +377,27 @@ public sealed class RoamingSpawner : MonoBehaviour
         }
 
         return false;
+    }
+
+    // The players up, gathered as each think asks (RaidPlayers.Positions).
+    private readonly List<Vector3> players = new List<Vector3>();
+
+    // The nearest of <paramref name="players"/> to <paramref name="at"/>, or <paramref name="fallback"/> when there are none.
+    private static Vector3 NearestOf(List<Vector3> players, Vector3 at, Vector3 fallback)
+    {
+        Vector3 nearest = fallback;
+        float best = float.PositiveInfinity;
+        foreach (Vector3 each in players)
+        {
+            float distance = Flat(each - at);
+            if (distance < best)
+            {
+                best = distance;
+                nearest = each;
+            }
+        }
+
+        return nearest;
     }
 
     private static float Flat(Vector3 offset)

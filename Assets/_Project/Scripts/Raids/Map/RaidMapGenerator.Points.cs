@@ -13,12 +13,7 @@ public static partial class RaidMapGenerator
     // Each part of a set-piece stands on the ground by itself, so a ruin sits into the hill and doesn't hang off it. Laid out anew, it starts over.
     private static void PlacePieces(RaidMap map, RaidLayoutPlan plan, Terrain terrain, System.Func<Vector2, Vector3> world)
     {
-        Transform old = map.transform.Find(PiecesName);
-        if (old != null)
-        {
-            old.SetParent(null);
-            Object.Destroy(old.gameObject);
-        }
+        RemoveOld(map.transform, PiecesName);
 
         var holder = new GameObject(PiecesName).transform;
         holder.SetParent(map.transform, false);
@@ -169,12 +164,7 @@ public static partial class RaidMapGenerator
     // something inside. On the ground, off steep slopes, never in the middle of the site.
     private static void PlaceClutter(RaidMap map, RaidLayoutPlan plan, RaidLayoutRules rules, Terrain terrain, System.Func<Vector2, Vector3> world)
     {
-        Transform old = map.transform.Find(ClutterName);
-        if (old != null)
-        {
-            old.SetParent(null);
-            Object.Destroy(old.gameObject);
-        }
+        RemoveOld(map.transform, ClutterName);
 
         var holder = new GameObject(ClutterName).transform;
         holder.SetParent(map.transform, false);
@@ -238,12 +228,7 @@ public static partial class RaidMapGenerator
     /// </summary>
     public static void PlaceCampDressing(RaidMap map, RaidLayoutPlan plan, RaidLayoutRules rules)
     {
-        Transform old = map.transform.Find(CampDressingName);
-        if (old != null)
-        {
-            old.SetParent(null);
-            Object.Destroy(old.gameObject);
-        }
+        RemoveOld(map.transform, CampDressingName);
 
         IReadOnlyList<GameObject> kinds = rules.CampDressing;
         if (kinds == null || kinds.Count == 0)

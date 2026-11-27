@@ -226,10 +226,15 @@ public sealed class CarriedBurden : RaidEventTask, IInteractionName, IInteractio
             Player.Current.Noise.Make(transform.position, noiseRadius);
         }
 
-        ExtractionPoint exit = NearestOpenExit(holder.transform.position);
-        if (exit != null && FlatDistance(exit.transform.position, holder.transform.position) <= exit.HoldRadius)
+        // Inside any open way out, by its own rule (ExtractionPoint.Inside): measured to the nearest centre alone, standing in a bigger
+        // circle whose centre was farther delivered nothing (review 2026-11-27).
+        foreach (ExtractionPoint exit in ExtractionPoint.Active)
         {
-            Deliver();
+            if (exit != null && exit.IsOpen && exit.Inside(holder.transform.position))
+            {
+                Deliver();
+                break;
+            }
         }
     }
 

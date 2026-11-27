@@ -19,12 +19,7 @@ public static partial class RaidMapGenerator
 
     public static void PlaceBridges(RaidMap map, RaidLayoutPlan plan, RaidLayoutRules rules)
     {
-        Transform old = map.transform.Find(BridgesName);
-        if (old != null)
-        {
-            old.SetParent(null);
-            Object.Destroy(old.gameObject);
-        }
+        RemoveOld(map.transform, BridgesName);
 
         RaidValleyRule rule = rules.Valley;
         if (plan.Valley == null || rule.bridgePrefab == null || plan.Rivers.Count == 0 || !plan.Crossings.Exists(c => c.Bridge))

@@ -56,12 +56,7 @@ public static partial class RaidMapGenerator
     /// </summary>
     public static void PlaceFenWater(RaidMap map, RaidLayoutPlan plan, RaidLayoutRules rules, float level, List<Mesh> meshes)
     {
-        Transform old = map.transform.Find(FenWaterName);
-        if (old != null)
-        {
-            old.SetParent(null);
-            Object.Destroy(old.gameObject);
-        }
+        RemoveOld(map.transform, FenWaterName);
 
         Material material = rules.Fen.water != null ? rules.Fen.water : rules.PondMaterial;
         if (!rules.Fen.enabled || material == null)
@@ -89,13 +84,7 @@ public static partial class RaidMapGenerator
 
     public static void PlacePonds(RaidMap map, RaidLayoutPlan plan, RaidLayoutRules rules, List<Mesh> meshes)
     {
-        Transform old = map.transform.Find(PondsName);
-        if (old != null)
-        {
-            // Detached first, as it lives on to the end of the frame and the name must be free for the new ones.
-            old.SetParent(null);
-            Object.Destroy(old.gameObject);
-        }
+        RemoveOld(map.transform, PondsName);
 
         foreach (Mesh mesh in meshes)
         {
@@ -184,12 +173,7 @@ public static partial class RaidMapGenerator
     /// </summary>
     public static void PlaceRavines(RaidMap map, RaidLayoutPlan plan, RaidLayoutRules rules, List<Mesh> meshes)
     {
-        Transform old = map.transform.Find(RavinesName);
-        if (old != null)
-        {
-            old.SetParent(null);
-            Object.Destroy(old.gameObject);
-        }
+        RemoveOld(map.transform, RavinesName);
 
         if (plan.Ravines.Count == 0)
         {
@@ -501,12 +485,7 @@ public static partial class RaidMapGenerator
     /// </summary>
     public static void PlaceRivers(RaidMap map, RaidLayoutPlan plan, RaidLayoutRules rules, List<Mesh> meshes)
     {
-        Transform old = map.transform.Find(RiversName);
-        if (old != null)
-        {
-            old.SetParent(null);
-            Object.Destroy(old.gameObject);
-        }
+        RemoveOld(map.transform, RiversName);
 
         if (plan.Rivers.Count == 0 || rules.RiverMaterial == null)
         {

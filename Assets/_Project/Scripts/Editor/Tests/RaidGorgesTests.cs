@@ -220,6 +220,38 @@ public sealed class RaidGorgesTests
     }
 
     [Test]
+    public void TheMapsSize_IsOneValue_InEveryLayoutAndMap()
+    {
+        // Authored twice (RaidLayoutRules › Map Size for the plan and the briefing's prefetch, RaidMapDefinition › Size for the terrain):
+        // apart, the prefetched layout is quietly thrown away and the briefing shows a map that isn't the one played (review 2026-11-27).
+        var sizes = new Dictionary<float, List<string>>();
+        void Note(float size, string what)
+        {
+            if (!sizes.TryGetValue(size, out List<string> named))
+            {
+                sizes[size] = named = new List<string>();
+            }
+
+            named.Add(what);
+        }
+
+        foreach (string guid in AssetDatabase.FindAssets("t:RaidLayoutRules"))
+        {
+            var rules = AssetDatabase.LoadAssetAtPath<RaidLayoutRules>(AssetDatabase.GUIDToAssetPath(guid));
+            Note(rules.MapSize, rules.name);
+        }
+
+        foreach (string guid in AssetDatabase.FindAssets("t:RaidMapDefinition"))
+        {
+            var map = AssetDatabase.LoadAssetAtPath<RaidMapDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            Note(map.Size, map.name);
+        }
+
+        Assert.AreEqual(1, sizes.Count, "one size for the plan and the terrain: " +
+            string.Join("; ", System.Linq.Enumerable.Select(sizes, pair => pair.Key + " m: " + string.Join(", ", pair.Value))));
+    }
+
+    [Test]
     public void AFall_CountsOnlyOverTheCut_NotOnANeck()
     {
         foreach (int seed in SeedsOf(Rules, true, 6))
@@ -232,11 +264,25 @@ public sealed class RaidGorgesTests
             }
 
             RaidLayoutRavine ravine = plan.Ravines[0];
-            Vector2 middle = ravine.Line[ravine.Line.Count / 2];
-            float floor = field.HeightAt(middle.x / Size, middle.y / Size);
-            Assert.IsTrue(RaidChasm.HasFallen(plan, middle, floor + 1f, floor), $"seed {seed}: down in the ravine is a fall");
-            float rim = ravine.Rim[ravine.Line.Count / 2];
-            Assert.IsFalse(RaidChasm.HasFallen(plan, middle, rim, rim), $"seed {seed}: at rim height (a neck) is no fall");
+            // Down in the cut: its deepest point. The line's middle can be a neck, filled to the rim where a way crosses (raid places, 11-26),
+            // and the test failed there on a ravine carved twenty metres deep either side.
+            int deepest = 0;
+            float most = float.NegativeInfinity;
+            for (int i = 0; i < ravine.Line.Count; i++)
+            {
+                float depth = ravine.Rim[i] - field.HeightAt(ravine.Line[i].x / Size, ravine.Line[i].y / Size);
+                if (depth > most)
+                {
+                    most = depth;
+                    deepest = i;
+                }
+            }
+
+            Vector2 down = ravine.Line[deepest];
+            float floor = field.HeightAt(down.x / Size, down.y / Size);
+            Assert.IsTrue(RaidChasm.HasFallen(plan, down, floor + 1f, floor), $"seed {seed}: down in the ravine is a fall");
+            float rim = ravine.Rim[deepest];
+            Assert.IsFalse(RaidChasm.HasFallen(plan, down, rim, rim), $"seed {seed}: at rim height (a neck) is no fall");
             return;
         }
 

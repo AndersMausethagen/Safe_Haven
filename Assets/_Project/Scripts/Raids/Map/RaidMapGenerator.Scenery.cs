@@ -39,12 +39,7 @@ public static partial class RaidMapGenerator
     // Solid boulders, set a little into the ground, and lookouts on the highest clearings. Kept out of Content, which is snapped to the ground.
     private static void PlaceBoulders(RaidMap map, RaidLayoutPlan plan, RaidLayoutRules rules)
     {
-        Transform old = map.transform.Find(BouldersName);
-        if (old != null)
-        {
-            old.SetParent(null);
-            Object.Destroy(old.gameObject);
-        }
+        RemoveOld(map.transform, BouldersName);
 
         CliffKit kit = rules.BoulderKit;
         bool wallCrags = plan.Valley != null && rules.Valley.wallCrags > 0f;

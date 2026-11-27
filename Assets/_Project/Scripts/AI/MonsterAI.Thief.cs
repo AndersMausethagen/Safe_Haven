@@ -182,6 +182,9 @@ public sealed partial class MonsterAI
     }
 
     // Away from the player, as game bolts; with the player right beside it and nowhere to go, it turns and fights.
+    // The ways tried for a flight, straight away first: one array, not one made at every step.
+    private static readonly float[] FleeTurns = { 0f, 45f, -45f, 90f, -90f, 135f, -135f };
+
     private void Flee(Player player, Vector3 playerAt, float distance)
     {
         float moved = Vector3.Distance(transform.position, lastThiefPosition);
@@ -204,7 +207,7 @@ public sealed partial class MonsterAI
         away.y = 0f;
         away = away.sqrMagnitude > 0.01f ? away.normalized : transform.forward;
         movement.SetSpeed(definition.MoveSpeed * HeldScale);
-        foreach (float turn in new[] { 0f, 45f, -45f, 90f, -90f, 135f, -135f })
+        foreach (float turn in FleeTurns)
         {
             Vector3 destination = transform.position + Quaternion.Euler(0f, turn, 0f) * away * FleeStride;
             if (movement.TryFindGround(destination, 3f, out Vector3 ground) && movement.MoveTo(ground))

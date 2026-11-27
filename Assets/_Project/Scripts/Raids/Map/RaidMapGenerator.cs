@@ -18,6 +18,25 @@ public static partial class RaidMapGenerator
     public const string RavinesName = "Ravines";
     public const string BouldersName = "Boulders";
 
+    /// <summary>
+    /// Takes away what an earlier layout left under <paramref name="name"/> (walls, bridges, pieces, water): out of the world at once,
+    /// switched off before Destroy, which waits for the end of the frame, and detached so the name is free for the new. The one way every
+    /// part of the generator starts over: eleven copies only detached it, and a map's second attempt rebuilt its navmesh in the same frame
+    /// with the first attempt's walls, set pieces and bridges still standing in it (review 2026-11-27).
+    /// </summary>
+    private static void RemoveOld(Transform parent, string name)
+    {
+        Transform old = parent.Find(name);
+        if (old == null)
+        {
+            return;
+        }
+
+        old.gameObject.SetActive(false);
+        old.SetParent(null);
+        Object.Destroy(old.gameObject);
+    }
+
     private const float RockClearing = 3f;
     private const float TerrainHeadroom = 4f;
     /// <summary>The most metres across a boulder lying about may be, so it keeps off trails and clearings (RaidLayoutPlanner's clearances).</summary>

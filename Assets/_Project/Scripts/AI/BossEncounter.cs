@@ -315,22 +315,11 @@ public sealed class BossEncounter : MonoBehaviour
         yield return Begin();
     }
 
+    // Someone up within the range (RaidPlayers: this game's player and the friends standing).
     private bool Near(float sqrRange)
     {
-        if (Player.Current != null && (Player.Current.transform.position - transform.position).sqrMagnitude < sqrRange)
-        {
-            return true;
-        }
-
-        foreach (FriendHitbox friend in FriendHitbox.Active)
-        {
-            if (friend.IsAlive && (friend.transform.position - transform.position).sqrMagnitude < sqrRange)
-            {
-                return true;
-            }
-        }
-
-        return false;
+        RaidPlayers.NearestUp(Player.Current, transform.position, out float nearest);
+        return nearest < sqrRange;
     }
 
     private System.Collections.IEnumerator Begin()
@@ -404,23 +393,7 @@ public sealed class BossEncounter : MonoBehaviour
     }
 
     // The nearest of the player and the friends still standing (co-op): whom it goes for as it wakes.
-    private IDamageable Nearest()
-    {
-        Player player = Player.Current;
-        IDamageable nearest = player != null ? player.Health : null;
-        float best = player != null ? (player.transform.position - transform.position).sqrMagnitude : float.MaxValue;
-        foreach (FriendHitbox friend in FriendHitbox.Active)
-        {
-            float distance = (friend.transform.position - transform.position).sqrMagnitude;
-            if (friend.IsAlive && distance < best)
-            {
-                best = distance;
-                nearest = friend;
-            }
-        }
-
-        return nearest;
-    }
+    private IDamageable Nearest() => RaidPlayers.NearestUp(Player.Current, transform.position, out _);
 
     private void StopMusic()
     {

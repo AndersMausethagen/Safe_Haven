@@ -32,7 +32,11 @@ public sealed class FoundationTests
         List<RecipeDefinition> day1 = All<RecipeDefinition>().Where(recipe => recipe.Station == CraftingStationType.Workbench && recipe.KnownFromStart
             && recipe.RequiredStationTier == 1 && recipe.ItemCost.All(cost => atHome.Contains(cost.Item.name)) && recipe.ResourceCost.Count == 0).ToList();
         Assert.GreaterOrEqual(day1.Count(recipe => recipe.Output.Category == ItemCategory.Equipment), 3, "gear to make before the first raid");
-        Assert.IsTrue(day1.Any(recipe => recipe.Output.Category == ItemCategory.Consumable), "something to heal with");
+        // Healing is made by hand since the user's 2026-11-25 list ("bandages by hand"), from the same things found at home.
+        bool heals = All<RecipeDefinition>().Any(recipe => (recipe.Station == CraftingStationType.Workbench || recipe.Station == CraftingStationType.None)
+            && recipe.KnownFromStart && recipe.RequiredStationTier <= 1 && recipe.Output != null && recipe.Output.Category == ItemCategory.Consumable
+            && recipe.ItemCost.All(cost => atHome.Contains(cost.Item.name)) && recipe.ResourceCost.Count == 0);
+        Assert.IsTrue(heals, "something to heal with, by hand or at the workbench");
     }
 
     [Test]

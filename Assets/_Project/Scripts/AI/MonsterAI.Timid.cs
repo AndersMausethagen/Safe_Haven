@@ -22,6 +22,9 @@ public sealed partial class MonsterAI
     /// <summary>True while it is running from something.</summary>
     public bool IsBolting => Time.time < boltUntil;
 
+    // The ways tried for a bolt, straight away first: one array, not one made at every step.
+    private static readonly float[] BoltTurns = { 0f, 50f, -50f, 100f, -100f };
+
     // Run by Update before anything a calm creature does. True while it is running (and nothing else should move it).
     private bool UpdateTimid()
     {
@@ -41,6 +44,20 @@ public sealed partial class MonsterAI
                 if (distance < definition.CloseSenseRange || senses.CanNotice(player.transform))
                 {
                     Bolt(player.transform.position);
+                }
+            }
+
+            // A friend walking up (co-op) startles it too, sensed close (their sneaking and cover are their game's): only the host's own
+            // player did, so deer never bolted from a guest (review 2026-11-27).
+            if (!IsBolting)
+            {
+                foreach (FriendHitbox friend in FriendHitbox.Active)
+                {
+                    if (friend != null && friend.IsAlive && HorizontalDistance(friend.transform.position) < definition.CloseSenseRange)
+                    {
+                        Bolt(friend.transform.position);
+                        break;
+                    }
                 }
             }
         }
@@ -65,7 +82,7 @@ public sealed partial class MonsterAI
             away = away.sqrMagnitude > 0.01f ? away.normalized : transform.forward;
             movement.SetSpeed(definition.MoveSpeed * HeldScale);
             // Straight away if there is ground that way, else to one side or the other: a cliff or the water turns it, it does not stop.
-            foreach (float turn in new[] { 0f, 50f, -50f, 100f, -100f })
+            foreach (float turn in BoltTurns)
             {
                 Vector3 destination = transform.position + Quaternion.Euler(0f, turn, 0f) * away * BoltStride;
                 if (movement.TryFindGround(destination, 3f, out Vector3 ground) && movement.MoveTo(ground))

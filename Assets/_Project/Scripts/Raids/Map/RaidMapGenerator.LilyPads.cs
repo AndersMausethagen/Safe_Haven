@@ -20,12 +20,7 @@ public static partial class RaidMapGenerator
     /// </summary>
     public static string PlaceLilyPads(RaidMap map, RaidLayoutPlan plan, RaidLayoutRules rules, RaidLayoutField field, List<Mesh> meshes)
     {
-        Transform old = map.transform.Find(LilyPadsName);
-        if (old != null)
-        {
-            old.SetParent(null);
-            Object.Destroy(old.gameObject);
-        }
+        RemoveOld(map.transform, LilyPadsName);
 
         RaidLilyPadRule rule = map.Definition != null ? map.Definition.LilyPads : null;
         if (rule == null || !rule.Enabled || field == null)
