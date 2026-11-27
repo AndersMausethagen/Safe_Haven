@@ -657,7 +657,8 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             {
                 if (agent.enabled)
                 {
-                    agent.enabled = false;
+                    // Held in the map's name (CreatureHold): what else holds a creature's feet meanwhile keeps them.
+                    CreatureHold.Hold(agent, this, CreatureHold.Part.Feet);
                     agents.Add(agent);
                 }
             }
@@ -670,10 +671,7 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
     {
         foreach (NavMeshAgent agent in agents)
         {
-            if (agent != null)
-            {
-                agent.enabled = true;
-            }
+            CreatureHold.Release(agent, this);
         }
 
         // Creatures placed on the map may have started before the ground changed; their home moved with them.

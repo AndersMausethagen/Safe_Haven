@@ -266,22 +266,15 @@ public sealed class BossEncounter : MonoBehaviour
     private System.Collections.IEnumerator Held()
     {
         health.AddInvulnerability(holdToken);
-        bool aiWasOn = ai != null && ai.enabled;
-        if (ai != null)
-        {
-            ai.enabled = false;
-        }
-
+        // Its brain held in the gate's name (CreatureHold): back when nobody else holds it (asleep, say), not by a guess of what it was.
+        CreatureHold.Hold(ai, holdToken, CreatureHold.Part.Brain);
         while (held)
         {
             yield return null;
         }
 
         health.RemoveInvulnerability(holdToken);
-        if (ai != null)
-        {
-            ai.enabled = aiWasOn;
-        }
+        CreatureHold.Release(ai, holdToken);
 
         wokenFromHold = true;
         yield return Begin();
@@ -389,7 +382,8 @@ public sealed class BossEncounter : MonoBehaviour
             sleep.WakeNow(ai);
         }
 
-        ai.enabled = false;
+        // Still through its roar: its brain held in the waking's name (CreatureHold), its body left to play the roar.
+        CreatureHold.Hold(ai, this, CreatureHold.Part.Brain);
         AudioManager.Play(definition.WakeSound, transform.position);
         CameraShake.Add(0.8f);
         Animator animator = GetComponentInChildren<Animator>();
@@ -401,7 +395,7 @@ public sealed class BossEncounter : MonoBehaviour
         bar.ShowCard(definition.WakeSeconds);
         yield return new WaitForSeconds(definition.WakeSeconds);
         health.RemoveInvulnerability(this);
-        ai.enabled = true;
+        CreatureHold.Release(ai, this);
         IDamageable nearest = Nearest();
         if (nearest != null)
         {

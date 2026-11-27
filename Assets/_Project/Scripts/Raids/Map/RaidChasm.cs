@@ -69,9 +69,10 @@ public sealed class RaidChasm : MonoBehaviour
 
     private void OnAnyDamaged(Damageable body, DamageInfo hit, DamageResult result)
     {
-        // A boss never goes over: its fight is the point.
-        if (plan == null || terrain == null || body == null || !body.IsAlive || falling.Contains(body) || !body.TryGetComponent(out MonsterAI _)
-            || body.TryGetComponent(out BossEncounter _) || !body.TryGetComponent(out HitReaction reaction) || reaction.KnockbackScale <= 0f
+        // A boss never goes over: its fight is the point. Nor a friend's copy of the host's creature (co-op): its fall is the host's game's
+        // to decide, and the copy here, held at 1 by its floor, froze at the bottom while the host's creature fought on (review 2026-11-27).
+        if (plan == null || terrain == null || body == null || !body.IsAlive || falling.Contains(body) || !body.TryGetComponent(out MonsterAI brain)
+            || brain.IsRemote || body.TryGetComponent(out BossEncounter _) || !body.TryGetComponent(out HitReaction reaction) || reaction.KnockbackScale <= 0f
             || CombatFeelSettings.Current == null)
         {
             return;
@@ -109,16 +110,8 @@ public sealed class RaidChasm : MonoBehaviour
     private IEnumerator Topple(Damageable body, Vector3 direction, Combatant pusher, float rim)
     {
         falling.Add(body);
-        if (body.TryGetComponent(out MonsterAI brain))
-        {
-            brain.enabled = false;
-        }
-
-        if (body.TryGetComponent(out NavMeshAgent agent))
-        {
-            agent.enabled = false;
-        }
-
+        // Its brain and feet held while it falls (CreatureHold): let go if it is still alive at the bottom.
+        CreatureHold.Hold(body, this, CreatureHold.Part.Brain | CreatureHold.Part.Feet);
         Vector3 velocity = direction * FallSpeed + Vector3.up * FallLift;
         while (body != null && body.IsAlive)
         {
@@ -126,7 +119,10 @@ public sealed class RaidChasm : MonoBehaviour
             body.transform.position += velocity * Time.deltaTime;
             if (body.transform.position.y < rim - FallDepth)
             {
-                body.ApplyDamage(new DamageInfo(pusher, null, body.MaxHealth * 100f, DamageType.Physical, false, body.transform.position, Vector3.down));
+                // A finishing blow: the fall is the end of it, whatever would have it rise again (the Draug's floor held it at 1, and it
+                // stood at the bottom with its brain off for good: review 2026-11-27).
+                body.ApplyDamage(new DamageInfo(pusher, null, body.MaxHealth * 100f, DamageType.Physical, false, body.transform.position, Vector3.down,
+                    0f, HitTechnique.Finisher));
                 break;
             }
 
@@ -149,6 +145,11 @@ public sealed class RaidChasm : MonoBehaviour
         }
 
         falling.Remove(body);
+        // Still alive (a floor nothing here could end): it gets up where it landed, its feet put on the nearest navmesh.
+        if (body != null && body.IsAlive)
+        {
+            CreatureHold.Release(body, this);
+        }
     }
 
     private void Update()

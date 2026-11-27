@@ -12,12 +12,10 @@ public sealed class CreatureSleep : MonoBehaviour
 {
     private const float CheckInterval = 0.5f;
 
+    // Its brain, feet and body are held in this one's name while it sleeps (CreatureHold).
     private sealed class Sleeper
     {
         public MonsterAI Ai;
-        public NavMeshAgent Agent;
-        public Animator Animator;
-        public MonsterAnimationDriver Driver;
         public Damageable Damageable;
         public System.Action<DamageInfo, DamageResult> OnDamaged;
     }
@@ -112,18 +110,11 @@ public sealed class CreatureSleep : MonoBehaviour
         var sleeper = new Sleeper
         {
             Ai = ai,
-            Agent = ai.GetComponent<NavMeshAgent>(),
-            Animator = ai.GetComponentInChildren<Animator>(),
-            Driver = ai.GetComponentInChildren<MonsterAnimationDriver>(),
             Damageable = ai.GetComponent<Damageable>(),
         };
         sleeper.OnDamaged = (damage, result) => Wake(ai, damage.Source);
 
-        // The AI goes first so it never runs a frame with its agent switched off.
-        ai.enabled = false;
-        SetEnabled(sleeper.Driver, false);
-        SetEnabled(sleeper.Animator, false);
-        SetEnabled(sleeper.Agent, false);
+        CreatureHold.Hold(ai, this, CreatureHold.Part.All);
         if (sleeper.Damageable != null)
         {
             sleeper.Damageable.Damaged += sleeper.OnDamaged;
@@ -166,10 +157,7 @@ public sealed class CreatureSleep : MonoBehaviour
             return;
         }
 
-        SetEnabled(sleeper.Agent, true);
-        SetEnabled(sleeper.Animator, true);
-        SetEnabled(sleeper.Driver, true);
-        ai.enabled = true;
+        CreatureHold.Release(ai, this);
 
         // The AI missed this hit while it was switched off, so pass the attacker on directly.
         if (attacker != null && ai.CurrentState != MonsterAI.State.Dead)
@@ -179,14 +167,6 @@ public sealed class CreatureSleep : MonoBehaviour
             {
                 ai.Engage(target);
             }
-        }
-    }
-
-    private static void SetEnabled(Behaviour behaviour, bool value)
-    {
-        if (behaviour != null)
-        {
-            behaviour.enabled = value;
         }
     }
 

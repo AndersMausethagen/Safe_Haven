@@ -133,6 +133,88 @@ public sealed class SharedStateTests
             "what another still held (a downed player with full controls, a cinematic the scene change ended)");
     }
 
+    // ----- A creature's body -----
+
+    // Scripts whose agents are their own, never a creature's: a horse, a companion, a resident walking home, the Nøkken's stripped figure.
+    private static readonly Dictionary<string, string> OwnAgents = new Dictionary<string, string>
+    {
+        { "Horses/HorseMotion.cs", "a horse's own walking, riding and leading" },
+        { "Companions/Companion.cs", "a companion's own agent" },
+        { "Settlement/ResidentLife.cs", "a resident's own walking" },
+        { "Fishing/NokkenEncounter.cs", "a stripped copy of a model, no creature" },
+    };
+
+    [Test]
+    public void ACreaturesBrainAndFeet_AreHeldInAnOwnersName()
+    {
+        var switched = new List<string>();
+        foreach ((string path, string source) in ConventionTests.RuntimeScripts())
+        {
+            string file = path.Substring("Assets/_Project/Scripts/".Length);
+            if (file == "AI/CreatureHold.cs" || OwnAgents.ContainsKey(file))
+            {
+                continue;
+            }
+
+            // A creature's brain or feet, by whatever name the script gives them: a field, a local, an out variable, a GetComponent result.
+            var names = new HashSet<string>();
+            foreach (Match declared in Regex.Matches(source, @"\b(?:MonsterAI|NavMeshAgent|UnityEngine\.AI\.NavMeshAgent)\s+(\w+)\b"))
+            {
+                names.Add(declared.Groups[1].Value);
+            }
+
+            foreach (Match declared in Regex.Matches(source, @"<(?:MonsterAI|NavMeshAgent)>\s*\(\s*out\s+var\s+(\w+)|\bvar\s+(\w+)\s*=[^;\n]*<(?:MonsterAI|NavMeshAgent)>\s*\(\)"))
+            {
+                names.Add(declared.Groups[1].Success ? declared.Groups[1].Value : declared.Groups[2].Value);
+            }
+
+            string[] lines = source.Split('\n');
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string code = CodePart(lines[i]);
+                bool direct = Regex.IsMatch(code, @"<(?:MonsterAI|NavMeshAgent)>\s*\(\)\s*\.enabled\s*=(?!=)");
+                if (direct || names.Any(name => Regex.IsMatch(code, $@"\b{name}\s*\.\s*enabled\s*=(?!=)")))
+                {
+                    switched.Add($"{file}:{i + 1}: {code.Trim()}");
+                }
+            }
+        }
+
+        CollectionAssert.IsEmpty(switched, "hold a creature's brain and feet in your own name (CreatureHold.Hold/Release): switched by hand, a ravine " +
+            "left a creature the fall didn't kill standing at the bottom with its brain off for good, as a boss stayed frozen (Docs/BugPatterns.md, ninth round)");
+    }
+
+    [Test]
+    public void ACreaturesHolds_LetGoInAnyOrder_AndLeaveWhatOthersHold()
+    {
+        var creature = new GameObject("A creature held by two");
+        try
+        {
+            var brain = creature.AddComponent<MonsterAI>();
+            var sleep = new object();
+            var gate = new object();
+            Assert.IsTrue(brain.enabled);
+            CreatureHold.Hold(brain, sleep, CreatureHold.Part.Brain | CreatureHold.Part.Body);
+            CreatureHold.Hold(brain, gate, CreatureHold.Part.Brain);
+            Assert.IsFalse(brain.enabled);
+            CreatureHold.Release(brain, sleep);
+            Assert.IsFalse(brain.enabled, "the gate still holds it");
+            CreatureHold.Release(brain, gate);
+            Assert.IsTrue(brain.enabled, "let go by both, in any order: awake");
+
+            brain.enabled = false; // placed still in the scene, by no hold
+            CreatureHold.Hold(brain, sleep, CreatureHold.Part.Body);
+            CreatureHold.Release(brain, sleep);
+            Assert.IsFalse(brain.enabled, "a release wakes only what that holder held");
+            CreatureHold.Release(brain, gate, CreatureHold.Part.Brain);
+            Assert.IsTrue(brain.enabled, "unless it asks to wake it (the story's \"a creature hunts\")");
+        }
+        finally
+        {
+            Object.DestroyImmediate(creature);
+        }
+    }
+
     // The Player map's keys as they are now, put back afterwards: holding the controls switches them (GameInput.SetPlayerKeys), and in
     // edit mode no OnEnable gives them back, so a test left them off for every test after it.
     private static System.Action KeepPlayerMap()

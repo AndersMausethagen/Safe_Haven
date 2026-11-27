@@ -122,11 +122,8 @@ public sealed partial class MonsterAI
         remotePoses.Clear();
         remoteHunt = RemoteHunt.None;
         remoteStaggerHold = float.NegativeInfinity;
-        if (TryGetComponent(out NavMeshAgent agent))
-        {
-            agent.enabled = false;
-        }
-
+        // Its feet held for as long as it is a copy (CreatureHold): taken back, they come back unless something else holds them.
+        CreatureHold.Hold(this, CopyHold, CreatureHold.Part.Feet);
         if (movement != null)
         {
             movement.Detached = true;
@@ -160,15 +157,13 @@ public sealed partial class MonsterAI
             movement.Detached = false;
         }
 
-        if (TryGetComponent(out NavMeshAgent agent))
-        {
-            agent.enabled = true;
-            agent.Warp(transform.position);
-        }
-
+        CreatureHold.Release(this, CopyHold);
         RefreshAmbush();
         TellCopyChanged(false);
     }
+
+    // A copy's own hold on its feet (CreatureHold).
+    private static readonly LeaseKey CopyHold = new LeaseKey("a friend's copy of the host's creature");
 
     /// <summary>
     /// Where the host's creature was at <paramref name="time"/> (the session's clock) and what it was doing. A strike or death

@@ -156,8 +156,11 @@ public sealed class MonsterMovement
     public void Halt()
     {
         Stop();
-        agent.enabled = false;
+        // Held for good in death's name (CreatureHold): a sleep or a fall let go later must not stand a dead body's feet up again.
+        CreatureHold.Hold(agent, Fallen, CreatureHold.Part.Feet);
     }
+
+    private static readonly LeaseKey Fallen = new LeaseKey("a creature fallen for good");
 
     /// <summary>Turns toward <paramref name="direction"/> at its turn speed. True once it faces it.</summary>
     public bool TurnTowards(Vector3 direction)

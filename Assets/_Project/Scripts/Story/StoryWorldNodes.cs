@@ -131,6 +131,9 @@ public sealed class CreatureHuntsNode : StoryNode
              "it meets on the way doesn't stop it. 0: it hunts as it likes from wherever it finds someone.")]
     [Min(0f)] public float stayWithin;
 
+    // The story's own hold on a puppet's brain and feet (CreatureHold).
+    private static readonly LeaseKey StoryHold = new LeaseKey("a story's puppet");
+
     public override bool IsFight => true;
 
     public override string Title => hunt ? "Creature Hunts" : "Creature Stops Hunting";
@@ -143,24 +146,15 @@ public sealed class CreatureHuntsNode : StoryNode
             yield break;
         }
 
-        UnityEngine.AI.NavMeshAgent agent = creature.GetComponent<UnityEngine.AI.NavMeshAgent>();
+        // Held still in the story's name (CreatureHold); sent hunting, it lets go and wakes brain and feet even if the scene placed it
+        // still (its feet back on the navmesh where it stands).
         if (!hunt)
         {
-            creature.enabled = false;
-            if (agent != null) agent.enabled = false;
+            CreatureHold.Hold(creature, StoryHold, CreatureHold.Part.Brain | CreatureHold.Part.Feet);
             yield break;
         }
 
-        if (agent != null)
-        {
-            agent.enabled = true;
-            if (UnityEngine.AI.NavMesh.SamplePosition(creature.transform.position, out UnityEngine.AI.NavMeshHit ground, 6f, UnityEngine.AI.NavMesh.AllAreas))
-            {
-                agent.Warp(ground.position);
-            }
-        }
-
-        creature.enabled = true;
+        CreatureHold.Release(creature, StoryHold, CreatureHold.Part.Brain | CreatureHold.Part.Feet);
         // A frame for the creature to set itself up before it is sent on its way.
         yield return null;
         if (towards != null)
