@@ -28,6 +28,8 @@ public sealed class GameLoopLiveTests
     private LiveTestErrors problems;
     private string where = "a new game";
     private string folder;
+    // Every data asset as it was before Play (DataAssets), put back after whatever the loop wrote.
+    private Dictionary<ScriptableObject, string> dataBefore;
 
     [UnityTest, Timeout(600000)]
     public IEnumerator ANewGame_GoesOnARaid_AndComesHomeWithIt()
@@ -35,6 +37,7 @@ public sealed class GameLoopLiveTests
         var raid = AssetDatabase.LoadAssetAtPath<RaidDefinition>(RaidPath);
         Assert.IsNotNull(raid, RaidPath);
         Dictionary<string, DateTime> playersSaves = PlayersSaves();
+        dataBefore = DataAssets();
 
         // Entered from the runner's own empty scene: opening the Haven in the Editor rebuilds its scatter (scene churn).
         LogAssert.ignoreFailingMessages = true;
@@ -88,6 +91,42 @@ public sealed class GameLoopLiveTests
         List<string> heard = problems.All;
         CollectionAssert.IsEmpty(heard, "nothing threw or logged an error on the way:\n" + string.Join("\n\n", heard));
         CollectionAssert.AreEquivalent(playersSaves, PlayersSaves(), "the player's own saves are untouched");
+        CollectionAssert.IsEmpty(ChangedDataAssets(),
+            "shared definitions and settings are read-only in play (a write to one is every user's, lives on in the Editor after Play, and " +
+            "is never in a build's next run): keep what changes on the object that owns it (Docs/BugPatterns.md, ninth round)");
+    }
+
+    // Every ScriptableObject of the game's own (sub-assets too), serialized as it is now. TextMesh Pro's fonts are left out: a dynamic
+    // font adds the glyphs it meets to its atlas, which is what it is for.
+    private static Dictionary<ScriptableObject, string> DataAssets()
+    {
+        var all = new Dictionary<ScriptableObject, string>();
+        foreach (string guid in AssetDatabase.FindAssets("t:ScriptableObject", new[] { "Assets/_Project" }))
+        {
+            foreach (Object found in AssetDatabase.LoadAllAssetsAtPath(AssetDatabase.GUIDToAssetPath(guid)))
+            {
+                if (found is ScriptableObject data && !(data is TMPro.TMP_Asset) && !all.ContainsKey(data))
+                {
+                    all[data] = EditorJsonUtility.ToJson(data);
+                }
+            }
+        }
+
+        return all;
+    }
+
+    private List<string> ChangedDataAssets()
+    {
+        var changed = new List<string>();
+        foreach (KeyValuePair<ScriptableObject, string> before in dataBefore)
+        {
+            if (before.Key != null && EditorJsonUtility.ToJson(before.Key) != before.Value)
+            {
+                changed.Add($"{AssetDatabase.GetAssetPath(before.Key)} ({before.Key.GetType().Name} {before.Key.name})");
+            }
+        }
+
+        return changed;
     }
 
     [UnityTearDown]
@@ -99,6 +138,20 @@ public sealed class GameLoopLiveTests
         {
             Cheats.SetInvincible(false);
             yield return new ExitPlayMode();
+        }
+
+        // A data asset written in play keeps the write in the Editor: put back as it was, once Play is over.
+        if (dataBefore != null)
+        {
+            foreach (KeyValuePair<ScriptableObject, string> before in dataBefore)
+            {
+                if (before.Key != null && EditorJsonUtility.ToJson(before.Key) != before.Value)
+                {
+                    EditorJsonUtility.FromJsonOverwrite(before.Value, before.Key);
+                }
+            }
+
+            dataBefore = null;
         }
 
         SaveGameService.Storage = new SaveStorage();
