@@ -27,7 +27,13 @@ public static class PlaceDressingBuilder
         public float X, Z, Turn, Scale = 1f, Raised, TiltX, TiltZ;
         // A decal (Path is its material): width and depth on the ground.
         public Vector2 Decal;
+        // A light (no Path): its colour, range and intensity, Raised above the ground.
+        public Color Light;
+        public float Range, Intensity;
     }
+
+    private static Prop L(float x, float z, float raised, Color colour, float range, float intensity) =>
+        new Prop { X = x, Z = z, Raised = raised, Light = colour, Range = range, Intensity = intensity };
 
     private static Prop P(string path, float x, float z, float turn = 0f, float scale = 1f, float raised = 0f, float tiltX = 0f, float tiltZ = 0f) =>
         new Prop { Path = path, X = x, Z = z, Turn = turn, Scale = scale, Raised = raised, TiltX = tiltX, TiltZ = tiltZ };
@@ -211,6 +217,34 @@ public static class PlaceDressingBuilder
             D("Scorch", 1.1f, 1.8f, 1.6f, 1.6f),
         },
 
+        // Happenings (HavenHappenings): a pedlar resting on the old road, by a small fire.
+        ["Pedlar's Camp"] = new[]
+        {
+            P(Props + "Hooded Stranger/Hooded Stranger.prefab", 0f, 0f, 200f),
+            P(R("Log Pile"), 1.6f, 0.8f, 30f, 0.6f),
+            P(R("Old Bucket"), -1f, 0.9f, 0f),
+            P(R("Cut Stone A"), 0.6f, -1.6f, 0f, 0.45f, -0.05f),
+            P(R("Cut Stone B"), 1.2f, -1.2f, 70f, 0.45f, -0.05f),
+            D("Scorch", 0.9f, -1.5f, 1.4f, 1.4f),
+            L(0.9f, -1.5f, 0.5f, new Color(1f, 0.6f, 0.3f), 6f, 1.2f),
+        },
+
+        // A storm felled an oak across the way: wood for whoever takes it.
+        ["Storm-felled Oak"] = new[]
+        {
+            P("Assets/_Project/Art/Vegetation/Misty Woods/Rocks and Logs/Rotten Log A.prefab", 0f, 0f, 65f, 1.6f),
+            P(R("Plank"), 1.5f, 1.8f, 20f, 0.6f, 0.05f),
+            P(R("Plank"), -1.2f, -1.6f, 140f, 0.5f, 0.05f),
+        },
+
+        // Lights over the tarn at night: cold, moving the way people move.
+        ["Tarn Lights"] = new[]
+        {
+            L(-2.5f, 1f, 1.6f, new Color(0.55f, 0.85f, 1f), 7f, 2.2f),
+            L(1.8f, 3f, 1.9f, new Color(0.5f, 1f, 0.85f), 6f, 1.8f),
+            L(0.4f, -2.2f, 1.4f, new Color(0.6f, 0.8f, 1f), 5f, 1.6f),
+        },
+
         // The drowned road: a causeway of boards across the fen, sunk and broken, its posts leaning.
         ["Sunken Causeway Scene"] = new[]
         {
@@ -270,6 +304,20 @@ public static class PlaceDressingBuilder
 
     private static bool Make(Prop prop, Transform root)
     {
+        if (prop.Range > 0f)
+        {
+            var glow = new GameObject("Light");
+            glow.transform.SetParent(root, false);
+            glow.transform.localPosition = new Vector3(prop.X, prop.Raised, prop.Z);
+            var light = glow.AddComponent<Light>();
+            light.type = LightType.Point;
+            light.color = prop.Light;
+            light.range = prop.Range;
+            light.intensity = prop.Intensity;
+            light.shadows = LightShadows.None;
+            return true;
+        }
+
         if (prop.Decal != Vector2.zero)
         {
             var material = AssetDatabase.LoadAssetAtPath<Material>(prop.Path);

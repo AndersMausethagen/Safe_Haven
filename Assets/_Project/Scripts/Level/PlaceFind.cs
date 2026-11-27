@@ -30,7 +30,8 @@ public sealed class PlaceFind : MonoBehaviour, IInteractionName, IInteractionVer
     public static string KeyOf(WorldAtlas.Place place, HavenPlaceVerbs.Find find, int daysAtHome)
     {
         string key = TakenKey(place.id, find.item != null ? find.item.Id : find.name);
-        return find.everyDays <= 0 ? key : $"{key}:{Mathf.Max(0, daysAtHome) / find.everyDays}";
+        // A yield also by its name: two of the same thing at one place (smoked fish and a run of perch) are taken apart.
+        return find.everyDays <= 0 ? key : $"{key}:{find.name}:{Mathf.Max(0, daysAtHome) / find.everyDays}";
     }
 
     /// <summary>True when the find has been taken (this span, for a yield).</summary>

@@ -391,6 +391,9 @@ MonoBehaviour:
       smokeAt: {x: 0, y: 1.4, z: 0}
       clearsMist: 0
       hidesEarlier: 0
+      worker: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: -2, y: -1.5}
   - placeId: haven.burnt_farmstead.0
     thoughts: []
     stages:
@@ -405,6 +408,9 @@ MonoBehaviour:
       smokeAt: {x: 0, y: 0, z: 0}
       clearsMist: 0
       hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 14, y: 18}
+      workAt: {x: 1.5, y: -1.5}
     - note: 'The Hollow Pines remembered: Asa''s field, sown with the family''s seed.'
       gate: 2
       quest: {fileID: 11400000, guid: 7fd51412ce7494e4394efdf6c6ebd5a6, type: 2}
@@ -417,6 +423,9 @@ MonoBehaviour:
       smokeAt: {x: 1.1, y: 0.6, z: 1.8}
       clearsMist: 0
       hidesEarlier: 0
+      worker: {fileID: 11400000, guid: ec38b2d8e58d6d84899dfeda6a4f8aeb, type: 2}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 0, y: -1.5}
   - placeId: haven.authored.familys_grave
     thoughts: []
     stages:
@@ -431,6 +440,9 @@ MonoBehaviour:
       smokeAt: {x: 0, y: 0, z: 0}
       clearsMist: 0
       hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 14, y: 18}
+      workAt: {x: 1.5, y: -1.5}
     - note: 'The family found: the grave tended.'
       gate: 2
       quest: {fileID: 11400000, guid: c02abb0f34687e841b484a01d52b7be5, type: 2}
@@ -443,6 +455,9 @@ MonoBehaviour:
       smokeAt: {x: 1.1, y: 0.6, z: 1.8}
       clearsMist: 0
       hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 14, y: 18}
+      workAt: {x: 1.5, y: -1.5}
   - placeId: haven.authored.old_steading
     thoughts: []
     stages:
@@ -457,6 +472,9 @@ MonoBehaviour:
       smokeAt: {x: 0, y: 0, z: 0}
       clearsMist: 0
       hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 14, y: 18}
+      workAt: {x: 1.5, y: -1.5}
   - placeId: haven.authored.empty_hall
     thoughts: []
     stages:
@@ -471,6 +489,9 @@ MonoBehaviour:
       smokeAt: {x: 0, y: 0, z: 0}
       clearsMist: 0
       hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 14, y: 18}
+      workAt: {x: 1.5, y: -1.5}
   - placeId: haven.authored.alder_spring
     thoughts: []
     stages:
@@ -485,6 +506,9 @@ MonoBehaviour:
       smokeAt: {x: 0, y: 0, z: 0}
       clearsMist: 0.85
       hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 14, y: 18}
+      workAt: {x: 1.5, y: -1.5}
   - placeId: haven.authored.tarn_shrine
     thoughts: []
     stages:
@@ -499,6 +523,9 @@ MonoBehaviour:
       smokeAt: {x: 0, y: 0, z: 0}
       clearsMist: 0.85
       hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 14, y: 18}
+      workAt: {x: 1.5, y: -1.5}
   - placeId: haven.authored.sunken_causeway
     thoughts: []
     stages:
@@ -513,6 +540,9 @@ MonoBehaviour:
       smokeAt: {x: 0, y: 0, z: 0}
       clearsMist: 0
       hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 14, y: 18}
+      workAt: {x: 1.5, y: -1.5}
   - placeId: haven.old_quarry.0
     thoughts: []
     stages:
@@ -528,6 +558,9 @@ MonoBehaviour:
       smokeAt: {x: 1.1, y: 0.6, z: 1.8}
       clearsMist: 0
       hidesEarlier: 0
+      worker: {fileID: 11400000, guid: f8b63bb3e2db2fb44947d33b612f80f3, type: 2}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
   - placeId: haven.fisher_s_rest.0
     thoughts: []
     stages:
@@ -543,6 +576,9 @@ MonoBehaviour:
       smokeAt: {x: 1.1, y: 0.6, z: 1.8}
       clearsMist: 0
       hidesEarlier: 0
+      worker: {fileID: 11400000, guid: 9f83966b2e3c8fe42a58fd9d130cb08e, type: 2}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1, y: -1.5}
   smoke: {fileID: 2100000, guid: e0dc5fdfe4f83b44294848291dbc9ed2, type: 2}
   lookoutReveal: 110
   lookoutSees: 180

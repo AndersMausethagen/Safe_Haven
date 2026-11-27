@@ -14,6 +14,8 @@ public enum HabitPlace
     Lanes = 3,
     /// <summary>The nearest guard post (or the edge with none): an eye on the dark.</summary>
     Watch = 4,
+    /// <summary>The place they work out in the Haven's land, once a region's arc left it worked (PlaceWorkers): Asa's field.</summary>
+    Worked = 5,
 }
 
 /// <summary>A trait's habit (Docs/PeopleSystemReview_2026-11-23.md §1.2): in its hours, their free time (and their meal, if it says) is spent
@@ -53,6 +55,13 @@ public static class PeopleHabits
         if (record?.Resident == null || (activity != ResidentActivity.Fire && activity != ResidentActivity.Meal))
         {
             return false;
+        }
+
+        // A place of theirs worked out in the land (PlaceWorkers) comes before a trait's habit: their free time is spent there.
+        if (activity == ResidentActivity.Fire && PlaceWorkers.TryGet(record.Resident, hour, out PlaceWorkers.Spot worked))
+        {
+            habit = new TraitHabit(HabitPlace.Worked, worked.From, worked.Until);
+            return true;
         }
 
         foreach (ResidentTraitDefinition trait in record.Resident.Traits)

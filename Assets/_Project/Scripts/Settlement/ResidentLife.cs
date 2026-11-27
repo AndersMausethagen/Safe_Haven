@@ -741,6 +741,16 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
                 look = at + away;
                 break;
             }
+            case HabitPlace.Worked:
+                // Their place out in the land (PlaceWorkers): the quarry, the field, the rest.
+                if (!PlaceWorkers.TryGet(npc.Resident, hour, out PlaceWorkers.Spot worked))
+                {
+                    return false;
+                }
+
+                at = worked.At;
+                look = worked.Look;
+                break;
             case HabitPlace.Watch:
             {
                 IReadOnlyList<Vector3> posts = GameSession.Here.Posts;

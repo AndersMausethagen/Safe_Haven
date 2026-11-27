@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// Keeps the Haven's places as their story stands (Docs/HavenWorldStory_2026-11-26.md steps 3-4): each place's scene stages
 /// (HavenPlaceVerbs › Scenes: dressing, thoughts, a worked place's smoke) and the things left there to take (Finds), each shown only
-/// while its gate is open. Looks again whenever a quest moves, a region is remembered or a day passes at home, so nothing waits for
+/// while its gate is open. Looks again whenever a quest moves, a region is remembered, a day passes at home or night falls, so nothing waits for
 /// the next scene load. Stood by HavenPlaceVerbs.Begin on the scene's place-verbs holder; derives everything from the quest log, the
 /// territory and the used-stone keys, so it saves nothing of its own.
 /// </summary>
@@ -178,13 +178,23 @@ public sealed class HavenPlaceScenes : MonoBehaviour
             holder.AddComponent<KeptPlace>().Configure(stage.smokeRise > 0f, stage.clearsMist);
         }
 
+        // Someone from home works it: they walk out to it in their free time (PlaceWorkers), facing the stage's centre.
+        if (stage.worker != null)
+        {
+            var spot = new GameObject("Worker's Spot");
+            spot.transform.SetParent(holder.transform, false);
+            Vector3 at = holder.transform.TransformPoint(new Vector3(stage.workAt.x, 0f, stage.workAt.y));
+            spot.transform.position = HavenPlaceVerbs.Ground(new Vector2(at.x, at.z));
+            spot.AddComponent<PlaceWorkerSpot>().Configure(stage.worker, stage.workHours, holder.transform.position);
+        }
+
         holder.SetActive(true);
         return holder;
     }
 
     // The dressing's props each stand on the ground beneath them, so a scene laid out on flat ground sits on the slope it is stood on.
     // Only its direct children move, and only up or down: what a prop holds keeps its place on it.
-    private static void Settle(Transform dressing)
+    public static void Settle(Transform dressing)
     {
         foreach (Transform prop in dressing)
         {

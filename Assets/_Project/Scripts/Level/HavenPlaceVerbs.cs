@@ -118,6 +118,13 @@ public sealed class HavenPlaceVerbs : ScriptableObject
         [Range(0f, 1f)] public float clearsMist;
         [Tooltip("The earlier stages' dressing goes when this one shows.")]
         public bool hidesEarlier;
+        [Tooltip("Who works this place once it shows (PlaceWorkers): they walk out to it in their free time, in Work Hours, and are home " +
+                 "at night. Nobody while they aren't home yet.")]
+        public ResidentDefinition worker;
+        [Tooltip("The hours they are out at it (from, until).")]
+        public Vector2 workHours = new Vector2(14f, 18f);
+        [Tooltip("Where they stand to work, from the stage's centre (x, z).")]
+        public Vector2 workAt = new Vector2(1.5f, -1.5f);
     }
 
     [Serializable]
@@ -270,6 +277,8 @@ public sealed class HavenPlaceVerbs : ScriptableObject
         // The finds and the scenes' stages come and go with the story (a quest started, a region remembered), so they are stood by a
         // keeper that looks again whenever it moves on.
         stood.AddComponent<HavenPlaceScenes>().Begin(atlas, verbs);
+        // And what is going on out there this span (HavenHappenings): a swarm, a fish run, a pedlar on the old road.
+        stood.AddComponent<HavenHappeningsKeeper>().Begin(atlas);
     }
 
     private static void Stand(WorldAtlas.Place place, Kind kind, string[] thoughts, Vector3 at, HavenPlaceVerbs verbs)

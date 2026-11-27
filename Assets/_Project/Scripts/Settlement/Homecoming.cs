@@ -134,8 +134,19 @@ public static class Homecoming
             }
         }
 
-        // Someone met out there came by the gate (a raid choice's mark), heading the card above all.
         JournalRecord journal = GameSession.Progress.Journal;
+        // What is going on out in the land this span (HavenHappenings), told once: a reason to walk out before the next raid.
+        string foretold = HavenHappenings.Foretell(journal);
+        if (foretold != null)
+        {
+            lines.Insert(System.Math.Min(1, lines.Count), foretold);
+            if (lines.Count > MostLines)
+            {
+                lines.RemoveAt(lines.Count - 1);
+            }
+        }
+
+        // Someone met out there came by the gate (a raid choice's mark), heading the card above all.
         string visit = AwayGifts.Visit(gifts, GameSession.Stash, journal.HasNoticed, mark => journal.NoteNoticed(mark));
         if (visit != null)
         {

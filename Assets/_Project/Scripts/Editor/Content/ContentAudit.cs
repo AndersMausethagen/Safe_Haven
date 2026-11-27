@@ -46,6 +46,8 @@ public static class ContentAudit
         "ForaySettings.destinations[].loot[].item",
         // What someone met in a raid leaves at the gate when they come by (HomecomingSettings' visits: the pedlar freed).
         "HomecomingSettings.visits[].item",
+        // What a happening out in the Haven's land leaves to take, once in its span (HavenHappenings: the swarm's honeycomb).
+        "HavenHappenings.happenings[].item",
     };
 
     private static readonly string[] ItemUses =
