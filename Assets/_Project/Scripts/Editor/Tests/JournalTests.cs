@@ -345,7 +345,10 @@ public sealed class JournalTests
     public void EveryCinematic_CanBeWatchedAgain()
     {
         var listed = Settings.Cinematics.Select(c => c.cinematic).ToList();
-        foreach (string guid in AssetDatabase.FindAssets("t:CinematicDefinition", new[] { "Assets/_Project/Data" }))
+        // The start menu's living picture is a cinematic's shot held behind the menu (MenuBackdrop), not a cinematic to watch.
+        string menu = System.IO.File.ReadAllText("Assets/_Project/Scenes/MainMenu.unity");
+        foreach (string guid in AssetDatabase.FindAssets("t:CinematicDefinition", new[] { "Assets/_Project/Data" })
+                     .Where(id => !menu.Contains("backdrop: {fileID: 11400000, guid: " + id)))
         {
             var cinematic = AssetDatabase.LoadAssetAtPath<CinematicDefinition>(AssetDatabase.GUIDToAssetPath(guid));
             CollectionAssert.Contains(listed, cinematic, $"{cinematic.name} can't be watched again.");

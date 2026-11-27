@@ -29,6 +29,10 @@ public static class ActiveEffects
 {
     private static IContentLookup content;
 
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => content = null;
+
     private static IContentLookup Content() => content != null ? content : content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
 
     /// <summary>What is at work on <paramref name="player"/> now, harmful things first.</summary>
