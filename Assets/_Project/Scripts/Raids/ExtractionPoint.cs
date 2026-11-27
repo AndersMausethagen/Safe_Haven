@@ -13,6 +13,9 @@ using UnityEngine;
 /// item to light it, take more or less time to hold, and sound an alarm that sends a spawn group hunting the player.
 /// When the raid clock runs out (RaidDirector.InOvertime), a portal opens at the centre of every stone: stepping through takes the
 /// player home at once, no hold, and the player may stay instead while the mist allows (RaidPacingSettings, the user 2026-11-22).
+/// A full hold opens that portal too, at this stone, for the rest of the raid (the user, 2026-11-27: "when we stand in the circle long
+/// enough, a portal like the one in Haven activates. We could then send a rescue through it and choose to stay, or press the portal to
+/// go home"): the raid no longer ends by itself when the hold fills. A boss encounter's arrival stone (Turns Back) still leaves at once.
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
@@ -79,6 +82,7 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
         Mathf.Lerp(slowest, fastest, Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(fill)));
     private bool alarmRaised;
     private bool extracted;
+    private bool openedByHold;
     private float nextCallAt;
     // What the clock has done to this way out so far (see Status).
     private bool openedOnce;
@@ -112,8 +116,13 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
     public float Duration => Mathf.Max(RaidParameters.MinimumExtractionTime,
         (RaidDirector.Current != null ? RaidDirector.Current.Parameters.ExtractionTime * RaidDirector.Current.HoldScale : fallbackSeconds) * timeMultiplier);
 
-    /// <summary>The clock has run out and a portal stands open here: step through, no hold (RaidDirector.InOvertime).</summary>
-    public bool IsPortal => !turnsBack && RaidDirector.Current != null && RaidDirector.Current.InOvertime;
+    /// <summary>A portal stands open here: its hold was filled (<see cref="IsOpenedByHold"/>), or the clock has run out
+    /// (RaidDirector.InOvertime). Step through, no hold.</summary>
+    public bool IsPortal => !turnsBack && (openedByHold || (RaidDirector.Current != null && RaidDirector.Current.InOvertime));
+
+    /// <summary>True once its circle was held full: its portal stays open for the rest of the raid, for the player to step through
+    /// (or send the freed home by) whenever they choose.</summary>
+    public bool IsOpenedByHold => openedByHold;
 
     /// <summary>True once lit, until the raid ends or the way goes dark.</summary>
     public bool IsLit => hold.IsLit;
@@ -131,7 +140,8 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
         : ExtractionWindow.StatusAt(openedOnce ? 0f : opensAtSecondsLeft, closesAtSecondsLeft, SecondsLeft);
     public bool IsOpen => Status == ExtractionStatus.Open;
     /// <summary>Seconds until this point opens or closes, or -1 when it won't change again.</summary>
-    public float SecondsUntilChange => IsPortal ? RaidDirector.Current.OvertimeLeft
+    public float SecondsUntilChange => openedByHold && !turnsBack ? -1f
+        : IsPortal ? RaidDirector.Current.OvertimeLeft
         : closedOnce || heldShut != null ? -1f
         : ExtractionWindow.SecondsUntilChange(openedOnce ? 0f : opensAtSecondsLeft, closesAtSecondsLeft, SecondsLeft);
 
@@ -216,7 +226,8 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
             }
         }
 
-        if (!IsLit || extracted)
+        // Held open: the portal waits for the player to step through; nothing more to hold or call out.
+        if (!IsLit || extracted || openedByHold)
         {
             return;
         }
@@ -255,8 +266,27 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
 
         if (state == ExtractionHoldState.Done)
         {
-            Leave(player);
+            if (turnsBack || RaidDirector.Current == null)
+            {
+                Leave(player);
+            }
+            else
+            {
+                OpenPortal();
+            }
         }
+    }
+
+    // The hold is full: the portal stands open here until the raid ends. The player goes when they choose (Interact), and may send
+    // the freed through it first (HomewardSpot).
+    private void OpenPortal()
+    {
+        openedByHold = true;
+        ShowPortal();
+        string key = GameInput.KeyLabel(GameInput.Interact);
+        string press = string.IsNullOrEmpty(key) ? "Step through it" : $"Step through it ({key})";
+        GameMessages.Post($"The portal at {displayName} stands open! {press} to go home, or stay: it waits for you. " +
+                          "Bring anyone you freed into the circle to send them home first.", MessageKind.Gain);
     }
 
     /// <summary>
@@ -406,7 +436,12 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
         // In overtime the portal takes them at once.
         if (IsPortal && !extracted)
         {
-            PlaytestLogger.Note(PlaytestLog.ExitLit, displayName, -Mathf.RoundToInt(RaidDirector.Current.Session.Overtime), "portal");
+            // A held portal was noted when its stone was lit: one row a stone, as the logs count them.
+            if (!openedByHold)
+            {
+                PlaytestLogger.Note(PlaytestLog.ExitLit, displayName, -Mathf.RoundToInt(RaidDirector.Current.Session.Overtime), "portal");
+            }
+
             Leave(user);
             return;
         }

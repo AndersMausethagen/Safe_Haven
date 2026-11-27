@@ -186,6 +186,11 @@ public sealed partial class PlayerCombat : MonoBehaviour
     private bool waitingForHold;
     private bool charging;
     private float attackPressedAt = float.NegativeInfinity;
+    // The end of a recovery the guard cut short (GiveWayToGuard): no new swing before it, but for a counter.
+    private float recoveryOwedUntil = float.NegativeInfinity;
+
+    /// <summary>True while a recovery the guard cut short is still owed: attacks wait (a ready counter doesn't).</summary>
+    public bool OwesRecovery => Time.time < recoveryOwedUntil && !CounterIsReady;
     private bool attackHeld;
     // How long the player has been running, for the running attack.
     private float runningFor;

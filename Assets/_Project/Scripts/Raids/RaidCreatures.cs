@@ -108,6 +108,8 @@ public sealed class RaidCreatures
         {
             ai.PlayerOnly = true;
             ai.Relentless = true;
+            // It comes all the way, but once it has found the player it can be shaken off (the user, 2026-11-27).
+            ai.ShakenOffAfterFound = true;
             ai.Engage(hunted);
         }
     }

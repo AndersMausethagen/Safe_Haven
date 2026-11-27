@@ -12,6 +12,7 @@ public sealed class KitHaul
 {
     private const float Gap = 8f;
     private const float HeadingHeight = 30f;
+    private const int MostPerRow = 8;
 
     private readonly RectTransform root;
     private readonly TMP_Text heading;
@@ -87,7 +88,8 @@ public sealed class KitHaul
         }
 
         float width = Mathf.Max(cardSize, root.rect.width);
-        int perRow = Mathf.Max(1, Mathf.FloorToInt((width + Gap) / (cardSize + Gap)));
+        // Never more than eight to a row (the user, 2026-11-27: "Start a new line when items on the left side are over 8").
+        int perRow = Mathf.Clamp(Mathf.FloorToInt((width + Gap) / (cardSize + Gap)), 1, MostPerRow);
         int room = perRow * Mathf.Max(1, rows);
         // Past the room, the last card counts the rest.
         int cardsShown = shown.Count <= room ? shown.Count : room;

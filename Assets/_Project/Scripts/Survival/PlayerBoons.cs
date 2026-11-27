@@ -13,9 +13,11 @@ public readonly struct BoonRecord
     public readonly bool IsCoating;
     public readonly float SecondsLeft;
     public readonly IReadOnlyList<StatBonus> Bonuses;
+    /// <summary>Seconds more a meal keeps hunger from falling (SurvivalSettings › Meal Holds Hunger), 0 when it doesn't.</summary>
+    public readonly float HungerHeldLeft;
 
     public BoonRecord(string id, string name, bool isMeal, float secondsLeft, IReadOnlyList<StatBonus> bonuses, bool isTonic = false,
-        bool isCoating = false)
+        bool isCoating = false, float hungerHeldLeft = 0f)
     {
         Id = id;
         Name = name;
@@ -24,6 +26,7 @@ public readonly struct BoonRecord
         IsCoating = isCoating;
         SecondsLeft = secondsLeft;
         Bonuses = bonuses;
+        HungerHeldLeft = hungerHeldLeft;
     }
 }
 
@@ -45,6 +48,7 @@ public sealed class PlayerBoons : MonoBehaviour
         public bool IsCoating;
         public float SecondsLeft;
         public IReadOnlyList<StatBonus> Bonuses;
+        public float HungerHeldLeft;
     }
 
     private readonly List<Entry> active = new List<Entry>();
@@ -56,13 +60,29 @@ public sealed class PlayerBoons : MonoBehaviour
     /// <summary>How many boons are at work.</summary>
     public int Count => active.Count;
 
+    /// <summary>Seconds more hunger is held where it is by a meal eaten (the longest of them), 0 when none: PlayerNeeds doesn't drain it.</summary>
+    public float HungerHeldLeft
+    {
+        get
+        {
+            float longest = 0f;
+            foreach (Entry entry in active)
+            {
+                longest = Mathf.Max(longest, entry.HungerHeldLeft);
+            }
+
+            return longest;
+        }
+    }
+
     /// <summary>What is at work, for the HUD and for carrying across scenes.</summary>
     public List<BoonRecord> Capture()
     {
         var records = new List<BoonRecord>(active.Count);
         foreach (Entry entry in active)
         {
-            records.Add(new BoonRecord(entry.Id, entry.Name, entry.IsMeal, entry.SecondsLeft, entry.Bonuses, entry.IsTonic, entry.IsCoating));
+            records.Add(new BoonRecord(entry.Id, entry.Name, entry.IsMeal, entry.SecondsLeft, entry.Bonuses, entry.IsTonic, entry.IsCoating,
+                entry.HungerHeldLeft));
         }
 
         return records;
@@ -86,8 +106,9 @@ public sealed class PlayerBoons : MonoBehaviour
     /// slot of its own beside the meals and the tonics: one coating at a time, and it shares no family with them, so it adds to a fed
     /// and dosed player rather than taking their food's place.
     /// </summary>
+    /// <param name="holdsHunger">Seconds it keeps hunger from falling (a meal: SurvivalSettings › Meal Holds Hunger), 0 for none.</param>
     public bool Add(string id, string displayName, IReadOnlyList<StatBonus> bonuses, float seconds, bool isMeal, bool isTonic = false,
-        bool isCoating = false)
+        bool isCoating = false, float holdsHunger = 0f)
     {
         if (bonuses == null || bonuses.Count == 0 || seconds <= 0f)
         {
@@ -127,7 +148,11 @@ public sealed class PlayerBoons : MonoBehaviour
             }
         }
 
-        Begin(new Entry { Id = id, Name = displayName, IsMeal = isMeal, IsTonic = isTonic, IsCoating = isCoating, SecondsLeft = seconds, Bonuses = bonuses });
+        Begin(new Entry
+        {
+            Id = id, Name = displayName, IsMeal = isMeal, IsTonic = isTonic, IsCoating = isCoating, SecondsLeft = seconds, Bonuses = bonuses,
+            HungerHeldLeft = Mathf.Min(Mathf.Max(0f, holdsHunger), seconds),
+        });
         Changed?.Invoke();
         return true;
     }
@@ -143,7 +168,7 @@ public sealed class PlayerBoons : MonoBehaviour
         foreach (BoonRecord record in records)
         {
             Begin(new Entry { Id = record.Id, Name = record.Name, IsMeal = record.IsMeal, IsTonic = record.IsTonic, IsCoating = record.IsCoating,
-                SecondsLeft = record.SecondsLeft, Bonuses = record.Bonuses });
+                SecondsLeft = record.SecondsLeft, Bonuses = record.Bonuses, HungerHeldLeft = record.HungerHeldLeft });
         }
 
         Changed?.Invoke();
@@ -155,6 +180,7 @@ public sealed class PlayerBoons : MonoBehaviour
         for (int i = active.Count - 1; i >= 0; i--)
         {
             active[i].SecondsLeft -= Time.deltaTime;
+            active[i].HungerHeldLeft = Mathf.Max(0f, active[i].HungerHeldLeft - Time.deltaTime);
             if (active[i].SecondsLeft <= 0f)
             {
                 GameMessages.Post($"{active[i].Name} has worn off.");

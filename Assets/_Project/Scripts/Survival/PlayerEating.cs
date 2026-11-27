@@ -204,9 +204,12 @@ public sealed class PlayerEating : MonoBehaviour, IPlayerActivity
 
         // A cook knows how to make a meal last, an alchemist a tonic (the Cooking and Alchemy skills).
         float boonSeconds = item.BoonSeconds * BoonScale(item);
-        if (item.HasBoon && boons != null && boons.Add(item.Id, item.DisplayName, item.BoonBonuses, boonSeconds, item.IsMeal, item.IsTonic, item.IsCoating))
+        // A meal also keeps hunger where it is for a while (SurvivalSettings › Meal Holds Hunger).
+        float holds = item.IsMeal ? SurvivalSettings.Current.MealHoldsHunger : 0f;
+        if (item.HasBoon && boons != null && boons.Add(item.Id, item.DisplayName, item.BoonBonuses, boonSeconds, item.IsMeal, item.IsTonic, item.IsCoating, holds))
         {
-            GameMessages.Post($"{item.DisplayName}: {ItemTooltipView.DescribeBonuses(item.BoonBonuses)} for {RaidStats.FormatTime(boonSeconds)}", MessageKind.Gain);
+            string full = holds > 0f ? $"; you won't hunger for {RaidStats.FormatTime(Mathf.Min(holds, boonSeconds))}" : "";
+            GameMessages.Post($"{item.DisplayName}: {ItemTooltipView.DescribeBonuses(item.BoonBonuses)} for {RaidStats.FormatTime(boonSeconds)}{full}", MessageKind.Gain);
         }
 
         if (item.Cures.Count > 0 && TryGetComponent(out StatusEffects effects) && effects.Cure(item.Cures) > 0)

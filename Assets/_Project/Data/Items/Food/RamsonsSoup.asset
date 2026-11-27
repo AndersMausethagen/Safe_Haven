@@ -46,7 +46,7 @@ MonoBehaviour:
   - stat: 11
     op: 0
     value: 0.25
-  boonSeconds: 480
+  boonSeconds: 2700
   tonic: 0
   coating: 0
   cures:
@@ -67,6 +67,7 @@ MonoBehaviour:
   experience: 0
   learnedAtHome: 0
   inscription: 0
+  teachesSkill: {fileID: 0}
   transport: {fileID: 0}
   sapling: {fileID: 0}
   lantern: {fileID: 0}
@@ -76,7 +77,6 @@ MonoBehaviour:
   bardingLook: 0
   horseTreat: 0
   runeArt: {fileID: 0}
-  runeFocus: 30
   runeFor: 0
   raidModifier: {fileID: 0}
   workerCarryWeight: 0

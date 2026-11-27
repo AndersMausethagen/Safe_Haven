@@ -69,8 +69,8 @@ public sealed class BuildMenuWindow : MonoBehaviour
         public string Missing;
         /// <summary>Known, but not open yet: what it waits for ("Needs a Workshop."). Null when it can be built.</summary>
         public string Locked;
-        /// <summary>A quest under way asks for it to be built: its icon glows (QuestLog.WantsBuilt).</summary>
-        public Outline Glow;
+        /// <summary>A quest under way asks for it to be built: the whole card glows round its edge (QuestLog.WantsBuilt).</summary>
+        public Image Glow;
     }
 
     private UIWindow window;
@@ -180,14 +180,15 @@ public sealed class BuildMenuWindow : MonoBehaviour
             return;
         }
 
-        // What a quest asks to be built glows, breathing (the user, 2026-11-25: "mark that building with a glowing outline on the icon").
+        // What a quest asks to be built glows, breathing: the whole card, not its picture (the user, 2026-11-27: "The whole square icon
+        // should glow, not the picture of the building itself").
         Color glow = UIStyle.Current.AccentBright;
-        glow.a = 0.55f + 0.45f * Mathf.Sin(Time.unscaledTime * 4f);
+        glow.a = 0.6f + 0.4f * Mathf.Sin(Time.unscaledTime * 4f);
         foreach (Card card in cards)
         {
             if (card.Glow != null && card.Glow.enabled)
             {
-                card.Glow.effectColor = glow;
+                card.Glow.color = glow;
             }
         }
 
@@ -365,6 +366,25 @@ public sealed class BuildMenuWindow : MonoBehaviour
         cards.Add(card);
     }
 
+    // A bright rim just outside the card's own, over everything on it, with a soft halo: the card glows, its picture is left as it is.
+    private static Image CardGlow(RectTransform card)
+    {
+        UIStyle style = UIStyle.Current;
+        RectTransform ring = CodeUI.Stretch("Quest Glow", card);
+        ring.offsetMin = new Vector2(-GlowSpread, -GlowSpread);
+        ring.offsetMax = new Vector2(GlowSpread, GlowSpread);
+        Image glow = HearthKit.Sliced(ring.gameObject.AddComponent<Image>(), style.CardRim, 1.3f);
+        glow.raycastTarget = false;
+        glow.color = style.AccentBright;
+        var halo = ring.gameObject.AddComponent<Outline>();
+        halo.effectDistance = new Vector2(2f, -2f);
+        halo.effectColor = HearthKit.Faded(style.AccentBright, 0.5f);
+        ring.SetAsLastSibling();
+        return glow;
+    }
+
+    private const float GlowSpread = 4f;
+
     // The Manage cards' marks: up for upgrade, a cross for taking down, arrows for moving.
     private static string ManageGlyph(Card card) => card.ToDemolish ? "×" : card.ToUpgrade ? "▲" : "⇄";
 
@@ -421,15 +441,13 @@ public sealed class BuildMenuWindow : MonoBehaviour
             }
 
             bool wanted = card.Building != null && QuestsHere() != null && QuestsHere().WantsBuilt(card.Building);
-            if (card.Icon != null && (wanted || card.Glow != null))
+            if (wanted && card.Glow == null)
             {
-                if (card.Glow == null)
-                {
-                    card.Glow = card.Icon.gameObject.AddComponent<Outline>();
-                    card.Glow.effectDistance = new Vector2(3f, -3f);
-                    card.Glow.useGraphicAlpha = false;
-                }
+                card.Glow = CardGlow((RectTransform)card.Frame.transform);
+            }
 
+            if (card.Glow != null)
+            {
                 card.Glow.enabled = wanted;
             }
 

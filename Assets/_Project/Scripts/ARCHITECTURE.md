@@ -3622,3 +3622,31 @@ From the user's list after their 72-minute run.
   meanwhile; saved as a sixth state part. Not yet: modules
   needing new items (Barrow-iron Anvil, Jeweller's Bench, Burl Still, Jutul Cold Store, Bloomery Hearth, Nykk-hair Lines, Brukam's Horn,
   Living Heart) and their quests and rumours; the Storage Shed's two (the shed already holds a chest's 60-slot most).
+
+## Playtest list 2026-11-27
+
+The user's notes after playing the build of 2026-11-27 (tests: `PlaytestFixes1127Tests`):
+- **A held circle opens a portal.** `ExtractionPoint`: the hold filling no longer ends the raid; it opens the stone's portal
+  (`IsOpenedByHold`, the overtime portal's look) for the rest of the raid. The player steps through with Interact when they choose, and
+  can send freed people home there first (`HomewardSpot`). A boss arrival stone (Turns Back) still leaves at once. `RaidHudView` says so.
+- **Results without panels.** `RaidResultsScreen`: no window behind the haul or the facts; the artwork is shaded softly at both sides and
+  the words carry a TMP underlay shadow (`ShadowWords`); the title is carved by hand (no window to do it). `KitHaul`: at most 8 a row.
+- **Block + attack owed its recovery.** `PlayerCombat.GiveWayToGuard` cutting a swing's recovery sets `recoveryOwedUntil`; attack presses
+  wait it out (`OwesRecovery`), except a ready counter and the guard counter just after a block.
+- **Build menu glow:** a ring round the whole card (`BuildMenuWindow.CardGlow`), not an outline on the picture.
+- **Nodes come back at home.** `Regrowth.HomeDays/HomeRaids/HomeDue`: a non-tree node with Respawn Seconds above 0 gathered in the Haven
+  grows back after HavenSettings › Regrow After Days (3) or Regrow After Raids (3, the journal's raid count), whichever first, never
+  where a building stands (`BuiltOver`). `ResourceNode` saves `regrowOnRaid`; painted rocks (`TerrainNodeHarvesting.homeDue`) save
+  `rockDays`/`rockRaids` in `TerrainTreeMemory`. Saves from before start counting on load. Trees still come back only from saplings.
+- **Helpers hammer.** `ResidentLife.WorkJob`: anyone at a scaffold who isn't a builder works as HomeLifeSettings › Builders[0] does
+  (gesture, tool, sound).
+- **Meals:** every meal's boon lasts 30-60 min (data), and holds hunger for SurvivalSettings › Meal Holds Hunger (600 s), carried in
+  `BoonRecord.HungerHeldLeft` through the portal; `PlayerNeeds` doesn't drain hunger meanwhile.
+- **Active effects on the C sheet.** `ActiveEffects.On` lists statuses, the mist, boons (with what gave them: `SourceOf`) and skill
+  buffs; `CharacterWindow.Effects` shows them as picture cards across the sheet's foot (the sheet is 800 tall), words on hover.
+- **Raid hunters can be shaken off.** `MonsterAI.ShakenOffAfterFound` (set by `RaidCreatures.Prepare`): once a relentless hunter has
+  seen the player and then lost them for PerceptionSettings › Hunt Shaken Off Seconds (10), it hunts as any creature does.
+- **Life motes:** Misty Woods' Life Wells weight 4 → 10; the mote has a rising glimmer (loot sparkle material) and brighter emission.
+- **The tusse:** `MonsterDefinition.LadenSpeed` (0.7) while it carries loot.
+- **Parry and stagger effects:** bigger, white-gold (`Flash` tone), and lingering 2.5× (`SkillFxPrefabs.Linger`); the stagger plays
+  at the creature's middle (`CombatFeedback.MiddleOf`), not at its feet.

@@ -45,25 +45,32 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 1.7
     priority: 20
+    opener: 0
     weight: 0
     whenFoe: 0
     heavy: 0
     cooldown: 1.4
     interruptible: 1
+    reelWhenBroken: 0
     sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    untilPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps:
     - {fileID: 11400000, guid: ead5f29d54ed4ef4a978deb82a7a8b18, type: 2}
     comboChance: 0.45
     comboGap: 0.2
     comboFromTier: 2
     holdChance: 0.25
+    breakAway: 0
+    breakAwayDelay: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -84,6 +91,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -91,6 +100,9 @@ MonoBehaviour:
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    bondPoiseShare: 0
+    bondToppleSeconds: 0
+    bondWithin: 12
     lobSeconds: 1.1
     lobScatter: 2
   movementTactic: 1
@@ -107,14 +119,18 @@ MonoBehaviour:
   idleGrazeChance: 0
   idleSleepChance: 0.25
   idleSleepAttention: 0.3
+  swims: 0
   timid: 0
   boltSeconds: 7
   thief: 1
   stealReach: 1.5
   escapeDistance: 18
   corneredSeconds: 4
+  ladenSpeed: 0.7
   canBeFinished: 0
   flankSpread: 0
+  flanksFromTier: 0
+  flankSound: {fileID: 0}
   breaksWalls: 0
   spottedPause: 0
   guardAfterBlows: 0
@@ -127,6 +143,12 @@ MonoBehaviour:
   arrowDodge: 0.35
   poise: 0
   parryResponse: 0
+  poiseRecoveryDelay: 0
+  toppleSeconds: 0
+  poiseGrowth: 0
+  toppleStrike: 0
+  toppleBreaksArmour: 0
+  toppleSound: {fileID: 0}
   openWhileStriking: 1
   parriesBackstabs: 1
   shieldArc: 0

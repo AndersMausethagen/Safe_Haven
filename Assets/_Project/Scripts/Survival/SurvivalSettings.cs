@@ -47,6 +47,9 @@ public sealed class SurvivalSettings : GameSettings<SurvivalSettings>
     [Header("Meals")]
     [Tooltip("How many cooked meals can give their bonuses at once (GDD §11.4). Another meal pushes out the one closest to ending. Tonics don't count.")]
     [SerializeField, Min(1)] private int mealSlots = 2;
+    [Tooltip("Seconds a meal with a boon keeps hunger from falling once eaten (the user, 2026-11-27: \"All food buffs should last at least " +
+             "30 minutes and keep hunger from going down for at least 10\"). Never longer than the boon itself. 0: it doesn't.")]
+    [SerializeField, Min(0f)] private float mealHoldsHunger = 600f;
     [Tooltip("How many tonics can give their bonuses at once (Docs/PlayerStatsResearch.md #4); another pushes out the one closest to ending. " +
              "A second comes from the Cauldron's top upgrade or the Alchemy perk Second Vial. Set high, every different tonic stacks, as before.")]
     [SerializeField, Min(1)] private int tonicSlots = 1;
@@ -80,6 +83,7 @@ public sealed class SurvivalSettings : GameSettings<SurvivalSettings>
     public float ParchedCombatRegeneration => parchedCombatRegeneration;
     public float ParchedRegeneration => parchedRegeneration;
     public int MealSlots => Mathf.Max(1, mealSlots);
+    public float MealHoldsHunger => mealHoldsHunger;
     public int TonicSlots => Mathf.Max(1, tonicSlots);
 
     /// <summary>Minutes a full meter lasts at the given drain, for the Systems Editor. Infinity when it doesn't drain.</summary>

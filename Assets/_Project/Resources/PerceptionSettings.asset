@@ -32,6 +32,7 @@ MonoBehaviour:
   sightInDenseFog: 0.75
   sightAtNight: 0.85
   loseTrackSeconds: 3
+  huntShakenOffSeconds: 10
   searchSeconds: 6
   maxInvestigateSeconds: 15
   lostSearchSeconds: 20

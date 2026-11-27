@@ -63,9 +63,9 @@ public sealed partial class RaidResultsScreen : MonoBehaviour
 
     private void Awake()
     {
+        reportScroll = bodyLabel.GetComponentInParent<ScrollRect>();
         Dress();
         continueButton.onClick.AddListener(Continue);
-        reportScroll = bodyLabel.GetComponentInParent<ScrollRect>();
         if (reportScroll != null && reportScroll.verticalScrollbar == null)
         {
             reportScroll.verticalScrollbar = ScrollBar((RectTransform)reportScroll.transform);
@@ -78,6 +78,13 @@ public sealed partial class RaidResultsScreen : MonoBehaviour
     private void Dress()
     {
         UIStyle style = UIStyle.Current;
+        // Without a window round it, the title is carved here, as the window's dressing did (UIRole).
+        if (reportScroll != null)
+        {
+            style.Display(titleLabel);
+            HearthlineArt.AddTitleRule(titleLabel, style);
+        }
+
         // One line, never broken in a word ("Extracte / d!"): the carved face is wide. Not past 64 either, where the
         // face's atlas shows specks of the letters beside each one.
         titleLabel.textWrappingMode = TextWrappingModes.NoWrap;
@@ -87,7 +94,18 @@ public sealed partial class RaidResultsScreen : MonoBehaviour
         // Not bold: the carved face is thickened by widening its letters' field, which with its shadow reaches past the
         // atlas's padding and picks up bits of the next letters there.
         titleLabel.fontStyle = FontStyles.Normal;
-        content.gameObject.AddComponent<UIRole>().Set(UIRole.Kind.Window);
+        // No panel behind the facts (the user, 2026-11-27: "Remove the half-transparent bar around the extraction HUD, just keep the
+        // icons and information"): the words and pictures stand on the artwork, darkened at the sides (Shade). The old words-only
+        // report (a scene without the scroll) keeps its window.
+        if (reportScroll == null)
+        {
+            content.gameObject.AddComponent<UIRole>().Set(UIRole.Kind.Window);
+        }
+        else if (content.TryGetComponent(out Image ground))
+        {
+            ground.enabled = false;
+        }
+
         style.Title(subtitleLabel);
         subtitleLabel.fontStyle = FontStyles.Normal;
         subtitleLabel.color = style.Muted;
@@ -178,6 +196,39 @@ public sealed partial class RaidResultsScreen : MonoBehaviour
         float haul = RaidReportCards.Show(report, first, second, lessons, 0f, room, out _, 3);
         FitHaulPanel(haul);
         ShowFacts(RaidReportFacts.For(report, line => RaidReportFacts.EventPicture(report.Definition, line)));
+        ShadowWords(haulPanel, titleLabel);
+        ShadowWords(content.transform, titleLabel);
+    }
+
+    // A soft dark shadow under every word laid on the artwork, so it reads on a bright patch (a portal's light) with no panel behind
+    // it. Each label gets its own copy of its face's material, once. Not the carved title: its face, widened, already reaches past its
+    // atlas's padding (Dress), and a dilated shadow picked up specks of the next letters.
+    private static void ShadowWords(Transform root, TMP_Text except)
+    {
+        if (root == null)
+        {
+            return;
+        }
+
+        foreach (TMP_Text words in root.GetComponentsInChildren<TMP_Text>(true))
+        {
+            if (words == except)
+            {
+                continue;
+            }
+
+            Material face = words.fontMaterial;
+            if (face == null || face.IsKeywordEnabled(ShaderUtilities.Keyword_Underlay) || !face.HasProperty(ShaderUtilities.ID_UnderlayColor))
+            {
+                continue;
+            }
+
+            face.EnableKeyword(ShaderUtilities.Keyword_Underlay);
+            face.SetColor(ShaderUtilities.ID_UnderlayColor, new Color(0f, 0f, 0f, 0.85f));
+            face.SetFloat(ShaderUtilities.ID_UnderlayDilate, 0.35f);
+            face.SetFloat(ShaderUtilities.ID_UnderlaySoftness, 0.65f);
+            words.UpdateMeshPadding();
+        }
     }
 
     public void Show(RaidReport report)
@@ -235,16 +286,8 @@ public sealed partial class RaidResultsScreen : MonoBehaviour
         haulPanel.anchoredPosition = new Vector2(0f, -canvas.rect.height * 0.05f);
         haulPanel.sizeDelta = new Vector2(0f, 400f);
         haulPanel.SetSiblingIndex(content.transform.GetSiblingIndex());
-        var face = haulPanel.gameObject.AddComponent<Image>();
-        var ownFace = content.GetComponent<Image>();
-        if (ownFace != null)
-        {
-            face.sprite = ownFace.sprite;
-            face.type = ownFace.type;
-            face.color = ownFace.color;
-        }
-
-        haulPanel.gameObject.AddComponent<UIRole>().Set(UIRole.Kind.Window);
+        // No face of its own either: the haul's pictures and words on the artwork (see Dress).
+        Shade(canvas, haulPanel.GetSiblingIndex());
         haulGroup = haulPanel.gameObject.AddComponent<CanvasGroup>();
         haulGroup.alpha = 0f;
 
@@ -274,6 +317,35 @@ public sealed partial class RaidResultsScreen : MonoBehaviour
         reportScroll.horizontal = false;
         return true;
     }
+
+    // The artwork darkened toward both sides, softly, with no edge anywhere: the words and pictures read on it without a panel. A
+    // texture made here (a few bytes), stretched over the screen, behind the haul and the facts.
+    private static void Shade(RectTransform canvas, int siblingIndex)
+    {
+        // Made once for the game's run: every results screen shares it.
+        if (shadeTexture == null)
+        {
+            const int Width = 128;
+            shadeTexture = new Texture2D(Width, 1, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp, name = "Results Shade" };
+            for (int x = 0; x < Width; x++)
+            {
+                // 0 at the middle, rising smoothly to its darkest at either side.
+                float fromMiddle = Mathf.Abs(x / (Width - 1f) - 0.5f) * 2f;
+                shadeTexture.SetPixel(x, 0, new Color(0f, 0f, 0f, ShadeDarkest * Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.02f, 0.5f, fromMiddle))));
+            }
+
+            shadeTexture.Apply();
+        }
+
+        RectTransform shade = CodeUI.Stretch("Shade", canvas);
+        shade.SetSiblingIndex(siblingIndex);
+        var image = shade.gameObject.AddComponent<RawImage>();
+        image.texture = shadeTexture;
+        image.raycastTarget = false;
+    }
+
+    private const float ShadeDarkest = 0.7f;
+    private static Texture2D shadeTexture;
 
     // Moves a label to the haul's panel, across its width under the panel's top.
     private void Place(RectTransform label, float top, float height)

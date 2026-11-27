@@ -54,6 +54,10 @@ public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
     [Header("Hunting and searching")]
     [Tooltip("Seconds a hunting monster keeps after a target it can no longer see before it goes to where it last saw it.")]
     [SerializeField, Min(0f)] private float loseTrackSeconds = 3f;
+    [Tooltip("A raid's hunters (a stage's or an alarm's group sent at the player) come all the way to the player, but once they have " +
+             "found them and then lost sight of them this long, they hunt as any creature does and can be shaken off (the user, " +
+             "2026-11-27: \"The player should be able to loose threat from all mobs in a raid\").")]
+    [SerializeField, Min(1f)] private float huntShakenOffSeconds = 10f;
     [Tooltip("Seconds it looks around at the spot it went to check.")]
     [SerializeField, Min(0f)] private float searchSeconds = 6f;
     [Tooltip("Seconds it may walk toward a spot before it gives up and searches where it is.")]
@@ -202,6 +206,7 @@ public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
     public float SightAtNight => sightAtNight;
 
     public float LoseTrackSeconds => loseTrackSeconds;
+    public float HuntShakenOffSeconds => huntShakenOffSeconds;
     public float SearchSeconds => searchSeconds;
     public float MaxInvestigateSeconds => maxInvestigateSeconds;
     public float LostSearchSeconds => lostSearchSeconds;

@@ -206,7 +206,8 @@ public sealed partial class MonsterAI
         Vector3 away = transform.position - playerAt;
         away.y = 0f;
         away = away.sqrMagnitude > 0.01f ? away.normalized : transform.forward;
-        movement.SetSpeed(definition.MoveSpeed * HeldScale);
+        // Weighed down by what it took: slower, so the player can catch it (Monster › Laden Speed).
+        movement.SetSpeed(definition.MoveSpeed * HeldScale * (loot.IsEmpty ? 1f : definition.LadenSpeed));
         foreach (float turn in FleeTurns)
         {
             Vector3 destination = transform.position + Quaternion.Euler(0f, turn, 0f) * away * FleeStride;

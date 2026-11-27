@@ -22,6 +22,9 @@ public sealed class TerrainTreeMemory : MonoBehaviour, ISaveable, ISharedState
         /// <summary>Painted rocks gone (TerrainNodeHarvesting), by index, and the seconds until each grows back (-1: never).</summary>
         public List<int> rocks = new List<int>();
         public List<float> rockSecondsLeft = new List<float>();
+        /// <summary>The home day and raid count each waits for (Regrowth.HomeDue), 0 when none; saves from before have neither.</summary>
+        public List<int> rockDays = new List<int>();
+        public List<int> rockRaids = new List<int>();
     }
 
     private const float Forever = -1f;
@@ -75,6 +78,9 @@ public sealed class TerrainTreeMemory : MonoBehaviour, ISaveable, ISharedState
                 {
                     state.rocks.Add(index);
                     state.rockSecondsLeft.Add(float.IsPositiveInfinity(secondsLeft) ? Forever : secondsLeft);
+                    (int day, int raid) due = harvesting.HomeDueOf(index);
+                    state.rockDays.Add(due.day);
+                    state.rockRaids.Add(due.raid);
                 }
             }
         }
@@ -110,7 +116,9 @@ public sealed class TerrainTreeMemory : MonoBehaviour, ISaveable, ISharedState
             TerrainNodeHarvesting harvesting = TerrainNodeHarvesting.On(terrain);
             for (int i = 0; i < state.rocks.Count && i < state.rockSecondsLeft.Count; i++)
             {
-                harvesting.RestoreGone(state.rocks[i], state.rockSecondsLeft[i] < 0f ? float.PositiveInfinity : state.rockSecondsLeft[i]);
+                harvesting.RestoreGone(state.rocks[i], state.rockSecondsLeft[i] < 0f ? float.PositiveInfinity : state.rockSecondsLeft[i],
+                    state.rockDays != null && i < state.rockDays.Count ? state.rockDays[i] : 0,
+                    state.rockRaids != null && i < state.rockRaids.Count ? state.rockRaids[i] : 0);
             }
         }
     }

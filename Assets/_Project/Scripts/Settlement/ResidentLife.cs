@@ -1040,7 +1040,7 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         }
 
         nextGestureAt = 0f;
-        JobDefinition job = activity == ResidentActivity.Work ? npc.Job : null;
+        JobDefinition job = WorkJob;
         if (job != null)
         {
             ShowTool(job.WorkTool, job.WorkToolScale);
@@ -1113,7 +1113,7 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
             return;
         }
 
-        JobDefinition job = activity == ResidentActivity.Work ? npc.Job : null;
+        JobDefinition job = WorkJob;
         if (job != null && job.WorkSound != null)
         {
             MakeWorkSound(job);
@@ -1127,7 +1127,7 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         SettlementSettings settings = SettlementSettings.Current;
         EmoteDefinition gesture = activity switch
         {
-            ResidentActivity.Work => npc.WorkGesture,
+            ResidentActivity.Work => job != null ? job.WorkGesture : null,
             ResidentActivity.Meal => settings.ResidentMealGesture,
             ResidentActivity.Sleep => settings.ResidentSleepGesture,
             ResidentActivity.Fire => Pick(settings.ResidentFireGestures),
@@ -1962,6 +1962,25 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     }
 
     private static bool NeedsHands(Construction site) => site != null && site.Paid && site.WorkLeft > 0f;
+
+    /// <summary>
+    /// The work they are seen doing now (its gesture, tool and sound): at a scaffold, anyone not a builder works as the first builder does,
+    /// hammer in hand (the user, 2026-11-27: "NPC's are supposed to help set up buildings, but at most they just watch": a helper played
+    /// their own job's work, a cook's stirring or nothing at all, beside the scaffold); else their own job's; null when not at work.
+    /// </summary>
+    private JobDefinition WorkJob
+    {
+        get
+        {
+            if (activity != ResidentActivity.Work)
+            {
+                return null;
+            }
+
+            IReadOnlyList<JobDefinition> builders = HomeLifeSettings.Current.Builders;
+            return building != null && builders.Count > 0 && !ResidentBuilders.Builds(npc.Record) ? builders[0] : npc.Job;
+        }
+    }
 
     /// <summary>How many builders go to a scaffold with <paramref name="workLeft"/> seconds of hammering left: one to a flower bed, up to
     /// BuildersPerSite on a hall (three sent across the Haven to a few seconds' work only got in each other's way).</summary>

@@ -12,7 +12,8 @@ using UnityEngine.UI;
 public sealed partial class CharacterWindow
 {
     private const float SheetWidth = 1120f;
-    private const float SheetHeight = 640f;
+    // Taller since 2026-11-27 for the Active Effects card across the foot (CharacterWindow.Effects).
+    private const float SheetHeight = 800f;
     private const float StatsX = 592f;
     private const float StatsWidth = 504f;
 
@@ -113,11 +114,13 @@ public sealed partial class CharacterWindow
             toolRows[i] = new KitStatRow(gathering, 16f + i * third, 12f, third - 10f, tools[i], tools[i], false, 17f, labelWidth: 74f);
         }
 
-        // The hint keeps to the foot, under the portrait.
+        BuildEffects(window);
+
+        // The hint keeps to the foot, under the Active Effects.
         Transform hint = window.Find("Hint");
         if (hint != null)
         {
-            ((RectTransform)hint).anchoredPosition = new Vector2(24f, -SheetHeight + 40f);
+            ((RectTransform)hint).anchoredPosition = new Vector2(24f, -SheetHeight + 28f);
             ((RectTransform)hint).sizeDelta = new Vector2(500f, 22f);
         }
     }

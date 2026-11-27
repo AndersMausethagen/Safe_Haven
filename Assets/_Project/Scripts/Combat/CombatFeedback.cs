@@ -674,7 +674,9 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
 
     private void OnAnyStaggered(MonsterAI monster, float seconds)
     {
-        Spawn(feel.StaggerEffect, monster.transform.position + Vector3.up * 0.05f, monster.transform.forward);
+        // At its middle, where it is seen: at its feet the burst was lost in the grass (the user, 2026-11-27: "I dont notice the parry and
+        // stagger vfx at all").
+        Spawn(feel.StaggerEffect, MiddleOf(monster), monster.transform.forward);
         AudioManager.Play(Sounds != null ? Sounds.Stagger : null, monster.transform.position);
         Callout(monster, feel.StaggerText);
         if (Player.Current != null && (monster.transform.position - Player.Current.transform.position).sqrMagnitude < BackstabMarkerRange * BackstabMarkerRange)
@@ -684,6 +686,10 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
     }
 
     private const float BackstabMarkerRange = 12f;
+
+    // A creature's middle: its collider's centre (a wolf's chest, a troll's belly), else a metre up.
+    private static Vector3 MiddleOf(MonsterAI monster) =>
+        monster.TryGetComponent(out Collider body) && body.enabled ? body.bounds.center : monster.transform.position + Vector3.up;
 
     // A wind-up broken off by a blow (No Rest for the Wicked's Crucible: a spark on interrupt): sparks, a clang and a beat of hit stop.
     private void OnAnyInterrupted(MonsterAI monster, Combatant by)

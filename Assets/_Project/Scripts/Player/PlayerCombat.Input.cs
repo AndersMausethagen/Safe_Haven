@@ -14,6 +14,21 @@ public sealed partial class PlayerCombat
             return; // PlayerArchery draws and shoots; PlayerFishing casts
         }
 
+        // The swing the guard cut short is still recovering (GiveWayToGuard). A blow just caught on the guard can still be answered with
+        // the guard counter. Under the guard the press is let go and the guard stays up; with the guard down it is kept, and the swing
+        // starts once the recovery is paid, as a press in any recovery is (review 2026-11-27: it was dropped).
+        bool guarding = guard != null && guard.IsGuarding;
+        if (OwesRecovery && !(guarding && HasGuardCounter && weapon != null && guard.JustBlocked(Rules.GuardCounterSeconds)))
+        {
+            if (!guarding)
+            {
+                queuedKind = SwingKind.Light;
+                queuedJudge = ChainPress.Late;
+            }
+
+            return;
+        }
+
         if (guard != null && guard.IsGuarding)
         {
             // Just after a parry the press is the counter itself (the light swing a ready counter becomes), not the art or a bash: the
@@ -370,7 +385,7 @@ public sealed partial class PlayerCombat
             return false; // eating takes both hands
         }
 
-        if (Time.time < attackLockedUntil)
+        if (Time.time < attackLockedUntil || (OwesRecovery && kind != SwingKind.GuardCounter))
         {
             return false;
         }

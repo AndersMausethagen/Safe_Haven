@@ -80,6 +80,17 @@ public sealed partial class MonsterAI
             lastSeenTargetVelocity = attacks != null ? attacks.TargetVelocity : Vector3.zero;
             senses.Awareness.Alert(lastKnownTargetPosition);
             ScanForNearerTarget();
+            // A raid's hunter has found its prey: from now on it can be shaken off.
+            huntFound |= Relentless && ShakenOffAfterFound;
+            return;
+        }
+
+        // A raid's hunter that found the player and then lost them long enough is an ordinary hunter again: hidden from, it gives up.
+        if (Relentless && ShakenOffAfterFound && huntFound && Time.time - lastSeenTargetAt > PerceptionSettings.Current.HuntShakenOffSeconds)
+        {
+            Relentless = false;
+            huntFound = false;
+            LoseTrack();
             return;
         }
 

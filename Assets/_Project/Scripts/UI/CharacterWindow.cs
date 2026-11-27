@@ -111,6 +111,8 @@ public sealed partial class CharacterWindow : MonoBehaviour, IItemSlotHandler
 
         CancelDrag();
         hovered = null;
+        hoveredEffect = -1;
+        nextEffectsRefresh = 0f;
         if (tooltip != null)
         {
             tooltip.Hide();
@@ -127,6 +129,8 @@ public sealed partial class CharacterWindow : MonoBehaviour, IItemSlotHandler
         {
             RefreshStats();
         }
+
+        UpdateEffects();
     }
 
     // ----- Slots -----

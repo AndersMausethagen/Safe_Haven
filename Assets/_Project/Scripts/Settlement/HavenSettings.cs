@@ -52,6 +52,13 @@ public sealed class HavenSettings : GameSettings<HavenSettings>
              "own wood and stone run out, raids are where materials come from, and saplings from the raids are how trees return " +
              "(PlantedTrees). Nothing grows back in a raid either way (Regrowth).")]
     [SerializeField] private bool nodesRegrowAtHome;
+    [Tooltip("A rock, ore or other node gathered in the Haven grows back this many in-game days later (the user, 2026-11-27: \"Resource " +
+             "nodes should respawn after three days in the haven, or after three raids\"), whichever comes first of this and Regrow After " +
+             "Raids. A node's own Regrows At Home After Days (berry bushes) comes first. 0: never by days. Nodes with Respawn Seconds 0 " +
+             "(the overgrowth) never come back, nor does one where a building now stands.")]
+    [SerializeField, Min(0)] private int regrowAfterDays = 3;
+    [Tooltip("The same, counted in raids run since it was gathered. 0: never by raids.")]
+    [SerializeField, Min(0)] private int regrowAfterRaids = 3;
     [SerializeField] private List<Rank> ranks = new List<Rank>
     {
         new Rank { name = "Overgrown Camp", renown = 0, line = "A fire and a tree, and the forest pressing in." },
@@ -72,6 +79,8 @@ public sealed class HavenSettings : GameSettings<HavenSettings>
     public IReadOnlyList<StatBonus> RestedBonuses => restedBonuses;
     public int RestedFullComfort => restedFullComfort;
     public bool NodesRegrowAtHome => nodesRegrowAtHome;
+    public int RegrowAfterDays => regrowAfterDays;
+    public int RegrowAfterRaids => regrowAfterRaids;
 
     /// <summary>The highest rank this much renown reaches (0 is the first).</summary>
     public int RankFor(int renown)

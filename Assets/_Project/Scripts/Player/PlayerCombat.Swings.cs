@@ -436,7 +436,14 @@ public sealed partial class PlayerCombat
             bool dodgeInTheWay = dodge != null && dodge.IsDodging && !(queuedKind == SwingKind.Rush && dodge.CanBeCutShort);
             // A skill under way (Wolf's Lunge in flight): a press made in it waits for it, as one made in a dodge does.
             bool skillInTheWay = skills != null && skills.IsBusy;
-            if (queuedKind != SwingKind.None && !IsFlinching && !dodgeInTheWay && !skillInTheWay && (guard == null || !guard.IsStunned))
+            // A press kept through a recovery the guard cut short waits until it is paid; the guard raised again meanwhile lets it go.
+            if (queuedKind != SwingKind.None && guard != null && guard.IsGuarding)
+            {
+                queuedKind = SwingKind.None;
+            }
+
+            if (queuedKind != SwingKind.None && !IsFlinching && !dodgeInTheWay && !skillInTheWay && (guard == null || !guard.IsStunned)
+                && !OwesRecovery)
             {
                 Begin(queuedKind, queuedJudge);
             }
@@ -1114,6 +1121,14 @@ public sealed partial class PlayerCombat
             {
                 charging = false;
                 movement.SetSpeedScale(this, 1f);
+            }
+
+            // A recovery the guard cut short is still owed by the next swing: the guard comes up at once, but attacking out of it waits
+            // until the swing would have recovered (the user, 2026-11-27: "Holding block while attacking lets us attack really fast":
+            // block held, each blow raised the guard and the next press swung again with no recovery at all).
+            if (!hitPending && activeAttack != null)
+            {
+                recoveryOwedUntil = Time.time + Mathf.Max(0f, RecoverAt(activeAttack, activeSpeed) - ActiveElapsed);
             }
 
             EndSwing();

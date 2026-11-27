@@ -424,6 +424,15 @@ public sealed class RaidHudView : MonoBehaviour
             }
 
             nearest = point;
+            // Held full: its portal waits for the player, who may stay on as long as the clock allows.
+            if (point.IsOpenedByHold)
+            {
+                int metres = Mathf.RoundToInt(player != null ? point.DistanceFrom(player.transform.position) : 0f);
+                return Unchanged(point, 7, metres, 0) ? lastWay
+                    : lastWay = $"<color={UIStyle.Current.GoodHex}>The portal at {point.DisplayName} is open: step through to go home</color>" +
+                                (metres > 0 ? $"  {metres} m" : "");
+            }
+
             int percent = Mathf.FloorToInt(point.HoldFraction * 100f);
             switch (point.HoldState)
             {

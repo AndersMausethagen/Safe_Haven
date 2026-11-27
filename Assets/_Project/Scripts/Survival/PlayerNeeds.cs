@@ -68,7 +68,10 @@ public sealed class PlayerNeeds : MonoBehaviour
         EnsureMeters();
         stamina = GetComponent<PlayerStamina>();
         health = GetComponent<Damageable>();
+        boons = GetComponent<PlayerBoons>();
     }
+
+    private PlayerBoons boons;
 
     private void EnsureMeters()
     {
@@ -102,7 +105,9 @@ public sealed class PlayerNeeds : MonoBehaviour
 
         float multiplier = RaidDirector.Current != null ? settings.RaidMultiplier : 1f;
         float minutes = Time.deltaTime / 60f;
-        bool changed = Hunger.Drain(settings.HungerPerMinute * multiplier * minutes);
+        // A meal eaten holds hunger where it is for a while (PlayerBoons.HungerHeldLeft); thirst goes on.
+        bool fed = boons != null && boons.HungerHeldLeft > 0f;
+        bool changed = !fed && Hunger.Drain(settings.HungerPerMinute * multiplier * minutes);
         changed |= Thirst.Drain(settings.ThirstPerMinute * multiplier * minutes);
         if (changed)
         {

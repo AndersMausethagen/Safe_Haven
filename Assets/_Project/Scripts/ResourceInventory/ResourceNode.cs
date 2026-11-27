@@ -22,8 +22,10 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
         // When it was saved, in this run of the game (DayNightCycle.Run), so the time away on a raid counts.
         public string run;
         public double savedAt;
-        // The home day it grows back on (Gathering Node › Regrows At Home After Days), 0 when it doesn't count days.
+        // The home day it grows back on (Regrowth.HomeDays), 0 when it doesn't count days.
         public int regrowOnDay;
+        // Or the raid count it grows back at (Regrowth.HomeRaids), whichever comes first; 0 when it doesn't count raids.
+        public int regrowOnRaid;
     }
 
     [SerializeField] private GatheringNodeDefinition node;
@@ -38,8 +40,15 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
     private Renderer[] renderers;
     private Collider[] colliders;
     private float respawnAt;
-    // The home day (SettlementState.DaysPassed) it grows back on, 0 when it doesn't count days.
+    // The home day (SettlementState.DaysPassed) it grows back on, 0 when it doesn't count days; or the raid count (Regrowth.RaidsRun).
     private int regrowOnDay;
+    private int regrowOnRaid;
+
+    /// <summary>The home day it grows back on, 0 when none (a painted rock's stand-in hands it on when let go).</summary>
+    public int RegrowOnDay => IsDepleted ? regrowOnDay : 0;
+
+    /// <summary>The raid count it grows back at, 0 when none.</summary>
+    public int RegrowOnRaid => IsDepleted ? regrowOnRaid : 0;
     private float hideAt = -1f;
     private Coroutine countdown;
 
@@ -72,7 +81,7 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
         return JsonUtility.ToJson(new SavedNode
         {
             depleted = IsDepleted, respawnRemaining = RespawnRemaining, run = DayNightCycle.Run, savedAt = DayNightCycle.AwayStamp,
-            regrowOnDay = IsDepleted ? regrowOnDay : 0,
+            regrowOnDay = IsDepleted ? regrowOnDay : 0, regrowOnRaid = IsDepleted ? regrowOnRaid : 0,
         });
     }
 
@@ -86,8 +95,11 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
             // On the day's own clock (game time): in real time, an hour in the pause menu on a raid grew every node back.
             float away = DayNightCycle.SecondsAwaySince(saved.run, saved.savedAt);
             respawnAt = Time.time + Mathf.Max(0f, saved.respawnRemaining - away);
-            regrowOnDay = RestoredRegrowDay(saved.regrowOnDay, IsDepleted ? regrowOnDay : 0, node != null ? node.RegrowsAtHomeAfterDays : 0,
+            // A save from before nodes came back at home (none saved) starts counting today, as one picked by a friend does.
+            regrowOnDay = RestoredRegrowDay(saved.regrowOnDay, IsDepleted ? regrowOnDay : 0, Regrowth.HomeDays(node),
                 GameSession.Home.DaysPassed, AtOwnHome);
+            regrowOnRaid = RestoredRegrowDay(saved.regrowOnRaid, IsDepleted ? regrowOnRaid : 0, Regrowth.HomeRaids(node),
+                Regrowth.RaidsRun, AtOwnHome);
             SetPresent(false);
         }
         else if (IsDepleted)
@@ -174,7 +186,10 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
         }
     }
 
-    private bool HasTimer => hideAt >= 0f || (IsDepleted && node != null && (node.RegrowsAfter > 0f || regrowOnDay > 0));
+    private bool HasTimer => hideAt >= 0f || (IsDepleted && !builtOver && node != null && (node.RegrowsAfter > 0f || regrowOnDay > 0 || regrowOnRaid > 0));
+
+    // Due to grow back where a building now stands: it stays gone and its countdown stops.
+    private bool builtOver;
 
     /// <summary>
     /// The home day a node gathered now grows back on: today plus its Regrows At Home After Days, at home only (not in a raid, the
@@ -200,8 +215,18 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
 
     private static bool AtOwnHome => Place.AtHome;
 
-    // True once the home day it waits for has come.
-    private bool DayHasCome => regrowOnDay > 0 && GameSession.Home.DaysPassed >= regrowOnDay;
+    // True once the home day or the raid count it waits for has come.
+    private bool DayHasCome => Regrowth.HomeDue(regrowOnDay, regrowOnRaid, GameSession.Home.DaysPassed, Regrowth.RaidsRun);
+
+    // Waiting on days or raids alone changes at dawn or a homecoming: looked at now and then, not every frame (hundreds wait at home).
+    private static readonly WaitForSeconds DayLook = new WaitForSeconds(2f);
+
+    // Starts the wait for a node gathered now: days and raids at home only (not in a raid, the prologue or a friend's Haven).
+    private void StartHomeWait()
+    {
+        regrowOnDay = RegrowDay(Regrowth.HomeDays(node), GameSession.Home.DaysPassed, AtOwnHome);
+        regrowOnRaid = RegrowDay(Regrowth.HomeRaids(node), Regrowth.RaidsRun, AtOwnHome);
+    }
 
     private void WatchTimers()
     {
@@ -226,11 +251,21 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
             if (IsDepleted && node != null && ((node.RegrowsAfter > 0f && Time.time >= respawnAt) || DayHasCome))
             {
                 regrowOnDay = 0;
-                SetPresent(true);
-                Regrown?.Invoke();
+                regrowOnRaid = 0;
+                // A house raised where it stood: it stays gone, and stops counting (looked at again only after a load).
+                if (Regrowth.BuiltOver(transform.position))
+                {
+                    respawnAt = Time.time;
+                    builtOver = true;
+                }
+                else
+                {
+                    SetPresent(true);
+                    Regrown?.Invoke();
+                }
             }
 
-            yield return null;
+            yield return hideAt < 0f && IsDepleted && node != null && node.RegrowsAfter <= 0f ? DayLook : null;
         }
 
         countdown = null;
@@ -371,7 +406,7 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
         }
 
         respawnAt = Time.time + node.RegrowsAfter;
-        regrowOnDay = RegrowDay(node.RegrowsAtHomeAfterDays, GameSession.Home.DaysPassed, AtOwnHome);
+        StartHomeWait();
         SetPresent(false, 0f);
         return true;
     }
@@ -390,7 +425,7 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
         }
 
         respawnAt = Time.time + node.RegrowsAfter;
-        regrowOnDay = RegrowDay(node.RegrowsAtHomeAfterDays, GameSession.Home.DaysPassed, AtOwnHome);
+        StartHomeWait();
         SetPresent(false, feedback != null ? feedback.BreakSeconds : 0f);
     }
 

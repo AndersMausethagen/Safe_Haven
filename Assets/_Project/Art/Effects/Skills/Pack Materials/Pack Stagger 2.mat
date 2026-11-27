@@ -48,13 +48,13 @@ Material:
     - _CullMode: 0
     - _Cutoff: 0.1
     - _Depthpower: 1
-    - _Emission: 1.4
+    - _Emission: 2
     - _InvFade: 1
     - _Opacity: 1
     - _Usecenterglow: 0
     - _Usedepth: 0
     m_Colors:
-    - _Color: {r: 0.49411762, g: 0.31143132, b: 0.22235292, a: 0.6313726}
+    - _Color: {r: 0.7058823, g: 0.49235287, b: 0.38823527, a: 0.6313726}
     - _DistortionSpeedXYPowerZ: {r: 0, g: 0, b: 0, a: 0}
     - _SpeedMainTexUVNoiseZW: {r: 0, g: 0, b: 0, a: 0}
     - _TintColor: {r: 0.7075472, g: 0.22947475, b: 0, a: 0.49803922}

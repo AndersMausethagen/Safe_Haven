@@ -825,6 +825,16 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     public bool Relentless { get; set; }
 
     /// <summary>
+    /// With <see cref="Relentless"/>: relentless only until it has found its prey; lost from sight for PerceptionSettings › Hunt Shaken Off
+    /// Seconds after that, it hunts as any creature does (a raid's hunters: RaidCreatures.Prepare). Off for a ward breach or a defence, which
+    /// must press on.
+    /// </summary>
+    public bool ShakenOffAfterFound { get; set; }
+
+    // A relentless hunter that can be shaken off has seen its prey.
+    private bool huntFound;
+
+    /// <summary>
     /// Ground it will not enter (night prowlers: light). It neither notices targets standing there nor follows them in:
     /// a hunt that leads into it is lost at the edge, and anything heard there is searched for from where it stands.
     /// </summary>

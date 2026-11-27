@@ -36,7 +36,10 @@ MonoBehaviour:
   - stat: 51
     op: 0
     value: 0.2
-  restedSecondsPerComfort: 60
+  restedFullComfort: 6
+  nodesRegrowAtHome: 0
+  regrowAfterDays: 3
+  regrowAfterRaids: 3
   ranks:
   - name: Overgrown Camp
     renown: 0

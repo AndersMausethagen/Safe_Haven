@@ -103,8 +103,16 @@ public sealed class JournalRecord
     /// <summary>True the first time a page is told about.</summary>
     public bool Announce(string page) => announced.Add(page);
 
+    /// <summary>Every raid run in this game, however many the journal still remembers (it keeps the last MostRaids): what a node
+    /// gathered at home counts its raids by (Regrowth.RaidsRun).</summary>
+    public int RaidsEver { get; private set; }
+
+    /// <summary>Puts back the lifetime count from a save; one from before it was kept counts the raids remembered.</summary>
+    public void RestoreRaidsEver(int saved) => RaidsEver = System.Math.Max(saved, raids.Count);
+
     public void AddRaid(RaidRecord raid)
     {
+        RaidsEver++;
         raids.Add(raid);
         if (raids.Count > MostRaids)
         {
@@ -130,6 +138,7 @@ public sealed class JournalRecord
         found.UnionWith(savedFound);
         killedBy.UnionWith(savedKilledBy);
         raids.AddRange(savedRaids);
+        RaidsEver = raids.Count;
         PinnedQuest = pinned;
     }
 }

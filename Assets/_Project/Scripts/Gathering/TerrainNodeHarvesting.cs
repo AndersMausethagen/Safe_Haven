@@ -40,6 +40,10 @@ public sealed class TerrainNodeHarvesting : MonoBehaviour
     private readonly Dictionary<int, (TreeInstance original, float regrowAt)> gone = new Dictionary<int, (TreeInstance, float)>();
     private readonly List<int> regrown = new List<int>();
     private float nextRegrowAt = float.PositiveInfinity;
+    // Painted rocks gone at home that come back by days or raids (Regrowth.HomeDue): the home day and raid count each waits for.
+    private readonly Dictionary<int, (int day, int raid)> homeDue = new Dictionary<int, (int, int)>();
+    private float nextHomeLook;
+    private const float HomeLookSeconds = 2f;
     private static readonly List<TerrainNodeHarvesting> active = new List<TerrainNodeHarvesting>();
 
     /// <summary>Every terrain with painted resources to gather.</summary>
@@ -141,8 +145,9 @@ public sealed class TerrainNodeHarvesting : MonoBehaviour
         }
     }
 
-    /// <summary>Takes a painted rock away again as it was saved (nothing breaks): it stays gone for the seconds left.</summary>
-    public void RestoreGone(int index, float secondsLeft)
+    /// <summary>Takes a painted rock away again as it was saved (nothing breaks): it stays gone for the seconds left, or at home until
+    /// home day <paramref name="day"/> or raid count <paramref name="raid"/> (a save from before those were kept starts counting now).</summary>
+    public void RestoreGone(int index, float secondsLeft, int day = 0, int raid = 0)
     {
         Cache();
         if (index < 0 || index >= positions.Count || !gatherable[index] || gone.ContainsKey(index) || stands.ContainsKey(index))
@@ -151,6 +156,39 @@ public sealed class TerrainNodeHarvesting : MonoBehaviour
         }
 
         Take(index, float.IsPositiveInfinity(secondsLeft) ? float.PositiveInfinity : Time.time + Mathf.Max(0f, secondsLeft));
+        if (Place.AtHome)
+        {
+            GatheringNodeDefinition kind = KindOf(index);
+            int days = Regrowth.HomeDays(kind), raids = Regrowth.HomeRaids(kind);
+            WaitAtHome(index, day > 0 ? day : ResourceNode.RegrowDay(days, GameSession.Home.DaysPassed, true),
+                raid > 0 ? raid : ResourceNode.RegrowDay(raids, Regrowth.RaidsRun, true));
+        }
+    }
+
+    /// <summary>The home day and raid count a painted rock gone now waits for (0, 0: none), for the save.</summary>
+    public (int day, int raid) HomeDueOf(int index)
+    {
+        if (homeDue.TryGetValue(index, out (int day, int raid) due))
+        {
+            return due;
+        }
+
+        return stands.TryGetValue(index, out Stand stand) && stand.Node != null && stand.Node.IsDepleted
+            ? (stand.Node.RegrowOnDay, stand.Node.RegrowOnRaid) : (0, 0);
+    }
+
+    private GatheringNodeDefinition KindOf(int index)
+    {
+        ResourceNode node = PrefabNodeOf(index);
+        return node != null ? node.Definition : null;
+    }
+
+    private void WaitAtHome(int index, int day, int raid)
+    {
+        if (day > 0 || raid > 0)
+        {
+            homeDue[index] = (day, raid);
+        }
     }
 
     /// <summary>Whether the painted rock <paramref name="index"/> stands to be gathered (not gone, not a gathered stand-in).</summary>
@@ -228,6 +266,13 @@ public sealed class TerrainNodeHarvesting : MonoBehaviour
         ResourceNode node = PrefabNodeOf(index);
         float respawn = node != null && node.Definition != null ? node.Definition.RegrowsAfter : 0f;
         Take(index, respawn > 0f ? Time.time + respawn : float.PositiveInfinity);
+        if (Place.AtHome)
+        {
+            GatheringNodeDefinition kind = KindOf(index);
+            WaitAtHome(index, ResourceNode.RegrowDay(Regrowth.HomeDays(kind), GameSession.Home.DaysPassed, true),
+                ResourceNode.RegrowDay(Regrowth.HomeRaids(kind), Regrowth.RaidsRun, true));
+        }
+
         return true;
     }
 
@@ -245,9 +290,15 @@ public sealed class TerrainNodeHarvesting : MonoBehaviour
         NodeChanged?.Invoke(positions[index]);
     }
 
-    // Painted rocks gone with no stand-in whose time is up stand again.
+    // Painted rocks gone with no stand-in whose time is up stand again; at home, those whose day or raid has come (looked at now and then).
     private void GrowBack()
     {
+        if (homeDue.Count > 0 && Time.time >= nextHomeLook)
+        {
+            nextHomeLook = Time.time + HomeLookSeconds;
+            GrowBackAtHome();
+        }
+
         if (Time.time < nextRegrowAt || gone.Count == 0)
         {
             return;
@@ -271,6 +322,34 @@ public sealed class TerrainNodeHarvesting : MonoBehaviour
         {
             OwnTheData();
             terrain.terrainData.SetTreeInstance(index, gone[index].original);
+            gone.Remove(index);
+            NodeChanged?.Invoke(positions[index]);
+        }
+    }
+
+    private void GrowBackAtHome()
+    {
+        int today = GameSession.Home.DaysPassed, raids = Regrowth.RaidsRun;
+        regrown.Clear();
+        foreach (var pair in homeDue)
+        {
+            if (Regrowth.HomeDue(pair.Value.day, pair.Value.raid, today, raids))
+            {
+                regrown.Add(pair.Key);
+            }
+        }
+
+        foreach (int index in regrown)
+        {
+            homeDue.Remove(index);
+            // Only one gone with no stand-in is stood up here (a stand-in's own node grows back by itself); none where a house now stands.
+            if (!gone.TryGetValue(index, out (TreeInstance original, float regrowAt) was) || Regrowth.BuiltOver(positions[index]))
+            {
+                continue;
+            }
+
+            OwnTheData();
+            terrain.terrainData.SetTreeInstance(index, was.original);
             gone.Remove(index);
             NodeChanged?.Invoke(positions[index]);
         }
@@ -360,6 +439,8 @@ public sealed class TerrainNodeHarvesting : MonoBehaviour
                 bool regrows = stand.Node.Definition != null && stand.Node.Definition.RegrowsAfter > 0f;
                 gone[pair.Key] = (stand.Original, regrows ? Time.time + stand.Node.RespawnRemaining : float.PositiveInfinity);
                 nextRegrowAt = Mathf.Min(nextRegrowAt, gone[pair.Key].regrowAt);
+                // Its wait at home goes on without it.
+                WaitAtHome(pair.Key, stand.Node.RegrowOnDay, stand.Node.RegrowOnRaid);
                 scratch.Add(pair.Key);
             }
         }
@@ -486,6 +567,7 @@ public sealed class TerrainNodeHarvesting : MonoBehaviour
         if (!sameInstances)
         {
             gone.Clear();
+            homeDue.Clear();
             nextRegrowAt = float.PositiveInfinity;
         }
 

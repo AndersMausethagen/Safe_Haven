@@ -12,6 +12,8 @@ public static partial class SkillFxPrefabs
 {
     private static readonly Tone Grave = new Tone(0.15f, 0.4f);
     private static readonly Tone Root = new Tone(0.4f, 0.6f);
+    // A warm, bright white-gold: the guard's rewards must catch the eye in a fight.
+    private static readonly Tone Flash = new Tone(0.45f, 1f);
     private const string BoltBase = "Assets/_Project/Prefabs/Enemies/WispBolt.prefab";
     private const string BoltFolder = "Assets/_Project/Prefabs/Effects/Combat";
 
@@ -19,10 +21,13 @@ public static partial class SkillFxPrefabs
     {
         var swaps = new List<(string ours, GameObject pack, int most, SkillFxPlace? place)>();
 
-        // The guard: a steel ring and star where a blow is caught or turned, a burst where something reels.
+        // The guard: a steel ring and star where a blow is caught or turned, a burst where something reels. The parry and the stagger
+        // are the player's rewards: bigger and brighter than the rest (the user, 2026-11-27: "I dont notice the parry and stagger vfx at
+        // all"; they were grey and half the size).
         log.Append(SetFeel("blockEffect", MakeFromPack("Pack Block", "FX - Hit/Prefab/FX_Blue_Hit_03.prefab", 0.45f, Steel, pooled: true)));
-        log.Append(SetFeel("parryEffect", MakeFromPack("Pack Parry", "FX - Hit/Prefab/FX_Slash_Hit.prefab", 0.9f, Steel, pooled: true)));
-        log.Append(SetFeel("staggerEffect", MakeFromPack("Pack Stagger", "FX - Hit/Prefab/FX_Yellow_Hit_06.prefab", 0.6f, Sparks, pooled: true)));
+        // Their parts lived 0.16-0.3 s, a blink under the hit stop: they linger two and a half times as long.
+        log.Append(SetFeel("parryEffect", Linger(MakeFromPack("Pack Parry", "FX - Hit/Prefab/FX_Slash_Hit.prefab", 1.7f, Flash, pooled: true), GuardLinger)));
+        log.Append(SetFeel("staggerEffect", Linger(MakeFromPack("Pack Stagger", "FX - Hit/Prefab/FX_Yellow_Hit_06.prefab", 1.2f, Flash, pooled: true), GuardLinger)));
 
         // The spells' cast circles.
         swaps.Add(("Frost Cast Circle", MakeFromPack("Pack Frost Circle", "FX - Dissolving Magic Circle/Prefabs/FX_DMagicCircle_IceRune.prefab", 1.2f, Frost), int.MaxValue, null));
@@ -56,6 +61,51 @@ public static partial class SkillFxPrefabs
         }
 
         return swaps;
+    }
+
+    private const float GuardLinger = 2.5f;
+
+    // Makes a pooled burst's particles live <paramref name="factor"/> times as long (and their delays wait as long), its pool lifetime
+    // with them. Applied to the made copy, so running the dressing again gives the same result.
+    private static GameObject Linger(GameObject effect, float factor)
+    {
+        if (effect == null)
+        {
+            return null;
+        }
+
+        string path = AssetDatabase.GetAssetPath(effect);
+        GameObject contents = PrefabUtility.LoadPrefabContents(path);
+        try
+        {
+            float longest = 0f;
+            foreach (ParticleSystem system in contents.GetComponentsInChildren<ParticleSystem>(true))
+            {
+                ParticleSystem.MainModule main = system.main;
+                main.startLifetimeMultiplier *= factor;
+                main.startDelayMultiplier *= factor;
+                var drawn = system.GetComponent<ParticleSystemRenderer>();
+                if (drawn != null && drawn.enabled && drawn.sharedMaterial != null)
+                {
+                    longest = Mathf.Max(longest, main.startDelay.constantMax + main.startLifetime.constantMax);
+                }
+            }
+
+            if (contents.TryGetComponent(out PooledEffect pooled))
+            {
+                var data = new SerializedObject(pooled);
+                data.FindProperty("lifetime").floatValue = Mathf.Max(0.5f, longest + 0.1f);
+                data.ApplyModifiedPropertiesWithoutUndo();
+            }
+
+            PrefabUtility.SaveAsPrefabAsset(contents, path);
+        }
+        finally
+        {
+            PrefabUtility.UnloadPrefabContents(contents);
+        }
+
+        return AssetDatabase.LoadAssetAtPath<GameObject>(path);
     }
 
     // A bolt of our own made from WispBolt (a prefab variant: its flight and blow stay WispBolt's), its ball hidden, the pack's bullet

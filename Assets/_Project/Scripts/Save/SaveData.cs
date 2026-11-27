@@ -393,6 +393,8 @@ public sealed class JournalSaveData
     public List<string> killedBy = new List<string>();
     public string pinned = "";
     public List<RaidRecordSaveData> raids = new List<RaidRecordSaveData>();
+    /// <summary>Every raid run, past the MostRaids remembered (JournalRecord.RaidsEver). 0 in older saves.</summary>
+    public int raidsEver;
     /// <summary>Skills tried at least once, which open their mechanics pages. Missing in older saves.</summary>
     public List<string> tried = new List<string>();
     /// <summary>Named places found on the map. Missing in older saves.</summary>

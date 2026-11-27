@@ -112,6 +112,9 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     [SerializeField, Min(5f)] private float escapeDistance = 40f;
     [Tooltip("Seconds it fights back when cornered (the player beside it and nowhere to run), before it tries to run again.")]
     [SerializeField, Min(0.5f)] private float corneredSeconds = 4f;
+    [Tooltip("Its speed while it carries what it took, as a share of its own (the user, 2026-11-27: \"After the tusser steals from us, it " +
+             "should move at 30% less speed\"): 0.7 is 30% slower, so the player can run it down.")]
+    [SerializeField, Range(0.1f, 1f)] private float ladenSpeed = 0.7f;
 
     [Header("In a Fight")]
     [Tooltip("A person-shaped creature, whom a finishing blow can line up with: a press close behind it while it staggers locks the two together for the stab.")]
@@ -273,6 +276,8 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     public float StealReach => stealReach;
     public float EscapeDistance => escapeDistance;
     public float CorneredSeconds => corneredSeconds;
+    /// <summary>A thief's speed share while it carries loot (0.7: 30% slower).</summary>
+    public float LadenSpeed => ladenSpeed;
     public float DetectionRange => detectionRange;
     public float ChaseRange => Mathf.Max(chaseRange, detectionRange);
     public float LeashRange => leashRange;
