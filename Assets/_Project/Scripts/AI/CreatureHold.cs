@@ -17,6 +17,7 @@ using Object = UnityEngine.Object;
 /// </para>
 /// </summary>
 [DisallowMultipleComponent]
+[OnAFriendsCopy(CopyRule.Same, "each game holds its own copy's parts: a copy's feet are held for as long as it is one (MonsterAI.MakeRemote)")]
 public sealed class CreatureHold : MonoBehaviour
 {
     /// <summary>The parts of a creature a hold can stop.</summary>
@@ -33,8 +34,9 @@ public sealed class CreatureHold : MonoBehaviour
         All = Brain | Feet | Body,
     }
 
-    // How far a body may stand from the navmesh to be put back on it as its feet come back.
-    private const float BackOnTheMesh = 6f;
+    // How far a body may stand from the navmesh to be put back on it as its feet come back: about its own height, so a body at a
+    // ravine's foot isn't put on the rim above, nor one under a bridge onto its deck (review 2026-11-27: 6 m reached both).
+    private const float BackOnTheMeshAtLeast = 1f;
 
     private readonly Dictionary<object, Part> holders = new Dictionary<object, Part>();
     private readonly List<object> gone = new List<object>();
@@ -94,6 +96,14 @@ public sealed class CreatureHold : MonoBehaviour
         Find();
         Part before = HeldParts();
         Part freed = holders.TryGetValue(owner, out Part had) ? had : Part.None;
+        // Only what is on (or held already) is this owner's to give back: a part switched off some other way (placed still in the
+        // scene) recorded here would be switched on by its release (review 2026-11-27).
+        parts &= PartsOn() | before;
+        if (parts == Part.None && freed == Part.None && alsoWake == Part.None && !holders.ContainsKey(owner))
+        {
+            return;
+        }
+
         if (parts == Part.None)
         {
             holders.Remove(owner);
@@ -108,6 +118,28 @@ public sealed class CreatureHold : MonoBehaviour
         Part now = HeldParts();
         // Stopped: what is newly held. Started: what this owner (or the wake asked for) frees and nobody else holds.
         Apply(now & ~before, (freed | alsoWake) & ~now);
+    }
+
+    // The parts switched on now.
+    private Part PartsOn()
+    {
+        Part on = Part.None;
+        if (brain != null && brain.enabled)
+        {
+            on |= Part.Brain;
+        }
+
+        if (feet != null && feet.enabled)
+        {
+            on |= Part.Feet;
+        }
+
+        if ((animator != null && animator.enabled) || (driver != null && driver.enabled))
+        {
+            on |= Part.Body;
+        }
+
+        return on;
     }
 
     private Part HeldParts()
@@ -179,7 +211,7 @@ public sealed class CreatureHold : MonoBehaviour
     // Where the body stands now, on the navmesh: an agent switched on off the mesh isn't placed ("Failed to create agent").
     private void PutOnTheMesh()
     {
-        if (NavMesh.SamplePosition(transform.position, out NavMeshHit ground, BackOnTheMesh, feet.areaMask))
+        if (NavMesh.SamplePosition(transform.position, out NavMeshHit ground, Mathf.Max(BackOnTheMeshAtLeast, feet.height), feet.areaMask))
         {
             transform.position = ground.position;
         }

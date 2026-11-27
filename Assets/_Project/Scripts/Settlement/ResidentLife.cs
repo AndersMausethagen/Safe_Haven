@@ -340,7 +340,10 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
 
             int rank = GuardPosts.Rank(GameSession.Here, npc.Record);
             bool posted = rank >= 0 && rank < GuardPosts.Cap(DefenceSettings.Current);
-            if (!posted && !(breach && DefenceSettings.Current.EveryoneFightsBreaches))
+            // In a breach, who stands is the one rule the waves and the marks also ask (GuardPosts.FightsBreach); on a night or at the horn,
+            // those with a post.
+            bool stands = breach ? GuardPosts.FightsBreach(GameSession.Here, npc.Record, DefenceSettings.Current) : posted;
+            if (!stands)
             {
                 // No post for them (more guards than the defences hold): they shelter with the rest.
                 nextGuardLook = Time.time + 2f;

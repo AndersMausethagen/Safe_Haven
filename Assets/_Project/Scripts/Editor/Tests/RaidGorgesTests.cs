@@ -281,8 +281,19 @@ public sealed class RaidGorgesTests
             Vector2 down = ravine.Line[deepest];
             float floor = field.HeightAt(down.x / Size, down.y / Size);
             Assert.IsTrue(RaidChasm.HasFallen(plan, down, floor + 1f, floor), $"seed {seed}: down in the ravine is a fall");
-            float rim = ravine.Rim[deepest];
-            Assert.IsFalse(RaidChasm.HasFallen(plan, down, rim, rim), $"seed {seed}: at rim height (a neck) is no fall");
+
+            // A neck (ground at the rim where a way crosses): a body low over it, even as low as a fall's depth, stands on ground there.
+            for (int i = 0; i < ravine.Line.Count; i++)
+            {
+                float neckFloor = field.HeightAt(ravine.Line[i].x / Size, ravine.Line[i].y / Size);
+                if (ravine.Rim[i] - neckFloor < RaidChasm.FallDepth * 0.5f)
+                {
+                    Assert.IsFalse(RaidChasm.HasFallen(plan, ravine.Line[i], ravine.Rim[i] - RaidChasm.FallDepth - 1f, neckFloor),
+                        $"seed {seed}: over a neck, with ground under it, is no fall");
+                    return;
+                }
+            }
+
             return;
         }
 

@@ -25,7 +25,7 @@ public sealed class ExperienceHud : MonoBehaviour
     private float shownShare;
     private float lastMote = -10f;
     private const float SlowSeconds = 0.9f;
-    // The level line's breath as last shown (in twelfths): its colour is set only when it changes.
+    // The level line's breath as last shown (in sixths): its colour is set only when it changes.
     private float shownBreath = -1f;
     private ProficiencyDefinition easedSkill;
     private int easedLevel;
@@ -316,7 +316,9 @@ public sealed class ExperienceHud : MonoBehaviour
 
         // A perk waiting to be chosen keeps calling softly. In steps: a text's colour set regenerates its whole mesh, and set every frame it
         // did so all session while Insight waited unspent (review 2026-11-27).
-        float breath = points > 0 ? Mathf.Round(UIMotion.Breath(0.8f) * 12f) / 12f : 0f;
+        // Six steps (about ten small rebuilds a second while it calls): a canvas tint would cost none but would tint the key hint's own
+        // green within the line too.
+        float breath = points > 0 ? Mathf.Round(UIMotion.Breath(0.8f) * 6f) / 6f : 0f;
         if (!Mathf.Approximately(breath, shownBreath) || level.color == default)
         {
             shownBreath = breath;

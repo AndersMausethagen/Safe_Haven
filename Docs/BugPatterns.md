@@ -427,3 +427,48 @@ Open:
 - End-of-raid listeners run in an order nobody chose: a companion lost on an extraction is mourned one raid less. The fix is one ordered step in `RaidDirector.Finish`.
 - A reward's ground share counts for no quest when picked up.
 - A downed co-op player's swing already under way still lands, because `CoopDowned` raises no interrupt.
+
+## Ninth round: structure, SOLID and Unity practice (2026-11-27)
+
+The user's request: "keep reviewing systems. look for patterns. fix the code structure if needed. check if code follows solid patterns and unity best practice".
+
+**Measured first.**
+- The largest classes: MonsterAI (5,079 lines in 14 partials), RaidLayoutPlanner (4,921 in 12), HavenWorldPlan (3,382) and RaidMapGenerator (2,556). Partials split a file, not its reasons to change.
+- There are 83 static "Current" singletons. `Player.Current` is read in 576 places, `RaidDirector.Current` in 170.
+- 58 settings assets are loaded from Resources. These are fine: read-only, shared config.
+- Per-frame code was mostly clean. The five object searches in Update are all throttled. `Camera.main` has been cached by Unity itself since 2020.2.
+
+Three read-only reviewers covered the systems no round had looked at: AI and raids; the settlement, its people, the Keeper and building; UI, horses, rendering and audio. Between them they reported 20 findings.
+
+**The one pattern under nearly all of them: a rule restated where it is used or shown, instead of asked of one owner.** The copies agree until a setting, a co-op visit, the main menu or a second worker shows the difference. The fix that holds removes the copy. Each was fixed at its owner, with a guard where a scan can catch the kind.
+
+- **Shared switches with many writers.**
+  - A creature's brain and feet had eight writers. Each switched them back on by its own guess, and a Draug the ravine's fall didn't kill stood at the bottom forever. Now `CreatureHold` holds them per owner, part by part, like `PlayerControl`. Guard: `SharedStateTests.ACreaturesBrainAndFeet_AreHeldInAnOwnersName`.
+  - `Time.timeScale` had a third writer: a skill milestone's slow overwrote hit stops. Now only `CombatFeedback.SlowTime` (with `easeOut`) and the pause write it. Guard: `SharedStateTests.TimesScale_IsWrittenByThePauseAndCombatFeedbackOnly`.
+- **Questions answered at every call site.**
+  - "Is this resident at work?" was answered 11 ways. The altar purified on with its Alchemist paused, on a foray or along on the raid. Now `ResidentsOut.AtWork`, and `HasWorker` asks it.
+  - "Does the guest keep this field?" was a list of name strings that left the modules out. Now `[SeenHere]`.
+  - "May the player travel now?" was asked in two of seven offers, so the Haven window's "Go there" escaped a fight. Now `HavenTravel.WhyShut`, with building's own `WardBreachDirector.UnderWay`.
+  - "Who fights the breach?" was answered four ways, the post cap applied in two. Now `GuardPosts.FightsBreach`.
+  - "Is a game being played?" had no answer: the settlement ticked on the main menu.
+  - "Which players are on this raid?" was the host's alone in the roaming spawner, the boss's waking and timid creatures. Now `RaidPlayers.NearestUp`.
+  - "Inside the way out?" was three copies. Now `ExtractionPoint.Inside`.
+- **A window computing the rule it shows.**
+  - The raid briefing's risk now uses `RaidRisk`, and its tier buttons `RaidLauncher.TierOpen`.
+  - A stablehand's card now uses `Stablehands.BestOf`.
+  - The altar's buttons now use `AltarWork.Queueable`.
+  - Horse bonds were bare numbers. Now `Horse.StrikesOnCommand` and its siblings, with the thresholds in HorseSettings.
+- **A rule copied, with its subtle part in one copy only.** A map's retried attempt baked the first attempt's walls into its navmesh, because only one of twelve copies switched the old holder off before `Destroy`. Now `RaidMapGenerator.RemoveOld`.
+- **The same value authored in two assets.** Map size lives in the layout and in the map definition. Guard: `RaidGorgesTests.TheMapsSize_IsOneValue_InEveryLayoutAndMap`.
+- **Shared data written in play.** Nothing writes it today, and now a test would see it if anything did. Guard: `GameLoopLiveTests` snapshots all 2,736 data assets around a new game, a raid and the way home.
+
+**Not done, on purpose.** The singleton wiring (`Player.Current` in 576 places) stays. Replacing it would touch everything for little gain. The harm it caused came from co-op, where "the player" was the host alone, and that is now handled at `RaidPlayers` call by call. The large partial classes stay too. Splitting MonsterAI or RaidLayoutPlanner would only pay with a bug class behind it, and none showed up this round.
+
+**Two stale tests were brought up to date.**
+- `FoundationTests`: bandages have been made by hand since 2026-11-25.
+- `RaidGorgesTests`: measured at a neck, where a ravine has been filled to the rim for a crossing since 2026-11-26.
+
+Open:
+- In co-op, the thief robs only the host, and a Watchful elite reads only the host's wind-up for a backstab. Both need the co-op wire.
+- Stone-to-stone travel is offered in a friend's Haven, but the portal's old ways are not.
+- `CarriedBurden.Update` makes three `TryGetComponent` calls a frame.

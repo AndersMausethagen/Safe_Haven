@@ -18,6 +18,7 @@ public sealed class CopyRuleTests
     private static readonly Type[] AddedAtRuntime =
     {
         typeof(StatusEffects), typeof(Burning), typeof(ForcedMove), typeof(EliteCreature), typeof(LostOne), typeof(BoundSummons), typeof(BossTryLog),
+        typeof(CreatureHold),
     };
 
     private readonly List<GameObject> made = new List<GameObject>();

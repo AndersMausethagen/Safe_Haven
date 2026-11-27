@@ -781,7 +781,9 @@ public sealed class ResidentWindow : MonoBehaviour
         {
             // The stable's own answer (Stablehands.BestOf: the best at work tends, alone): worked out here, a second stablehand, or one
             // paused or away, promised bond that never came (review 2026-11-27).
-            ResidentRecord tending = Stablehands.BestOf(GameSession.Home, out float bond);
+            // The Haven the window shows (a friend's stable when visiting), as the rest of the window reads it.
+            float bond = 0f;
+            ResidentRecord tending = GameSession.Here is SettlementState here ? Stablehands.BestOf(here, out bond) : null;
             string what = tending == record ? $"+{bond:0.#} bond each, every morning"
                 : tending != null && tending.Resident != null ? $"{tending.Resident.DisplayName} tends them now"
                 : "Every morning, when at work";

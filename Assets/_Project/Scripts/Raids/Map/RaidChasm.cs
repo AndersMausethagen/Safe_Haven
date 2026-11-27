@@ -119,10 +119,11 @@ public sealed class RaidChasm : MonoBehaviour
             body.transform.position += velocity * Time.deltaTime;
             if (body.transform.position.y < rim - FallDepth)
             {
-                // A finishing blow: the fall is the end of it, whatever would have it rise again (the Draug's floor held it at 1, and it
-                // stood at the bottom with its brain off for good: review 2026-11-27).
-                body.ApplyDamage(new DamageInfo(pusher, null, body.MaxHealth * 100f, DamageType.Physical, false, body.transform.position, Vector3.down,
-                    0f, HitTechnique.Finisher));
+                // The end of it, past any floor (Damageable.Finish): a floor that would have it rise again held a Draug at 1, and it stood
+                // at the bottom with its brain off for good. A plain blow, not a Finisher, which read as the player's brutal crit (a flash,
+                // a camera kick, the pack at the rim wavering) at the bottom of a gorge (review 2026-11-27).
+                body.Finish(new DamageInfo(pusher, null, body.MaxHealth, DamageType.Physical, false, body.transform.position, Vector3.down,
+                    0f, HitTechnique.None));
                 break;
             }
 

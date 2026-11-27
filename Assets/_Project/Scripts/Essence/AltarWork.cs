@@ -60,20 +60,33 @@ public static class AltarWork
     // ----- Purifying -----
 
     /// <summary>
-    /// How many batches can be queued at the altar now: as many as there is room for and Cursed Essence to pay for, and none while no
-    /// Alchemist is at work (<paramref name="why"/> says so). The window's buttons and Purify both ask this: the window kept its own sum,
-    /// without the guard against a batch of nothing (review 2026-11-27).
+    /// How many batches can be queued at the altar now: as many as there is room for and Cursed Essence to pay for, and none while nobody
+    /// holds the Alchemist's job. One who holds it but is away or resting can be queued for: the altar waits for them (the purifying asks
+    /// HasWorker, at work now), and <paramref name="why"/> says so. The window's buttons and Purify both ask this: the window kept its own
+    /// sum, without the guard against a batch of nothing (review 2026-11-27).
     /// </summary>
     public static int Queueable(GameObject user, out string why)
     {
         SettlementSettings settings = SettlementSettings.Current;
-        if (!GameSession.Here.HasWorker(settings.PurifierJob))
+        string job = settings.PurifierJob != null ? settings.PurifierJob.DisplayName : "someone";
+        ResidentRecord holder = null;
+        foreach (ResidentRecord record in GameSession.Here.Residents)
         {
-            why = $"The altar is cold. It needs a resident working as the {(settings.PurifierJob != null ? settings.PurifierJob.DisplayName : "someone")}.";
+            if (record != null && settings.PurifierJob != null && record.Job == settings.PurifierJob)
+            {
+                holder = record;
+                break;
+            }
+        }
+
+        if (holder == null)
+        {
+            why = $"The altar is cold. It needs a resident working as the {job}.";
             return 0;
         }
 
-        why = null;
+        why = GameSession.Here.HasWorker(settings.PurifierJob) ? null
+            : $"{(holder.Resident != null ? holder.Resident.DisplayName : "The " + job)} is away or resting: the altar waits for them.";
         int room = settings.MaxQueuedBatches - GameSession.Here.PurificationQueued;
         // As many as there is room for AND essence to pay for: "Purify all" asked for the whole queue's room and, with less Cursed
         // than that, paid for nothing and did nothing (the user's playtest, 2026-11-21).

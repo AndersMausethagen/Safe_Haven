@@ -125,3 +125,5 @@ AgentScripts/discord.local.json
 # copied out of the package by Tools; the materials and prefabs made from them are the project's own (Art/World/Ruins).
 /Assets/MeshingunStudio/
 /Assets/MeshingunStudio.meta
+/Assets/Game VFX Mega Pack(URP)/
+/Assets/Game VFX Mega Pack(URP).meta

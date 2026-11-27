@@ -42,6 +42,7 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
     // A slow that waits for the stop running now (the last kill of a fight), real seconds; below 0 none.
     private float thenScale = -1f;
     private float thenSeconds;
+    private bool thenEased;
     // The fight under way (§8): the foes the player struck or was struck by, since its first blow; a gap of quiet starts another.
     private readonly System.Collections.Generic.HashSet<Damageable> fightFoes = new System.Collections.Generic.HashSet<Damageable>();
     private float fightBeganAt;
@@ -117,7 +118,6 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
         }
 
         float until = Time.unscaledTime + seconds;
-        easing = false;
         if (hitStopUntil < 0f)
         {
             hitStopScale = scale;
@@ -131,19 +131,22 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
         {
             // Keeping the slowest and the latest end made a hurt during an ultimate's slow beat, or a skill's stop during the last
             // kill's slow, freeze the whole rest of the slow (review 2026-11-27).
-            WaitAfterTheStop(hitStopScale, hitStopUntil - until);
+            // An eased slow goes on eased after the stop, from where it had come to (review 2026-11-27: it froze flat, then snapped).
+            WaitAfterTheStop(hitStopScale, hitStopUntil - until, easing);
             hitStopScale = scale;
             hitStopUntil = until;
+            easing = false;
         }
         else if (scale > hitStopScale && until > hitStopUntil)
         {
-            WaitAfterTheStop(scale, until - hitStopUntil);
+            WaitAfterTheStop(scale, until - hitStopUntil, easeOut);
             return;
         }
         else
         {
             hitStopScale = Mathf.Min(hitStopScale, scale);
             hitStopUntil = Mathf.Max(hitStopUntil, until);
+            easing = false;
         }
 
         if (!GamePause.IsTimeFrozen)
@@ -161,11 +164,11 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
             return;
         }
 
-        WaitAfterTheStop(scale, seconds);
+        WaitAfterTheStop(scale, seconds, false);
     }
 
-    // One slow waits at most: the slowest and the longest of those asked (the last one asked used to win).
-    private void WaitAfterTheStop(float scale, float seconds)
+    // One slow waits at most: the slowest and the longest of those asked (the last one asked used to win); eased only if all of it is.
+    private void WaitAfterTheStop(float scale, float seconds, bool eased)
     {
         if (seconds <= 0f)
         {
@@ -173,6 +176,7 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
         }
 
         bool none = thenScale < 0f;
+        thenEased = none ? eased : thenEased && eased;
         thenScale = none ? scale : Mathf.Min(thenScale, scale);
         thenSeconds = none ? seconds : Mathf.Max(thenSeconds, seconds);
     }
@@ -199,10 +203,11 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
         {
             float then = thenScale;
             float thenFor = thenSeconds;
+            bool thenEase = thenEased;
             EndHitStop();
             if (then > 0f)
             {
-                SlowTime(then, thenFor);
+                SlowTime(then, thenFor, thenEase);
             }
         }
     }

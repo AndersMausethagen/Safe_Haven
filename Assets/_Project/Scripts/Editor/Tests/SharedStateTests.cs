@@ -151,7 +151,7 @@ public sealed class SharedStateTests
             for (int i = 0; i < lines.Length; i++)
             {
                 string code = CodePart(lines[i]);
-                if (Regex.IsMatch(code, @"\bTime\s*\.\s*timeScale\s*=(?!=)"))
+                if (Regex.IsMatch(code, @"\bTime\s*\.\s*timeScale\s*[-+*/]?=(?!=)"))
                 {
                     writers.Add($"{file}:{i + 1}: {code.Trim()}");
                 }
@@ -187,7 +187,7 @@ public sealed class SharedStateTests
 
             // A creature's brain or feet, by whatever name the script gives them: a field, a local, an out variable, a GetComponent result.
             var names = new HashSet<string>();
-            foreach (Match declared in Regex.Matches(source, @"\b(?:MonsterAI|NavMeshAgent|UnityEngine\.AI\.NavMeshAgent)\s+(\w+)\b"))
+            foreach (Match declared in Regex.Matches(source, @"\b(?:MonsterAI|NavMeshAgent|UnityEngine\.AI\.NavMeshAgent)(?:\[\])?>?\s+(\w+)\b"))
             {
                 names.Add(declared.Groups[1].Value);
             }
@@ -201,8 +201,9 @@ public sealed class SharedStateTests
             for (int i = 0; i < lines.Length; i++)
             {
                 string code = CodePart(lines[i]);
-                bool direct = Regex.IsMatch(code, @"<(?:MonsterAI|NavMeshAgent)>\s*\(\)\s*\.enabled\s*=(?!=)");
-                if (direct || names.Any(name => Regex.IsMatch(code, $@"\b{name}\s*\.\s*enabled\s*=(?!=)")))
+                // Straight off a lookup (GetComponentInChildren<MonsterAI>(true).enabled), or by name, an element of a list or array included.
+                bool direct = Regex.IsMatch(code, @"<(?:MonsterAI|NavMeshAgent)>\s*\([^)]*\)\s*\.enabled\s*=(?!=)");
+                if (direct || names.Any(name => Regex.IsMatch(code, $@"\b{name}\s*(?:\[[^\]]*\])?\s*\.\s*enabled\s*=(?!=)")))
                 {
                     switched.Add($"{file}:{i + 1}: {code.Trim()}");
                 }
@@ -235,6 +236,9 @@ public sealed class SharedStateTests
             CreatureHold.Hold(brain, sleep, CreatureHold.Part.Body);
             CreatureHold.Release(brain, sleep);
             Assert.IsFalse(brain.enabled, "a release wakes only what that holder held");
+            CreatureHold.Hold(brain, gate, CreatureHold.Part.Brain);
+            CreatureHold.Release(brain, gate);
+            Assert.IsFalse(brain.enabled, "nor what was off before it held it: that was never its to give back");
             CreatureHold.Release(brain, gate, CreatureHold.Part.Brain);
             Assert.IsTrue(brain.enabled, "unless it asks to wake it (the story's \"a creature hunts\")");
         }

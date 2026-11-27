@@ -152,6 +152,16 @@ public sealed class PauseTests
             Assert.Less(Time.timeScale, 1f);
             feedback.EndStopsDueBy(now + 1f);
             Assert.AreEqual(1f, Time.timeScale, 1e-4f, "and full speed once it is over");
+
+            // A hit stop inside the ease: after it, the ease goes on, not a flat slow that snaps at its end.
+            float again = Time.unscaledTime;
+            feedback.SlowTime(0.3f, 0.9f, easeOut: true);
+            feedback.SlowTime(0.05f, 0.07f);
+            Assert.AreEqual(0.05f, Time.timeScale, 1e-4f, "the stop");
+            feedback.EndStopsDueBy(again + 0.1f);
+            float after = Time.timeScale;
+            feedback.EndStopsDueBy(again + 0.6f);
+            Assert.Greater(Time.timeScale, after, "still easing back after the stop");
         }
         finally
         {
