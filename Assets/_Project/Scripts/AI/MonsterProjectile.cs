@@ -42,12 +42,13 @@ public sealed class MonsterProjectile : MonoBehaviour
     // Where it comes down, it leaves its hazard (a pool of bile), on the ground beneath.
     // struck: it met something (else it ran out of reach in the air, where no impact shows). A friend's bolt drawn here (co-op) shows
     // none: it has no owner to pass by, so it stops on bodies the real one flies past (review 2026-11-27).
-    private void Splash(Vector3 at, bool struck)
+    // at: the ground it leaves its hazard on (under a creature struck); contact: where it struck, for its impact (on the chest, not the feet).
+    private void Splash(Vector3 at, Vector3 contact, bool struck)
     {
         if (impactEffect != null && struck && !visualOnly)
         {
             Vector3 back = -direction;
-            PrefabPool.Spawn(impactEffect, at, back.sqrMagnitude > 0.0001f ? Quaternion.LookRotation(back) : Quaternion.identity);
+            PrefabPool.Spawn(impactEffect, contact, back.sqrMagnitude > 0.0001f ? Quaternion.LookRotation(back) : Quaternion.identity);
         }
 
         if (hazard != null && owner != null)
@@ -79,6 +80,13 @@ public sealed class MonsterProjectile : MonoBehaviour
             Collider collider = contacts[i].collider;
             // A friend's bolt has no owner to pass by: what it starts inside (the friend's own body) it doesn't stop on.
             if (visualOnly && contacts[i].distance <= 0f)
+            {
+                continue;
+            }
+
+            // Started inside something (a tree beside the caster): the cast reports it at the world's origin; it flies on out of it,
+            // as an arrow does (review 2026-11-27: its impact played at 0,0,0).
+            if (contacts[i].distance <= 0f && contacts[i].point == Vector3.zero)
             {
                 continue;
             }
@@ -115,7 +123,7 @@ public sealed class MonsterProjectile : MonoBehaviour
                 AttackResolver.Landed(owner, attack, victim, info, result);
                 WebLasso.AfterHit(attack, victim, owner, result);
             }
-            Splash(victim is Component splashed && splashed != null ? splashed.transform.position : hit.point, true);
+            Splash(victim is Component splashed && splashed != null ? splashed.transform.position : hit.point, hit.point, true);
             PrefabPool.Release(gameObject);
             return;
         }
@@ -123,7 +131,7 @@ public sealed class MonsterProjectile : MonoBehaviour
         remaining -= step;
         if (remaining <= 0f)
         {
-            Splash(transform.position, false);
+            Splash(transform.position, transform.position, false);
             PrefabPool.Release(gameObject);
         }
     }
