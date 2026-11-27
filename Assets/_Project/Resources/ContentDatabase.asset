@@ -300,6 +300,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 515aefd6a6b08894597e42359a19aea9, type: 2}
   - {fileID: 11400000, guid: 939768c47ce0dbe408f8a7b50a1b497e, type: 2}
   - {fileID: 11400000, guid: 103ba3ddcfd75784885af6c34f64b282, type: 2}
+  - {fileID: 11400000, guid: 703b74df38883b04cbe09c95db72a49a, type: 2}
+  - {fileID: 11400000, guid: adbd13d5f52aca34985ee5e749a9b54b, type: 2}
+  - {fileID: 11400000, guid: 08f5a55bd75f82047be9befd8aa991ad, type: 2}
+  - {fileID: 11400000, guid: a5eabca2e16e6f84ebb2e0e08c719675, type: 2}
   resourceCatalog: {fileID: 11400000, guid: 82528be8462042341acfc62489e5c91f, type: 2}
   recipeBook: {fileID: 11400000, guid: cd7724124d8b393439143345d7f2b45f, type: 2}
   saveablePrefabs:
@@ -634,9 +638,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: bed09cebf09c4e146b21f31b35f57caf, type: 2}
   skills:
   - {fileID: 11400000, guid: da09e366badb315479c32e7da86ea251, type: 2}
+  - {fileID: 11400000, guid: d4c0e361221a96a4b863431fe6af034b, type: 2}
   - {fileID: 11400000, guid: 13728d10373538c41b1351d572a393a9, type: 2}
   - {fileID: 11400000, guid: 586344847bcbbc749a583c0aa4420aea, type: 2}
   - {fileID: 11400000, guid: 728aad6a1bc2e0b409b54269e0456784, type: 2}
+  - {fileID: 11400000, guid: 3bd43c11449ff1c4cb558ba47fcd032b, type: 2}
   - {fileID: 11400000, guid: bfd515b7dfa209443b9f7e30787ee61e, type: 2}
   - {fileID: 11400000, guid: e01d9c8c4e0c7d04f86576ee47bc3254, type: 2}
   - {fileID: 11400000, guid: ea2ebfef3d35eae42a29237e4b273b5d, type: 2}
@@ -646,11 +652,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 232cded6c08cb2b45aa9aabed31be4cf, type: 2}
   - {fileID: 11400000, guid: 1ed16a27aed704c4fbcf6235fb0e823d, type: 2}
   - {fileID: 11400000, guid: e30f0159f046e3249945f3cf1123396c, type: 2}
+  - {fileID: 11400000, guid: 3c8c34d779f18214397e781b8fd20d67, type: 2}
   - {fileID: 11400000, guid: 6b5d0509f85cad745abe021e77c086dc, type: 2}
   - {fileID: 11400000, guid: 536438740f1668a4b882abac06d4448c, type: 2}
   - {fileID: 11400000, guid: df741c0d1e4c5604ea961c3a33afb8fd, type: 2}
   - {fileID: 11400000, guid: fd482999517e26c47bab3f1ad1e36f5b, type: 2}
   - {fileID: 11400000, guid: 96b386ef2827f5c468060fffa9a00acc, type: 2}
+  - {fileID: 11400000, guid: 837203a14830d5448988e3e493c548e1, type: 2}
   - {fileID: 11400000, guid: 9218ba12b9f62314ea6a1c8c1469fdd4, type: 2}
   - {fileID: 11400000, guid: 8f48b8411eaf29845b33f493a27649e5, type: 2}
   - {fileID: 11400000, guid: a8e3eb9e42951db4589859c6bd82c89c, type: 2}

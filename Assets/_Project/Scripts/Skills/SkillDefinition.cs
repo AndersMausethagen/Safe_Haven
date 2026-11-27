@@ -100,6 +100,8 @@ public sealed class SkillDefinition : ScriptableObject
     [SerializeField, Min(0f)] private float buffDuration = 6f;
     [Tooltip("The buff's own name, on the card and beside the health bar while it lasts (Steel Wall). Empty: the skill's name.")]
     [SerializeField] private string buffName;
+    [Tooltip("While the buff lasts, blows taken fill Focus this many times faster (Bear-Hide: built around taking hits). 1: as ever.")]
+    [SerializeField, Range(1f, 4f)] private float focusFromBlows = 1f;
 
     [Header("Presentation")]
     [SerializeField] private bool playAttackAnimation = true;
@@ -162,6 +164,8 @@ public sealed class SkillDefinition : ScriptableObject
     public IReadOnlyList<SkillStatBuff> Buffs => buffs;
     public float BuffDuration => buffDuration;
     public string BuffName => string.IsNullOrWhiteSpace(buffName) ? DisplayName : buffName;
+    /// <summary>How much faster blows taken fill Focus while its buff lasts.</summary>
+    public float FocusFromBlows => focusFromBlows;
     public bool PlayAttackAnimation => playAttackAnimation;
     public string AnimationState => animationState;
     public float AnimationSpeed => animationSpeed;

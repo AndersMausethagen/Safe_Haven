@@ -164,6 +164,9 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     [Tooltip("An inscription: it teaches the enchantment its stack carries when read at home (Inscriptions). One item serves every " +
              "enchantment; a blank one (no enchantment) is for a carved stone's rubbing.")]
     [SerializeField] private bool inscription;
+    [Tooltip("Lore: a rare find (a saga-stave, a carved bone) that teaches this ability when read at home (SkillLore; the user, " +
+             "2026-11-27: \"we could also unlock abilities other ways. through exploring or finding rare items\"). Empty for other items.")]
+    [SerializeField] private SkillDefinition teachesSkill;
 
     [Header("Transport")]
     [Tooltip("Makes this item a transport's kit: using it sets the cart or boat down. Empty for other items.")]
@@ -297,7 +300,7 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public float GearRepair => gearRepair;
     public GameObject PlacesInRaid => placesInRaid;
     /// <summary>True when right-clicking does something: eat, drink, heal, equip or read.</summary>
-    public bool IsUsable => IsConsumable || IsEquippable || IsBlueprint || experience > 0 || transport != null || IsSapling || lasso || IsArtRune || inscription;
+    public bool IsUsable => IsConsumable || IsEquippable || IsBlueprint || experience > 0 || transport != null || IsSapling || lasso || IsArtRune || inscription || teachesSkill != null;
     /// <summary>An art rune: attuning it gives the weapons of its kind a second art (ArtRunes).</summary>
     public bool IsArtRune => runeArt != null && runeFor != WeaponSignature.None;
     public AttackDefinition RuneArt => runeArt;
@@ -322,6 +325,9 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public bool IsLearnedAtHome => learnedAtHome;
     /// <summary>A parchment that teaches the enchantment its stack carries (Inscriptions.Read).</summary>
     public bool IsInscription => inscription;
+    /// <summary>The ability this lore teaches when read at home; null for other items.</summary>
+    public SkillDefinition TeachesSkill => teachesSkill;
+    public bool IsSkillLore => teachesSkill != null;
     /// <summary>Experience for reading it (a rune book).</summary>
     public int Experience => experience;
     /// <summary>Gear wears: tools, weapons, backpacks and armor are deployed equipment that survives death with damage.</summary>

@@ -632,6 +632,60 @@ MonoBehaviour:
     when: 0
     costItem: {fileID: 0}
     costAmount: 1
+  - placeId: haven.lookout_cairn.2
+    name: Frost-rimed stave
+    verb: Take
+    item: {fileID: 11400000, guid: adbd13d5f52aca34985ee5e749a9b54b, type: 2}
+    amount: 1
+    taken: 'Wedged in the cairn, where the wind never stops: a stave rimed with frost that doesn''t melt in your hand.'
+    offset: {x: 1.6, y: 1.2}
+    marker: {fileID: 1987186056636952893, guid: 9c63895aedf974b41ac19d55902cc357, type: 3}
+    markerScale: 0.55
+    markerTurn: 30
+    questTarget: {fileID: 0}
+    gate: 0
+    quest: {fileID: 0}
+    everyDays: 0
+    keepsSpans: 3
+    when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
+  - placeId: haven.wayfarer_s_stones.0
+    name: Raven bones
+    verb: Take
+    item: {fileID: 11400000, guid: 08f5a55bd75f82047be9befd8aa991ad, type: 2}
+    amount: 1
+    taken: 'Bound with black thread at the foot of the stones, where the ravens gather: three carved bones.'
+    offset: {x: -1.4, y: 1.5}
+    marker: {fileID: 1987186056636952893, guid: 9c63895aedf974b41ac19d55902cc357, type: 3}
+    markerScale: 0.55
+    markerTurn: 30
+    questTarget: {fileID: 0}
+    gate: 0
+    quest: {fileID: 0}
+    everyDays: 0
+    keepsSpans: 3
+    when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
+  - placeId: haven.elder_cedar.1
+    name: Bear's fang
+    verb: Take
+    item: {fileID: 11400000, guid: 703b74df38883b04cbe09c95db72a49a, type: 2}
+    amount: 1
+    taken: 'Driven into the old cedar''s bark, above claw marks a bear made long ago: a fang carved with runes.'
+    offset: {x: 1.8, y: -1.1}
+    marker: {fileID: 1987186056636952893, guid: 9c63895aedf974b41ac19d55902cc357, type: 3}
+    markerScale: 0.55
+    markerTurn: 30
+    questTarget: {fileID: 0}
+    gate: 0
+    quest: {fileID: 0}
+    everyDays: 0
+    keepsSpans: 3
+    when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
   targets:
   - placeId: haven.old_quarry.0
     target: {fileID: 11400000, guid: 452286aed8706314fbb93b4d23abab81, type: 2}

@@ -236,6 +236,10 @@ public static class PlaytestLog
     /// <summary>The skill bar as a raid begins (Docs/SkillChoiceResearch_2026-11-27.md 3.7): subject the skill ids in slots 1-5 joined
     /// by "|" ("-" for none), amount how many skills, detail the weapon in hand.</summary>
     public const string Loadout = "Loadout";
+    /// <summary>Lore found (SkillLore): subject the ability's id, detail where ("the Old Moss Troll", "a supply cache").</summary>
+    public const string LoreFound = "LoreFound";
+    /// <summary>Lore read at home: subject the ability's id, detail the item's.</summary>
+    public const string LoreRead = "LoreRead";
 
     /// <summary>A Loadout row's subject: slots 1-5's skill ids joined by "|", "-" for an empty one.</summary>
     public static string LoadoutSubject(SkillLoadout loadout)

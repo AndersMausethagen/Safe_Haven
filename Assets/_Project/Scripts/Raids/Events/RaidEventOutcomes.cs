@@ -365,6 +365,25 @@ public sealed class GiveInscriptionOutcome : RaidEventOutcome
     }
 }
 
+/// <summary>Lore (SkillLore): the one named, or one the player neither knows nor carries. None once every one is found.</summary>
+[Serializable]
+public sealed class GiveLoreOutcome : RaidEventOutcome
+{
+    [Tooltip("Empty: one not yet found.")]
+    [SerializeField] private ItemDefinition lore;
+
+    public override string DisplayName => "Give Lore";
+
+    public override void Apply(RaidEventContext context)
+    {
+        ItemDefinition given = lore != null && lore.IsSkillLore ? lore : SkillLore.Pick(context.Player, context.Random);
+        if (given != null)
+        {
+            SkillLore.Grant(context.Player, given, "a strange place");
+        }
+    }
+}
+
 /// <summary>Someone is freed and follows the player: they come home if they are alive and still with the player when they extract (RescuableTraveler).</summary>
 [Serializable]
 public sealed class RescueResidentOutcome : RaidEventOutcome

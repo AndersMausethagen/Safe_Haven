@@ -74,7 +74,9 @@ public sealed class PlayerFocus : MonoBehaviour
         }
 
         // Health lost, not the blow's size: one a floor held off (downed in co-op, a relic's last stand, sparring) cost nothing.
-        Earn(ForHurt(result.HealthLost, health.MaxHealth, Rules));
+        // A skill's buff can make blows taken pay more (Bear-Hide).
+        float scale = TryGetComponent(out PlayerSkills skills) ? skills.FocusFromBlowsScale : 1f;
+        Earn(ForHurt(result.HealthLost, health.MaxHealth, Rules) * scale);
     }
 
     private void OnEnable()

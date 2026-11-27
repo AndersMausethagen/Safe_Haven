@@ -89,6 +89,11 @@ public sealed class SkillLookTests
         var taught = new HashSet<SkillDefinition>(settings.StartingSkills);
         // A weapon's own technique is taught by wielding one of its kind at copper or better (2026-11-27, SkillPriceTests).
         taught.UnionWith(settings.WeaponTechniques);
+        // And lore found in the raids and the Haven's hidden places teaches its own (SkillLore, SkillLoreTests).
+        foreach (ItemDefinition lore in SkillLoreSettings.Current.Lore)
+        {
+            taught.Add(lore.TeachesSkill);
+        }
         foreach (string guid in AssetDatabase.FindAssets("t:BossDefinition", new[] { "Assets/_Project" }))
         {
             taught.Add(AssetDatabase.LoadAssetAtPath<BossDefinition>(AssetDatabase.GUIDToAssetPath(guid)).RewardSkill);

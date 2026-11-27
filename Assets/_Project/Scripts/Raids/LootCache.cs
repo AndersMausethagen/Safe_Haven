@@ -123,6 +123,9 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
             {
                 gaveSomething |= !Inscriptions.Grant(searcher, found, "a supply cache").IsEmpty;
             }
+
+            // The rare caches (those with an inscription) hold lore now and then (SkillLore).
+            gaveSomething |= SkillLore.Roll(searcher, SkillLoreSettings.Current.RareCacheChance, "a supply cache") != null;
         }
 
         if (!gaveSomething && contents.Count == 0 && resourceContents.Count == 0)

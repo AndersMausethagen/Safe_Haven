@@ -393,6 +393,12 @@ public sealed class ItemInventory : MonoBehaviour
             return Inscriptions.Read(gameObject, from, slot);
         }
 
+        // Lore: an ability found, taken in at home (SkillLore).
+        if (item.IsSkillLore)
+        {
+            return SkillLore.Read(gameObject, from, slot);
+        }
+
         if (item.IsEquippable)
         {
             var equipment = GetComponent<PlayerEquipment>();

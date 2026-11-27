@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f62d1e1256004448b037e8c7a95adac, type: 3}
+  m_Name: SkillLoreSettings
+  m_EditorClassIdentifier: SafeHaven::SkillLoreSettings
+  lore:
+  - {fileID: 11400000, guid: adbd13d5f52aca34985ee5e749a9b54b, type: 2}
+  - {fileID: 11400000, guid: a5eabca2e16e6f84ebb2e0e08c719675, type: 2}
+  - {fileID: 11400000, guid: 08f5a55bd75f82047be9befd8aa991ad, type: 2}
+  - {fileID: 11400000, guid: 703b74df38883b04cbe09c95db72a49a, type: 2}
+  greatCreatureChance: 0.35
+  eliteChanceByTier:
+  - 0.03
+  - 0.04
+  - 0.05
+  - 0.06
+  - 0.07
+  rareCacheChance: 0.15
+  lostOneChance: 0.3
+  lostOneChancePerRank: 0.15

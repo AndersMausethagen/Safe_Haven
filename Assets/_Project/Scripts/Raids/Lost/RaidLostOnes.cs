@@ -188,6 +188,9 @@ public sealed class RaidLostOnes
 
     private void Reward(GameObject killer, LostOneSettings settings)
     {
+        // The Lost carry lore they took from the forest: the more it rose, the likelier (SkillLore).
+        SkillLore.Roll(killer, SkillLoreSettings.Current.LostOneChance(Walker.Rank), Walker.FullName);
+
         int above = Mathf.Max(0, Walker.Rank - 1);
         ResourceDefinition essence = SettlementSettings.Current.CursedEssence;
         int amount = settings.EssenceAtRest + settings.EssencePerRank * above;

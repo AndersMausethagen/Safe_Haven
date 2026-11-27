@@ -196,6 +196,9 @@ public sealed class LootOnDeath : MonoBehaviour
             {
                 global::Inscriptions.Grant(inventory.gameObject, own, name);
             }
+
+            // A great creature's lore: sure the first time (none found yet), then now and then (SkillLore).
+            SkillLore.Roll(inventory.gameObject, LoreChance(inventory.gameObject), name);
         }
 
         LearnRecipes(taker);
@@ -254,8 +257,22 @@ public sealed class LootOnDeath : MonoBehaviour
         }
 
         string title = creature.Definition != null ? creature.Definition.DisplayName : name;
+        // A great creature's lore lies on its body with the rest: sure the first time, then now and then (SkillLore).
+        if (raid != null && inscriptions.Count > 0 && Random.value < LoreChance(Player.Current.gameObject))
+        {
+            ItemDefinition lore = SkillLore.Pick(Player.Current.gameObject, new System.Random(Random.Range(0, int.MaxValue)));
+            if (lore != null)
+            {
+                items.Add(new ItemAmount(lore, 1));
+                PlaytestLogger.Note(PlaytestLog.LoreFound, lore.TeachesSkill.Id, 1, title);
+            }
+        }
+
         LootableRemains.Leave(damageable, title, items, reaped, relic, raid != null ? raid.Session.Tier : 0, inscription);
     }
+
+    // The great creatures (those with inscriptions of their own) carry lore: the first one for sure while none has been found.
+    private static float LoreChance(GameObject player) => SkillLore.AnyFound(player) ? SkillLoreSettings.Current.GreatCreatureChance : 1f;
 
     private static IReadOnlyList<ResourceAmount> Reaped(IReadOnlyList<ResourceAmount> rolled, Combatant killer)
     {

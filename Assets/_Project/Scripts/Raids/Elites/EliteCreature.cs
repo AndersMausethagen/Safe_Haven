@@ -310,6 +310,8 @@ public sealed class EliteCreature : MonoBehaviour
         }
 
         GiveInscription(killer, difficulty.tier);
+        // Now and then an elite carries lore: an ability to take home (SkillLore).
+        SkillLore.Roll(killer, SkillLoreSettings.Current.EliteChance(difficulty.tier), Title);
     }
 
     // The raid's elite table (rows by tier) when it has one, else the tier's own list.

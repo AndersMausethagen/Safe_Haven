@@ -35,6 +35,8 @@ public static class ContentAudit
         "HavenPlaceVerbs.finds[].item",
         // Inscriptions are made by drops, caches and rubbings from the one item (Inscriptions.Make).
         "EssenceSettings.inscription",
+        // Lore the raids give at their rare moments (SkillLore: great creatures, elites, rare caches, Lost Ones, strange places).
+        "SkillLoreSettings.lore",
         // What someone at home made while the player was away, put in the chests on coming home (AwayGifts).
         "HomecomingSettings.gifts[].item",
         // What a party to a held land brings home from a raid (LandParties), and a rock a mason broke while the player was away

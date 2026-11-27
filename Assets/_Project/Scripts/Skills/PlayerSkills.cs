@@ -116,6 +116,24 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     /// <summary>The skills' buffs on the player now (a war cry, a blessing), each with the Time.time it wears off (PlayerConditionsView).</summary>
     public IReadOnlyDictionary<SkillDefinition, float> ActiveBuffs => activeBuffs;
 
+    /// <summary>How much faster blows taken fill Focus now: the most any lasting buff gives (Bear-Hide), 1 with none.</summary>
+    public float FocusFromBlowsScale
+    {
+        get
+        {
+            float scale = 1f;
+            foreach (KeyValuePair<SkillDefinition, float> buff in activeBuffs)
+            {
+                if (buff.Key != null && Time.time < buff.Value)
+                {
+                    scale = Mathf.Max(scale, buff.Key.FocusFromBlows);
+                }
+            }
+
+            return scale;
+        }
+    }
+
     // Which skill keys are down (pressed through the input, let go on release): a channel lasts only while its key is held, so one
     // cast from a buffered press or after an aimed release, with the key already up, ends after its first blow.
     private readonly bool[] held = new bool[SkillLoadout.SlotCount];
