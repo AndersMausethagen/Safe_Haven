@@ -82,16 +82,38 @@ public static class GuardPosts
         return record.Resident != null && record.Resident.RaidCompanion != null ? record.Resident.RaidCompanion : settings.BreachFighter;
     }
 
-    /// <summary>How many of the Haven's people fight in a ward breach.</summary>
+    /// <summary>How many of the Haven's people fight in a ward breach (FightsBreach).</summary>
     public static int BreachFighters(IHavenView home, DefenceSettings settings)
     {
         int count = 0;
         foreach (ResidentRecord record in home.Residents)
         {
-            count += FightsAs(record, true, settings) != null ? 1 : 0;
+            count += FightsBreach(home, record, settings) ? 1 : 0;
         }
 
         return count;
+    }
+
+    /// <summary>
+    /// Whether <paramref name="record"/> fights in a ward breach: one who can fight (FightsAs), at home, and with a post within the Cap
+    /// unless Everyone Fights Breaches. The one rule for who stands at the ward, how big its waves come, who is marked for holding it and
+    /// who is bruised when it falls: each kept its own, and with Everyone Fights off, guards past the cap sheltered yet still made every
+    /// wave bigger and came out bruised (review 2026-11-27).
+    /// </summary>
+    public static bool FightsBreach(IHavenView home, ResidentRecord record, DefenceSettings settings)
+    {
+        if (record == null || record.IsAway || FightsAs(record, true, settings) == null)
+        {
+            return false;
+        }
+
+        if (settings.EveryoneFightsBreaches)
+        {
+            return true;
+        }
+
+        int rank = Rank(home, record);
+        return rank >= 0 && rank < Cap(settings);
     }
 
     /// <summary>Whether the guards are called out now: a ward breach, (when DefenceSettings says so) a corruption night, or the horn.</summary>

@@ -403,18 +403,37 @@ public static class ResidentsOut
     /// <summary>Whether anyone could be out on this raid: a party set, or an outpost raised (cheap, before asking for each).</summary>
     public static bool Any(SettlementState home) => home.Parties.Count > 0 || home.Outposts.Count > 0 || home.Foray != null;
 
-    /// <summary>Those at their own work in the Haven now: not the one along, not paused or away, not out (Now). What the Haven gets done
-    /// while the player is away is counted over these (the fields watered, a homecoming gift; builders and rings ask Now themselves).</summary>
+    /// <summary>Those at their own work in the Haven now (AtWork). What the Haven gets done while the player is away is counted over these
+    /// (the fields watered, a homecoming gift; builders and rings ask Now themselves).</summary>
     public static IEnumerable<ResidentRecord> Working(SettlementState home, ResidentDefinition along)
     {
         foreach (ResidentRecord record in home.Residents)
         {
-            if (record != null && record.Resident != null && record.Resident != along && !record.WorkPaused && !Now(home, record, along))
+            if (AtWork(home, record, along))
             {
                 yield return record;
             }
         }
     }
+
+    /// <summary>
+    /// Whether <paramref name="record"/> is at their own work in the Haven now: not the one along on the raid, not paused, not away on a
+    /// foray, and (in one's own Haven, on a raid long enough for parties to set out) not out with a party or at an outpost. The one rule
+    /// whatever sets a resident to work asks: the altar, a building's staff, the watch post, the stable, the kitchen each asked its own share
+    /// of it, and the altar purified on at full pace with its Alchemist paused, on a foray or along on the raid (review 2026-11-27).
+    /// </summary>
+    public static bool AtWork(IHavenView here, ResidentRecord record, ResidentDefinition along)
+    {
+        if (record == null || record.Resident == null || record.Resident == along || record.WorkPaused || record.IsAway)
+        {
+            return false;
+        }
+
+        return !(here is SettlementState home) || !Now(home, record, along);
+    }
+
+    /// <summary>The resident along on the raid under way, at work nowhere meanwhile (none at home).</summary>
+    public static ResidentDefinition Along => GameSession.ActiveRaid != null ? GameSession.ActiveRaid.Companion : null;
 
     public static bool Now(SettlementState home, ResidentRecord record, ResidentDefinition along)
     {

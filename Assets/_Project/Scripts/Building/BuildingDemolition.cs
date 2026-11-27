@@ -30,7 +30,7 @@ public static class BuildingDemolition
             return "Only your own buildings can be taken down.";
         }
 
-        if (!HavenTravel.IsOpen)
+        if (WardBreachDirector.UnderWay)
         {
             return "Not while the ward is breached.";
         }

@@ -172,8 +172,8 @@ public sealed class BoundaryStone : MonoBehaviour, IInteractionName
             page.Add(new MenuAction("Offer a Pact Rune", can ? $"Hold +{settings.RuneHold:0} (you have {runes})." : why, can, () => Territory.Offer(region, user)));
         }
 
-        bool open = HavenTravel.IsOpen && !GameStateManager.InCombat;
-        string shut = GameStateManager.InCombat ? "Not with something at your heels." : "Not during a breach.";
+        string shut = HavenTravel.WhyShut();
+        bool open = shut == null;
         // A lit stone knows the way home from the first one lit, and the portal knows the way back out to it (HomePortalMenu): a land
         // remembered isn't walked again (the user, 2026-11-27: "walking for several minutes is not fun").
         if (state.IsClaimed(region) && Place.InOwnHaven)

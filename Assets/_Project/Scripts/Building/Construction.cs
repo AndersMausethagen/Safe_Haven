@@ -190,9 +190,12 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
                 return station.HasWorker;
             }
 
-            foreach (ResidentRecord record in GameSession.Here.Residents)
+            // At work now (ResidentsOut.AtWork): paused alone was asked here, so a module counted as staffed with its worker on a foray.
+            IHavenView here = GameSession.Here;
+            ResidentDefinition along = ResidentsOut.Along;
+            foreach (ResidentRecord record in here.Residents)
             {
-                if (record.Job != null && record.Job.Workplace == Definition && !record.WorkPaused)
+                if (record.Job != null && record.Job.Workplace == Definition && ResidentsOut.AtWork(here, record, along))
                 {
                     return true;
                 }

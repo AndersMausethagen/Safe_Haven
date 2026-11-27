@@ -224,10 +224,12 @@ public static class ResidentMeals
 
         float more = 0f;
         IReadOnlyList<ResidentRecord> people = here.Residents;
+        ResidentDefinition along = ResidentsOut.Along;
         for (int i = 0; i < people.Count; i++)
         {
+            // A cook at work now (ResidentsOut.AtWork): away alone was asked here, so a paused cook still fed everyone well.
             ResidentRecord cook = people[i];
-            if (!cook.IsAway && cook.Job != null && cook.Job.Workplace == settings.MealsFrom)
+            if (cook.Job != null && cook.Job.Workplace == settings.MealsFrom && ResidentsOut.AtWork(here, cook, along))
             {
                 more += ResidentTraits.Sum(cook, TraitEffectKind.FeedsWell);
             }

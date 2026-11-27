@@ -289,11 +289,11 @@ public sealed class FallenRecord
 /// </summary>
 public sealed class SettlementState : IHavenView
 {
-    [NotSaved("what stands at home, noted again from the buildings on every load there (NoteBuildings, NoteBuilt)")]
+    [NotSaved("what stands at home, noted again from the buildings on every load there (NoteBuildings, NoteBuilt)"), SeenHere]
     private readonly Dictionary<BuildingDefinition, int> builtTiers = new Dictionary<BuildingDefinition, int>();
-    [NotSaved("seen: counted again from the buildings on every load at home (NoteBuildings)")]
+    [NotSaved("seen: counted again from the buildings on every load at home (NoteBuildings)"), SeenHere]
     private readonly Dictionary<BuildingDefinition, int> builtCounts = new Dictionary<BuildingDefinition, int>();
-    [NotSaved("the modules counting at home, noted again from the buildings on every load there (NoteBuildings)")]
+    [NotSaved("the modules counting at home, noted again from the buildings on every load there (NoteBuildings)"), SeenHere]
     private readonly List<BuildingModuleDefinition> notedModules = new List<BuildingModuleDefinition>();
     private readonly List<ResidentRecord> residents = new List<ResidentRecord>();
     private readonly List<FallenRecord> fallen = new List<FallenRecord>();
@@ -526,7 +526,7 @@ public sealed class SettlementState : IHavenView
     public IReadOnlyList<ResidentRecord> Residents => residents;
 
     /// <summary>Beds standing at home, as last seen there. Nobody needs one; whoever has one works faster and adds comfort.</summary>
-    [field: NotSaved("what this game sees standing, counted from the houses at home")]
+    [field: NotSaved("what this game sees standing, counted from the houses at home"), SeenHere]
     public int Beds { get; private set; }
 
     /// <summary>How many residents have a bed.</summary>
@@ -736,11 +736,11 @@ public sealed class SettlementState : IHavenView
     }
 
     /// <summary>Scaffolds (paid for) stood at home when it was last seen: builders have work waiting there.</summary>
-    [field: NotSaved("what this game sees standing, from the scaffolds at home")]
+    [field: NotSaved("what this game sees standing, from the scaffolds at home"), SeenHere]
     public bool ScaffoldsWaiting { get; private set; }
 
     /// <summary>The hammering those scaffolds still needed when home was last seen (Construction work; 0: not known).</summary>
-    [field: NotSaved("what this game sees standing, from the scaffolds at home")]
+    [field: NotSaved("what this game sees standing, from the scaffolds at home"), SeenHere]
     public float ScaffoldWorkLeft { get; private set; }
 
     /// <summary>
@@ -1035,14 +1035,6 @@ public sealed class SettlementState : IHavenView
         }
     }
 
-    // What this game sees standing, not what is saved or sent (HavenProgress notes it where the player is): taken on from the
-    // host's word, a guest's copy had no building tiers, beds or scaffolds for the whole visit (meal slots, mentors, raid caches
-    // and rumours all read 0).
-    private static readonly string[] SeenHere =
-    {
-        nameof(builtTiers), nameof(builtCounts), "<Beds>k__BackingField", "<ScaffoldsWaiting>k__BackingField", "<ScaffoldWorkLeft>k__BackingField",
-    };
-
     public void TakeOn(SettlementState other)
     {
         if (other == null || other == this)
@@ -1053,7 +1045,9 @@ public sealed class SettlementState : IHavenView
         foreach (System.Reflection.FieldInfo field in typeof(SettlementState).GetFields(
                      System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic))
         {
-            if (field.Name != nameof(Changed) && System.Array.IndexOf(SeenHere, field.Name) < 0)
+            // What this game sees standing ([SeenHere]) is its own, not the host's word: taken on, a guest's copy had no building tiers,
+            // beds, scaffolds or fitted modules for the whole visit (meal slots, mentors, raid caches and rumours all read 0).
+            if (field.Name != nameof(Changed) && !field.IsDefined(typeof(SeenHereAttribute), false))
             {
                 field.SetValue(this, field.GetValue(other));
             }
@@ -1698,10 +1692,16 @@ public sealed class SettlementState : IHavenView
         return total;
     }
 
-    /// <summary>True when some resident holds the job.</summary>
+    /// <summary>True when some resident holds the job and is at work now (ResidentsOut.AtWork: not paused, away, out or along).</summary>
     public bool HasWorker(JobDefinition job)
     {
-        return job != null && residents.Exists(record => record.Job == job);
+        if (job == null)
+        {
+            return false;
+        }
+
+        ResidentDefinition along = ResidentsOut.Along;
+        return residents.Exists(record => record.Job == job && ResidentsOut.AtWork(this, record, along));
     }
 
     /// <summary>Adds batches to the purification queue. Returns how many were added.</summary>

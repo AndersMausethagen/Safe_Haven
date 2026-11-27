@@ -94,4 +94,56 @@ public sealed class GuardPostsTests
         Assert.AreEqual(-8f, back.Posts[0].z, 1e-3f);
         Assert.AreEqual(-2f, back.Posts[1].x, 1e-3f, "in order");
     }
+
+    [Test]
+    public void AtWork_IsOneRule_ForTheAltarAndEveryJob()
+    {
+        (ResidentDefinition who, JobDefinition job) = ADefender();
+        var home = new SettlementState();
+        home.AddResident(who, job);
+        ResidentRecord record = home.Find(who);
+        Assert.IsTrue(ResidentsOut.AtWork(home, record, null));
+        Assert.IsTrue(home.HasWorker(job), "holding the job, and at work");
+        Assert.IsFalse(ResidentsOut.AtWork(home, record, who), "along on the raid: at work nowhere");
+        record.WorkPaused = true;
+        Assert.IsFalse(ResidentsOut.AtWork(home, record, null));
+        Assert.IsFalse(home.HasWorker(job), "paused: the altar purified on with its Alchemist paused, away or along (review 2026-11-27)");
+    }
+
+    [Test]
+    public void WhoFightsABreach_IsOneRule_PostsCappedUnlessEveryoneFights()
+    {
+        (_, JobDefinition job) = ADefender();
+        DefenceSettings settings = DefenceSettings.Current;
+        var data = new SerializedObject(settings);
+        bool everyone = data.FindProperty("everyoneFightsBreaches").boolValue;
+        try
+        {
+            data.FindProperty("everyoneFightsBreaches").boolValue = false;
+            data.ApplyModifiedPropertiesWithoutUndo();
+            int cap = GuardPosts.Cap(settings);
+            var home = new SettlementState();
+            foreach (ResidentDefinition resident in Resources.Load<ContentDatabase>(ContentDatabase.ResourceName).Residents)
+            {
+                if (home.Residents.Count <= cap)
+                {
+                    home.AddResident(resident, job);
+                }
+            }
+
+            Assert.AreEqual(cap + 1, home.Residents.Count, "one guard more than there are posts");
+            ResidentRecord last = home.Residents[home.Residents.Count - 1];
+            Assert.IsFalse(GuardPosts.FightsBreach(home, last, settings), "past the cap they shelter");
+            Assert.AreEqual(cap, GuardPosts.BreachFighters(home, settings), "and make no wave bigger (nor are bruised when it falls)");
+
+            data.FindProperty("everyoneFightsBreaches").boolValue = true;
+            data.ApplyModifiedPropertiesWithoutUndo();
+            Assert.IsTrue(GuardPosts.FightsBreach(home, last, settings), "everyone fights: they too");
+        }
+        finally
+        {
+            data.FindProperty("everyoneFightsBreaches").boolValue = everyone;
+            data.ApplyModifiedPropertiesWithoutUndo();
+        }
+    }
 }

@@ -62,7 +62,7 @@ public static class WallUpgrades
             return "Only your own walls can be changed.";
         }
 
-        return !HavenTravel.IsOpen ? "Not while the ward is breached." : null;
+        return WardBreachDirector.UnderWay ? "Not while the ward is breached." : null;
     }
 
     /// <summary>Turns the piece into its gate. False, with a message, when it can't be.</summary>

@@ -14,20 +14,41 @@ public static class HavenTravel
     // How near a following horse must be to come along.
     private const float FollowerReach = 20f;
 
-    /// <summary>True while going somewhere is allowed.</summary>
-    public static bool IsOpen => WardBreachDirector.Current == null || !WardBreachDirector.Current.IsActive;
+    /// <summary>True while going somewhere is allowed (<see cref="WhyShut"/>).</summary>
+    public static bool IsOpen => WhyShut() == null;
+
+    /// <summary>
+    /// Why the player can't go across the Haven now, in words for them, or null when they can: not during a breach, nor with something at
+    /// their heels. The one rule for every way across (the Haven window, the journal, a resident's card, the portal's old ways, a stone):
+    /// only the stones and the portal refused a fight, so "Go there" from the Haven window escaped one (review 2026-11-27).
+    /// </summary>
+    public static string WhyShut()
+    {
+        if (WardBreachDirector.UnderWay)
+        {
+            return "Not during a breach.";
+        }
+
+        return GameStateManager.InCombat ? "Not with something at your heels." : null;
+    }
 
     public static void AddGoTo(HavenEntry entry, Transform target)
     {
-        bool open = IsOpen;
-        entry.Actions.Add(new HavenAction(open ? "Go there" : "Not during a breach", () => GoTo(target), open, primary: false));
+        string shut = WhyShut();
+        entry.Actions.Add(new HavenAction(shut == null ? "Go there" : shut.TrimEnd('.'), () => GoTo(target), shut == null, primary: false));
     }
 
     public static void GoTo(Transform target)
     {
         Player player = Player.Current;
-        if (target == null || player == null || !IsOpen || !player.TryGetComponent(out PlayerPersistence persistence))
+        if (target == null || player == null || !player.TryGetComponent(out PlayerPersistence persistence))
         {
+            return;
+        }
+
+        if (WhyShut() is string shut)
+        {
+            GameMessages.Post(shut, MessageKind.Warning);
             return;
         }
 

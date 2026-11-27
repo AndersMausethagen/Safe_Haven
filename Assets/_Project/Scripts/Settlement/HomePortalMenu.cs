@@ -161,8 +161,8 @@ public sealed class HomePortalMenu
     private MenuPage OldWaysPage(GameObject user)
     {
         var page = new MenuPage { Title = "The Old Ways", Body = "Every stone you lit remembers the path to my fire. Name one, and walk it." };
-        bool open = HavenTravel.IsOpen && !GameStateManager.InCombat;
-        string shut = GameStateManager.InCombat ? "Not with something at your heels." : "Not during a breach.";
+        string shut = HavenTravel.WhyShut();
+        bool open = shut == null;
         foreach (BoundaryStone stone in BoundaryStone.Lit())
         {
             BoundaryStone to = stone;

@@ -62,6 +62,14 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
             return;
         }
 
+        // No game in play (the main menu, quit to from a game): the left game's Haven waits with it. With no portal it read as "away"
+        // and worked on there: forays came home, crafts finished, rings were felled into the old stash and the old run's playtest log
+        // took rows (review 2026-11-27). The prologue (a player, no portal) still counts as away.
+        if (Player.Current == null && GameSession.ActiveRaid == null)
+        {
+            return;
+        }
+
         // Only off a visit (above), where one's own Haven is the one here.
         SettlementState settlement = GameSession.Home;
         bool atHome = HomePortal.Current != null;

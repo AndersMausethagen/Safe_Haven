@@ -68,6 +68,7 @@ public interface IHavenView
     ResidentRecord WorkerAt(string stationId, CraftingStationType station);
     float WorkerSpeed(CraftingStationType station);
     float WorkerSpeed(string stationId, CraftingStationType station);
+    /// <summary>Whether someone holding <paramref name="job"/> is at work now (ResidentsOut.AtWork).</summary>
     bool HasWorker(JobDefinition job);
     List<JobDefinition> JobsOpenTo(ResidentDefinition resident);
     /// <summary>The trades known in the Haven (someone whose written trade it is lives here or is lost).</summary>

@@ -63,6 +63,9 @@ public sealed class WardBreachDirector : MonoBehaviour
     /// <summary>The breach director in the loaded scene, or null.</summary>
     public static WardBreachDirector Current { get; private set; }
 
+    /// <summary>True while a breach is under way in the Haven here: building, demolishing and travelling across the Haven wait for it.</summary>
+    public static bool UnderWay => Current != null && Current.IsActive;
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => Current = null;
 
@@ -508,10 +511,7 @@ public sealed class WardBreachDirector : MonoBehaviour
         DefenceSettings defence = DefenceSettings.Current;
         foreach (ResidentRecord defender in GameSession.Home.Residents)
         {
-            int post = GuardPosts.Rank(GameSession.Home, defender);
-            bool stood = GuardPosts.FightsAs(defender, true, defence) != null
-                         && (defence.EveryoneFightsBreaches || (post >= 0 && post < GuardPosts.Cap(defence)));
-            if (!defender.IsAway && stood)
+            if (GuardPosts.FightsBreach(GameSession.Home, defender, defence))
             {
                 foreach (MarkDefinition mark in ResidentMarks.AfterEvent(defender, MarkCause.BreachWon, breach.name, () => Random.value))
                 {
@@ -562,7 +562,7 @@ public sealed class WardBreachDirector : MonoBehaviour
         {
             foreach (ResidentRecord record in GameSession.Home.Residents)
             {
-                if (GuardPosts.FightsAs(record, true, DefenceSettings.Current) != null)
+                if (GuardPosts.FightsBreach(GameSession.Home, record, DefenceSettings.Current))
                 {
                     record.Bruised = true;
                 }

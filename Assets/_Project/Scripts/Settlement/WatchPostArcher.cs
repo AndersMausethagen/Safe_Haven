@@ -37,13 +37,15 @@ public sealed class WatchPostArcher : MonoBehaviour
         health = GetComponent<Damageable>();
     }
 
-    private bool IsManned => building != null && GameSession.Here.Residents is var residents && HasWorkerHere(residents);
+    private bool IsManned => building != null && HasWorkerHere(GameSession.Here);
 
-    private bool HasWorkerHere(System.Collections.Generic.IReadOnlyList<ResidentRecord> residents)
+    // A warden at work now (ResidentsOut.AtWork): away alone was asked here, so a paused one still manned the post.
+    private bool HasWorkerHere(IHavenView here)
     {
-        foreach (ResidentRecord resident in residents)
+        ResidentDefinition along = ResidentsOut.Along;
+        foreach (ResidentRecord resident in here.Residents)
         {
-            if (!resident.IsAway && resident.Job != null && resident.Job.Workplace == building.Definition)
+            if (resident.Job != null && resident.Job.Workplace == building.Definition && ResidentsOut.AtWork(here, resident, along))
             {
                 return true;
             }

@@ -35,6 +35,27 @@ public sealed class CoopHomeTests
     }
 
     [Test]
+    public void TakingOnTheHostsWord_KeepsWhatThisGameSeesStanding()
+    {
+        var mine = new SettlementState();
+        var hosts = new SettlementState();
+        var module = ScriptableObject.CreateInstance<BuildingModuleDefinition>();
+        try
+        {
+            FieldInfo noted = typeof(SettlementState).GetField("notedModules", BindingFlags.NonPublic | BindingFlags.Instance);
+            ((System.Collections.Generic.List<BuildingModuleDefinition>)noted.GetValue(mine)).Add(module);
+            mine.TakeOn(hosts);
+            CollectionAssert.Contains((System.Collections.Generic.List<BuildingModuleDefinition>)noted.GetValue(mine), module,
+                "the modules fitted where the guest stands are seen there: the host's word, which never sends them, emptied them");
+            Assert.IsTrue(noted.IsDefined(typeof(SeenHereAttribute), false));
+        }
+        finally
+        {
+            Object.DestroyImmediate(module);
+        }
+    }
+
+    [Test]
     public void AnExtraction_OnAFollowedRaid_CountsForTheGuestsOwnHaven()
     {
         GameSession.StartNewGame();

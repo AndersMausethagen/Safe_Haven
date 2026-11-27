@@ -713,8 +713,8 @@ public sealed class ResidentWindow : MonoBehaviour
         ResidentNpc npc = ResidentNpc.Of(who);
         if (npc != null)
         {
-            bool open = HavenTravel.IsOpen;
-            actions.Add(new MenuAction(open ? "Go there" : "Not during a breach", "Walk over to them", open, () => HavenTravel.GoTo(npc.transform), closesMenu: true) { Icon = "Lead" });
+            string shut = HavenTravel.WhyShut();
+            actions.Add(new MenuAction(shut == null ? "Go there" : shut.TrimEnd('.'), "Walk over to them", shut == null, () => HavenTravel.GoTo(npc.transform), closesMenu: true) { Icon = "Lead" });
         }
 
         workActions.Show(actions);

@@ -64,9 +64,11 @@ public static class Stablehands
             return null;
         }
 
+        ResidentDefinition along = ResidentsOut.Along;
         foreach (ResidentRecord record in home.Residents)
         {
-            float tends = record?.Job != null && !record.IsAway && !record.WorkPaused ? record.Job.TendsHorses : 0f;
+            // At work now (ResidentsOut.AtWork): one along on the raid, or out with a party, tended the horses at home too.
+            float tends = record?.Job != null && ResidentsOut.AtWork(home, record, along) ? record.Job.TendsHorses : 0f;
             float now = tends > 0f ? tends * ResidentTalents.StationSpeed(record) : 0f;
             if (now > amount)
             {

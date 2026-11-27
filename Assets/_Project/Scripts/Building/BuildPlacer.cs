@@ -293,7 +293,7 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
     {
         // Not moved during a breach: carried off, it left BuildingObject.Active, so the attackers, the repairs and the renown
         // lost it until it was set down again.
-        if (!toUpgrade && !HavenTravel.IsOpen)
+        if (!toUpgrade && WardBreachDirector.UnderWay)
         {
             GameMessages.Post("Not while the ward is breached.", MessageKind.Warning);
             return;
@@ -308,7 +308,7 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
     /// <summary>Lets the player click a building they built to take it down, getting back what it cost (BuildingDemolition).</summary>
     public void PickToDemolish()
     {
-        if (!HavenTravel.IsOpen)
+        if (WardBreachDirector.UnderWay)
         {
             GameMessages.Post("Not while the ward is breached.", MessageKind.Warning);
             return;
