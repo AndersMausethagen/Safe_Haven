@@ -794,7 +794,7 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
     public void Groom()
     {
         float today = PlantedTrees.Today;
-        if (today - LastGroomed < 1f)
+        if (GroomedToday)
         {
             GameMessages.Post($"{HorseName} has been groomed today. Tomorrow again.", MessageKind.Info);
             return;
@@ -977,8 +977,20 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
     public float Weight => Cargo != null ? Cargo.CurrentWeight : 0f;
     public float Capacity => Stats.carryWeight;
     public bool IsOverfilled => Weight > Capacity + 0.001f;
+    /// <summary>The share of what it can carry that it carries easily, at full pace (SpeedScale; its panel says so).</summary>
+    public const float EasyLoad = 0.6f;
     /// <summary>How much of its pace a load leaves it: full speed up to what it carries easily, down to 60% overloaded.</summary>
-    public float SpeedScale => Weight <= Capacity * 0.6f ? 1f : Mathf.Lerp(1f, 0.6f, Mathf.InverseLerp(Capacity * 0.6f, Capacity * 1.25f, Weight));
+    public float SpeedScale => Weight <= Capacity * EasyLoad ? 1f : Mathf.Lerp(1f, 0.6f, Mathf.InverseLerp(Capacity * EasyLoad, Capacity * 1.25f, Weight));
+
+    /// <summary>Groomed since the last dawn (once a day for its bond). The care menu, the panel and grooming itself ask this.</summary>
+    public bool GroomedToday => PlantedTrees.Today - LastGroomed < 1f;
+
+    /// <summary>Whether it strikes out at its rider's command: a Bold horse always, else from Strike Bond (HorseSettings). The ride, its
+    /// refusal and the panel's tip ask this: the tip left the Bold out, and the bond was a number written in three places (review 2026-11-27).</summary>
+    public bool StrikesOnCommand => Stats.temperament == HorseTemperament.Bold || CurrentBond() >= HorseSettings.Current.StrikeBond;
+
+    /// <summary>A tamed horse past Fearless Bond (HorseSettings) no longer shies from creatures.</summary>
+    public bool FearsLittle => IsTamed && CurrentBond() >= HorseSettings.Current.FearlessBond;
 
     /// <summary>
     /// What its prompt calls it. A wild one shows its nature and how it looks before the lasso is thrown (the systems review, 2026-11-21:
@@ -1085,7 +1097,7 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
         Add("Main", "HorseHead", new MenuAction("Ride", !IsGrown ? "Too young to ride" : IsStabled ? "Lead it out first" : $"Tap {GameInput.KeyLabel(GameInput.HorseGallop)} to canter, hold it to gallop; {GameInput.KeyLabel(GameInput.Dodge)} jumps. {GameInput.KeyLabel(GameInput.Whistle)} gets you down.",
             riding != null && Rider == null && IsGrown && !IsStabled, () => riding.Mount(this), closesMenu: true));
         Add("Care", "Wheat", new MenuAction("Feed it", "Barley, a turnip or bread from your bag", items != null, () => Feed(items)));
-        Add("Care", "Brush", new MenuAction("Groom it", PlantedTrees.Today - LastGroomed < 1f ? "Groomed today" : "Once a day, for its bond", true, Groom));
+        Add("Care", "Brush", new MenuAction("Groom it", GroomedToday ? "Groomed today" : "Once a day, for its bond", true, Groom));
         // A friend's bags are theirs; a visitor uses the host's horses' bags as they would the stash, with the host's yes.
         bool bags = mine || (visiting && HavenVisit.StashAllowed);
         Add("Gear", "Bags", new MenuAction("Saddle bags", saddle == null ? "It needs a saddle" : bags ? $"{Weight:0} / {Capacity:0} weight" : visiting ? "Ask to use the stores first" : theirs,

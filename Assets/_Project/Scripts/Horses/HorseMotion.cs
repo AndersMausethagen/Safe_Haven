@@ -784,7 +784,7 @@ public sealed class HorseMotion : MonoBehaviour
     private void ShyFromMonsters()
     {
         if (mode == Idle.Dead || mode == Idle.Stall || horse.Stats.Has(HorseTrait.Brave) || horse.Armour != null || horse.Definition.AlwaysArmoured
-            || Time.time < frightenedUntil || horse.IsTamed && horse.CurrentBond() >= 70f)
+            || Time.time < frightenedUntil || horse.FearsLittle)
         {
             return;
         }
@@ -827,7 +827,7 @@ public sealed class HorseMotion : MonoBehaviour
             return false;
         }
 
-        if (horse.Stats.temperament != HorseTemperament.Bold && horse.CurrentBond() < 40f)
+        if (!horse.StrikesOnCommand)
         {
             return false;
         }

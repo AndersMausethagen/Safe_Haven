@@ -133,6 +133,35 @@ public sealed class SharedStateTests
             "what another still held (a downed player with full controls, a cinematic the scene change ended)");
     }
 
+    // ----- Time -----
+
+    [Test]
+    public void TimesScale_IsWrittenByThePauseAndCombatFeedbackOnly()
+    {
+        var writers = new List<string>();
+        foreach ((string path, string source) in ConventionTests.RuntimeScripts())
+        {
+            string file = path.Substring("Assets/_Project/Scripts/".Length);
+            if (file == "Core/GamePause.cs" || file == "Combat/CombatFeedback.cs")
+            {
+                continue;
+            }
+
+            string[] lines = source.Split('\n');
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string code = CodePart(lines[i]);
+                if (Regex.IsMatch(code, @"\bTime\s*\.\s*timeScale\s*=(?!=)"))
+                {
+                    writers.Add($"{file}:{i + 1}: {code.Trim()}");
+                }
+            }
+        }
+
+        CollectionAssert.IsEmpty(writers, "slow time through CombatFeedback.SlowTime (it merges stops and slows, honours Hit Stop and co-op's shared " +
+            "time) and pause through GamePause: a milestone's own slow overwrote hit stops and cut an ultimate's beat (Docs/BugPatterns.md, ninth round)");
+    }
+
     // ----- A creature's body -----
 
     // Scripts whose agents are their own, never a creature's: a horse, a companion, a resident walking home, the Nøkken's stripped figure.

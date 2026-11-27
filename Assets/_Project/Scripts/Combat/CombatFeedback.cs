@@ -34,6 +34,11 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
     // The player's swing whoosh, waiting for the moment the weapon moves (Combat Feel › Swing Sound Lead), and which swing it is for.
     private SoundDefinition pendingSwingSound;
     private float pendingSwingStart;
+    // A slow eased back to full as it runs (SlowTime's easeOut): from what, since when, over how long.
+    private bool easing;
+    private float easeFrom;
+    private float easeStart;
+    private float easeSeconds;
     // A slow that waits for the stop running now (the last kill of a fight), real seconds; below 0 none.
     private float thenScale = -1f;
     private float thenSeconds;
@@ -101,7 +106,9 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
     /// <summary>Slows the game to <paramref name="scale"/> for <paramref name="seconds"/> of real time. Overlapping requests keep
     /// the slowest for as long as it asked: a short stop inside a longer, gentler slow runs on its own and the slow takes up again
     /// after it for what is left of it, and a gentler, longer slow asked during a stop follows the stop.</summary>
-    public void SlowTime(float scale, float seconds)
+    /// <param name="easeOut">Eased from <paramref name="scale"/> back to full over the time (a milestone's held breath), when nothing
+    /// else slows time meanwhile.</param>
+    public void SlowTime(float scale, float seconds, bool easeOut = false)
     {
         // Hosting friends in co-op, time is theirs too (GamePause.TimeIsShared): the camera shake carries the blow alone.
         if (seconds <= 0f || !GameOptions.HitStop.On || GamePause.TimeIsShared)
@@ -110,10 +117,15 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
         }
 
         float until = Time.unscaledTime + seconds;
+        easing = false;
         if (hitStopUntil < 0f)
         {
             hitStopScale = scale;
             hitStopUntil = until;
+            easing = easeOut;
+            easeFrom = scale;
+            easeStart = Time.unscaledTime;
+            easeSeconds = seconds;
         }
         else if (scale < hitStopScale && until < hitStopUntil)
         {
@@ -176,6 +188,13 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
     /// public for tests, which hand it a later time.</summary>
     public void EndStopsDueBy(float now)
     {
+        if (easing && hitStopUntil >= 0f && now < hitStopUntil && !GamePause.IsTimeFrozen)
+        {
+            float t = Mathf.Clamp01((now - easeStart) / Mathf.Max(0.01f, easeSeconds));
+            hitStopScale = Mathf.Lerp(easeFrom, 1f, t * t);
+            Time.timeScale = hitStopScale;
+        }
+
         if (hitStopUntil >= 0f && now >= hitStopUntil)
         {
             float then = thenScale;
@@ -257,6 +276,7 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
         hitStopUntil = -1f;
         hitStopScale = 1f;
         thenScale = -1f;
+        easing = false;
         // The pause owns time while it is frozen and restores it itself.
         if (!GamePause.IsTimeFrozen)
         {

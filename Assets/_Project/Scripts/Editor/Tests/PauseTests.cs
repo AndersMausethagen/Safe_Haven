@@ -136,6 +136,31 @@ public sealed class PauseTests
     }
 
     [Test]
+    public void AnEasedSlow_ComesBackToFullSpeedAsItRuns()
+    {
+        float hitStopBefore = GameOptions.HitStop.Value;
+        GameOptions.HitStop.Value = 1f;
+        var feedback = new GameObject("feedback").AddComponent<CombatFeedback>();
+        try
+        {
+            float now = Time.unscaledTime;
+            // A milestone's held breath (ExperienceHud), through the one owner of slow time.
+            feedback.SlowTime(0.3f, 0.9f, easeOut: true);
+            Assert.AreEqual(0.3f, Time.timeScale, 1e-4f);
+            feedback.EndStopsDueBy(now + 0.6f);
+            Assert.Greater(Time.timeScale, 0.3f, "easing back");
+            Assert.Less(Time.timeScale, 1f);
+            feedback.EndStopsDueBy(now + 1f);
+            Assert.AreEqual(1f, Time.timeScale, 1e-4f, "and full speed once it is over");
+        }
+        finally
+        {
+            UnityEngine.Object.DestroyImmediate(feedback.gameObject);
+            GameOptions.HitStop.Value = hitStopBefore;
+        }
+    }
+
+    [Test]
     public void BackHandlersRunHighestPriorityFirstAndStopWhenUsed()
     {
         var calls = new List<string>();

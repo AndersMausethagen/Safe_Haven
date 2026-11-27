@@ -779,7 +779,13 @@ public sealed class ResidentWindow : MonoBehaviour
         var rows = new List<(string, string)>();
         if (job.TendsHorses > 0f)
         {
-            rows.Add(("Tends the stabled horses", $"+{job.TendsHorses * ResidentTalents.StationSpeed(record):0.#} bond each, every morning"));
+            // The stable's own answer (Stablehands.BestOf: the best at work tends, alone): worked out here, a second stablehand, or one
+            // paused or away, promised bond that never came (review 2026-11-27).
+            ResidentRecord tending = Stablehands.BestOf(GameSession.Home, out float bond);
+            string what = tending == record ? $"+{bond:0.#} bond each, every morning"
+                : tending != null && tending.Resident != null ? $"{tending.Resident.DisplayName} tends them now"
+                : "Every morning, when at work";
+            rows.Add(("Tends the stabled horses", what));
         }
 
         if (job.DefendsAs != null)

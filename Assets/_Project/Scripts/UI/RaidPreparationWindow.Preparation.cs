@@ -254,7 +254,7 @@ public sealed partial class RaidPreparationWindow
             dim.a = 0.5f;
             button.Label.text = Tiers.ToRoman(tier.tier);
             button.Label.color = shown ? Tiers.ColorOf(tier.tier) : fixedTier ? dim
-                : (score >= tier.minimumGearScore && RaidLauncher.CheckWard(tier) == null) || Cheats.NoRequirements ? style.Text : dim;
+                : RaidLauncher.TierOpen(tier, plan.Player) ? style.Text : dim;
             button.Button.interactable = shown || !fixedTier;
             button.Mark.SetActive(shown);
             var rect = (RectTransform)button.Button.transform;
@@ -410,27 +410,21 @@ public sealed partial class RaidPreparationWindow
             : $"<color={warning}>{lossSummary}</color>\n{carrying}";
     }
 
+    // What a fall would take, by the death rules' own answer (RaidRisk, as the raid's HUD says it): counted from everything carried, worn
+    // armour, the sword in hand and the safe pocket read as at risk on Normal rules, and the HUD then said nothing was (review 2026-11-27).
     private string DescribeCarried()
     {
-        int items = 0;
-        int resources = 0;
+        RaidRisk risk = default;
         if (plan.Player != null)
         {
+            // What is carried now is what goes in: the loadout that decides what a fall keeps.
             PlayerSnapshot carried = PlayerSnapshot.Capture(plan.Player);
-            foreach (KeyValuePair<ItemDefinition, int> entry in carried.CountItems())
-            {
-                items += entry.Value;
-            }
-
-            foreach (KeyValuePair<ResourceDefinition, int> entry in carried.CountResources())
-            {
-                resources += entry.Value;
-            }
+            risk = RaidRisk.Of(carried, carried);
         }
 
-        return items == 0 && resources == 0
+        return risk.IsEmpty
             ? "You carry nothing that can be lost."
-            : $"You carry {items} item{(items == 1 ? "" : "s")} and {resources} resource{(resources == 1 ? "" : "s")}. Leave what you can't risk in storage.";
+            : $"A fall would take {risk.Items} item{(risk.Items == 1 ? "" : "s")} and {risk.Resources} resource{(risk.Resources == 1 ? "" : "s")}. Leave what you can't risk in storage.";
     }
 
     private void BindModifier(ModifierRow row, ItemDefinition item, int count)

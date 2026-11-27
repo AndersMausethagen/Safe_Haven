@@ -667,17 +667,6 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
         return RingsOf(kind) >= WorkerSettings.Current.MostRings ? $"At most {WorkerSettings.Current.MostRings} rings of a kind at once." : null;
     }
 
-    /// <summary>A few words of why no felling ring can be drawn, for a button (null when one can).</summary>
-    public static string ShortWhyNoRing() => ShortWhyNoRing(RingKind.Fell);
-
-    /// <summary>A few words of why no ring of <paramref name="kind"/> can be drawn, for a button (null when one can).</summary>
-    public static string ShortWhyNoRing(RingKind kind)
-    {
-        string why = WhyNoRing(kind);
-        return why == null ? null : HavenVisit.IsVisiting ? "your Haven only" : why.StartsWith("Nobody")
-            ? kind == RingKind.Quarry ? "no mason yet" : "no woodcutter yet" : "at most " + WorkerSettings.Current.MostRings;
-    }
-
     /// <summary>How many rings of <paramref name="kind"/> stand in the Haven one is in.</summary>
     public static int RingsOf(RingKind kind)
     {
@@ -805,14 +794,6 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
 
     /// <summary>Why no post can be set now, or null.</summary>
     public static string WhyNoPost() => GuardPosts.WhyNoPost(GameSession.Here, DefenceSettings.Current, HavenVisit.IsVisiting);
-
-    /// <summary>A few words of why no post can be set, for a button (null when one can).</summary>
-    public static string ShortWhyNoPost()
-    {
-        string why = WhyNoPost();
-        return why == null ? null : HavenVisit.IsVisiting ? "your Haven only" : why.StartsWith("Nobody") ? "no guards yet"
-            : $"at most {GuardPosts.Cap(DefenceSettings.Current)}";
-    }
 
     private void LayPost(Vector3 at)
     {

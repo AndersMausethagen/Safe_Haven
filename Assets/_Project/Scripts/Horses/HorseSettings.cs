@@ -70,6 +70,10 @@ public sealed class HorseSettings : GameSettings<HorseSettings>
     [SerializeField, Range(0f, 1f)] private float calmerAtFullBond = 0.7f;
     [Tooltip("Below this bond, a hit makes it throw its rider now and then.")]
     [SerializeField, Range(0f, 100f)] private float throwsBelowBond = 20f;
+    [Tooltip("From this bond it strikes out at the rider's command (R); a Bold horse does from the start.")]
+    [SerializeField, Range(0f, 100f)] private float strikeBond = 40f;
+    [Tooltip("From this bond a tamed horse no longer shies from creatures.")]
+    [SerializeField, Range(0f, 100f)] private float fearlessBond = 70f;
 
     [Header("Experience (Horsemanship)")]
     [SerializeField, Min(0f)] private float experiencePerTame = 40f;
@@ -278,6 +282,8 @@ public sealed class HorseSettings : GameSettings<HorseSettings>
     public float StaminaAtFullBond => staminaAtFullBond;
     public float CalmerAtFullBond => calmerAtFullBond;
     public float ThrowsBelowBond => throwsBelowBond;
+    public float StrikeBond => strikeBond;
+    public float FearlessBond => fearlessBond;
     public float BreedingBond => breedingBond;
     public float DaysToFoal => daysToFoal;
     public float DaysBetweenFoals => daysBetweenFoals;

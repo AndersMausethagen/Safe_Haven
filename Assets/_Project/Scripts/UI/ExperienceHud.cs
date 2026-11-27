@@ -24,9 +24,9 @@ public sealed class ExperienceHud : MonoBehaviour
     private Image screenGlow;
     private float shownShare;
     private float lastMote = -10f;
-    private float slowUntil = -10f;
-    private bool slowing;
     private const float SlowSeconds = 0.9f;
+    // The level line's breath as last shown (in twelfths): its colour is set only when it changes.
+    private float shownBreath = -1f;
     private ProficiencyDefinition easedSkill;
     private int easedLevel;
     private TMP_Text level;
@@ -210,11 +210,12 @@ public sealed class ExperienceHud : MonoBehaviour
         {
             // At home and out of a fight, the world holds its breath a moment as a milestone lands. Not in a world shared with
             // friends (hosting): it would slow their creatures and residents too (hit-stop skips it the same way).
-            if (!Place.OnRaid && !GamePause.TimeIsShared && Player.Current != null
-                && (Player.Current.Stealth == null || !Player.Current.Stealth.IsFighting))
+            // Through the one owner of slow time (CombatFeedback.SlowTime, eased out): written here as well, it overwrote a hit stop each
+            // frame and set full speed in the middle of an ultimate's slow beat (review 2026-11-27).
+            if (!Place.OnRaid && Player.Current != null && (Player.Current.Stealth == null || !Player.Current.Stealth.IsFighting)
+                && CombatFeedback.Current != null)
             {
-                slowUntil = Time.unscaledTime + SlowSeconds;
-                slowing = true;
+                CombatFeedback.Current.SlowTime(0.3f, SlowSeconds, easeOut: true);
             }
 
             UIMotion.Burst(bannerRect, new Vector2(0f, 14f), 18, Color.white, 300f, 1.1f, 7f);
@@ -231,36 +232,6 @@ public sealed class ExperienceHud : MonoBehaviour
             UIMotion.Flash(fillImage, Color.white, 0.6f);
             UIMotion.Punch(bar, 0.25f, 0.5f);
         }
-    }
-
-    // Eases time from a third back to full over the milestone's first moment; never touches a paused or frozen game.
-    private void SlowMotion()
-    {
-        if (!slowing || GamePause.IsTimeFrozen)
-        {
-            return;
-        }
-
-        float left = slowUntil - Time.unscaledTime;
-        if (left <= 0f)
-        {
-            slowing = false;
-            Time.timeScale = 1f;
-            return;
-        }
-
-        float t = 1f - left / SlowSeconds;
-        Time.timeScale = Mathf.Lerp(0.3f, 1f, t * t);
-    }
-
-    private void OnDisable()
-    {
-        if (slowing && !GamePause.IsTimeFrozen)
-        {
-            Time.timeScale = 1f;
-        }
-
-        slowing = false;
     }
 
     // The first time a technique comes into play it is named, so the player knows what just happened and why.
@@ -297,7 +268,6 @@ public sealed class ExperienceHud : MonoBehaviour
 
     private void LateUpdate()
     {
-        SlowMotion();
         float shown = Time.unscaledTime - bannerAt;
         banner.alpha = shown >= bannerFor ? 0f : Mathf.Clamp01(shown / 0.25f) * Mathf.Clamp01((bannerFor - shown) / 0.6f);
 
@@ -344,8 +314,14 @@ public sealed class ExperienceHud : MonoBehaviour
             level.text = points > 0 ? GameInput.WithRebinds($"{name}  <color={UIStyle.Current.GoodHex}>({{key:Talents}})</color>") : name;
         }
 
-        // A perk waiting to be chosen keeps calling softly.
-        level.color = points > 0 ? Color.Lerp(Gold, Color.white, UIMotion.Breath(0.8f) * 0.6f) : Gold;
+        // A perk waiting to be chosen keeps calling softly. In steps: a text's colour set regenerates its whole mesh, and set every frame it
+        // did so all session while Insight waited unspent (review 2026-11-27).
+        float breath = points > 0 ? Mathf.Round(UIMotion.Breath(0.8f) * 12f) / 12f : 0f;
+        if (!Mathf.Approximately(breath, shownBreath) || level.color == default)
+        {
+            shownBreath = breath;
+            level.color = points > 0 ? Color.Lerp(Gold, Color.white, breath * 0.6f) : Gold;
+        }
 
         float age = Time.unscaledTime - gainAt;
         // In a Contextual HUD (HudRules) only while it has something to say: something to spend (N), experience just earned, the raid's

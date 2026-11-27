@@ -59,15 +59,33 @@ public static class AltarWork
 
     // ----- Purifying -----
 
-    /// <summary>Queues batches at the altar, paying their Cursed Essence now. Returns false when it can't.</summary>
-    public static bool Purify(GameObject user, int batches)
+    /// <summary>
+    /// How many batches can be queued at the altar now: as many as there is room for and Cursed Essence to pay for, and none while no
+    /// Alchemist is at work (<paramref name="why"/> says so). The window's buttons and Purify both ask this: the window kept its own sum,
+    /// without the guard against a batch of nothing (review 2026-11-27).
+    /// </summary>
+    public static int Queueable(GameObject user, out string why)
     {
         SettlementSettings settings = SettlementSettings.Current;
+        if (!GameSession.Here.HasWorker(settings.PurifierJob))
+        {
+            why = $"The altar is cold. It needs a resident working as the {(settings.PurifierJob != null ? settings.PurifierJob.DisplayName : "someone")}.";
+            return 0;
+        }
+
+        why = null;
         int room = settings.MaxQueuedBatches - GameSession.Here.PurificationQueued;
         // As many as there is room for AND essence to pay for: "Purify all" asked for the whole queue's room and, with less Cursed
         // than that, paid for nothing and did nothing (the user's playtest, 2026-11-21).
         int affordable = settings.CursedPerBatch > 0 ? MaterialPool.For(user).Have(settings.CursedEssence) / settings.CursedPerBatch : 0;
-        batches = Mathf.Min(batches, Mathf.Min(room, affordable));
+        return Mathf.Max(0, Mathf.Min(room, affordable));
+    }
+
+    /// <summary>Queues batches at the altar, paying their Cursed Essence now. Returns false when it can't.</summary>
+    public static bool Purify(GameObject user, int batches)
+    {
+        SettlementSettings settings = SettlementSettings.Current;
+        batches = Mathf.Min(batches, Queueable(user, out _));
         int cost = batches * settings.CursedPerBatch;
         var price = new[] { new ResourceAmount(settings.CursedEssence, cost) };
         if (batches <= 0 || !MaterialPool.For(user).TrySpend(price))

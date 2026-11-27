@@ -105,6 +105,10 @@ public static class RaidLauncher
             : $"Tier {Tiers.ToRoman(difficulty.tier)} needs a gear score of at least {difficulty.minimumGearScore}. Yours is {score}.";
     }
 
+    /// <summary>Whether <paramref name="player"/> may set out at this tier now: gear and ward both (the briefing's tier buttons ask this,
+    /// as the launch does: they kept a copy of the gear rule).</summary>
+    public static bool TierOpen(RaidDifficulty difficulty, GameObject player) => CheckGear(difficulty, player) == null && CheckWard(difficulty) == null;
+
     /// <summary>Why the portal can't yet hold the way open to a tier, or null when it can.</summary>
     public static string CheckWard(RaidDifficulty difficulty)
     {

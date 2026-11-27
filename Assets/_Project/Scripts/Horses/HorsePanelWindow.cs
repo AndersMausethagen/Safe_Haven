@@ -427,7 +427,7 @@ public sealed class HorsePanelWindow : MonoBehaviour
         careRows[2].Set($"{horse.CurrentBond():0}", bond, style.Accent, style.Danger);
         feedButton.Bind(Find("Care", "Feed it"), "Feed");
         groomButton.Bind(Find("Care", "Groom it"), "Groom");
-        bool groomed = PlantedTrees.Today - horse.LastGroomed < 1f;
+        bool groomed = horse.GroomedToday;
         groomedLine.text = groomed ? "Groomed today: it is content." : "Not groomed today: a brush once a day grows its bond.";
         List<MenuAction> main = Actions("Main");
         for (int i = 0; i < mainButtons.Count; i++)
@@ -442,7 +442,7 @@ public sealed class HorsePanelWindow : MonoBehaviour
     {
         saddleSlot.Set(horse.Saddle != null ? horse.Saddle.DisplayName : "No saddle", horse.Saddle != null ? $"{horse.Saddle.SaddleSlots} places in its bags" : "Without one it carries nothing", horse.Saddle != null);
         bardingSlot.Set(horse.Armour != null ? horse.Armour.DisplayName : "No barding", horse.Armour != null ? $"Keeps {horse.Armour.HorseArmour * 100f:0}% of a blow off" : "Iron or hide keeps blows off it", horse.Armour != null);
-        bagsSlot.Set(horse.Saddle != null ? $"{horse.Weight:0} / {horse.Capacity:0} weight" : "None yet", horse.Saddle != null ? (horse.IsOverfilled ? "Too heavy: it slows" : "More than six tenths slows it") : "They come with a saddle", horse.Saddle != null,
+        bagsSlot.Set(horse.Saddle != null ? $"{horse.Weight:0} / {horse.Capacity:0} weight" : "None yet", horse.Saddle != null ? (horse.IsOverfilled ? "Too heavy: it slows" : $"More than {Horse.EasyLoad * 10f:0} tenths slows it") : "They come with a saddle", horse.Saddle != null,
             horse.Saddle != null ? horse.Weight / Mathf.Max(1f, horse.Capacity) : -1f);
         gearList.Show(Actions("Gear"));
         int slots = horse.Saddle != null ? horse.Saddle.SaddleSlots : 0;
@@ -549,7 +549,7 @@ public sealed class HorsePanelWindow : MonoBehaviour
 
     private static string CareSummary(Horse horse)
     {
-        bool groomed = PlantedTrees.Today - horse.LastGroomed < 1f;
+        bool groomed = horse.GroomedToday;
         return $"Barley, a turnip or bread from your bag mends it; a brush once a day grows its bond{(groomed ? " (done today)" : "")}. " +
                "In the stable it heals, safe from the night; near a station it can work for you.";
     }
@@ -566,9 +566,9 @@ public sealed class HorsePanelWindow : MonoBehaviour
             return "Groom it today: a horse that is fond of you has more breath and fears less.";
         }
 
-        if (horse.CurrentBond() < 40f)
+        if (!horse.StrikesOnCommand)
         {
-            return "Ride it far and it grows fond of you; at a bond of 40 it strikes out at your command.";
+            return $"Ride it far and it grows fond of you; at a bond of {HorseSettings.Current.StrikeBond:0} it strikes out at your command.";
         }
 
         return $"Tap {GameInput.KeyLabel(GameInput.HorseGallop)} to cruise, hold it to gallop; {GameInput.KeyLabel(GameInput.Dodge)} jumps what is ahead.";

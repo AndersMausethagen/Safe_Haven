@@ -507,23 +507,9 @@ public sealed partial class ItemInventoryWindow : MonoBehaviour, IItemSlotHandle
         List<ItemSlotView> views = from == container ? slots : from == pocket ? pocketSlots : null;
         if (views != null && index >= 0 && index < views.Count && isActiveAndEnabled)
         {
-            StartCoroutine(Pulse((RectTransform)views[index].transform));
-        }
-    }
-
-    private static System.Collections.IEnumerator Pulse(RectTransform slot)
-    {
-        const float seconds = 0.28f;
-        for (float t = 0f; t < seconds && slot != null; t += Time.unscaledDeltaTime)
-        {
-            float k = t / seconds;
-            slot.localScale = Vector3.one * (1f + 0.18f * Mathf.Sin(k * Mathf.PI));
-            yield return null;
-        }
-
-        if (slot != null)
-        {
-            slot.localScale = Vector3.one;
+            // UIMotion's shared runner, which puts the slot back at its resting scale: a coroutine of this window's died as the bag
+            // closed mid-pulse, and the reused slot stayed enlarged over its neighbours (review 2026-11-27).
+            UIMotion.Punch(views[index].transform, 0.18f, 0.28f);
         }
     }
 

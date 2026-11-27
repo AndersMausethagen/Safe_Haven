@@ -330,16 +330,12 @@ public sealed class AltarWindow : MonoBehaviour
         int queued = settlement.PurificationQueued;
         queueLine.text = queued > 0 ? $"{queued} batch{(queued == 1 ? "" : "es")} waiting" : "Nothing in the queue";
 
-        bool staffed = settlement.HasWorker(settings.PurifierJob);
-        string worker = settings.PurifierJob != null ? settings.PurifierJob.DisplayName : "someone";
-        warningLine.gameObject.SetActive(!staffed);
-        warningLine.text = $"The altar is cold. It needs a resident working as the {worker}.";
-
-        int have = MaterialPool.For(viewer).Have(cursed);
-        int room = settings.MaxQueuedBatches - queued;
-        int all = Mathf.Min(have / settings.CursedPerBatch, room);
-        purifyOne.interactable = staffed && all >= 1;
-        purifyAll.interactable = staffed && all > 1;
+        // The altar's own answer (AltarWork.Queueable): who is at work, the room, the essence to pay.
+        int all = AltarWork.Queueable(viewer, out string cold);
+        warningLine.gameObject.SetActive(cold != null);
+        warningLine.text = cold ?? "";
+        purifyOne.interactable = all >= 1;
+        purifyAll.interactable = all > 1;
         purifyAllLabel.text = all > 1 ? $"Purify all ({all})" : "Purify all";
     }
 

@@ -644,10 +644,10 @@ public sealed class PlayerRiding : MonoBehaviour, IPlayerActivity
             {
                 nextKick = Time.time + 5f;
             }
-            else if (Riding.Stats.temperament != HorseTemperament.Bold && Riding.CurrentBond() < 40f)
+            else if (!Riding.StrikesOnCommand)
             {
                 nextKick = Time.time + 2f;
-                GameMessages.Post($"{Riding.HorseName} won't strike out for you yet (a bond of 40, or a bold horse).", MessageKind.Info);
+                GameMessages.Post($"{Riding.HorseName} won't strike out for you yet (a bond of {HorseSettings.Current.StrikeBond:0}, or a bold horse).", MessageKind.Info);
             }
         }
 
