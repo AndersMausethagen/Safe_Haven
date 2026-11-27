@@ -148,7 +148,7 @@ MonoBehaviour:
     value: 1.6
   vectors:
   - name: Color
-    value: {x: 1.75, y: 3, z: 5}
+    value: {x: 0.47127375, y: 0.57213, z: 0.7335}
   - name: Velocity Min
     value: {x: -10, y: 3, z: -10}
   - name: Velocity Max

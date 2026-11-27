@@ -92,7 +92,7 @@ MonoBehaviour:
       seconds: 0.6
       scale: 1
     struck:
-    - prefab: {fileID: 7948493385885557333, guid: 31ddf1bf1f95521489a61edd92b92253, type: 3}
+    - prefab: {fileID: 2645947797707975630, guid: fa3aa742c15b12449966be3f8341f451, type: 3}
       place: 5
       count: 1
       delay: 0

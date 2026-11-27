@@ -142,12 +142,12 @@ MonoBehaviour:
       stepDelay: 0
       seconds: 0.8
       scale: 1.3
-    - prefab: {fileID: 762036928436965563, guid: fca46606b73a7af48903453647e4c2fe, type: 3}
+    - prefab: {fileID: 6180488795206432772, guid: 817bacec54797e9418d42ab55afa9992, type: 3}
       place: 1
       count: 1
       delay: 0
       stepDelay: 0
-      seconds: 3.8
+      seconds: 6
       scale: 1
     - prefab: {fileID: 2595930943193031825, guid: 973dc13e98b7e644ba082aa9a794b28b, type: 3}
       place: 4
@@ -185,7 +185,7 @@ MonoBehaviour:
       seconds: 4
       scale: 1
     struck:
-    - prefab: {fileID: 377090434003316256, guid: 33d71bb7bc108364b88da87de2d4dcc0, type: 3}
+    - prefab: {fileID: 3394008543887140823, guid: 9727425a6e5f06b448424336bef6cab2, type: 3}
       place: 5
       count: 1
       delay: 0.03
@@ -218,7 +218,7 @@ MonoBehaviour:
       slowScale: 0.28
       slowSeconds: 0.5
       punchSeconds: 0.9
-      exposure: 0.85
+      exposure: 0.45
       chromatic: 1
       distortion: -0.42
       tint: {r: 1.15, g: 0.97, b: 0.85, a: 1}

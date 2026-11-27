@@ -43,6 +43,7 @@ MonoBehaviour:
     value: 0.3
   buffDuration: 5
   buffName: Heavy Hands
+  focusFromBlows: 1
   playAttackAnimation: 1
   animationState: Throw
   animationSpeed: 1
@@ -59,7 +60,7 @@ MonoBehaviour:
     - prefab: {fileID: 2681584111135180071, guid: 3944ddcf25c73224393184634d06ba50, type: 3}
       place: 1
       count: 1
-      delay: 0.055
+      delay: 0.05
       stepDelay: 0
       seconds: 1
       scale: 1
@@ -96,4 +97,19 @@ MonoBehaviour:
     castSound: {fileID: 11400000, guid: f863ead39fc8d3d4d907ef6cddc3d6a2, type: 2}
     releaseSound: {fileID: 0}
     releaseSoundDelay: 0
+    sounds: []
+    moment:
+      windUpZoom: 1
+      impactDelay: 0
+      slowScale: 1
+      slowSeconds: 0
+      punchSeconds: 0.6
+      exposure: 0
+      chromatic: 0
+      distortion: 0
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      afterglow: {r: 0, g: 0, b: 0, a: 0}
+      afterglowStrength: 0.5
+      afterglowSeconds: 0
+      afterglowSaturation: 0
   weaponArt: 0

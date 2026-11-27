@@ -144,5 +144,5 @@ MonoBehaviour:
     value: 1.6
   vectors:
   - name: Color
-    value: {x: 0.85, y: 0.95, z: 1}
+    value: {x: 0.412875, y: 0.437625, z: 0.45}
   objects: []

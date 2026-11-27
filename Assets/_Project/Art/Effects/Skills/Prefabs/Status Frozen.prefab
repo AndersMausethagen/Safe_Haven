@@ -152,7 +152,7 @@ MonoBehaviour:
   - name: Flipbook Size
     value: {x: 1, y: 1, z: 0}
   - name: Color
-    value: {x: 1.5, y: 3, z: 5}
+    value: {x: 0.4511025, y: 0.57213, z: 0.7335}
   - name: Velocity Min
     value: {x: -0.05, y: -0.02, z: -0.05}
   - name: Velocity Max

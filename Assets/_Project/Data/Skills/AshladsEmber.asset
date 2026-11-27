@@ -59,6 +59,7 @@ MonoBehaviour:
     value: 0.25
   buffDuration: 6
   buffName: Kindled Blade
+  focusFromBlows: 1
   playAttackAnimation: 1
   animationState: Spell Push
   animationSpeed: 1
@@ -94,15 +95,15 @@ MonoBehaviour:
       stepDelay: 0
       seconds: 1
       scale: 1
-    - prefab: {fileID: 7083453234208179152, guid: 2fc352a88f706fb49946b65aff9035be, type: 3}
+    - prefab: {fileID: 5951158283650087512, guid: 7406761c495a552498086c88a57af7bc, type: 3}
       place: 3
-      count: 4
+      count: 3
       delay: 0.12
       stepDelay: 0.03
-      seconds: 1.6
+      seconds: 6
       scale: 1
     struck:
-    - prefab: {fileID: 1509305429499617986, guid: 426da7421f10fbb4aa7e683a3f2bb70b, type: 3}
+    - prefab: {fileID: 3394008543887140823, guid: 9727425a6e5f06b448424336bef6cab2, type: 3}
       place: 5
       count: 1
       delay: 0.05
@@ -119,4 +120,19 @@ MonoBehaviour:
     castSound: {fileID: 11400000, guid: 94aeefe0053571b4292f961d0a52f280, type: 2}
     releaseSound: {fileID: 11400000, guid: 2ba717727eee7634b9444ad2f77a4491, type: 2}
     releaseSoundDelay: 0
+    sounds: []
+    moment:
+      windUpZoom: 1
+      impactDelay: 0
+      slowScale: 1
+      slowSeconds: 0
+      punchSeconds: 0.6
+      exposure: 0
+      chromatic: 0
+      distortion: 0
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      afterglow: {r: 0, g: 0, b: 0, a: 0}
+      afterglowStrength: 0.5
+      afterglowSeconds: 0
+      afterglowSaturation: 0
   weaponArt: 0

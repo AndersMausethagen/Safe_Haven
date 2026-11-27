@@ -146,7 +146,7 @@ MonoBehaviour:
     value: 14
   vectors:
   - name: Color
-    value: {x: 5, y: 2, z: 0.4}
+    value: {x: 1.1040001, y: 0.67344004, z: 0.44380805}
   objects:
   - name: Texture
     value: {fileID: 2800000, guid: c172ef37f1d716040a3449a5ff517b6c, type: 3}

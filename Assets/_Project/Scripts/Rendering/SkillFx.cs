@@ -332,6 +332,16 @@ public sealed class SkillFx : MonoBehaviour
             visual.Play();
         }
 
+        // Particle systems too (the VFX pack's effects): from the start each time a pooled one is taken again.
+        foreach (ParticleSystem system in effect.GetComponentsInChildren<ParticleSystem>())
+        {
+            if (system.transform.parent == null || system.transform.parent.GetComponentInParent<ParticleSystem>() == null)
+            {
+                system.Clear(true);
+                system.Play(true);
+            }
+        }
+
         yield return new WaitForSeconds(cue.seconds);
         Give(effect);
     }

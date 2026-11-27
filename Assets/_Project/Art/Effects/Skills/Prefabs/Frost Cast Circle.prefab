@@ -138,7 +138,7 @@ MonoBehaviour:
     value: 0.9
   vectors:
   - name: Color
-    value: {x: 0.5, y: 1.4, z: 3}
+    value: {x: 0.32053125, y: 0.41816998, z: 0.59175}
   - name: Spin
     value: {x: 0, y: 0, z: 45}
   objects:

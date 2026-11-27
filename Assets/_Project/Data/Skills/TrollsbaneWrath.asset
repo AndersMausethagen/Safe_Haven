@@ -100,12 +100,12 @@ MonoBehaviour:
       stepDelay: 0
       seconds: 1.3
       scale: 1
-    - prefab: {fileID: 4025133171583311569, guid: 4c35bb8e3b7944746a23f992b5375464, type: 3}
+    - prefab: {fileID: 1396355488053175514, guid: 71b180592b42a2945836536681a9ac6f, type: 3}
       place: 4
-      count: 8
+      count: 4
       delay: 0.03
       stepDelay: 0
-      seconds: 0.7
+      seconds: 2.65
       scale: 1
     - prefab: {fileID: 2310899002014320839, guid: c5ca1464509c50346aef5c9432a696ba, type: 3}
       place: 1
@@ -135,26 +135,26 @@ MonoBehaviour:
       stepDelay: 0
       seconds: 0.7
       scale: 1.35
-    - prefab: {fileID: 411920152369871821, guid: e6d0b6ed790b6054c81231407fe4d3b8, type: 3}
+    - prefab: {fileID: 1372361868683901477, guid: c614b171fc842ad4790cfefa23b8a1a9, type: 3}
       place: 1
       count: 1
       delay: 0
       stepDelay: 0
-      seconds: 3
+      seconds: 6
       scale: 1
-    - prefab: {fileID: 8740076298579911331, guid: 0c6d25a276fe7ae4e80651042d42b5d4, type: 3}
-      place: 4
-      count: 12
+    - prefab: {fileID: 3713238952748238037, guid: 4de0138f4a428d54caf8134aaddbd0f0, type: 3}
+      place: 1
+      count: 1
       delay: 0.03
       stepDelay: 0.015
-      seconds: 2.6
+      seconds: 3.23
       scale: 1
-    - prefab: {fileID: 2958375136646954658, guid: b8b88ff3a8b3e584a979bbe3ac2733ad, type: 3}
+    - prefab: {fileID: 1396355488053175514, guid: 71b180592b42a2945836536681a9ac6f, type: 3}
       place: 4
-      count: 10
+      count: 4
       delay: 0.05
       stepDelay: 0.01
-      seconds: 2.2
+      seconds: 2.65
       scale: 1
     struck:
     - prefab: {fileID: 7695878944792941921, guid: 91c82be48bd6a2c46b2cbd1b38c5f670, type: 3}
@@ -190,7 +190,7 @@ MonoBehaviour:
       slowScale: 0.32
       slowSeconds: 0.4
       punchSeconds: 0.8
-      exposure: 0.9
+      exposure: 0.5
       chromatic: 0.7
       distortion: -0.35
       tint: {r: 1.12, g: 1, b: 0.9, a: 1}

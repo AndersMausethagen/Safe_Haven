@@ -176,6 +176,8 @@ public static partial class SkillFxPrefabs
         log.Append(DressUltimates());
         log.Append(DressNewerSkills());
         log.Append(DressPayoffs());
+        // Last: the VFX pack's effects in place of ours where they are better (SkillFxPrefabs.Pack), so remaking a look keeps them.
+        log.Append(DressFromPack());
         return log.ToString();
     }
 
@@ -246,7 +248,7 @@ public static partial class SkillFxPrefabs
             },
             moment = new SkillMomentLook
             {
-                windUpZoom = 0.84f, slowScale = 0.3f, slowSeconds = 0.45f, punchSeconds = 0.9f, exposure = 1f, chromatic = 0.9f, distortion = -0.38f,
+                windUpZoom = 0.84f, slowScale = 0.3f, slowSeconds = 0.45f, punchSeconds = 0.9f, exposure = 0.5f, chromatic = 0.9f, distortion = -0.38f,
                 tint = new Color(0.85f, 0.97f, 1.25f), afterglow = new Color(0.78f, 0.9f, 1.12f), afterglowStrength = 0.55f, afterglowSeconds = 3.2f,
                 afterglowSaturation = -35f,
             },
@@ -314,7 +316,7 @@ public static partial class SkillFxPrefabs
             },
             moment = new SkillMomentLook
             {
-                windUpZoom = 0.84f, slowScale = 0.28f, slowSeconds = 0.5f, punchSeconds = 0.9f, exposure = 0.85f, chromatic = 1f, distortion = -0.42f,
+                windUpZoom = 0.84f, slowScale = 0.28f, slowSeconds = 0.5f, punchSeconds = 0.9f, exposure = 0.45f, chromatic = 1f, distortion = -0.42f,
                 tint = new Color(1.15f, 0.97f, 0.85f), afterglow = new Color(1.15f, 0.86f, 0.66f), afterglowStrength = 0.5f, afterglowSeconds = 2.6f,
                 afterglowSaturation = 10f,
             },
@@ -363,7 +365,7 @@ public static partial class SkillFxPrefabs
             look.sounds.Add(Layer("Skill Ult Earth Tail", SkillSoundPhase.Release, 0.25f));
             look.moment = new SkillMomentLook
             {
-                windUpZoom = 0.86f, slowScale = 0.32f, slowSeconds = 0.4f, punchSeconds = 0.8f, exposure = 0.9f, chromatic = 0.7f, distortion = -0.35f,
+                windUpZoom = 0.86f, slowScale = 0.32f, slowSeconds = 0.4f, punchSeconds = 0.8f, exposure = 0.5f, chromatic = 0.7f, distortion = -0.35f,
                 tint = new Color(1.12f, 1f, 0.9f), afterglow = new Color(1.08f, 0.98f, 0.9f), afterglowStrength = 0.35f, afterglowSeconds = 1.6f,
                 afterglowSaturation = -15f,
             };

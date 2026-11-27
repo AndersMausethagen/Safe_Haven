@@ -84,12 +84,12 @@ MonoBehaviour:
       stepDelay: 0
       seconds: 0.25
       scale: 1
-    - prefab: {fileID: 8063749954072611978, guid: 64e229451c1caaf4bb1f5ac511df504e, type: 3}
+    - prefab: {fileID: 1745419613027150297, guid: 1bbb69248d9abe14aa928ddf6866d710, type: 3}
       place: 2
       count: 1
       delay: 0
       stepDelay: 0
-      seconds: 1.8
+      seconds: 2
       scale: 1
     - prefab: {fileID: 2681584111135180071, guid: 3944ddcf25c73224393184634d06ba50, type: 3}
       place: 2

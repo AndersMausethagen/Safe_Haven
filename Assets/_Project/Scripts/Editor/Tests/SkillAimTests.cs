@@ -87,6 +87,29 @@ public sealed class SkillAimTests
         Assert.Greater(PlayerSkills.LungeReach(most, 0f), 0f, "aimed at the feet: still a step");
     }
 
+    // The user, 2026-11-27: "keep the player centered in the runic circle until after the effect is done".
+    [Test]
+    public void ACastsRuneCircle_HoldsTheCasterInItUntilItIsGone()
+    {
+        var look = new SkillLook();
+        look.cast.Add(new SkillFxCue { prefab = new GameObject("A test's circle"), place = SkillFxPlace.CasterGround, delay = 0.2f, seconds = 1f });
+        look.cast.Add(new SkillFxCue { prefab = look.cast[0].prefab, place = SkillFxPlace.Ring, seconds = 5f });
+        look.release.Add(new SkillFxCue { prefab = look.cast[0].prefab, place = SkillFxPlace.CasterGround, seconds = 6f });
+        try
+        {
+            Assert.AreEqual(1.2f, look.CasterGroundSeconds, 1e-4f, "only the cast's marks at the feet: not round the reach, not the release's");
+        }
+        finally
+        {
+            Object.DestroyImmediate(look.cast[0].prefab);
+        }
+
+        SkillDefinition winter = Skill("Fimbulwinter");
+        Assert.Greater(PlayerSkills.HoldsStillFor(winter), winter.Attack.HitDelay, "still in the circle when the blow lands");
+        Assert.AreEqual(0f, PlayerSkills.HoldsStillFor(Skill("SurtrsBrand")), "a lunge is the move: never held");
+        Assert.AreEqual(0f, PlayerSkills.HoldsStillFor(Skill("ReapingArc")), "nothing drawn at the feet: free to walk");
+    }
+
     // The user, 2026-11-25: "Weapon art should change description based on which weapon we are holding": every art has its own words.
     [Test]
     public void EveryWeaponArtAndRuneArt_HasItsOwnWords()

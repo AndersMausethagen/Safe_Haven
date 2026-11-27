@@ -168,7 +168,14 @@ public sealed class SkillLookTests
             var status = AssetDatabase.LoadAssetAtPath<StatusEffectDefinition>($"Assets/_Project/Data/Combat/Status/{name}.asset");
             Assert.IsNotNull(status.Look, $"{name} shows on what bears it");
             var visual = status.Look.GetComponentInChildren<UnityEngine.VFX.VisualEffect>();
-            Assert.IsNotNull(visual, name);
+            if (visual == null)
+            {
+                // Dressed from the VFX pack (SkillFxPrefabs.Pack: Rend bleeds with the pack's looping spurt): particles that loop.
+                var particles = status.Look.GetComponentsInChildren<ParticleSystem>();
+                Assert.IsNotEmpty(particles, $"{name} draws something");
+                Assert.IsTrue(System.Array.Exists(particles, system => system.main.loop), $"{name} keeps going while it lasts");
+                continue;
+            }
             Assert.IsNotNull(visual.visualEffectAsset, name);
             Assert.IsNotNull(status.Look.GetComponent<VfxValues>(), $"{name} carries its own look on the shared graph");
         }

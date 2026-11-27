@@ -275,10 +275,15 @@ public sealed class StatusBearerLook : MonoBehaviour
             return;
         }
 
-        // No new particles; the last ones finish their lives.
+        // No new particles; the last ones finish their lives (particle systems too: the VFX pack's looks).
         foreach (VisualEffect visual in look.GetComponentsInChildren<VisualEffect>())
         {
             visual.Stop();
+        }
+
+        foreach (ParticleSystem system in look.GetComponentsInChildren<ParticleSystem>())
+        {
+            system.Stop(false, ParticleSystemStopBehavior.StopEmitting);
         }
 
         Destroy(look, FadeSeconds);

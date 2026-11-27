@@ -17,7 +17,7 @@ MonoBehaviour:
   description: 'Torn by fangs: it bleeds a while.'
   color: {r: 0.75, g: 0.06, b: 0.05, a: 1}
   icon: {fileID: 21300000, guid: 195db0da8380b8344bcc2ff29debf55f, type: 3}
-  look: {fileID: 6445174905079347178, guid: 89a4bb31731791a4691f4433acef9fc2, type: 3}
+  look: {fileID: 7073897692205536075, guid: f2332c66434c7f449ac703bfd10b3e3d, type: 3}
   seconds: 5
   damagePerSecond: 3
   damageType: 0
@@ -27,7 +27,7 @@ MonoBehaviour:
   damageDealt: 1
   consumedBy: 0
   consumeDamage: 0
-  consumeLook: {fileID: 2307465884428384104, guid: 17a3ca403527fb543af57f44ab9bfa02, type: 3}
+  consumeLook: {fileID: 5842164223234803579, guid: d45c43e50774d00468d68fd7f7046d77, type: 3}
   consumeSound: {fileID: 11400000, guid: b8cfe6e75eda64946b71014feafe18f4, type: 2}
   consumeLine: 
   reactions: []

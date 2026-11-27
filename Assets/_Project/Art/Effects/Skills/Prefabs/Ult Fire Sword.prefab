@@ -138,7 +138,7 @@ MonoBehaviour:
     value: 0.9
   vectors:
   - name: Color
-    value: {x: 8.32, y: 3.5200002, z: 0.96000004}
+    value: {x: 1.52232, y: 0.95145005, z: 0.64698607}
   - name: Shape
     value: {x: 1, y: 7, z: 1}
   - name: Lift

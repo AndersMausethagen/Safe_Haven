@@ -28,6 +28,10 @@ MonoBehaviour:
   foesStatus: {fileID: 0}
   foesRadius: 7
   foesDelay: 0.55
+  weapons: 
+  needsWeapon: 0
+  favouredDamage: 1.25
+  combos: []
   options: []
   leaves: {fileID: 0}
   leavesCount: 3
@@ -39,6 +43,7 @@ MonoBehaviour:
     value: -0.5
   buffDuration: 6
   buffName: Deep Roots
+  focusFromBlows: 1
   playAttackAnimation: 1
   animationState: Staff Burst
   animationSpeed: 1
@@ -78,4 +83,19 @@ MonoBehaviour:
     castSound: {fileID: 0}
     releaseSound: {fileID: 11400000, guid: 04e528df2242eeb45a3ec62c39040629, type: 2}
     releaseSoundDelay: 0
+    sounds: []
+    moment:
+      windUpZoom: 1
+      impactDelay: 0
+      slowScale: 1
+      slowSeconds: 0
+      punchSeconds: 0.6
+      exposure: 0
+      chromatic: 0
+      distortion: 0
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      afterglow: {r: 0, g: 0, b: 0, a: 0}
+      afterglowStrength: 0.5
+      afterglowSeconds: 0
+      afterglowSaturation: 0
   weaponArt: 0

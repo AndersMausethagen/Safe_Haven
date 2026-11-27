@@ -181,7 +181,7 @@ MonoBehaviour:
     - prefab: {fileID: 4047249316231547844, guid: 470b560476fcda647a51ec6ad778232e, type: 3}
       place: 1
       count: 1
-      delay: 0.3
+      delay: 0.2
       stepDelay: 0
       seconds: 0.8
       scale: 1
@@ -189,22 +189,22 @@ MonoBehaviour:
     - prefab: {fileID: 1507627560349560555, guid: 5d12d0212994e4a4ab5ff4cd1d2b9fa6, type: 3}
       place: 1
       count: 1
-      delay: 0.75
+      delay: 0.5
       stepDelay: 0
       seconds: 0.7
       scale: 1
     - prefab: {fileID: 8785999770213858728, guid: 14c8f11c88321f04391b1939aad7404a, type: 3}
       place: 1
       count: 1
-      delay: 0.825
+      delay: 0.55
       stepDelay: 0
       seconds: 0.5
       scale: 1
     - prefab: {fileID: 4047249316231547844, guid: 470b560476fcda647a51ec6ad778232e, type: 3}
       place: 4
       count: 10
-      delay: 0.825
-      stepDelay: 0.03
+      delay: 0.55
+      stepDelay: 0.02
       seconds: 0.8
       scale: 1
     - prefab: {fileID: 4506804763837238046, guid: 29786edfc90de8246a5d2be965a869f9, type: 3}

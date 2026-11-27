@@ -154,5 +154,5 @@ MonoBehaviour:
   - name: Tilt Max
     value: {x: 35, y: 360, z: 35}
   - name: Color
-    value: {x: 0.6, y: 0.85, z: 1.1}
+    value: {x: 0.3428156, y: 0.3999516, z: 0.45708752}
   objects: []

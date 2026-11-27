@@ -85,19 +85,19 @@ MonoBehaviour:
       seconds: 0.3
       scale: 0.7
     struck:
-    - prefab: {fileID: 7948493385885557333, guid: 31ddf1bf1f95521489a61edd92b92253, type: 3}
+    - prefab: {fileID: 2645947797707975630, guid: fa3aa742c15b12449966be3f8341f451, type: 3}
       place: 5
       count: 1
       delay: 0
       stepDelay: 0
       seconds: 0.9
       scale: 1
-    - prefab: {fileID: 8509353883847779146, guid: 8abdb0aebf3f09847992abc018aa8e1c, type: 3}
+    - prefab: {fileID: 8237346490372807219, guid: 2c3e87c1139b34849b08af29bc368e38, type: 3}
       place: 5
       count: 1
       delay: 0
       stepDelay: 0
-      seconds: 0.7
+      seconds: 0.74
       scale: 1
     light: {r: 0, g: 0, b: 0, a: 0}
     lightIntensity: 6

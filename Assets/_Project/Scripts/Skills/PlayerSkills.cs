@@ -54,6 +54,8 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
     private float busyUntil;
     private float lungeEndsAt = float.NegativeInfinity;
+    // Standing in the cast's rune circle until it is gone (HoldsStillFor); negative while not held.
+    private float heldStillUntil = float.NegativeInfinity;
     // The creatures a skill's blow struck as it landed (Damageable.AnyDamaged during its hit), for its look's struck effects.
     private readonly List<Vector3> struck = new List<Vector3>();
     // The creatures the landing skill struck and what each took, for its altar options' statuses and payoffs.
@@ -396,6 +398,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
         pendingHit = null;
         pendingCry = null;
+        LetGoOfFeet();
         foreach (SkillDefinition skill in activeBuffs.Keys)
         {
             combatant.Stats.RemoveModifiersFrom(skill);
@@ -448,6 +451,11 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
                 bufferedSlot = -1;
                 TryCast(slot);
             }
+        }
+
+        if (heldStillUntil >= 0f && (Time.time >= heldStillUntil || !health.IsAlive))
+        {
+            LetGoOfFeet();
         }
 
         if (pendingCry != null && (!health.IsAlive || Time.time >= pendingCryAt))
@@ -801,6 +809,16 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             pendingCryAt = now + skill.FoesDelay;
         }
 
+        // Feet planted in its rune circle until the circle is gone (the user, 2026-11-27: "keep the player centered in the runic circle
+        // until after the effect is done"): walking off mid-cast left the circle, and the blow, behind. A dodge still breaks free
+        // (a dash isn't scaled by speed, and it ends the cast: CancelCast).
+        float still = HoldsStillFor(skill);
+        if (still > 0f)
+        {
+            heldStillUntil = now + still;
+            movement.SetSpeedScale(this, 0f);
+        }
+
         float hitAfter = 0f;
         if (skill.LungeDistance > 0f)
         {
@@ -857,6 +875,20 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         if (skill.HasBuffs && skill.Attack == null)
         {
             ApplyBuffs(skill, now);
+        }
+    }
+
+    /// <summary>How long casting <paramref name="skill"/> plants the caster's feet: as long as the marks its cast draws on the caster's
+    /// own ground last (SkillLook.CasterGroundSeconds), and never for a lunge or a leap, whose whole point is the move.</summary>
+    public static float HoldsStillFor(SkillDefinition skill) =>
+        skill == null || skill.Look == null || skill.LungeDistance > 0f ? 0f : skill.Look.CasterGroundSeconds;
+
+    private void LetGoOfFeet()
+    {
+        heldStillUntil = float.NegativeInfinity;
+        if (movement != null)
+        {
+            movement.SetSpeedScale(this, 1f);
         }
     }
 
@@ -1194,6 +1226,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
         pendingHit = null;
         busyUntil = Mathf.Min(busyUntil, Time.time);
+        LetGoOfFeet();
         if (Time.time < lungeEndsAt)
         {
             if (!dodged && movement != null)

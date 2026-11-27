@@ -88,12 +88,12 @@ MonoBehaviour:
       stepDelay: 0
       seconds: 0.6
       scale: 1
-    - prefab: {fileID: 3837593327403890887, guid: f07994ffe6e07e946bff78a3c642dea9, type: 3}
+    - prefab: {fileID: 5951158283650087512, guid: 7406761c495a552498086c88a57af7bc, type: 3}
       place: 4
-      count: 8
+      count: 3
       delay: 0.03
       stepDelay: 0.02
-      seconds: 1.8
+      seconds: 6
       scale: 1
     - prefab: {fileID: 4667854857652924013, guid: af2763e69015ef141a092a92844d41e8, type: 3}
       place: 0
@@ -103,7 +103,7 @@ MonoBehaviour:
       seconds: 0.7
       scale: 1
     struck:
-    - prefab: {fileID: 1509305429499617986, guid: 426da7421f10fbb4aa7e683a3f2bb70b, type: 3}
+    - prefab: {fileID: 3394008543887140823, guid: 9727425a6e5f06b448424336bef6cab2, type: 3}
       place: 5
       count: 1
       delay: 0

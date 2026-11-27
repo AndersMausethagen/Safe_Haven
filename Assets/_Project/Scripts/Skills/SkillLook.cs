@@ -131,4 +131,23 @@ public sealed class SkillLook
     public SkillMomentLook moment = new SkillMomentLook();
 
     public bool IsEmpty => cast.Count == 0 && release.Count == 0 && struck.Count == 0 && castSound == null && releaseSound == null;
+
+    /// <summary>How long the cast's marks on the caster's own ground last (its rune circle, the dust at its feet): the longest of their
+    /// delay and seconds. The caster stands in them until they are gone (PlayerSkills); 0 when the cast draws nothing there.</summary>
+    public float CasterGroundSeconds
+    {
+        get
+        {
+            float longest = 0f;
+            foreach (SkillFxCue cue in cast)
+            {
+                if (cue != null && cue.prefab != null && cue.place == SkillFxPlace.CasterGround)
+                {
+                    longest = Mathf.Max(longest, cue.delay + cue.seconds);
+                }
+            }
+
+            return longest;
+        }
+    }
 }

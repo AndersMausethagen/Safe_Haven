@@ -59,6 +59,7 @@ MonoBehaviour:
     value: 0.2
   buffDuration: 5
   buffName: Landing Fury
+  focusFromBlows: 1
   playAttackAnimation: 1
   animationState: KI 2H Leap Slam
   animationSpeed: 1
@@ -87,12 +88,12 @@ MonoBehaviour:
       stepDelay: 0
       seconds: 1.3
       scale: 1
-    - prefab: {fileID: 530393091379007461, guid: df231d18fb19ddc478cc3e8e82515538, type: 3}
+    - prefab: {fileID: 1396355488053175514, guid: 71b180592b42a2945836536681a9ac6f, type: 3}
       place: 4
-      count: 6
+      count: 4
       delay: 0.02
       stepDelay: 0
-      seconds: 0.8
+      seconds: 2.65
       scale: 1
     struck:
     - prefab: {fileID: 7695878944792941921, guid: 91c82be48bd6a2c46b2cbd1b38c5f670, type: 3}
@@ -112,4 +113,19 @@ MonoBehaviour:
     castSound: {fileID: 11400000, guid: f863ead39fc8d3d4d907ef6cddc3d6a2, type: 2}
     releaseSound: {fileID: 11400000, guid: 97de70e3d99a8e343a7d791b67d95f2f, type: 2}
     releaseSoundDelay: 0
+    sounds: []
+    moment:
+      windUpZoom: 1
+      impactDelay: 0
+      slowScale: 1
+      slowSeconds: 0
+      punchSeconds: 0.6
+      exposure: 0
+      chromatic: 0
+      distortion: 0
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      afterglow: {r: 0, g: 0, b: 0, a: 0}
+      afterglowStrength: 0.5
+      afterglowSeconds: 0
+      afterglowSaturation: 0
   weaponArt: 0
