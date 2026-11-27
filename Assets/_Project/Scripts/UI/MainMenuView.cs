@@ -43,6 +43,11 @@ public sealed class MainMenuView : MonoBehaviour
         savesButton = savesButton != null ? savesButton : AddButton("Saved Games Button", "SAVED GAMES");
         optionsButton = optionsButton != null ? optionsButton : AddButton("Options Button", "OPTIONS");
         cinematicsButton = cinematicsButton != null ? cinematicsButton : AddButton("Cinematics Button", "CINEMATICS");
+        // With the buttons made, the column is fitted to the screen's height: on a 16:9 screen it ran off both ends.
+        if (!exitButton.transform.parent.TryGetComponent(out FitColumnToScreen _))
+        {
+            exitButton.transform.parent.gameObject.AddComponent<FitColumnToScreen>();
+        }
     }
 
     // A copy of the Exit button in its place; Exit moves down one step.

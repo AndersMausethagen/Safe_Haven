@@ -3650,3 +3650,23 @@ The user's notes after playing the build of 2026-11-27 (tests: `PlaytestFixes112
 - **The tusse:** `MonsterDefinition.LadenSpeed` (0.7) while it carries loot.
 - **Parry and stagger effects:** bigger, white-gold (`Flash` tone), and lingering 2.5× (`SkillFxPrefabs.Linger`); the stagger plays
   at the creature's middle (`CombatFeedback.MiddleOf`), not at its feet.
+
+## The start menu's living picture (2026-11-27)
+
+The user asked for a start menu "in the style of the cinematics, where there is a moving foreground and background, and some vfx to
+make the image come to life", with the camera and animations loopable, a flickering light on the flame and smoke from the chimneys.
+The picture is their pick of 16 (8 LocalSpawn models x 2): Z-Image, seed 2711 (`Tools/LocalSpawn/HavenArt/main_menu_*`).
+- **`MenuBackdrop`** (on the MainMenu scene's `Main Menu` canvas) draws the first shot of `Data/Cinematics/MainMenuBackdrop.asset`
+  behind the menu, layers back to front, with the cinematics' own drawing (`CinematicScreen.DrawLayer`, shared now) and depth
+  (`CinematicCamera.Place`). The camera eases from the shot's Camera From to Camera To and back over Sway Seconds (40), leaning a
+  little after the pointer (not with a pad). **Loop:** the camera, each layer's Drift (a sway, not a slide) and Opacity curves (the
+  trolls' blinks) all repeat every two sways (`LoopSeconds`, 80 s); flicker, embers, fireflies and smoke are random and never repeat.
+  It runs on unscaled time. The scene's still picture (`Background`) is hidden while it draws; with no asset set it shows as before.
+- **The asset** (29 layers): sky with the trolls and their eye glows, far mist, the houses with window glows and three chimney smoke
+  plumes (Motes, not additive), ground mist, the portal and fire with the gate's light, rune light, firelight and its spill on the
+  ground and stones (one Flicker Speed, so they flicker together), embers and portal motes, grass, stones, fireflies, a vignette.
+  Painted layers are sized to cover the frame at the widest sway plus the lean (`MainMenuBackdropTests`).
+- **Layers** come from `Tools/LocalSpawn/main_menu_layers.py` (the backstory splitter, then the back layer set to the painting
+  wherever nothing nearer covers it, and the gate's light cut from the portal layer's opening). Change the asset for everything else.
+- **`FitColumnToScreen`** (added by `MainMenuView`): the menu column (title, six buttons) reached 964 units on a 720-unit canvas, so at
+  16:9 the title was cut and Leave the Forest sat under the screen. It is sized to its children, centred and shrunk to fit.

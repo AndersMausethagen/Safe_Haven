@@ -434,31 +434,44 @@ public sealed class CinematicScreen : MonoBehaviour
         {
             RectTransform rect = CodeUI.Box(string.IsNullOrEmpty(layer.name) ? "Layer" : layer.name, root, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
             var made = new LayerView { Layer = layer, Rect = rect };
-            if (layer.kind == CinematicLayerKind.Motes)
-            {
-                made.Motes = rect.gameObject.AddComponent<CinematicMotesGraphic>();
-                Sprite speck = layer.picture != null ? layer.picture : UIStyle.Current != null ? UIStyle.Current.Glow : null;
-                made.Motes.Show(layer.motes, speck);
-                made.Graphic = made.Motes;
-            }
-            else
-            {
-                var image = rect.gameObject.AddComponent<Image>();
-                image.sprite = layer.picture;
-                image.enabled = layer.picture != null;
-                made.Graphic = image;
-            }
-
-            made.Graphic.raycastTarget = false;
-            if (layer.additive && Additive != null)
-            {
-                made.Graphic.material = Additive;
-            }
-
+            made.Graphic = DrawLayer(layer, rect, out made.Motes);
             view.Layers.Add(made);
         }
 
         return view;
+    }
+
+    /// <summary>
+    /// What draws a cinematic layer, on <paramref name="rect"/>: its picture, or its specks (<paramref name="motes"/>, else null),
+    /// additive where the layer adds its light. Placing it each frame is the caller's (CinematicCamera.Place). Shared with the main
+    /// menu's backdrop (MenuBackdrop).
+    /// </summary>
+    public static Graphic DrawLayer(CinematicLayer layer, RectTransform rect, out CinematicMotesGraphic motes)
+    {
+        Graphic graphic;
+        motes = null;
+        if (layer.kind == CinematicLayerKind.Motes)
+        {
+            motes = rect.gameObject.AddComponent<CinematicMotesGraphic>();
+            Sprite speck = layer.picture != null ? layer.picture : UIStyle.Current != null ? UIStyle.Current.Glow : null;
+            motes.Show(layer.motes, speck);
+            graphic = motes;
+        }
+        else
+        {
+            var image = rect.gameObject.AddComponent<Image>();
+            image.sprite = layer.picture;
+            image.enabled = layer.picture != null;
+            graphic = image;
+        }
+
+        graphic.raycastTarget = false;
+        if (layer.additive && Additive != null)
+        {
+            graphic.material = Additive;
+        }
+
+        return graphic;
     }
 
     private static Material Additive

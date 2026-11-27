@@ -292,7 +292,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 2400.0002, y: 1600.0001}
+  m_SizeDelta: {x: 1943.627, y: 1295.7513}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &364666506
 MonoBehaviour:
@@ -1441,6 +1441,7 @@ GameObject:
   - component: {fileID: 1156488955}
   - component: {fileID: 1156488954}
   - component: {fileID: 1156488959}
+  - component: {fileID: 1156488960}
   m_Layer: 5
   m_Name: Main Menu
   m_TagString: Untagged
@@ -1574,6 +1575,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UIRoot
   referenceResolution: {x: 1920, y: 1080}
   scale: 1
+--- !u!114 &1156488960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1156488953}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5286ecce2c86d5f49a8428474cfde1aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::MenuBackdrop
+  backdrop: {fileID: 11400000, guid: 9330b4f5277df6f4caf38bdb19e811e6, type: 2}
+  swaySeconds: 40
+  pointerLean: {x: 0.012, y: 0.006}
+  leanSeconds: 1.4
+  driftSwaySeconds: 70
+  stillPicture: {fileID: 364666506}
 --- !u!1 &1237305184
 GameObject:
   m_ObjectHideFlags: 0
