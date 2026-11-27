@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: thewatchthatfled
   displayName: The Watch That Fled
-  description: Eirik says a watch that leaves its post has a reason, and he wants to know the Wolfwood's. The old tower still stands on the wood's edge, south-west, past the fen.
+  description: A watch that leaves its post has a reason, Eirik says, and he wants to know the Wolfwood's. The old tower still stands on the wood's edge, far south-west, past the fen.
   chain: Eirik
   journalNotes: The Ruined Watchtower lies about 450 m south-west of the portal, in the Wolfwood.
-  rank: 4
+  rank: 1
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
@@ -26,7 +26,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f2e1f14cdaba5e04489fb71d9fe5ccb3, type: 2}
   - {fileID: 11400000, guid: bd7dd70969be8174c8acfefd449bf963, type: 2}
   startedFirst: []
-  start: 0
+  start: 2
   startEvent: {fileID: 0}
   startWhen:
     type: 0
@@ -62,32 +62,6 @@ MonoBehaviour:
   onStarted: []
   objectivesInOrder: 1
   objectives:
-  - type: 9
-    description: Ask Eirik about the watch in the Wolfwood
-    amount: 1
-    item: {fileID: 0}
-    resource: {fileID: 0}
-    monster: {fileID: 0}
-    faction: 0
-    building: {fileID: 0}
-    raid: {fileID: 0}
-    mustExtract: 0
-    withinMinutes: 0
-    questEvent: {fileID: 0}
-    person: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
-    target: {fileID: 0}
-    job: {fileID: 0}
-    breach: {fileID: 0}
-    rank: 0
-    tier: 0
-    bringHome: 0
-    countAlreadyOwned: 0
-    enchantment: {fileID: 0}
-    greatOnly: 0
-    onlySource: 0
-    source: 0
-    otherPerson: {fileID: 0}
-    mark: {fileID: 0}
   - type: 10
     description: Walk out to the Ruined Watchtower
     amount: 1

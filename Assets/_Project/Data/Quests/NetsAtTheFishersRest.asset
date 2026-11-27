@@ -17,7 +17,7 @@ MonoBehaviour:
   description: Yrsa says a cook is only as good as her fish, and the old fishers of Stillwater were the best the Haven had. Their rest is still on the shore, east of the meadows.
   chain: Yrsa
   journalNotes: The Fisher's Rest lies about 240 m east of the portal, on Stillwater's shore.
-  rank: 4
+  rank: 1
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
@@ -26,7 +26,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f3c54bb743041a946b1f9c5e830b8dff, type: 2}
   - {fileID: 11400000, guid: bb2c787a2de76634ba9260ee402850fc, type: 2}
   startedFirst: []
-  start: 0
+  start: 2
   startEvent: {fileID: 0}
   startWhen:
     type: 0
@@ -62,32 +62,6 @@ MonoBehaviour:
   onStarted: []
   objectivesInOrder: 1
   objectives:
-  - type: 9
-    description: Ask Yrsa about the old fishers
-    amount: 1
-    item: {fileID: 0}
-    resource: {fileID: 0}
-    monster: {fileID: 0}
-    faction: 0
-    building: {fileID: 0}
-    raid: {fileID: 0}
-    mustExtract: 0
-    withinMinutes: 0
-    questEvent: {fileID: 0}
-    person: {fileID: 11400000, guid: 15e2a45207d23dd49a4a3a93e8bb8161, type: 2}
-    target: {fileID: 0}
-    job: {fileID: 0}
-    breach: {fileID: 0}
-    rank: 0
-    tier: 0
-    bringHome: 0
-    countAlreadyOwned: 0
-    enchantment: {fileID: 0}
-    greatOnly: 0
-    onlySource: 0
-    source: 0
-    otherPerson: {fileID: 0}
-    mark: {fileID: 0}
   - type: 10
     description: Walk out to the Fisher's Rest
     amount: 1

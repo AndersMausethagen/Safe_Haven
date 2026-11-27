@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: ashesinthehollowpines
   displayName: Ashes in the Hollow Pines
-  description: Asa's grandmother spoke of a farm in the Hollow Pines that burned the night the hearth went out. Somebody there kept a fire going after the roof was gone. Asa wants to know what they were keeping it for.
+  description: Asa was found guarding seed at a burnt farm in the deep woods. There is another in the Hollow Pines, she says, burnt the night the hearth went out, and somebody kept a fire going there after the roof was gone. She wants to know what for.
   chain: Asa
   journalNotes: The Burnt Farmstead lies about 270 m south of the portal, in the Hollow Pines.
-  rank: 4
+  rank: 1
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
@@ -26,7 +26,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 22c52c196cd7f01478e77e31ccc726a4, type: 2}
   - {fileID: 11400000, guid: bb2c787a2de76634ba9260ee402850fc, type: 2}
   startedFirst: []
-  start: 0
+  start: 2
   startEvent: {fileID: 0}
   startWhen:
     type: 0
@@ -62,32 +62,6 @@ MonoBehaviour:
   onStarted: []
   objectivesInOrder: 1
   objectives:
-  - type: 9
-    description: Ask Asa about the farm that burned
-    amount: 1
-    item: {fileID: 0}
-    resource: {fileID: 0}
-    monster: {fileID: 0}
-    faction: 0
-    building: {fileID: 0}
-    raid: {fileID: 0}
-    mustExtract: 0
-    withinMinutes: 0
-    questEvent: {fileID: 0}
-    person: {fileID: 11400000, guid: ec38b2d8e58d6d84899dfeda6a4f8aeb, type: 2}
-    target: {fileID: 0}
-    job: {fileID: 0}
-    breach: {fileID: 0}
-    rank: 0
-    tier: 0
-    bringHome: 0
-    countAlreadyOwned: 0
-    enchantment: {fileID: 0}
-    greatOnly: 0
-    onlySource: 0
-    source: 0
-    otherPerson: {fileID: 0}
-    mark: {fileID: 0}
   - type: 10
     description: Walk out to the Burnt Farmstead
     amount: 1

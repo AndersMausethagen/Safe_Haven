@@ -586,16 +586,20 @@ public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteract
         OutlineCopies.SetShown(glow, true);
     }
 
-    private void BuildSparkles(BodyLootSettings settings)
+    private void BuildSparkles(BodyLootSettings settings) => sparkles = Sparkles(transform, settings);
+
+    /// <summary>The glitter rising off something to take (a body with loot, a find at a Haven place: PlaceFind), under
+    /// <paramref name="parent"/>; null without a sparkle material.</summary>
+    public static ParticleSystem Sparkles(Transform parent, BodyLootSettings settings)
     {
-        if (settings.SparkleMaterial == null)
+        if (settings == null || settings.SparkleMaterial == null)
         {
-            return;
+            return null;
         }
 
         var holder = new GameObject("Glitter");
-        holder.transform.SetParent(transform, false);
-        sparkles = holder.AddComponent<ParticleSystem>();
+        holder.transform.SetParent(parent, false);
+        ParticleSystem sparkles = holder.AddComponent<ParticleSystem>();
         sparkles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         ParticleSystem.MainModule main = sparkles.main;
         main.loop = true;
@@ -635,6 +639,7 @@ public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteract
         renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         renderer.receiveShadows = false;
         sparkles.Play();
+        return sparkles;
     }
 
     private void OnDestroy()

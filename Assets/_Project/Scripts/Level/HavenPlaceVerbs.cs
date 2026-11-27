@@ -75,6 +75,9 @@ public sealed class HavenPlaceVerbs : ScriptableObject
         [Tooltip("0: taken once for good. More: a work site's yield, there once in every so many days at home (the relit clamp's " +
                  "charcoal).")]
         [Min(0)] public int everyDays;
+        [Tooltip("A yield left untaken builds up for this many spans at most (taken together, so a walk missed isn't a yield lost). " +
+                 "1: only this span's.")]
+        [Min(1)] public int keepsSpans = 3;
         [Tooltip("Only at these hours (night from 20 to 6, as a place's sounds): a lantern lit after dark.")]
         public When when = When.Always;
         [Tooltip("What doing it takes from the bag, used up (planks laid across the fen). Empty: nothing.")]

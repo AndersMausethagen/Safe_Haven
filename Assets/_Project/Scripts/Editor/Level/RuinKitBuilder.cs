@@ -179,20 +179,25 @@ public static class RuinKitBuilder
     {
         var model = AssetDatabase.LoadAssetAtPath<GameObject>(fbxPath);
         var levels = new List<(int lod, Mesh mesh, Transform node)>();
-        MeshFilter hulls = null;
+        var hulls = new List<MeshFilter>();
         foreach (MeshFilter filter in model.GetComponentsInChildren<MeshFilter>(true))
         {
             Mesh mesh = filter.sharedMesh;
             string n = filter.name.ToLowerInvariant();
             if (n.Contains("convexhull") || n.StartsWith("ucx_"))
             {
-                hulls = filter;
+                hulls.Add(filter);
                 continue;
             }
 
             int at = n.LastIndexOf("_lod", System.StringComparison.Ordinal);
             int lod = at >= 0 && int.TryParse(n.Substring(at + 4), out int parsed) ? parsed : 0;
             levels.Add((lod, mesh, filter.transform));
+        }
+
+        if (levels.Count == 0)
+        {
+            return $"{piece.Name}: {piece.Model} has no mesh to draw (only hulls)";
         }
 
         levels.Sort((a, b) => a.lod.CompareTo(b.lod));
@@ -237,15 +242,16 @@ public static class RuinKitBuilder
             group.SetLODs(chosen.Select((c, i) => new LOD(heights[i], new[] { renderers[i] })).ToArray());
             group.RecalculateBounds();
 
-            if (hulls != null)
+            // Static: the hulls as they are (a corner wall's two arms, not one hull round both), each placed as its node is.
+            foreach (MeshFilter hull in hulls)
             {
-                // Static: the hulls as they are (a corner wall's two arms, not one hull round both), placed as their node is.
-                var collider = new GameObject("Collider");
+                var collider = new GameObject(hulls.Count == 1 ? "Collider" : $"Collider {hulls.IndexOf(hull)}");
                 collider.transform.SetParent(root.transform, false);
-                Copy(hulls.transform, model.transform, collider.transform);
-                collider.AddComponent<MeshCollider>().sharedMesh = hulls.sharedMesh;
+                Copy(hull.transform, model.transform, collider.transform);
+                collider.AddComponent<MeshCollider>().sharedMesh = hull.sharedMesh;
             }
-            else
+
+            if (hulls.Count == 0)
             {
                 var box = root.AddComponent<BoxCollider>();
                 box.center = bounds.center;
@@ -265,7 +271,7 @@ public static class RuinKitBuilder
             string path = $"{Out}/Prefabs/{piece.Name}.prefab";
             PrefabUtility.SaveAsPrefabAsset(root, path);
             return $"{piece.Name}: {chosen.Count} LODs {string.Join("/", chosen.Select(c => Triangles(c.mesh)))} tris (pack LOD{chosen[0].lod} first), " +
-                   $"{bounds.size.x:0.0}x{bounds.size.y:0.0}x{bounds.size.z:0.0} m, collider {(hulls != null ? "hulls" : "box")}{(piece.Blocks ? ", carves" : "")}";
+                   $"{bounds.size.x:0.0}x{bounds.size.y:0.0}x{bounds.size.z:0.0} m, collider {(hulls.Count > 0 ? $"{hulls.Count} hull(s)" : "box")}{(piece.Blocks ? ", carves" : "")}";
         }
         finally
         {

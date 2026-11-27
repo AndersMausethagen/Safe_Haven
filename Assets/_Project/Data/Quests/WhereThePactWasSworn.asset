@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: wherethepactwassworn
   displayName: Where the Pact Was Sworn
-  description: 'Liv has read every rune the raids brought home, and none of them say what the pact was. She thinks the standing stones in Eastwood would: it is where it was sworn. They only read by starlight.'
+  description: 'Liv has read every rune the raids brought home, and none of them say what the pact was. The standing stones in Eastwood would: whoever first made the pact, the Haven swore to it there. They only read by starlight, and cold stone wants warming.'
   chain: Liv
-  journalNotes: The Standing Stones lie about 340 m north-east of the portal, in Eastwood. Go after dark.
-  rank: 4
+  journalNotes: The Standing Stones lie about 340 m north-east of the portal, in Eastwood. Go after dark, with a Hearth Ember.
+  rank: 1
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
@@ -26,7 +26,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 933d1de4d30ba9449985ab8bd2757b7e, type: 2}
   - {fileID: 11400000, guid: bd7dd70969be8174c8acfefd449bf963, type: 2}
   startedFirst: []
-  start: 0
+  start: 2
   startEvent: {fileID: 0}
   startWhen:
     type: 0
@@ -62,32 +62,6 @@ MonoBehaviour:
   onStarted: []
   objectivesInOrder: 1
   objectives:
-  - type: 9
-    description: Ask Liv about the standing stones
-    amount: 1
-    item: {fileID: 0}
-    resource: {fileID: 0}
-    monster: {fileID: 0}
-    faction: 0
-    building: {fileID: 0}
-    raid: {fileID: 0}
-    mustExtract: 0
-    withinMinutes: 0
-    questEvent: {fileID: 0}
-    person: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
-    target: {fileID: 0}
-    job: {fileID: 0}
-    breach: {fileID: 0}
-    rank: 0
-    tier: 0
-    bringHome: 0
-    countAlreadyOwned: 0
-    enchantment: {fileID: 0}
-    greatOnly: 0
-    onlySource: 0
-    source: 0
-    otherPerson: {fileID: 0}
-    mark: {fileID: 0}
   - type: 10
     description: Walk out to the Standing Stones in Eastwood
     amount: 1
@@ -115,7 +89,7 @@ MonoBehaviour:
     otherPerson: {fileID: 0}
     mark: {fileID: 0}
   - type: 11
-    description: Read the stones by starlight
+    description: Set a Hearth Ember in the ring, and read the stones by starlight
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}

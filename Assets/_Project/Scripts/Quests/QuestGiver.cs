@@ -121,6 +121,9 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
         Refresh();
     }
 
+    /// <summary>Gives it an owner's side quests at runtime (a resident's ResidentDefinition › Side Quests). Call before UseQuestLine.</summary>
+    public void UseSideOffers(IEnumerable<QuestOffer> sides) => sideOffers = new List<QuestOffer>(sides).ToArray();
+
     /// <summary>The owner's turn to let it speak (see <see cref="SpeaksThroughOwner"/>).</summary>
     public void AddTopicsForOwner(MenuPage page, DialogueSpeaker speaker, Action afterAnswer)
     {

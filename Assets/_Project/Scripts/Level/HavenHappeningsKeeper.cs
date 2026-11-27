@@ -51,13 +51,20 @@ public sealed class HavenHappeningsKeeper : MonoBehaviour
     /// <summary>Stands what this span and hour bring, and takes away what they no longer do.</summary>
     public void Refresh()
     {
-        if (atlas == null || settings == null || GameSession.Home == null)
+        if (atlas == null || settings == null || GameSession.Home == null || GameSession.Progress == null)
         {
             return;
         }
 
+        // A friend's Haven has its own happenings in its own game: the visitor stands none.
+        if (HavenVisit.IsVisiting)
+        {
+            Clear();
+            return;
+        }
+
         int span = settings.SpanOf(GameSession.Home.DaysPassed);
-        HavenHappenings.Happening now = settings.Pick(span, h => HavenHappenings.Possible(h, atlas));
+        HavenHappenings.Happening now = settings.Now(span, GameSession.Progress.Journal, h => HavenHappenings.Possible(h, atlas));
         bool hours = now != null && PlaceBeacon.PlaysAt(now.when, AtmosphereConditions.Hour);
         if (now != showing || span != showingSpan || !hours)
         {
@@ -85,7 +92,7 @@ public sealed class HavenHappeningsKeeper : MonoBehaviour
             {
                 placeId = place.id, name = string.IsNullOrWhiteSpace(now.findName) ? now.item.DisplayName : now.findName,
                 verb = now.findVerb, item = now.item, amount = now.amount, taken = now.taken, offset = now.offset + now.findOffset,
-                marker = now.findMarker, everyDays = settings.SpanDays,
+                marker = now.findMarker, everyDays = settings.SpanDays, keepsSpans = 1,
             };
             find = PlaceFind.Stand(transform, place, findData, HavenPlaceVerbs.Ground(place.at + findData.offset));
         }

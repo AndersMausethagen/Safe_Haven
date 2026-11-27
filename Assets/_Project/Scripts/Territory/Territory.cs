@@ -262,13 +262,44 @@ public static class Territory
             return false;
         }
 
-        if (State.ClaimNeedsRune(settings) && !HasRune(user))
+        if (State.ClaimNeedsRune(settings) && !HasRune(user) && !AnArcAsks(region))
         {
             reason = "It wants a Pact Rune: they turn up in raids, in caches and at the rot's heart.";
             return false;
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// True when a quest the player is on asks for this region's stone to be lit (a region's arc: HavenRegionSettings › Stone Target):
+    /// it lights without a Pact Rune, so an arc's end is never a wall for a player who spent their runes on holds (the quest review).
+    /// </summary>
+    public static bool AnArcAsks(string region)
+    {
+        QuestTargetDefinition stone = HavenRegionSettings.Current.LookOf(region)?.stoneTarget;
+        if (stone == null || GameSession.Quests == null)
+        {
+            return false;
+        }
+
+        foreach (QuestLog.Entry entry in GameSession.Quests.Entries)
+        {
+            if (entry == null || entry.Status != QuestStatus.Active || entry.Quest == null)
+            {
+                continue;
+            }
+
+            foreach (QuestObjective step in entry.Quest.Objectives)
+            {
+                if (step != null && step.Type == ObjectiveType.UseObject && step.Target == stone)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public static void Claim(string region, GameObject user)
@@ -279,7 +310,7 @@ public static class Territory
             return;
         }
 
-        if (State.ClaimNeedsRune(Settings) && !SpendRune(user))
+        if (State.ClaimNeedsRune(Settings) && !AnArcAsks(region) && !SpendRune(user))
         {
             return;
         }

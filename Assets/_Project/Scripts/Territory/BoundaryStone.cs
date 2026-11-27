@@ -141,9 +141,12 @@ public sealed class BoundaryStone : MonoBehaviour, IInteractionName
         int runes = Territory.RunesHeld(user);
         if (!state.IsClaimed(region))
         {
-            bool free = !state.ClaimNeedsRune(settings);
+            bool first = !state.ClaimNeedsRune(settings);
+            bool asked = !first && Territory.AnArcAsks(region);
             bool can = Territory.CanClaim(region, user, out string why);
-            page.Add(new MenuAction("Light the stone: remember the land", can ? (free ? "The first stone answers to the hearth: no rune needed." : $"A Pact Rune (you have {runes}).") : why,
+            page.Add(new MenuAction("Light the stone: remember the land", !can ? why
+                    : first ? "The first stone answers to the hearth: no rune needed."
+                    : asked ? "What you came out here for is enough: no rune needed." : $"A Pact Rune (you have {runes}).",
                 can, () => Territory.Claim(region, user)));
         }
         else
@@ -152,17 +155,27 @@ public sealed class BoundaryStone : MonoBehaviour, IInteractionName
             page.Add(new MenuAction("Offer a Pact Rune", can ? $"Hold +{settings.RuneHold:0} (you have {runes})." : why, can, () => Territory.Offer(region, user)));
         }
 
-        // The ways between the lit stones (Westwood remembered): to any other stone of a remembered land.
+        // The ways between the lit stones (Westwood remembered): to any other stone of a remembered land, in their names' order; not
+        // with something at your heels (no running from the Old Grey) nor during a breach.
         if (state.IsClaimed(region) && HavenRegionSettings.Current.StoneTravelOpen)
         {
+            var others = new System.Collections.Generic.List<BoundaryStone>();
             foreach (BoundaryStone other in FindObjectsByType<BoundaryStone>(FindObjectsInactive.Exclude))
             {
                 if (other != this && state.IsClaimed(other.region))
                 {
-                    bool open = HavenTravel.IsOpen;
-                    page.Add(new MenuAction($"Walk the old way to {other.region}'s stone", open ? "The cairn-builders' marks lead there." : "Not during a breach.",
-                        open, () => HavenTravel.GoTo(other.transform), true));
+                    others.Add(other);
                 }
+            }
+
+            others.Sort((a, b) => string.CompareOrdinal(a.region, b.region));
+            bool open = HavenTravel.IsOpen && !GameStateManager.InCombat;
+            string shut = GameStateManager.InCombat ? "Not with something at your heels." : "Not during a breach.";
+            foreach (BoundaryStone other in others)
+            {
+                BoundaryStone to = other;
+                page.Add(new MenuAction($"Walk the old way to {to.region}'s stone", open ? "The cairn-builders' marks lead there." : shut,
+                    open, () => HavenTravel.GoTo(to.transform), true));
             }
         }
 

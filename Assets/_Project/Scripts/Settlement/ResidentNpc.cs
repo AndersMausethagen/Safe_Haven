@@ -73,12 +73,15 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
     {
         resident = who;
         // Their quests at home, if they give any: a quest giver on them, speaking first in their conversation.
-        if (who.QuestLine != null && who.QuestLine.Count > 0)
+        bool sides = who.SideQuests != null && who.SideQuests.Count > 0;
+        if ((who.QuestLine != null && who.QuestLine.Count > 0) || sides)
         {
             questGiver = TryGetComponent(out QuestGiver existing) ? existing : gameObject.AddComponent<QuestGiver>();
             // The quest that brought them home is handed in to them: their mark shows it (set before the line, which refreshes it).
             questGiver.AlsoHandedInHere = () => ResidentQuests.RescueToHandIn(resident);
-            questGiver.UseQuestLine(who.QuestLine, who.QuestLineDone, true);
+            // Their side quests first: the line refreshes the mark, which reads them.
+            questGiver.UseSideOffers(sides ? who.SideQuests : System.Array.Empty<QuestOffer>());
+            questGiver.UseQuestLine(who.QuestLine ?? System.Array.Empty<QuestOffer>(), who.QuestLineDone, true);
         }
 
         homePosition = transform.position;

@@ -17,7 +17,7 @@ MonoBehaviour:
   description: Sigrid led the expedition north because she had read of a road out of the Haven that the old ones took. She thinks it began at the Farewell Stones in Greyfell, and that whoever left by it cut their names there.
   chain: Sigrid
   journalNotes: The Farewell Stones lie about 430 m north-west of the portal, in Greyfell.
-  rank: 4
+  rank: 1
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
@@ -25,7 +25,7 @@ MonoBehaviour:
   prerequisites:
   - {fileID: 11400000, guid: 43d140c7ce0db8248af73e619971f999, type: 2}
   startedFirst: []
-  start: 0
+  start: 2
   startEvent: {fileID: 0}
   startWhen:
     type: 0
@@ -61,32 +61,6 @@ MonoBehaviour:
   onStarted: []
   objectivesInOrder: 1
   objectives:
-  - type: 9
-    description: Ask Sigrid about the road north
-    amount: 1
-    item: {fileID: 0}
-    resource: {fileID: 0}
-    monster: {fileID: 0}
-    faction: 0
-    building: {fileID: 0}
-    raid: {fileID: 0}
-    mustExtract: 0
-    withinMinutes: 0
-    questEvent: {fileID: 0}
-    person: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
-    target: {fileID: 0}
-    job: {fileID: 0}
-    breach: {fileID: 0}
-    rank: 0
-    tier: 0
-    bringHome: 0
-    countAlreadyOwned: 0
-    enchantment: {fileID: 0}
-    greatOnly: 0
-    onlySource: 0
-    source: 0
-    otherPerson: {fileID: 0}
-    mark: {fileID: 0}
   - type: 10
     description: Walk out to the Farewell Stones
     amount: 1
@@ -127,6 +101,32 @@ MonoBehaviour:
     questEvent: {fileID: 0}
     person: {fileID: 0}
     target: {fileID: 11400000, guid: 55033df2638165d41819ee2b225a9c14, type: 2}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 0
+    tier: 0
+    bringHome: 0
+    countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 0
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
+  - type: 11
+    description: Cut the expedition's names under theirs
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 0
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 11400000, guid: 1ac9f1f81f6210045b83d37702d4d55b, type: 2}
     job: {fileID: 0}
     breach: {fileID: 0}
     rank: 0

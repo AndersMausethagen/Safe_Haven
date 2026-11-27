@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
@@ -30,6 +31,15 @@ public static class PlaceDressingBuilder
         // A light (no Path): its colour, range and intensity, Raised above the ground.
         public Color Light;
         public float Range, Intensity;
+        // Water to draw (a well): a WaterSource on it, by this name.
+        public string Water;
+    }
+
+    private static Prop W(string path, float x, float z, float turn, string waterName)
+    {
+        Prop prop = P(path, x, z, turn);
+        prop.Water = waterName;
+        return prop;
     }
 
     private static Prop L(float x, float z, float raised, Color colour, float range, float intensity) =>
@@ -83,7 +93,26 @@ public static class PlaceDressingBuilder
             P(R("Charred Cart"), -7f, 3.2f, 25f),
             P(R("Old Barrel"), -3.6f, 0.8f, 40f, 1f, 0.4f, 0f, 90f),
             P(R("Old Bucket"), -6.1f, -3.1f, 0f),
+            // Inside the longhouse (its centre at 0.6, -5.5): the roof beam down across the floor, boards burnt where they fell (the
+            // world review: remembered, it read as weathered wood, not burnt).
+            P(R("Charred Timber Frame C"), 1.5f, -5f, 75f, 1f, 0.3f, 0f, 68f),
+            P(R("Charred Plank"), -1.2f, -4.3f, 20f, 1f, 0.08f),
+            P(R("Charred Plank"), 2.6f, -6.3f, 105f, 1f, 0.08f),
+            P(R("Charred Plank"), 0.4f, -3.5f, 160f, 0.8f, 0.08f),
         }, FenceLine()),
+
+        // The family's way out of the burning farm (The Family's Flight, at the farm's centre): what they dropped along the burnt fence's
+        // bearing toward the grave, every 35 m, and the ground trampled past the sling.
+        ["Family's Trail"] = new[]
+        {
+            D("Trampled Ground", 34.5f, -9.7f, 1.2f, 3f, 106.7f),
+            D("Trampled Ground", 42.2f, -12f, 1.2f, 3f, 106.7f),
+            D("Trampled Ground", 49.8f, -14.3f, 1.2f, 3f, 106.7f),
+            P(R("Old Bucket"), 62f, -18f, 30f, 1f, 0.2f, 0f, 80f),
+            P(R("Charred Plank"), 63.2f, -17f, 60f, 0.6f, 0.05f),
+            P(R("Wattle Fence"), 98f, -29f, 15f, 0.8f, 0.1f, 0f, 85f),
+            P(R("Stone Pile"), 133f, -40f, 0f, 0.5f),
+        },
 
         // Where the family buried the one who didn't reach the trees: a cairn with a small stone at its head, a wattle hurdle round it.
         ["Family's Grave Scene"] = new[]
@@ -91,10 +120,29 @@ public static class PlaceDressingBuilder
             P(R("Stone Pile"), 0f, 0f, 0f, 1.15f),
             P(R("Stone Pile"), 0.3f, 0.6f, 120f, 0.85f, 0.12f),
             P(Props + "Standing Stone/Standing Stone.prefab", 0f, 1.7f, 8f, 0.55f),
+            // A long mound, not a heap (the world review); no bones: the hurdle kept the animals off.
+            P(R("Stone Pile"), 0f, -0.9f, 175f, 1f, 0.06f),
             P(R("Wattle Fence"), 2.1f, 0.3f, 0f, 0.8f),
-            P(R("Wattle Fence"), -0.4f, -2.1f, 90f, 0.8f, tiltZ: 14f),
+            P(R("Wattle Fence"), -0.4f, -2.7f, 90f, 0.8f, tiltZ: 14f),
             P(R("Cut Stone B"), -1.6f, -0.9f, 35f, 0.7f, tiltZ: 70f),
-            P(Props + "Old Bone/Old Bone.prefab", 1.3f, -1.4f, 60f, 0.7f),
+        },
+
+        // The grave tended once the family is found (The Family's Flight done): the hurdle stood up again, a fresh stone at its head.
+        ["Family's Grave Tended"] = new[]
+        {
+            P(R("Cut Stone C"), 0f, 2.3f, 90f, 0.6f, -0.1f),
+            P(R("Wattle Fence"), -2.1f, 0f, 0f, 0.8f),
+            P(R("Old Bucket"), 1.5f, 2.2f, 0f, 0.8f),
+        },
+
+        // The charcoal burners' camp, as its thoughts tell it: turf stacked to dry, the black ring of an old clamp, a rake left in the ash.
+        ["Charcoal Camp Scene"] = new[]
+        {
+            P(World + "Set Pieces/Peat Stack.prefab", -4.5f, 4f, 20f),
+            P(World + "Set Pieces/Peat Stack.prefab", -6f, 2.2f, 75f, 0.9f),
+            D("Scorch", -5f, -3f, 4.5f, 4.5f),
+            P(R("Charred Plank"), -3.2f, -4.6f, 40f, 0.6f, 0.05f),
+            P(R("Log Pile"), 7f, 4.5f, 10f),
         },
 
         // A farm of the old village, long empty: a house's dry-stone footing with its threshold, the well and trough, a yard fence,
@@ -109,7 +157,7 @@ public static class PlaceDressingBuilder
             P(R("Fieldstone Wall Corner"), 4.5f, -1.4f, 0f),
             P(R("Threshold Stone"), 1.55f, 2.7f, 0f),
             P(R("Timber Frame B"), -0.8f, -0.2f, 90f, tiltZ: 28f),
-            P(R("Village Well"), 7.2f, 5f, 30f),
+            W(R("Village Well"), 7.2f, 5f, 30f, "The old well"),
             P(R("Old Trough"), 8.8f, 2.9f, 10f),
             P(R("Old Bucket"), 6.1f, 3.6f, 0f, 1f, 0.2f, 0f, 75f),
             P(R("Stick Fence"), -2f, 8.2f, 90f),
@@ -120,6 +168,32 @@ public static class PlaceDressingBuilder
             P(R("Log Pile"), -6.3f, 3.4f, 0f),
             P(R("Old Barrel"), 5.7f, -3.9f, 20f),
             D("Trampled Ground", 0f, 0f, 10f, 6f),
+        },
+
+        // Asa's field, tilled (the strips of turned earth inside the hurdles: it read as a sheep pen).
+        ["Asa's Furrows"] = new[]
+        {
+            D("Dirt Path", -1.5f, 0f, 1f, 4.6f),
+            D("Dirt Path", 0f, 0f, 1f, 4.6f),
+            D("Dirt Path", 1.5f, 0f, 1f, 4.6f),
+        },
+
+        // The healer's spring cleared (Alder Mere remembered): the basin full again, the herb beds weeded, the rack hung.
+        ["Alder Spring Worked"] = new[]
+        {
+            D("Trampled Ground", 0f, -1.6f, 3f, 2.6f),
+            P(R("Old Bucket"), 1.2f, -2.4f, 0f),
+            P(R("Old Barrel"), 2.4f, 1.6f, 0f, 0.8f),
+            D("Dirt Path", -4f, 0f, 3f, 3.2f),
+        },
+
+        // The long hearth lit again once the last memory is told (Hightarn remembered): somebody has laid it, and nobody says who.
+        ["Empty Hall Hearth"] = new[]
+        {
+            L(0f, 0f, 0.6f, new Color(1f, 0.6f, 0.3f), 10f, 2f),
+            L(-2f, 0f, 0.5f, new Color(1f, 0.55f, 0.28f), 6f, 1.2f),
+            L(2f, 0f, 0.5f, new Color(1f, 0.55f, 0.28f), 6f, 1.2f),
+            P(R("Log Pile"), 4.6f, -1.8f, 90f, 0.7f),
         },
 
         // The hearth-keepers' hall: a long house's footing, its long hearth down the middle, the smith's corner, frames fallen in.
@@ -145,7 +219,8 @@ public static class PlaceDressingBuilder
             P(R("Timber Frame C"), -4f, -1.2f, 90f, 1f, 0.2f, 0f, 74f),
             P(R("Timber Frame A"), 3.8f, 1.3f, 270f, 1f, 0.2f, 0f, 70f),
             P(R("Old Anvil"), 5.6f, -1.6f, 30f),
-            P(R("Log Pile"), -6f, -1.8f, 90f),
+            // The smith's logs, beside the anvil as the thought says.
+            P(R("Log Pile"), 6.8f, -2.6f, 90f),
             P(R("Old Barrel"), 6.6f, 1.6f, 0f),
             P(R("Old Barrel"), 7f, 0.6f, 50f, 1f, 0.4f, 0f, 90f),
             P(R("Broken Cart"), 12f, 5f, -20f),
@@ -161,8 +236,12 @@ public static class PlaceDressingBuilder
             P(R("Cut Stone B"), 1.3f, -0.2f, -15f, 0.85f),
             P(R("Old Bucket"), 0.95f, -1.5f, 0f),
             D("Trampled Ground", 0f, -0.8f, 3.5f, 3f),
-            P(R("Wattle Fence"), -3.2f, 1.2f, 70f),
-            P(R("Wattle Fence"), -4.5f, -1.6f, 115f, 1f, 0.12f, 0f, 80f),
+            // The basin below the step, and the healer's herb plot: low hurdles round a 4 m bed (a shape to see from above).
+            P(R("Old Trough"), 0f, -2.2f, 90f),
+            P(R("Wattle Fence"), -4f, 2f, 90f, 0.55f),
+            P(R("Wattle Fence"), -4f, -2f, 90f, 0.55f, 0.08f, 0f, 70f),
+            P(R("Wattle Fence"), -6f, 0f, 0f, 0.55f),
+            P(R("Wattle Fence"), -2f, 0f, 0f, 0.55f),
             P("Assets/_Project/Prefabs/Raids/Camps/Drying Rack.prefab", 3.6f, 2.4f, 20f),
         },
 
@@ -233,6 +312,11 @@ public static class PlaceDressingBuilder
         // The Drowning Fen (A Way Across the Fen): the causeway laid again, dry boards in a line across the bog.
         ["Sunken Causeway Mended"] = new[]
         {
+            // Out to firmer ground at both ends (the world review: it ended in the bog).
+            P(World + "Set Pieces/Boardwalk.prefab", -6f, -16.5f, 30f, 1f, 0.05f),
+            P(World + "Set Pieces/Boardwalk.prefab", -4f, -13f, 30f, 1f, 0.05f),
+            P(World + "Set Pieces/Boardwalk.prefab", 10f, 11.5f, 30f, 1f, 0.05f),
+            P(World + "Set Pieces/Boardwalk.prefab", 12f, 15f, 30f, 1f, 0.05f),
             P(World + "Set Pieces/Boardwalk.prefab", -2f, -9.5f, 30f, 1f, 0.05f),
             P(World + "Set Pieces/Boardwalk.prefab", 0f, -6f, 30f, 1f, 0.05f),
             P(World + "Set Pieces/Boardwalk.prefab", 2f, -2.5f, 30f, 1f, 0.05f),
@@ -375,6 +459,15 @@ public static class PlaceDressingBuilder
         made.transform.localPosition = new Vector3(prop.X, prop.Raised, prop.Z);
         made.transform.localRotation = Quaternion.Euler(0f, prop.Turn, 0f) * Quaternion.Euler(prop.TiltX, 0f, prop.TiltZ);
         made.transform.localScale = Vector3.one * prop.Scale;
+        // Water to draw: a drink and a filled waterskin on the long walks out (the world review).
+        if (!string.IsNullOrEmpty(prop.Water))
+        {
+            var interactable = made.AddComponent<Interactable>();
+            interactable.Configure(InteractionAnimation.GatherLow, 1f, 2.5f, false, InteractionKind.Use);
+            string skin = AssetDatabase.FindAssets("Waterskin t:ItemDefinition").Select(AssetDatabase.GUIDToAssetPath).FirstOrDefault(p => Path.GetFileNameWithoutExtension(p) == "Waterskin");
+            made.AddComponent<WaterSource>().Configure(prop.Water, 100f, skin != null ? AssetDatabase.LoadAssetAtPath<ItemDefinition>(skin) : null, 3);
+        }
+
         // A world prop drawn without a collider of its own (a standing stone, a waystone) gets a box: nobody walks through a stone.
         if (made.GetComponentInChildren<Collider>(true) == null)
         {

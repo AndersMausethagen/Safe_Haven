@@ -24,6 +24,8 @@ public sealed class HavenHappenings : GameSettings<HavenHappenings>
         public bool needsRemembered = true;
         [Tooltip("Only once this quest has started (empty: from the start): the tarn's lights belong to the story's turn north.")]
         public QuestDefinition afterQuest;
+        [Tooltip("Never again once this quest is done (empty: never ends): the tarn's lights stop with Hightarn remembered.")]
+        public QuestDefinition untilQuest;
         [Tooltip("Only at these hours (night from 20 to 6): lights over the tarn.")]
         public HavenPlaceVerbs.When when = HavenPlaceVerbs.When.Always;
         [Tooltip("What shows there (props, a light, someone resting), round the place's centre plus Offset.")]
@@ -89,7 +91,17 @@ public sealed class HavenHappenings : GameSettings<HavenHappenings>
         return now;
     }
 
-    private bool Quiet(int span) => new System.Random(unchecked(span * 92821 + 7)).NextDouble() >= chance;
+    private bool Quiet(int span) => Hash(span, 1) % 10000 / 10000f >= chance;
+
+    // A span's draws (splitmix64 of the span and a salt): spread evenly, no fixed beat (System.Random's first outputs are affine in
+    // their seed, so quiet spans fell on a regular rhythm and the happenings came round in a fixed order: the code review).
+    private static ulong Hash(int span, ulong salt)
+    {
+        ulong z = unchecked((ulong)(uint)span * 0x9E3779B97F4A7C15UL + salt * 0xD1B54A32D192ED03UL);
+        z = unchecked((z ^ (z >> 30)) * 0xBF58476D1CE4E5B9UL);
+        z = unchecked((z ^ (z >> 27)) * 0x94D049BB133111EBUL);
+        return z ^ (z >> 31);
+    }
 
     // The span's own draw: from its seed on through the list, the first that isn't the one before and is possible now.
     private static Happening Draw(int span, Happening previous, List<Happening> all, Func<Happening, bool> possible)
@@ -99,9 +111,7 @@ public sealed class HavenHappenings : GameSettings<HavenHappenings>
             return null;
         }
 
-        var draw = new System.Random(unchecked(span * 92821 + 7));
-        draw.NextDouble();
-        int first = draw.Next() % all.Count;
+        int first = (int)(Hash(span, 2) % (ulong)all.Count);
         for (int k = 0; k < all.Count; k++)
         {
             Happening candidate = all[(first + k) % all.Count];
@@ -118,7 +128,7 @@ public sealed class HavenHappenings : GameSettings<HavenHappenings>
     /// shows: the lights over the tarn are the span's happening all day, and seen at night.)</summary>
     public static bool Possible(Happening happening, WorldAtlas atlas)
     {
-        if (happening == null || atlas == null
+        if (happening == null || atlas == null || Ended(happening)
             || (happening.afterQuest != null && GameSession.Quests.StatusOf(happening.afterQuest) == QuestStatus.NotStarted))
         {
             return false;
@@ -134,7 +144,72 @@ public sealed class HavenHappenings : GameSettings<HavenHappenings>
         return !happening.needsRemembered || HavenLand.IsRemembered(region);
     }
 
-    /// <summary>The homecoming card's line for the happening of this span, once (noted in the journal), or null.</summary>
+    /// <summary>True once its Until Quest is done: it never comes again.</summary>
+    public static bool Ended(Happening happening) =>
+        happening != null && happening.untilQuest != null && GameSession.Quests.StatusOf(happening.untilQuest) == QuestStatus.Completed;
+
+    /// <summary>
+    /// The happening of a span as this game has it: drawn once (Pick's rule, from the span before as it was had) and then remembered in
+    /// the journal, so what the homecoming card told is what stands there all through its span, whatever is remembered or started in
+    /// between (the code review: a stone lit mid-span swapped the swarm for something else). One that has since ended shows no more.
+    /// </summary>
+    public Happening Now(int span, JournalRecord journal, Func<Happening, bool> possible)
+    {
+        if (span < 0)
+        {
+            return null;
+        }
+
+        if (journal == null)
+        {
+            return Pick(span, possible);
+        }
+
+        if (Remembered(span, journal, out Happening had))
+        {
+            return had != null && !Ended(had) ? had : null;
+        }
+
+        Happening now = null;
+        if (!Quiet(span))
+        {
+            Happening previous = Remembered(span - 1, journal, out Happening before) ? before : span > 0 ? Pick(span - 1, possible) : null;
+            now = Draw(span, previous, happenings.FindAll(h => h != null && !string.IsNullOrEmpty(h.id)), possible);
+        }
+
+        journal.NoteNoticed(SpanKey(span, now != null ? now.id : "-"));
+        return now;
+    }
+
+    private static string SpanKey(int span, string id) => $"haven.happening.span.{span}.{id}";
+
+    private bool Remembered(int span, JournalRecord journal, out Happening had)
+    {
+        had = null;
+        if (span < 0)
+        {
+            return false;
+        }
+
+        if (journal.HasNoticed(SpanKey(span, "-")))
+        {
+            return true;
+        }
+
+        foreach (Happening happening in happenings)
+        {
+            if (happening != null && !string.IsNullOrEmpty(happening.id) && journal.HasNoticed(SpanKey(span, happening.id)))
+            {
+                had = happening;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>The homecoming card's line for the happening of this span, once (noted in the journal), or null. Told, its place goes
+    /// on the map (seen, as from a lookout) so it can be found.</summary>
     public static string Foretell(JournalRecord journal)
     {
         HavenHappenings settings = Current;
@@ -145,7 +220,7 @@ public sealed class HavenHappenings : GameSettings<HavenHappenings>
         }
 
         int span = settings.SpanOf(GameSession.Home.DaysPassed);
-        Happening now = settings.Pick(span, h => Possible(h, atlas));
+        Happening now = settings.Now(span, journal, h => Possible(h, atlas));
         if (now == null || string.IsNullOrWhiteSpace(now.foretold))
         {
             return null;
@@ -158,6 +233,11 @@ public sealed class HavenHappenings : GameSettings<HavenHappenings>
         }
 
         journal.NoteNoticed(key);
+        if (!journal.HasDiscovered(now.placeId))
+        {
+            journal.NoteSeen(now.placeId);
+        }
+
         return now.foretold;
     }
 

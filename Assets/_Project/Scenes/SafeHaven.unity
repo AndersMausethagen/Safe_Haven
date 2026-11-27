@@ -23734,68 +23734,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2495084940809469790, guid: cece39637df4fd044ab4df7346499ad8, type: 3}
   m_PrefabInstance: {fileID: 79620413}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &79730176
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1489340924}
-    m_Modifications:
-    - target: {fileID: 5068457664208720008, guid: dfa75a2b8fc307b4da9fb76b2ce561a5, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 343.23322
-      objectReference: {fileID: 0}
-    - target: {fileID: 5068457664208720008, guid: dfa75a2b8fc307b4da9fb76b2ce561a5, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 21.325443
-      objectReference: {fileID: 0}
-    - target: {fileID: 5068457664208720008, guid: dfa75a2b8fc307b4da9fb76b2ce561a5, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -341.70508
-      objectReference: {fileID: 0}
-    - target: {fileID: 5068457664208720008, guid: dfa75a2b8fc307b4da9fb76b2ce561a5, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.9330695
-      objectReference: {fileID: 0}
-    - target: {fileID: 5068457664208720008, guid: dfa75a2b8fc307b4da9fb76b2ce561a5, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5068457664208720008, guid: dfa75a2b8fc307b4da9fb76b2ce561a5, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0.359696
-      objectReference: {fileID: 0}
-    - target: {fileID: 5068457664208720008, guid: dfa75a2b8fc307b4da9fb76b2ce561a5, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5068457664208720008, guid: dfa75a2b8fc307b4da9fb76b2ce561a5, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5068457664208720008, guid: dfa75a2b8fc307b4da9fb76b2ce561a5, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5068457664208720008, guid: dfa75a2b8fc307b4da9fb76b2ce561a5, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5402517183627898201, guid: dfa75a2b8fc307b4da9fb76b2ce561a5, type: 3}
-      propertyPath: m_Name
-      value: Rocky Glade Landmark
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: dfa75a2b8fc307b4da9fb76b2ce561a5, type: 3}
---- !u!4 &79730177 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 5068457664208720008, guid: dfa75a2b8fc307b4da9fb76b2ce561a5, type: 3}
-  m_PrefabInstance: {fileID: 79730176}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &80156063
 GameObject:
   m_ObjectHideFlags: 0
@@ -137040,80 +136978,6 @@ MonoBehaviour:
   m_Center: {x: 0, y: 0, z: 0}
   m_Area: 3
   m_AffectedAgents: ffffffffi
---- !u!1001 &489679165
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1143342156}
-    m_Modifications:
-    - target: {fileID: 3209789557424891300, guid: 16ad38b0dd7488f4bb2214d4b77cb4a7, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.91142637
-      objectReference: {fileID: 0}
-    - target: {fileID: 3209789557424891300, guid: 16ad38b0dd7488f4bb2214d4b77cb4a7, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.91142637
-      objectReference: {fileID: 0}
-    - target: {fileID: 3209789557424891300, guid: 16ad38b0dd7488f4bb2214d4b77cb4a7, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.91142637
-      objectReference: {fileID: 0}
-    - target: {fileID: 3209789557424891300, guid: 16ad38b0dd7488f4bb2214d4b77cb4a7, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 351.8384
-      objectReference: {fileID: 0}
-    - target: {fileID: 3209789557424891300, guid: 16ad38b0dd7488f4bb2214d4b77cb4a7, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 21.105188
-      objectReference: {fileID: 0}
-    - target: {fileID: 3209789557424891300, guid: 16ad38b0dd7488f4bb2214d4b77cb4a7, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -337.38757
-      objectReference: {fileID: 0}
-    - target: {fileID: 3209789557424891300, guid: 16ad38b0dd7488f4bb2214d4b77cb4a7, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: -0.022370415
-      objectReference: {fileID: 0}
-    - target: {fileID: 3209789557424891300, guid: 16ad38b0dd7488f4bb2214d4b77cb4a7, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0.014035028
-      objectReference: {fileID: 0}
-    - target: {fileID: 3209789557424891300, guid: 16ad38b0dd7488f4bb2214d4b77cb4a7, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0.9994883
-      objectReference: {fileID: 0}
-    - target: {fileID: 3209789557424891300, guid: 16ad38b0dd7488f4bb2214d4b77cb4a7, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0.018049113
-      objectReference: {fileID: 0}
-    - target: {fileID: 3209789557424891300, guid: 16ad38b0dd7488f4bb2214d4b77cb4a7, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3209789557424891300, guid: 16ad38b0dd7488f4bb2214d4b77cb4a7, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3209789557424891300, guid: 16ad38b0dd7488f4bb2214d4b77cb4a7, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6738502702539548217, guid: 16ad38b0dd7488f4bb2214d4b77cb4a7, type: 3}
-      propertyPath: m_Name
-      value: Rotten Branch
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 16ad38b0dd7488f4bb2214d4b77cb4a7, type: 3}
---- !u!4 &489679166 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 3209789557424891300, guid: 16ad38b0dd7488f4bb2214d4b77cb4a7, type: 3}
-  m_PrefabInstance: {fileID: 489679165}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &489921131
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -283079,6 +282943,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HeartTree
   questWhispers:
+  - quest: {fileID: 11400000, guid: 1367dde89e95d714bbac19728a1bc16e, type: 2}
+    text: 'There is one memory the forest kept back from me, little one: who let my hearth go cold. The high tarn has it, and shows it only at night.'
+    moment: {fileID: 0}
   - quest: {fileID: 11400000, guid: fb9d0f9010e5743408d2ad484bbffb19, type: 2}
     text: 'You came back to me torn, little one. I caught you, as I catch all of mine. But you met the dark with your mouth shut. The hird that built your hearths never did. Stand here and roar with me: let them be the ones who are afraid.'
     moment: {fileID: 0}
@@ -311782,7 +311649,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 489679166}
   - {fileID: 119147934}
   - {fileID: 866201816}
   - {fileID: 1133480569}
@@ -404545,7 +404411,6 @@ Transform:
   - {fileID: 315245058}
   - {fileID: 1357669612}
   - {fileID: 201016170}
-  - {fileID: 79730177}
   - {fileID: 1264656560}
   - {fileID: 962351640}
   - {fileID: 1278767489}

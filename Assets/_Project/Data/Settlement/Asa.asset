@@ -56,7 +56,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: acb3416df6dae1b439a8b3945c3f098e, type: 2}
   favouriteDish: {fileID: 11400000, guid: 8ae780c7423381b4bae5edf4e4beabc9, type: 2}
   homeLiking:
-    resident: {fileID: 0}
+    resident: {fileID: 11400000}
     likes: Water close
     line: '"Water near, for the beds and the flax."'
     thanks: '"Water by the beds. The barley drinks, and I don''t carry it as far."'
@@ -78,3 +78,22 @@ MonoBehaviour:
     askText: 
     thanksText: 
   questLineDone: 
+  sideQuests:
+  - quest: {fileID: 11400000, guid: 53e34a73f89dac640ab91738fbc66874, type: 2}
+    text: 'I was found guarding seed at a burnt farm in the deep woods. There''s another in the Hollow Pines, my grandmother said: burnt the night the hearth went out, and somebody kept a fire going there after the roof was gone. I want to know what for.'
+    acceptText: I'll go and see.
+    waitingText: South, in the Hollow Pines. A longhouse with no roof. Look at their hearth.
+    askText: The farm in the Hollow Pines?
+    thanksText: 
+  - quest: {fileID: 11400000, guid: c02abb0f34687e841b484a01d52b7be5, type: 2}
+    text: 
+    acceptText: I'll do it.
+    waitingText: 'They meant to come back. Follow the burnt fence and see how far they got. Take planks: whatever they left will be falling down.'
+    askText: 
+    thanksText: 
+  - quest: {fileID: 11400000, guid: 7fd51412ce7494e4394efdf6c6ebd5a6, type: 2}
+    text: 
+    acceptText: I'll do it.
+    waitingText: Light the Hollow Pines' stone, and I'll sow their seed where they meant to.
+    askText: 
+    thanksText: It came up. Their seed, in their field. I'll keep it for them.

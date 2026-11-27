@@ -32,6 +32,9 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     // Woken by a knock: how long they stand at the door for the player, and how long they linger after a talk.
     private const float AwakeSeconds = 12f;
     private const float AfterTalkSeconds = 2.5f;
+    // A trip longer than this (metres left) is covered out of sight to Short Of metres from its end (a worked place far out in the land).
+    private const float LongWay = 120f;
+    private const float ShortOf = 30f;
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
 
     private ResidentNpc npc;
@@ -71,6 +74,7 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     // The scaffold a builder is hammering at home, or null.
     private Construction building;
     private bool repathed;
+    private float nextShortcut;
     private Renderer body;
 
     // A trip to a chest and back for their work (WorkerProduction): where they are on it, what they carry, a cart taken along.
@@ -944,6 +948,23 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         {
             Reached();
             return;
+        }
+
+        // A long way out to a place in the land (a worked place: PlaceWorkers) or back from it: the Haven's day is too short for a 400 m
+        // walk each way (they arrived after dark, or never). Unseen, they cover all but the last of it at once and walk the rest.
+        if (agent.remainingDistance > LongWay && Time.time >= nextShortcut && (body == null || !body.isVisible))
+        {
+            nextShortcut = Time.time + 2f;
+            Vector3 toward = place - transform.position;
+            toward.y = 0f;
+            if (toward.sqrMagnitude > LongWay * LongWay * 0.25f
+                && NavMesh.SamplePosition(place - toward.normalized * ShortOf, out NavMeshHit near, 8f, agent.areaMask)
+                && NavMesh.SamplePosition(place, out NavMeshHit there, 6f, agent.areaMask))
+            {
+                agent.Warp(near.position);
+                agent.SetDestination(there.position);
+                return;
+            }
         }
 
         // Boxed in by something built since, or no way through: they find their own way there rather than stand against a wall all day.

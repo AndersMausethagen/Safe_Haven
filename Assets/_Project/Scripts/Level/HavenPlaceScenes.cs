@@ -50,12 +50,14 @@ public sealed class HavenPlaceScenes : MonoBehaviour
     {
         QuestManager.Changed += MarkDirty;
         Territory.Changed += MarkDirty;
+        PlaceFind.Taken += MarkDirty;
     }
 
     private void OnDisable()
     {
         QuestManager.Changed -= MarkDirty;
         Territory.Changed -= MarkDirty;
+        PlaceFind.Taken -= MarkDirty;
     }
 
     private void MarkDirty() => dirty = true;
@@ -116,7 +118,7 @@ public sealed class HavenPlaceScenes : MonoBehaviour
         for (int i = scene.stages.Count - 1; i >= 0; i--)
         {
             HavenPlaceVerbs.Stage stage = scene.stages[i];
-            if (stage != null && stage.hidesEarlier && HavenPlaceVerbs.Passes(stage.gate, stage.quest, region))
+            if (stage != null && stage.hidesEarlier && Shows(stage.gate, stage.quest, region))
             {
                 firstKept = i;
                 break;
@@ -131,7 +133,7 @@ public sealed class HavenPlaceScenes : MonoBehaviour
                 continue;
             }
 
-            bool show = i >= firstKept && HavenPlaceVerbs.Passes(stage.gate, stage.quest, region);
+            bool show = i >= firstKept && Shows(stage.gate, stage.quest, region);
             stages.TryGetValue(stage, out GameObject shown);
             if (show && shown == null)
             {
@@ -178,8 +180,9 @@ public sealed class HavenPlaceScenes : MonoBehaviour
             holder.AddComponent<KeptPlace>().Configure(stage.smokeRise > 0f, stage.clearsMist);
         }
 
-        // Someone from home works it: they walk out to it in their free time (PlaceWorkers), facing the stage's centre.
-        if (stage.worker != null)
+        // Someone from home works it: they walk out to it in their free time (PlaceWorkers), facing the stage's centre. Not the host's
+        // people in a friend's Haven: their game keeps them.
+        if (stage.worker != null && !HavenVisit.IsVisiting)
         {
             var spot = new GameObject("Worker's Spot");
             spot.transform.SetParent(holder.transform, false);
@@ -189,7 +192,7 @@ public sealed class HavenPlaceScenes : MonoBehaviour
         }
 
         holder.SetActive(true);
-        if (stage.creature != null)
+        if (stage.creature != null && !HavenVisit.IsVisiting)
         {
             // Not under the stage (its body, once killed, is the player's to loot), but taken away with it while it lives.
             GameObject made = Instantiate(stage.creature, holder.transform.position, holder.transform.rotation);
@@ -218,10 +221,13 @@ public sealed class HavenPlaceScenes : MonoBehaviour
 
     private void RefreshFind(HavenPlaceVerbs.Find find, WorldAtlas.Place place)
     {
-        bool open = HavenPlaceVerbs.Passes(find.gate, find.quest, RegionOf(place)) && PlaceBeacon.PlaysAt(find.when, AtmosphereConditions.Hour);
+        // Its hours don't hide it: a night's lantern stands by day too, and says "not yet" (PlaceFind.CanInteract).
+        bool open = HavenPlaceVerbs.Passes(find.gate, find.quest, RegionOf(place));
         finds.TryGetValue(find, out PlaceFind shown);
         bool there = shown != null && shown.gameObject.activeSelf;
-        if (open && !there && !PlaceFind.IsTaken(place, find))
+        // What is taken goes (also a yield emptied by what was taken beside it); a thing only used stays as it is after.
+        bool wanted = open && (find.item == null || !PlaceFind.IsTaken(place, find));
+        if (wanted && !there)
         {
             if (shown != null)
             {
@@ -238,12 +244,18 @@ public sealed class HavenPlaceScenes : MonoBehaviour
                 finds.Remove(find);
             }
         }
-        else if (!open && shown != null)
+        else if (!wanted && shown != null)
         {
             Destroy(shown.gameObject);
             finds.Remove(find);
         }
     }
+
+    // In a friend's Haven a stage the story opens is theirs, not the visitor's (a wolf only one game would see, boards one game would
+    // walk on): only what always stands and what their land remembers shows.
+    private static bool Shows(HavenPlaceVerbs.Gate gate, QuestDefinition quest, string region) =>
+        HavenPlaceVerbs.Passes(gate, quest, region)
+        && (!HavenVisit.IsVisiting || gate == HavenPlaceVerbs.Gate.Always || gate == HavenPlaceVerbs.Gate.Remembered);
 
     private string RegionOf(WorldAtlas.Place place) => atlas.RegionAt(new Vector3(place.at.x, 0f, place.at.y))?.name;
 }

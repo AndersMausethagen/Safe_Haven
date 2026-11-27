@@ -16,8 +16,8 @@ MonoBehaviour:
   displayName: The Family's Flight
   description: 'The seed under the hearthstone was sealed for sowing, not for a winter: the family meant to come back. A burnt fence line runs off from the yard into the pines, to the south-east.'
   chain: Asa
-  journalNotes: Follow the fence where it runs out of the yard. What they dropped shows the way.
-  rank: 4
+  journalNotes: Follow the burnt fence where it runs out of the yard, south-east into the pines. What they dropped shows the way. Bring 2 Rough Planks to mend what is broken.
+  rank: 1
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
@@ -107,6 +107,32 @@ MonoBehaviour:
     tier: 0
     bringHome: 0
     countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 0
+    otherPerson: {fileID: 0}
+    mark: {fileID: 0}
+  - type: 11
+    description: Mend the hurdle round the grave
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 0
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 11400000, guid: 65cb62189f77c914a91f889ebc3e05be, type: 2}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 0
+    tier: 0
+    bringHome: 0
+    countAlreadyOwned: 0
     enchantment: {fileID: 0}
     greatOnly: 0
     onlySource: 0

@@ -42,9 +42,15 @@ public sealed class HavenLifeTests
     public void EveryWorkedPlace_HasSomeoneToWorkIt()
     {
         HavenPlaceVerbs verbs = HavenPlaceVerbs.Current;
-        var worked = verbs.Scenes.SelectMany(s => s.stages).Where(st => st.gate == HavenPlaceVerbs.Gate.QuestDone && st.dressing != null && st.smokeRise >= 0f
-            && verbs.Finds.Any(f => f.quest == st.quest && f.everyDays > 0)).ToList();
-        Assert.GreaterOrEqual(worked.Count, 3, "the quarry, Asa's field, the fishers' rest");
+        // A worked place: a stage a quest's end stands, where a yield of that same quest is taken every few days.
+        var worked = verbs.Scenes.SelectMany(s => s.stages).Where(st => st.gate == HavenPlaceVerbs.Gate.QuestDone && st.dressing != null && st.worker != null).ToList();
+        Assert.GreaterOrEqual(worked.Count, 4, "the clamp, the quarry, Asa's field, the fishers' rest, the spring");
+        foreach (HavenPlaceVerbs.Find yield in verbs.Finds.Where(f => f.everyDays > 0 && f.gate == HavenPlaceVerbs.Gate.QuestDone))
+        {
+            HavenPlaceVerbs.PlaceScene scene = verbs.SceneOf(yield.placeId);
+            Assert.IsTrue(scene != null && scene.stages.Any(st => st.quest == yield.quest && st.worker != null)
+                          || yield.quest.name == "EastwoodRemembered", $"{yield.name}: a yield at a place nobody works");
+        }
         foreach (HavenPlaceVerbs.Stage stage in worked)
         {
             Assert.IsNotNull(stage.worker, $"{stage.note}: somebody from home works it");
@@ -79,6 +85,73 @@ public sealed class HavenLifeTests
         Assert.That(quiet, Is.InRange(30, 110), "about a third of the spans are quiet");
         Assert.AreEqual(settings.Happenings.Count, seen.Count, "every happening comes round");
         Assert.IsNull(settings.Pick(5, h => false), "nothing possible: a quiet span");
+    }
+
+    [Test]
+    public void ASpansHappening_StaysWhatWasTold_WhateverChangesInIt()
+    {
+        HavenHappenings settings = Happenings;
+        var journal = new CharacterProgress().Journal;
+        int span = Enumerable.Range(0, 400).First(s => settings.Pick(s, null) != null && settings.Pick(s, h => h.id != settings.Pick(s, null).id) != null);
+        HavenHappenings.Happening told = settings.Now(span, journal, null);
+        Assert.IsNotNull(told);
+        // Something remembered mid-span would draw another now: the span keeps the one it had.
+        Assert.AreSame(told, settings.Now(span, journal, h => h != told), "what the card told stands all through its span");
+        HavenHappenings.Happening next = settings.Now(span + 1, journal, null);
+        Assert.AreNotSame(told, next, "never the same twice running, as it was had");
+        Assert.IsNull(settings.Pick(5, h => false), "nothing possible: a quiet span");
+    }
+
+    [Test]
+    public void AYield_BuildsUp_ForAFewSpans_AndIsTakenTogether()
+    {
+        var place = new WorldAtlas.Place { id = "test.place" };
+        var item = ScriptableObject.CreateInstance<ItemDefinition>();
+        try
+        {
+            var used = new HashSet<string>();
+            var yield = new HavenPlaceVerbs.Find { placeId = place.id, name = "Yield", item = item, everyDays = 2, keepsSpans = 3 };
+            Assert.AreEqual(3, PlaceFind.Waiting(place, yield, 10, used.Contains), "days 6-11 untaken: three spans' worth wait (no more)");
+            for (int span = 3; span <= 5; span++)
+            {
+                used.Add(PlaceFind.KeyOf(place, yield, span * 2));
+            }
+
+            Assert.AreEqual(0, PlaceFind.Waiting(place, yield, 11, used.Contains), "all taken this span");
+            Assert.AreEqual(1, PlaceFind.Waiting(place, yield, 12, used.Contains), "one span on, one span's worth");
+
+            var lantern = new HavenPlaceVerbs.Find { placeId = place.id, name = "Lantern" };
+            Assert.AreEqual(1, PlaceFind.Waiting(place, lantern, 0, used.Contains));
+            used.Add(PlaceFind.KeyOf(place, lantern, 0));
+            Assert.AreEqual(0, PlaceFind.Waiting(place, lantern, 50, used.Contains), "a thing used stays used");
+        }
+        finally
+        {
+            Object.DestroyImmediate(item);
+        }
+    }
+
+    [Test]
+    public void AStoneAnArcAsksFor_LightsWithoutARune_AndOneAlreadyLitCounts()
+    {
+        GameSession.StartNewGame();
+        try
+        {
+            var end = AssetDatabase.LoadAssetAtPath<QuestDefinition>("Assets/_Project/Data/Quests/RavenwoodRemembered.asset");
+            Assert.IsFalse(Territory.AnArcAsks("Ravenwood"), "before the errand, the stone wants its rune as ever");
+            GameSession.Quests.TryStart(end, true);
+            Assert.IsTrue(Territory.AnArcAsks("Ravenwood"), "the errand asks for it");
+            Assert.IsFalse(Territory.AnArcAsks("Stillwater"), "and for no other region's");
+
+            QuestObjective light = end.Objectives.Last();
+            Assert.AreEqual(0, light.Owned(null, GameSession.Quests), "not lit yet");
+            GameSession.Here.Territory.Claim("Ravenwood", TerritorySettings.Current);
+            Assert.AreEqual(1, light.Owned(null, GameSession.Quests), "lit before the quest (or in an older save) counts as lit");
+        }
+        finally
+        {
+            GameSession.StartNewGame();
+        }
     }
 
     [Test]

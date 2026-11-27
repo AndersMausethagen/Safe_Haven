@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: marksfortheway
   displayName: Marks for the Way
-  description: Runa found cairns on the bare knolls of Westwood, a line of them, built by people who walked between the boundary stones. Each wants a stone added by whoever passes, she says, or the way forgets itself.
+  description: 'Runa knows the cairns on Westwood''s knolls: she walked them once for a man in grey, counting stones. Now she wants each to have one more from home, or the way forgets itself.'
   chain: Runa
-  journalNotes: The Lookout Cairn and the Raven Cairn stand on the knolls of Westwood, far west of the portal.
-  rank: 4
+  journalNotes: The Lookout Cairn and the Raven Cairn stand on the knolls of Westwood, about 450 m west-south-west of the portal.
+  rank: 1
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
@@ -26,7 +26,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 336ec86166557214baa58cda9d5a9f91, type: 2}
   - {fileID: 11400000, guid: bd7dd70969be8174c8acfefd449bf963, type: 2}
   startedFirst: []
-  start: 0
+  start: 2
   startEvent: {fileID: 0}
   startWhen:
     type: 0
@@ -62,32 +62,6 @@ MonoBehaviour:
   onStarted: []
   objectivesInOrder: 1
   objectives:
-  - type: 9
-    description: Ask Runa about the cairn line
-    amount: 1
-    item: {fileID: 0}
-    resource: {fileID: 0}
-    monster: {fileID: 0}
-    faction: 0
-    building: {fileID: 0}
-    raid: {fileID: 0}
-    mustExtract: 0
-    withinMinutes: 0
-    questEvent: {fileID: 0}
-    person: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
-    target: {fileID: 0}
-    job: {fileID: 0}
-    breach: {fileID: 0}
-    rank: 0
-    tier: 0
-    bringHome: 0
-    countAlreadyOwned: 0
-    enchantment: {fileID: 0}
-    greatOnly: 0
-    onlySource: 0
-    source: 0
-    otherPerson: {fileID: 0}
-    mark: {fileID: 0}
   - type: 11
     description: Add a stone to the Lookout Cairn
     amount: 1

@@ -53,7 +53,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
   favouriteDish: {fileID: 11400000, guid: 991a6891d6fa5cf45a18629d3d7b1df4, type: 2}
   homeLiking:
-    resident: {fileID: 0}
+    resident: {fileID: 11400000}
     likes: Warm
     line: '"A smith''s bones like a warm house. The forge is warm enough by day."'
     thanks: '"Warm through, for once. My bones thank you before I do."'
@@ -85,3 +85,16 @@ MonoBehaviour:
     askText: 
     thanksText: 
   questLineDone: 
+  sideQuests:
+  - quest: {fileID: 11400000, guid: ddec661597421b24185a35a14896a28c, type: 2}
+    text: My grandfather cut stone before he ever worked iron. The boundary stones came out of a quarry in Ravenwood, he said, north of here, and the masons cut more than names into them. They left one half done. Take two ingots of copper for wedges, and finish it.
+    acceptText: I'll take the wedges.
+    waitingText: The Old Quarry, north. Two copper ingots for the wedges, and the stone they never finished.
+    askText: Where were the pact stones cut?
+    thanksText: 
+  - quest: {fileID: 11400000, guid: e4198f41e072322478873d87c9852ccc, type: 2}
+    text: 
+    acceptText: I'll do it.
+    waitingText: Light Ravenwood's stone. It stands by the path through the wood.
+    askText: 
+    thanksText: Ravenwood again. I'll go up of an evening and cut what they started. Iron can wait an hour.

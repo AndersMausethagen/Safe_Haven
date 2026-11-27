@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: smokeinthegreypines
   displayName: Smoke in the Grey Pines
-  description: 'Ingrid''s still wants a steady fire, and charcoal burns steadier than wood. The portal remembers who kept the old hearth fed: charcoal burners in the Grey Pines, west of the quarry road. Their last clamp was nearly done when they left. Light it again, and the Haven has charcoal of its own.'
+  description: 'Ingrid wants a steadier fire under her still, and charcoal burns steadier than wood. The portal remembers who kept the old hearth fed: charcoal burners in the Grey Pines, west of the quarry road. Their last clamp was nearly done when they left. Light it again, and the Haven has charcoal of its own.'
   chain: Ingrid
-  journalNotes: 'The Charcoal Camp lies about 220 m north-west of the portal, in the Grey Pines. A lit clamp smokes for days: from the meadows you will see where it is.'
+  journalNotes: The Charcoal Camp lies about 220 m north-west of the portal, in the Grey Pines, west of the quarry road. Lit, the clamp smokes for days.
   rank: 4
   availableObjective: 
   announceStart: 1

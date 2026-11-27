@@ -53,7 +53,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c7138267f80f6644fb98ef1cc46e7dab, type: 2}
   favouriteDish: {fileID: 11400000, guid: a8a861b083501ca4b9075a3301be4179, type: 2}
   homeLiking:
-    resident: {fileID: 0}
+    resident: {fileID: 11400000}
     likes: A place to sit
     line: '"Somewhere to sit and read the stones."'
     thanks: '"Somewhere to sit. The stones read better when my feet are still."'
@@ -73,3 +73,16 @@ MonoBehaviour:
     askText: 
     thanksText: 
   questLineDone: 
+  sideQuests:
+  - quest: {fileID: 11400000, guid: 8de6b00eb89a80440b18cba9f68d6638, type: 2}
+    text: 'Every rune you bring home is about the pact, and not one says what it was. The standing stones in Eastwood would. Whoever first made it, the Haven swore to it there. They read only by starlight, and cold stone wants warming: take a Hearth Ember.'
+    acceptText: I'll read them.
+    waitingText: North-east, in Eastwood. After dark, with a Hearth Ember.
+    askText: What did the pact say?
+    thanksText: 
+  - quest: {fileID: 11400000, guid: 8f16e042b4be01943ae65daf63d8e29c, type: 2}
+    text: 
+    acceptText: I'll do it.
+    waitingText: Light Eastwood's stone. I want to read them myself, of an evening.
+    askText: 
+    thanksText: Keep the fire, and the wood keeps faith. I'll cut a rune at the stones now and then. They'll know what it's for.

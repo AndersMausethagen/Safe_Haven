@@ -31,7 +31,7 @@ MonoBehaviour:
     stoneTarget: {fileID: 11400000, guid: b265db54845efbc479e942b79441afd0, type: 2}
   - region: The Hollow Pines
     ring: 1
-    filter: {r: 1.05, g: 1, b: 0.91, a: 1}
+    filter: {r: 1.04, g: 0.97, b: 0.88, a: 1}
     mistTint: {r: 0.93, g: 0.9, b: 0.84, a: 1}
     forgottenMist: 1.2
     forgottenFloor: 0.35
@@ -39,7 +39,7 @@ MonoBehaviour:
     stoneTarget: {fileID: 11400000, guid: db0307d90369db44cb74c439d013527c, type: 2}
   - region: Ravenwood
     ring: 1
-    filter: {r: 0.93, g: 0.95, b: 1.04, a: 1}
+    filter: {r: 0.88, g: 0.93, b: 1.08, a: 1}
     mistTint: {r: 0.79, g: 0.83, b: 0.91, a: 1}
     forgottenMist: 1.2
     forgottenFloor: 0.35

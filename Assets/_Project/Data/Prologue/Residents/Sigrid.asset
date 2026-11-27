@@ -73,7 +73,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
   favouriteDish: {fileID: 11400000, guid: 4f0ad2fc96d35f9458f41cc859ab82a9, type: 2}
   homeLiking:
-    resident: {fileID: 0}
+    resident: {fileID: 11400000}
     likes: Lit lane
     line: '"Light on the lanes. People should see their way home."'
     thanks: '"Light on the lanes. People find their way home now. So do I."'
@@ -93,3 +93,16 @@ MonoBehaviour:
     askText: 
     thanksText: 
   questLineDone: 
+  sideQuests:
+  - quest: {fileID: 11400000, guid: d1ae8213d90f5bc4a9797e93484eefb2, type: 2}
+    text: I led us north because I'd read of a road out of the Haven that the old ones took. It began at the Farewell Stones in Greyfell, I think, and whoever left by it cut their names there. Read them. Then cut ours under them.
+    acceptText: I'll cut them.
+    waitingText: North-west, in Greyfell. Read their names, then cut ours under them.
+    askText: Where did the road north begin?
+    thanksText: 
+  - quest: {fileID: 11400000, guid: 6717aefd0b55c0c499b47ee9c39ce066, type: 2}
+    text: 
+    acceptText: I'll do it.
+    waitingText: Light Greyfell's stone. The road starts at home again.
+    askText: 
+    thanksText: Our names under theirs. Whoever comes after will know we went, and that we came back.

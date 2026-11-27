@@ -196,6 +196,7 @@ MonoBehaviour:
     gate: 0
     quest: {fileID: 0}
     everyDays: 0
+    keepsSpans: 3
     when: 0
     costItem: {fileID: 0}
     costAmount: 1
@@ -213,6 +214,7 @@ MonoBehaviour:
     gate: 0
     quest: {fileID: 0}
     everyDays: 0
+    keepsSpans: 3
     when: 0
     costItem: {fileID: 0}
     costAmount: 1
@@ -230,6 +232,7 @@ MonoBehaviour:
     gate: 1
     quest: {fileID: 11400000, guid: 3c76010d130fc6a4e9f113f148b849ef, type: 2}
     everyDays: 0
+    keepsSpans: 3
     when: 0
     costItem: {fileID: 0}
     costAmount: 1
@@ -240,22 +243,23 @@ MonoBehaviour:
     amount: 5
     taken: Still warm. The clamp will have more in a day or two.
     offset: {x: 6, y: 0.5}
-    marker: {fileID: 0}
-    markerScale: 1
+    marker: {fileID: 6981668497946017043, guid: 6248fb1c4436a624ba51d40dc5f81593, type: 3}
+    markerScale: 0.6
     markerTurn: 20
     questTarget: {fileID: 0}
     gate: 2
     quest: {fileID: 11400000, guid: 3c76010d130fc6a4e9f113f148b849ef, type: 2}
     everyDays: 2
+    keepsSpans: 3
     when: 0
     costItem: {fileID: 0}
     costAmount: 1
   - placeId: haven.old_quarry.0
     name: The half-cut stone
-    verb: Read the marks
+    verb: Drive the wedges
     item: {fileID: 0}
     amount: 1
-    taken: The pact's marks, cut half-way into the stone. They stopped in the middle of a word.
+    taken: The wedges bite, and the stone splits clean along the masons' line. The word they stopped in the middle of still waits for its end, but the stone is ready.
     offset: {x: 9.5, y: 3}
     marker: {fileID: 1987186056636952893, guid: 9c63895aedf974b41ac19d55902cc357, type: 3}
     markerScale: 1
@@ -264,9 +268,10 @@ MonoBehaviour:
     gate: 1
     quest: {fileID: 11400000, guid: ddec661597421b24185a35a14896a28c, type: 2}
     everyDays: 0
+    keepsSpans: 3
     when: 0
-    costItem: {fileID: 0}
-    costAmount: 1
+    costItem: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
+    costAmount: 2
   - placeId: haven.old_quarry.0
     name: Squared stone
     verb: Take
@@ -274,13 +279,14 @@ MonoBehaviour:
     amount: 3
     taken: Squared and stacked. The quarry will have more in a few days.
     offset: {x: -10, y: -1.5}
-    marker: {fileID: 0}
+    marker: {fileID: 231233657689741705, guid: 58a01be98be75814faad36567695cb27, type: 3}
     markerScale: 1
     markerTurn: 0
     questTarget: {fileID: 0}
     gate: 2
     quest: {fileID: 11400000, guid: e4198f41e072322478873d87c9852ccc, type: 2}
     everyDays: 3
+    keepsSpans: 3
     when: 0
     costItem: {fileID: 0}
     costAmount: 1
@@ -298,23 +304,25 @@ MonoBehaviour:
     gate: 1
     quest: {fileID: 11400000, guid: 53e34a73f89dac640ab91738fbc66874, type: 2}
     everyDays: 0
+    keepsSpans: 3
     when: 0
     costItem: {fileID: 0}
     costAmount: 1
   - placeId: haven.burnt_farmstead.0
-    name: A child's sling
-    verb: Take
-    item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
+    name: A dropped pail
+    verb: Look
+    item: {fileID: 0}
     amount: 1
-    taken: A child's sling of nettle cord, dropped where the fence runs out. They went this way.
+    taken: A pail from the farm, dropped where the fence runs out, a child's sling still knotted to its handle. They went this way.
     offset: {x: 27, y: -7.5}
-    marker: {fileID: 0}
-    markerScale: 1
+    marker: {fileID: 6636398860116550178, guid: 51ca6153c8697d84398f230f8cb78295, type: 3}
+    markerScale: 0.9
     markerTurn: 0
     questTarget: {fileID: 11400000, guid: 9a7bc0505447a724681b786d3db2d627, type: 2}
     gate: 1
     quest: {fileID: 11400000, guid: c02abb0f34687e841b484a01d52b7be5, type: 2}
     everyDays: 0
+    keepsSpans: 3
     when: 0
     costItem: {fileID: 0}
     costAmount: 1
@@ -325,13 +333,14 @@ MonoBehaviour:
     amount: 1
     taken: Asa's field gives back the family's seed. More in a few days.
     offset: {x: -12, y: 2.5}
-    marker: {fileID: 0}
+    marker: {fileID: 6636398860116550178, guid: 51ca6153c8697d84398f230f8cb78295, type: 3}
     markerScale: 1
     markerTurn: 0
     questTarget: {fileID: 0}
     gate: 2
     quest: {fileID: 11400000, guid: 7fd51412ce7494e4394efdf6c6ebd5a6, type: 2}
     everyDays: 3
+    keepsSpans: 3
     when: 0
     costItem: {fileID: 0}
     costAmount: 1
@@ -349,6 +358,7 @@ MonoBehaviour:
     gate: 1
     quest: {fileID: 11400000, guid: cf2545313771e9a4288fcb71d5a9f678, type: 2}
     everyDays: 0
+    keepsSpans: 3
     when: 0
     costItem: {fileID: 0}
     costAmount: 1
@@ -366,32 +376,34 @@ MonoBehaviour:
     gate: 1
     quest: {fileID: 11400000, guid: d4977cc14786c464184618e1aba5cfa8, type: 2}
     everyDays: 0
+    keepsSpans: 3
     when: 2
     costItem: {fileID: 0}
     costAmount: 1
   - placeId: haven.fisher_s_rest.0
-    name: Smoked fish
+    name: Fish from the rest
     verb: Take
     item: {fileID: 11400000, guid: 1deba4cfdd0cc854ba9f9d3fa96aacd9, type: 2}
     amount: 2
-    taken: Smoked through. The rest will have more in a day or two.
+    taken: Fish from the racks. The rest will have more in a day or two.
     offset: {x: -6, y: -1}
-    marker: {fileID: 0}
-    markerScale: 1
+    marker: {fileID: 5195330831412958856, guid: 3d48ccf9ae3e04b4c8f9bec524e6fe0b, type: 3}
+    markerScale: 0.8
     markerTurn: 0
     questTarget: {fileID: 0}
     gate: 2
     quest: {fileID: 11400000, guid: c4c19733c3b2411499cb991d0c3f3788, type: 2}
     everyDays: 2
+    keepsSpans: 3
     when: 0
     costItem: {fileID: 0}
     costAmount: 1
   - placeId: haven.standing_stones.0
     name: The pact's words
-    verb: Read by starlight
+    verb: Set the ember, and read
     item: {fileID: 0}
     amount: 1
-    taken: 'By starlight the cuts fill with frost and read: keep the fire, and the wood keeps faith. Let it go cold, and it takes back what it gave.'
+    taken: 'The ember takes in the cold ring. Something like breath goes through the stones, and frost fills the cuts: keep the fire, and the wood keeps faith. Let it go cold, and it takes back what it gave.'
     offset: {x: 5, y: -3}
     marker: {fileID: 1987186056636952893, guid: 9c63895aedf974b41ac19d55902cc357, type: 3}
     markerScale: 0.7
@@ -400,8 +412,9 @@ MonoBehaviour:
     gate: 1
     quest: {fileID: 11400000, guid: 8de6b00eb89a80440b18cba9f68d6638, type: 2}
     everyDays: 0
+    keepsSpans: 3
     when: 2
-    costItem: {fileID: 0}
+    costItem: {fileID: 11400000, guid: 3bc5c06eef042084b9fc28865091670b, type: 2}
     costAmount: 1
   - placeId: haven.ruined_watchtower.0
     name: The watch's last tally
@@ -417,6 +430,7 @@ MonoBehaviour:
     gate: 1
     quest: {fileID: 11400000, guid: 70d1495488c1f1343bba03ac7eedce1d, type: 2}
     everyDays: 0
+    keepsSpans: 3
     when: 0
     costItem: {fileID: 0}
     costAmount: 1
@@ -434,6 +448,7 @@ MonoBehaviour:
     gate: 1
     quest: {fileID: 11400000, guid: 368885b39fb47ac438073d5978b8c2ab, type: 2}
     everyDays: 0
+    keepsSpans: 3
     when: 0
     costItem: {fileID: 0}
     costAmount: 1
@@ -442,7 +457,7 @@ MonoBehaviour:
     verb: Add a stone
     item: {fileID: 0}
     amount: 1
-    taken: One more stone on the cairn. From here the next one shows on the skyline.
+    taken: One more stone on the cairn. From here the old way runs on to the next lit stone.
     offset: {x: 3, y: -2}
     marker: {fileID: 5599622994095362584, guid: b670b983db86e784c96b2642a11d6a46, type: 3}
     markerScale: 0.5
@@ -451,6 +466,7 @@ MonoBehaviour:
     gate: 1
     quest: {fileID: 11400000, guid: 368885b39fb47ac438073d5978b8c2ab, type: 2}
     everyDays: 0
+    keepsSpans: 3
     when: 0
     costItem: {fileID: 0}
     costAmount: 1
@@ -468,6 +484,7 @@ MonoBehaviour:
     gate: 1
     quest: {fileID: 11400000, guid: d24516d183974e244b5c643e63b34347, type: 2}
     everyDays: 0
+    keepsSpans: 3
     when: 0
     costItem: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
     costAmount: 8
@@ -485,6 +502,7 @@ MonoBehaviour:
     gate: 1
     quest: {fileID: 11400000, guid: d1ae8213d90f5bc4a9797e93484eefb2, type: 2}
     everyDays: 0
+    keepsSpans: 3
     when: 0
     costItem: {fileID: 0}
     costAmount: 1
@@ -493,7 +511,7 @@ MonoBehaviour:
     verb: Look into the tarn
     item: {fileID: 0}
     amount: 1
-    taken: The tarn shows a man in grey at this shrine, years ago, with a lantern and no fire behind him. The winter's mist had taken his wife and his child, and he asked the tarn for a door to them. The hearth below went cold while he was gone, and the pact with it. He is looking still.
+    taken: A man in grey at this shrine, a hundred winters gone, with a lantern and no fire behind him. The winter's mist had taken his wife and child, and he asked the tarn for a door to them. It gave him the wrong one. The hunger came through, and the hearth below went cold. He is looking still.
     offset: {x: 0, y: -3}
     marker: {fileID: 7115005062286561332, guid: 8ea1636a9e145c14daea56dafda6919e, type: 3}
     markerScale: 0.7
@@ -502,15 +520,16 @@ MonoBehaviour:
     gate: 1
     quest: {fileID: 11400000, guid: 1367dde89e95d714bbac19728a1bc16e, type: 2}
     everyDays: 0
+    keepsSpans: 3
     when: 2
     costItem: {fileID: 0}
     costAmount: 1
   - placeId: haven.old_barrow.0
     name: The barrow stone
-    verb: Cut their names
+    verb: Cut their marks
     item: {fileID: 0}
     amount: 1
-    taken: Two names, and his under them. Whatever he opens, they're remembered here.
+    taken: 'No names: the tarn never gave them. A small horse, and a bear beside it, the way she would have drawn him.'
     offset: {x: 4, y: 0}
     marker: {fileID: 1987186056636952893, guid: 9c63895aedf974b41ac19d55902cc357, type: 3}
     markerScale: 0.8
@@ -519,6 +538,97 @@ MonoBehaviour:
     gate: 1
     quest: {fileID: 11400000, guid: 95be29b0e6fb030498e96b32f6d73aea, type: 2}
     everyDays: 0
+    keepsSpans: 3
+    when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
+  - placeId: haven.standing_stones.0
+    name: Liv's cut rune
+    verb: Take
+    item: {fileID: 11400000, guid: c9c58cc9c8a25eb4787a64e96598e266, type: 2}
+    amount: 1
+    taken: Liv's rune, cut fresh and left in the ring for whoever lights the next stone.
+    offset: {x: 3, y: -1}
+    marker: {fileID: 0}
+    markerScale: 1
+    markerTurn: 20
+    questTarget: {fileID: 0}
+    gate: 2
+    quest: {fileID: 11400000, guid: 8f16e042b4be01943ae65daf63d8e29c, type: 2}
+    everyDays: 5
+    keepsSpans: 1
+    when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
+  - placeId: haven.authored.familys_grave
+    name: The grave's hurdle
+    verb: Mend the hurdle
+    item: {fileID: 0}
+    amount: 1
+    taken: The hurdle stands again. The animals will leave them be.
+    offset: {x: -2.1, y: 0}
+    marker: {fileID: 1162556612447548530, guid: 218a65df27c7de24aa30219b3f2e2b37, type: 3}
+    markerScale: 0.7
+    markerTurn: 20
+    questTarget: {fileID: 11400000, guid: 65cb62189f77c914a91f889ebc3e05be, type: 2}
+    gate: 1
+    quest: {fileID: 11400000, guid: c02abb0f34687e841b484a01d52b7be5, type: 2}
+    everyDays: 0
+    keepsSpans: 3
+    when: 0
+    costItem: {fileID: 11400000, guid: c956d596285633041bd09bc7627a0b3d, type: 2}
+    costAmount: 2
+  - placeId: haven.wayfarer_s_stones.3
+    name: Room under their names
+    verb: Cut the expedition's names
+    item: {fileID: 0}
+    amount: 1
+    taken: 'Sigrid''s name, and the six who came home with her, under theirs. Shallow, as theirs was last: there wasn''t time either.'
+    offset: {x: 4.5, y: 0.5}
+    marker: {fileID: 1987186056636952893, guid: 9c63895aedf974b41ac19d55902cc357, type: 3}
+    markerScale: 0.5
+    markerTurn: 20
+    questTarget: {fileID: 11400000, guid: 1ac9f1f81f6210045b83d37702d4d55b, type: 2}
+    gate: 1
+    quest: {fileID: 11400000, guid: d1ae8213d90f5bc4a9797e93484eefb2, type: 2}
+    everyDays: 0
+    keepsSpans: 3
+    when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
+  - placeId: haven.authored.alder_spring
+    name: The choked spring
+    verb: Clear the spring
+    item: {fileID: 0}
+    amount: 1
+    taken: Silt, leaves, a fallen stone. Under them the water still comes, cold, and finds its basin.
+    offset: {x: 0, y: -1.2}
+    marker: {fileID: 5599622994095362584, guid: b670b983db86e784c96b2642a11d6a46, type: 3}
+    markerScale: 0.4
+    markerTurn: 20
+    questTarget: {fileID: 11400000, guid: 2552ed554cfe53f46ad48d79d423336c, type: 2}
+    gate: 1
+    quest: {fileID: 11400000, guid: b18a3c8b43f9b3a4990309ba133a064e, type: 2}
+    everyDays: 0
+    keepsSpans: 3
+    when: 0
+    costItem: {fileID: 0}
+    costAmount: 1
+  - placeId: haven.authored.alder_spring
+    name: Herbs from the spring bed
+    verb: Take
+    item: {fileID: 11400000, guid: 7e57bf86766de2341bd9c47b5830cf76, type: 2}
+    amount: 2
+    taken: From the healer's bed. It grows back by the water.
+    offset: {x: -4, y: 0}
+    marker: {fileID: 6636398860116550178, guid: 51ca6153c8697d84398f230f8cb78295, type: 3}
+    markerScale: 0.8
+    markerTurn: 20
+    questTarget: {fileID: 0}
+    gate: 2
+    quest: {fileID: 11400000, guid: 1b1c4b2ae46df3d43b5242e9630da8bf, type: 2}
+    everyDays: 3
+    keepsSpans: 3
     when: 0
     costItem: {fileID: 0}
     costAmount: 1
@@ -547,12 +657,29 @@ MonoBehaviour:
     target: {fileID: 11400000, guid: 883ff86eecaefeb48b21a8235bd0b337, type: 2}
   - placeId: haven.old_barrow.0
     target: {fileID: 11400000, guid: cd5d9928808463c46a5b6f353935cf4b, type: 2}
+  - placeId: haven.authored.alder_spring
+    target: {fileID: 11400000, guid: dbbc565077ae89647ba711e648dd51a6, type: 2}
   scenes:
   - placeId: haven.woodland_camp.2
     thoughts:
     - Turf stacked to dry, a rake left in the ash, a ring of black earth where a clamp burned. Charcoal burners worked here.
     - They kept the hearth in charcoal, the portal says, and were the last to leave. Somebody banked a clamp and meant to come back for it.
     stages:
+    - note: 'The burners'' camp: turf, the old clamp''s black ring, a rake.'
+      gate: 0
+      quest: {fileID: 0}
+      dressing: {fileID: 6066859025671619671, guid: 1a92d2ba29b9f8844bed6ddd9a804fb5, type: 3}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 0, y: 1.4, z: 0}
+      clearsMist: 0
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
     - note: 'The clamp lit again (Smoke in the Grey Pines): it smokes as the place comes into view, and from a lookout.'
       gate: 2
       quest: {fileID: 11400000, guid: 3c76010d130fc6a4e9f113f148b849ef, type: 2}
@@ -568,6 +695,21 @@ MonoBehaviour:
       worker: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
       workHours: {x: 18, y: 21.5}
       workAt: {x: -2, y: -1.5}
+      creature: {fileID: 0}
+    - note: The mist held back round the errand's place while it is under way.
+      gate: 1
+      quest: {fileID: 11400000, guid: 3c76010d130fc6a4e9f113f148b849ef, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 0, y: 1.4, z: 0}
+      clearsMist: 0.65
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
       creature: {fileID: 0}
   - placeId: haven.burnt_farmstead.0
     thoughts: []
@@ -603,6 +745,51 @@ MonoBehaviour:
       workHours: {x: 18, y: 21.5}
       workAt: {x: 0, y: -1.5}
       creature: {fileID: 0}
+    - note: The mist held back round the errand's place while it is under way.
+      gate: 1
+      quest: {fileID: 11400000, guid: 53e34a73f89dac640ab91738fbc66874, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 1.1, y: 0.6, z: 1.8}
+      clearsMist: 0.65
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
+    - note: Asa's furrows inside the hurdles.
+      gate: 2
+      quest: {fileID: 11400000, guid: 7fd51412ce7494e4394efdf6c6ebd5a6, type: 2}
+      dressing: {fileID: 4615467086121003151, guid: 3429a533fd68aca40a2103a127b938cc, type: 3}
+      offset: {x: -12, y: 6}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 1.1, y: 0.6, z: 1.8}
+      clearsMist: 0
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
+    - note: 'The family''s trail: what they dropped toward the grave.'
+      gate: 1
+      quest: {fileID: 11400000, guid: c02abb0f34687e841b484a01d52b7be5, type: 2}
+      dressing: {fileID: 656933193661925639, guid: cd82577673d5e084ca2ef0945a84e723, type: 3}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 1.1, y: 0.6, z: 1.8}
+      clearsMist: 0
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
   - placeId: haven.authored.familys_grave
     thoughts: []
     stages:
@@ -624,7 +811,7 @@ MonoBehaviour:
     - note: 'The family found: the grave tended.'
       gate: 2
       quest: {fileID: 11400000, guid: c02abb0f34687e841b484a01d52b7be5, type: 2}
-      dressing: {fileID: 0}
+      dressing: {fileID: 603679530481000017, guid: 861e350f6a06c5342818991ac60726ab, type: 3}
       offset: {x: 0, y: 0}
       turn: 0
       thoughts:
@@ -635,6 +822,21 @@ MonoBehaviour:
       hidesEarlier: 0
       worker: {fileID: 0}
       workHours: {x: 14, y: 18}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
+    - note: The mist held back round the errand's place while it is under way.
+      gate: 1
+      quest: {fileID: 11400000, guid: c02abb0f34687e841b484a01d52b7be5, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 1.1, y: 0.6, z: 1.8}
+      clearsMist: 0.65
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
       workAt: {x: 1.5, y: -1.5}
       creature: {fileID: 0}
   - placeId: haven.authored.old_steading
@@ -673,6 +875,22 @@ MonoBehaviour:
       workHours: {x: 14, y: 18}
       workAt: {x: 1.5, y: -1.5}
       creature: {fileID: 0}
+    - note: 'Hightarn remembered: the long hearth laid again.'
+      gate: 2
+      quest: {fileID: 11400000, guid: 2ff21f94c2dcf4c4db8b14b299b0a393, type: 2}
+      dressing: {fileID: 1814963520539094420, guid: e57a98759f4b2e545b43a797a2a33fdb, type: 3}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts:
+      - Somebody has laid the long hearth again. Nobody says who.
+      smokeRise: 10
+      smokeAt: {x: 0, y: 0, z: 0}
+      clearsMist: 0
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
   - placeId: haven.authored.alder_spring
     thoughts: []
     stages:
@@ -689,6 +907,37 @@ MonoBehaviour:
       hidesEarlier: 0
       worker: {fileID: 0}
       workHours: {x: 14, y: 18}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
+    - note: The mist held back round the errand's place while it is under way.
+      gate: 1
+      quest: {fileID: 11400000, guid: b18a3c8b43f9b3a4990309ba133a064e, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0, z: 0}
+      clearsMist: 0.65
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
+    - note: 'Alder Mere remembered: the spring cleared, the beds weeded; Ingrid keeps them.'
+      gate: 2
+      quest: {fileID: 11400000, guid: 1b1c4b2ae46df3d43b5242e9630da8bf, type: 2}
+      dressing: {fileID: 161013860248868247, guid: abf251df18fc29a4188b2cb7c0f493e3, type: 3}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts:
+      - Water in the basin again, and the beds weeded. Ingrid comes up of an evening.
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0, z: 0}
+      clearsMist: 0
+      hidesEarlier: 0
+      worker: {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}
+      workHours: {x: 18, y: 21.5}
       workAt: {x: 1.5, y: -1.5}
       creature: {fileID: 0}
   - placeId: haven.authored.tarn_shrine
@@ -720,6 +969,21 @@ MonoBehaviour:
       smokeRise: 0
       smokeAt: {x: 0, y: 0.6, z: 0}
       clearsMist: 0
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
+    - note: The mist held back round the errand's place while it is under way.
+      gate: 1
+      quest: {fileID: 11400000, guid: 1367dde89e95d714bbac19728a1bc16e, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0.6, z: 0}
+      clearsMist: 0.7
       hidesEarlier: 0
       worker: {fileID: 0}
       workHours: {x: 18, y: 21.5}
@@ -759,6 +1023,21 @@ MonoBehaviour:
       workHours: {x: 18, y: 21.5}
       workAt: {x: 1.5, y: -1.5}
       creature: {fileID: 0}
+    - note: The mist held back round the errand's place while it is under way.
+      gate: 1
+      quest: {fileID: 11400000, guid: d24516d183974e244b5c643e63b34347, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0.6, z: 0}
+      clearsMist: 0.65
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
   - placeId: haven.old_quarry.0
     thoughts: []
     stages:
@@ -769,12 +1048,27 @@ MonoBehaviour:
       offset: {x: -11, y: -4}
       turn: 0
       thoughts:
-      - Fresh chips on the old ones. Somebody from home has been cutting here.
+      - Fresh chips on the old ones. Bjarne comes up of an evening to cut.
       smokeRise: 0
       smokeAt: {x: 1.1, y: 0.6, z: 1.8}
       clearsMist: 0
       hidesEarlier: 0
-      worker: {fileID: 11400000, guid: f8b63bb3e2db2fb44947d33b612f80f3, type: 2}
+      worker: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
+    - note: The mist held back round the errand's place while it is under way.
+      gate: 1
+      quest: {fileID: 11400000, guid: 2ced2e8962ea6a2418a4d88e23d6eb8d, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 1.1, y: 0.6, z: 1.8}
+      clearsMist: 0.65
+      hidesEarlier: 0
+      worker: {fileID: 0}
       workHours: {x: 18, y: 21.5}
       workAt: {x: 1.5, y: -1.5}
       creature: {fileID: 0}
@@ -793,9 +1087,24 @@ MonoBehaviour:
       smokeAt: {x: 1.1, y: 0.6, z: 1.8}
       clearsMist: 0
       hidesEarlier: 0
-      worker: {fileID: 11400000, guid: 9f83966b2e3c8fe42a58fd9d130cb08e, type: 2}
+      worker: {fileID: 11400000, guid: 15e2a45207d23dd49a4a3a93e8bb8161, type: 2}
       workHours: {x: 18, y: 21.5}
       workAt: {x: 1, y: -1.5}
+      creature: {fileID: 0}
+    - note: The mist held back round the errand's place while it is under way.
+      gate: 1
+      quest: {fileID: 11400000, guid: cf2545313771e9a4288fcb71d5a9f678, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 1.1, y: 0.6, z: 1.8}
+      clearsMist: 0.65
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
       creature: {fileID: 0}
   - placeId: haven.standing_stones.0
     thoughts: []
@@ -816,6 +1125,21 @@ MonoBehaviour:
       workHours: {x: 18, y: 21.5}
       workAt: {x: 1.5, y: -1.5}
       creature: {fileID: 0}
+    - note: The mist held back round the errand's place while it is under way.
+      gate: 1
+      quest: {fileID: 11400000, guid: 8de6b00eb89a80440b18cba9f68d6638, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0.6, z: 0}
+      clearsMist: 0.65
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
   - placeId: haven.wolf_den.0
     thoughts: []
     stages:
@@ -829,7 +1153,7 @@ MonoBehaviour:
       - Bones, old and new, and one set of tracks bigger than all the rest.
       smokeRise: 0
       smokeAt: {x: 0, y: 0.6, z: 0}
-      clearsMist: 0
+      clearsMist: 0.85
       hidesEarlier: 0
       worker: {fileID: 0}
       workHours: {x: 18, y: 21.5}
@@ -870,6 +1194,21 @@ MonoBehaviour:
       workHours: {x: 18, y: 21.5}
       workAt: {x: 1.5, y: -1.5}
       creature: {fileID: 0}
+    - note: The mist held back round the errand's place while it is under way.
+      gate: 1
+      quest: {fileID: 11400000, guid: 70d1495488c1f1343bba03ac7eedce1d, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0.6, z: 0}
+      clearsMist: 0.65
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
   - placeId: haven.lookout_cairn.1
     thoughts: []
     stages:
@@ -884,6 +1223,21 @@ MonoBehaviour:
       smokeRise: 0
       smokeAt: {x: 0, y: 0.6, z: 0}
       clearsMist: 0
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
+    - note: The mist held back round the errand's place while it is under way.
+      gate: 1
+      quest: {fileID: 11400000, guid: 368885b39fb47ac438073d5978b8c2ab, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0.6, z: 0}
+      clearsMist: 0.6
       hidesEarlier: 0
       worker: {fileID: 0}
       workHours: {x: 18, y: 21.5}
@@ -908,6 +1262,21 @@ MonoBehaviour:
       workHours: {x: 18, y: 21.5}
       workAt: {x: 1.5, y: -1.5}
       creature: {fileID: 0}
+    - note: The mist held back round the errand's place while it is under way.
+      gate: 1
+      quest: {fileID: 11400000, guid: d1ae8213d90f5bc4a9797e93484eefb2, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0.6, z: 0}
+      clearsMist: 0.6
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
   - placeId: haven.drowned_stones.0
     thoughts: []
     stages:
@@ -926,6 +1295,76 @@ MonoBehaviour:
       worker: {fileID: 0}
       workHours: {x: 0, y: 0}
       workAt: {x: 0, y: 0}
+      creature: {fileID: 0}
+  - placeId: haven.fisher_s_rest.1
+    thoughts: []
+    stages:
+    - note: The mist held back round the errand's place while it is under way.
+      gate: 1
+      quest: {fileID: 11400000, guid: d4977cc14786c464184618e1aba5cfa8, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0, z: 0}
+      clearsMist: 0.65
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
+  - placeId: haven.lookout_cairn.0
+    thoughts: []
+    stages:
+    - note: The mist held back round the errand's place while it is under way.
+      gate: 1
+      quest: {fileID: 11400000, guid: 368885b39fb47ac438073d5978b8c2ab, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0, z: 0}
+      clearsMist: 0.6
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
+  - placeId: haven.old_barrow.0
+    thoughts: []
+    stages:
+    - note: The mist held back round the errand's place while it is under way.
+      gate: 1
+      quest: {fileID: 11400000, guid: 95be29b0e6fb030498e96b32f6d73aea, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts: []
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0, z: 0}
+      clearsMist: 0.65
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
+      creature: {fileID: 0}
+    - note: 'Their marks cut: he came back once.'
+      gate: 2
+      quest: {fileID: 11400000, guid: 95be29b0e6fb030498e96b32f6d73aea, type: 2}
+      dressing: {fileID: 0}
+      offset: {x: 0, y: 0}
+      turn: 0
+      thoughts:
+      - 'He came back here once, I think: to the dead, and not to the fire.'
+      smokeRise: 0
+      smokeAt: {x: 0, y: 0, z: 0}
+      clearsMist: 0
+      hidesEarlier: 0
+      worker: {fileID: 0}
+      workHours: {x: 18, y: 21.5}
+      workAt: {x: 1.5, y: -1.5}
       creature: {fileID: 0}
   smoke: {fileID: 2100000, guid: e0dc5fdfe4f83b44294848291dbc9ed2, type: 2}
   lookoutReveal: 110

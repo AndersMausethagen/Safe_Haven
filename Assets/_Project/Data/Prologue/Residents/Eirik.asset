@@ -73,7 +73,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5148bc82bfb79f94ca5482ed8e4ea69f, type: 2}
   favouriteDish: {fileID: 11400000, guid: 8a7fa5a174b89fe4fa13218f49daa4d1, type: 2}
   homeLiking:
-    resident: {fileID: 0}
+    resident: {fileID: 11400000}
     likes: Lit lane
     line: '"A lit way home. I''ve seen what waits in the dark."'
     thanks: '"A lit way home. I walk it slower now, and that''s a good thing."'
@@ -105,3 +105,22 @@ MonoBehaviour:
     askText: 
     thanksText: 
   questLineDone: 
+  sideQuests:
+  - quest: {fileID: 11400000, guid: 70d1495488c1f1343bba03ac7eedce1d, type: 2}
+    text: A watch that leaves its post has a reason. The old tower stands on the edge of the Wolfwood, south-west past the fen. Find out what theirs was.
+    acceptText: I'll find out.
+    waitingText: The Ruined Watchtower, south-west. Read what they left by the door.
+    askText: Why did the Wolfwood's watch leave?
+    thanksText: 
+  - quest: {fileID: 11400000, guid: 60b5c903101d6e040bfc8b4625f143a7, type: 2}
+    text: 
+    acceptText: I'll do it.
+    waitingText: The den is north-east of the tower, back toward home. Bring the old one down. Come ready.
+    askText: 
+    thanksText: 
+  - quest: {fileID: 11400000, guid: d00d40fb8b8689542893e0fa2a427f62, type: 2}
+    text: 
+    acceptText: I'll do it.
+    waitingText: Light the Wolfwood's stone. Then I keep the watch out there.
+    askText: 
+    thanksText: The Old Grey. My grandfather would have stood a round for whoever did it. I'll keep the fire at the tower.

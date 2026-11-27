@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: wherethepactstoneswerecut
   displayName: Where the Pact Stones Were Cut
-  description: Bjarne's grandfather cut stone before he ever worked iron, and spoke of a quarry in Ravenwood where the pact's boundary stones were cut. Bjarne thinks the marks on them were more than names. Go and see what the masons left.
+  description: Bjarne's grandfather cut stone before he ever worked iron, and spoke of a quarry in Ravenwood where the pact's boundary stones were cut, more than names in them. Bjarne will lend his wedges if you take the copper for them.
   chain: Bjarne
-  journalNotes: The Old Quarry lies about 290 m north of the portal, in Ravenwood. The masons left in the middle of a day.
-  rank: 4
+  journalNotes: The Old Quarry lies about 290 m north of the portal, in Ravenwood. Bring 2 Copper Ingots for the wedges.
+  rank: 1
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
@@ -26,7 +26,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 26c34c56b5f966642ba1377c4e221cd7, type: 2}
   - {fileID: 11400000, guid: bb2c787a2de76634ba9260ee402850fc, type: 2}
   startedFirst: []
-  start: 0
+  start: 2
   startEvent: {fileID: 0}
   startWhen:
     type: 0
@@ -62,32 +62,6 @@ MonoBehaviour:
   onStarted: []
   objectivesInOrder: 1
   objectives:
-  - type: 9
-    description: Ask Bjarne about the pact stones
-    amount: 1
-    item: {fileID: 0}
-    resource: {fileID: 0}
-    monster: {fileID: 0}
-    faction: 0
-    building: {fileID: 0}
-    raid: {fileID: 0}
-    mustExtract: 0
-    withinMinutes: 0
-    questEvent: {fileID: 0}
-    person: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
-    target: {fileID: 0}
-    job: {fileID: 0}
-    breach: {fileID: 0}
-    rank: 0
-    tier: 0
-    bringHome: 0
-    countAlreadyOwned: 0
-    enchantment: {fileID: 0}
-    greatOnly: 0
-    onlySource: 0
-    source: 0
-    otherPerson: {fileID: 0}
-    mark: {fileID: 0}
   - type: 10
     description: Walk out to the Old Quarry in Ravenwood
     amount: 1
@@ -115,7 +89,7 @@ MonoBehaviour:
     otherPerson: {fileID: 0}
     mark: {fileID: 0}
   - type: 11
-    description: Read the marks on the half-cut stone
+    description: Drive Bjarne's wedges into the half-cut stone
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}

@@ -72,7 +72,8 @@ public sealed class HavenPlaceScenesTests
             Assert.IsTrue(ids.Contains(scene.placeId), $"{scene.placeId}: no such place");
             foreach (HavenPlaceVerbs.Stage stage in scene.stages)
             {
-                Assert.IsTrue(stage.dressing != null || stage.thoughts.Length > 0 || stage.smokeRise > 0f, $"{scene.placeId} {stage.note}: shows nothing");
+                Assert.IsTrue(stage.dressing != null || stage.thoughts.Length > 0 || stage.smokeRise > 0f || stage.clearsMist > 0f,
+                    $"{scene.placeId} {stage.note}: shows nothing");
                 if (stage.gate == HavenPlaceVerbs.Gate.QuestStarted || stage.gate == HavenPlaceVerbs.Gate.QuestDone)
                 {
                     Assert.IsNotNull(stage.quest, $"{scene.placeId} {stage.note}: waits on no quest, so it never shows");
@@ -119,6 +120,7 @@ public sealed class HavenPlaceScenesTests
     [TestCase("WhereThePactStonesWereCut", "RavenwoodRemembered", "Ravenwood", "TheColdStones", true)]
     [TestCase("AshesInTheHollowPines", "TheHollowPinesRemembered", "The Hollow Pines", "TheColdStones", true)]
     [TestCase("NetsAtTheFishersRest", "StillwaterRemembered", "Stillwater", "TheColdStones", true)]
+    [TestCase("TheHealersSpring", "AlderMereRemembered", "Alder Mere", "TheColdStones", true)]
     [TestCase("WhereThePactWasSworn", "EastwoodRemembered", "Eastwood", "TheRoadNorth", false)]
     [TestCase("TheWatchThatFled", "WolfwoodRemembered", "The Wolfwood", "TheRoadNorth", false)]
     [TestCase("MarksForTheWay", "WestwoodRemembered", "Westwood", "TheRoadNorth", false)]
@@ -128,9 +130,16 @@ public sealed class HavenPlaceScenesTests
     {
         var hook = AssetDatabase.LoadAssetAtPath<QuestDefinition>($"Assets/_Project/Data/Quests/{first}.asset");
         var end = AssetDatabase.LoadAssetAtPath<QuestDefinition>($"Assets/_Project/Data/Quests/{last}.asset");
-        Assert.IsTrue(hook.HeldForHomecoming, "the hook waits for a homecoming (Story Pacing: two at most)");
-        Assert.AreEqual(ObjectiveType.TalkTo, hook.Objectives[0].Type);
-        Assert.IsNotNull(hook.Objectives[0].Person, "someone home tells of the place");
+        // Someone home tells of the place in their own voice: a side quest of theirs, taken in talk (the quest review: they were mute),
+        // and the end is handed back to them, the payoff said at home.
+        ResidentDefinition teller = AssetDatabase.FindAssets("t:ResidentDefinition").Select(g => AssetDatabase.LoadAssetAtPath<ResidentDefinition>(AssetDatabase.GUIDToAssetPath(g)))
+            .SingleOrDefault(r => r.SideQuests.Any(o => o != null && o.Quest == hook));
+        Assert.IsNotNull(teller, $"{first}: no one home offers it");
+        QuestOffer offer = teller.SideQuests.First(o => o.Quest == hook);
+        Assert.AreEqual(QuestStart.ByQuestGiver, hook.Start, "taken from them in talk");
+        Assert.IsFalse(string.IsNullOrWhiteSpace(offer.Text) || string.IsNullOrWhiteSpace(offer.AskText), "the hook in their voice, and the question that asks for it");
+        QuestOffer back = teller.SideQuests.FirstOrDefault(o => o.Quest == end);
+        Assert.IsTrue(end.TurnInToGiver && back != null && !string.IsNullOrWhiteSpace(back.ThanksText), $"{last}: handed back to {teller.name}, who says something");
         Assert.That(hook.Prerequisites.Select(p => p.name), Does.Contain(opens), $"{region}'s ring opens with {opens}");
 
         // Walk the chain from the hook to the end: each quest follows the last, and every place and thing it asks for is there.
@@ -158,7 +167,7 @@ public sealed class HavenPlaceScenesTests
                 {
                     Assert.IsTrue(verbs.Targets.Any(t => t.target == step.Target), $"{quest.name}: no place counts as reaching {step.Target?.name}");
                 }
-                else if (step.Type == ObjectiveType.UseObject && step.Target != stone)
+                else if (step.Type == ObjectiveType.UseObject && step.Target != null && step.Target != stone)
                 {
                     HavenPlaceVerbs.Find thing = verbs.Finds.SingleOrDefault(f => f.questTarget == step.Target);
                     Assert.IsNotNull(thing, $"{quest.name}: nothing to use for {step.Target?.name}");

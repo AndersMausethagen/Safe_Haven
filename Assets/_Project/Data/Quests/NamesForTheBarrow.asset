@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: NamesForTheBarrow
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: namesforthebarrow
-  displayName: Names for the Barrow
-  description: The hearth's keeper left it to find his wife and child, and the hearth went cold behind him, and the pact with it. The man in grey has been opening doors for them ever since. Their names belong with the others in the Old Barrow, where the hearth-keepers lie.
-  chain: The Last Memory
-  journalNotes: The Old Barrow lies far south-west, in the Wolfwood.
-  rank: 4
+  displayName: Marks for the Barrow
+  description: The last keeper of the hearth left it to find his wife and child, and the door he opened let the hunger in. The Old Barrow, where the hearth-keepers lie, has no mark for them.
+  chain: The Hearth and the Door
+  journalNotes: The Old Barrow lies about 550 m south-west of the portal, beyond the watchtower, in the Wolfwood.
+  rank: 1
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
@@ -88,7 +88,7 @@ MonoBehaviour:
     otherPerson: {fileID: 0}
     mark: {fileID: 0}
   - type: 11
-    description: Cut their names on the barrow stone
+    description: Cut their marks on the barrow stone
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}

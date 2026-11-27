@@ -91,3 +91,16 @@ MonoBehaviour:
     askText: 
     thanksText: 
   questLineDone: 
+  sideQuests:
+  - quest: {fileID: 11400000, guid: d24516d183974e244b5c643e63b34347, type: 2}
+    text: There's a causeway sinking in the Drowning Fen, south, and good boards going to waste under it. Eight hardwood planks and it carries a cart again.
+    acceptText: I'll bring the planks.
+    waitingText: South, in the fen. Eight hardwood planks.
+    askText: The causeway in the fen?
+    thanksText: 
+  - quest: {fileID: 11400000, guid: d811f217b358d1f46ad557876fb4d667, type: 2}
+    text: 
+    acceptText: I'll do it.
+    waitingText: Light the fen's stone. A road is only a road if it's remembered.
+    askText: 
+    thanksText: Dry boards across the bog. Somebody will walk them who isn't running.

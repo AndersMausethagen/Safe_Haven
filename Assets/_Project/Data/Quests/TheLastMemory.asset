@@ -15,9 +15,9 @@ MonoBehaviour:
   id: thelastmemory
   displayName: The Last Memory
   description: 'The portal says there is one memory the forest kept back: who let the hearth go cold. It lies in the high tarn, and the tarn shows it only at night.'
-  chain: The Last Memory
-  journalNotes: The Tarn Shrine stands on the shore of the high tarn, north-east of the portal near the Old Quarry. Go after dark.
-  rank: 4
+  chain: The Hearth and the Door
+  journalNotes: The Tarn Shrine stands on the shore of the high tarn, about 290 m north-north-east of the portal, beside the Old Quarry. Go after dark.
+  rank: 1
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
@@ -58,7 +58,7 @@ MonoBehaviour:
   closedBy: {fileID: 0}
   startDelay: 0
   startsInAFight: 0
-  startsWithoutWaiting: 0
+  startsWithoutWaiting: 1
   onStarted: []
   objectivesInOrder: 1
   objectives:

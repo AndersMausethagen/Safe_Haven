@@ -36,6 +36,9 @@ public sealed class WorldAtlas : ScriptableObject
         [Tooltip("A place written by hand: metres of open ground kept round it, no terrain tree inside (HavenAuthoredClearings, and " +
                  "the world generator's Finish). The plan's places have their own clearing.")]
         public float clearing;
+        [Tooltip("A place written by hand near a region's border: the region it belongs to. The ground within twice its clearing counts " +
+                 "as that region (RegionAt), so its scene isn't half in the next one's look. Empty: as the grid says.")]
+        public string region;
     }
 
     [Tooltip("The ground it covers, world x and z: the scene's terrain.")]
@@ -97,6 +100,25 @@ public sealed class WorldAtlas : ScriptableObject
         if (gridSize <= 0 || area.width <= 0f)
         {
             return null;
+        }
+
+        // A place written by hand on a border keeps the ground round it in its own region.
+        foreach (Place written in authored)
+        {
+            if (written != null && !string.IsNullOrEmpty(written.region) && written.clearing > 0f)
+            {
+                float dx = world.x - written.at.x, dz = world.z - written.at.y, reach = written.clearing * 2f;
+                if (dx * dx + dz * dz <= reach * reach)
+                {
+                    foreach (Region own in regions)
+                    {
+                        if (own != null && own.name == written.region)
+                        {
+                            return own;
+                        }
+                    }
+                }
+            }
         }
 
         int x = Mathf.FloorToInt((world.x - area.xMin) / area.width * gridSize);

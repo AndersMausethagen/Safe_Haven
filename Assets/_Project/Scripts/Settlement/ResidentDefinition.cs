@@ -73,6 +73,10 @@ public sealed class ResidentDefinition : ScriptableObject, IQuestTarget
     [SerializeField] private QuestOffer[] questLine = new QuestOffer[0];
     [Tooltip("Said when the last of their quests is handed in.")]
     [SerializeField, TextArea] private string questLineDone;
+    [Tooltip("Quests they also have, each on its own beside their line, asked about in talk in any order (a QuestGiver's side offers): " +
+             "the region of the Haven's land they know (Docs/HavenWorldStory_2026-11-26.md step 5). The offer says the hook in their voice, " +
+             "the waiting line gives the way while it is under way, the thanks is said when its last quest is handed in to them.")]
+    [SerializeField] private QuestOffer[] sideQuests = new QuestOffer[0];
 
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string QuestId => Id;
@@ -88,6 +92,7 @@ public sealed class ResidentDefinition : ScriptableObject, IQuestTarget
     public CompanionDefinition RaidCompanion => raidCompanion;
     public System.Collections.Generic.IReadOnlyList<QuestOffer> QuestLine => questLine;
     public string QuestLineDone => questLineDone;
+    public System.Collections.Generic.IReadOnlyList<QuestOffer> SideQuests => sideQuests;
     public System.Collections.Generic.IReadOnlyList<CompanionMemoryLines> MemoryLines => memoryLines;
     public System.Collections.Generic.IReadOnlyList<CompanionMemoryLines> ReturningLines => returningLines;
     public JobDefinition[] Jobs => jobs;

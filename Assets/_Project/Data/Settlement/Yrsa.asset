@@ -53,7 +53,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 15d1c587fc1b8f34696d9b01c733b94e, type: 2}
   favouriteDish: {fileID: 11400000, guid: ab1d11a58572d62458740158da5361f4, type: 2}
   homeLiking:
-    resident: {fileID: 0}
+    resident: {fileID: 11400000}
     likes: Warm
     line: '"A warm hearth. A cook can''t abide a cold house."'
     thanks: '"A warm hearth. Come by later: the first loaf from it is yours."'
@@ -74,3 +74,22 @@ MonoBehaviour:
     askText: 
     thanksText: 
   questLineDone: 
+  sideQuests:
+  - quest: {fileID: 11400000, guid: cf2545313771e9a4288fcb71d5a9f678, type: 2}
+    text: A cook is only as good as her fish, and the old fishers of Stillwater were the best the Haven had. Their rest is still on the shore, east. Bring me their nets, and three fish from that water.
+    acceptText: I'll bring them.
+    waitingText: The Fisher's Rest, east, on the shore. Their nets, and three fish.
+    askText: Who fished Stillwater?
+    thanksText: 
+  - quest: {fileID: 11400000, guid: d4977cc14786c464184618e1aba5cfa8, type: 2}
+    text: 
+    acceptText: I'll do it.
+    waitingText: They lit a lantern for their dead at the Netmender's Rest, south of the other, so the dead could find the isle. Go after dark.
+    askText: 
+    thanksText: 
+  - quest: {fileID: 11400000, guid: c4c19733c3b2411499cb991d0c3f3788, type: 2}
+    text: 
+    acceptText: I'll do it.
+    waitingText: Light Stillwater's stone, and the rest is ours.
+    askText: 
+    thanksText: Smoke in the reeds again. I'll keep the racks full.

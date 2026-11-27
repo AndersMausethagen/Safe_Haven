@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: theoldgrey
   displayName: The Old Grey
-  description: Seven days, a wolf's head, then nothing. The pack still runs from the den west of the tower, and the old one at its head is the one the watch fled. Eirik calls it the Old Grey, like his grandfather did.
+  description: 'Seven strokes, a wolf''s head, then nothing. A pack still runs from the den north-east of the tower, and the old one at its head is the one the watch fled: grey to the muzzle, bigger than any wolf should be. Eirik calls it the Old Grey.'
   chain: Eirik
-  journalNotes: 'The Wolf Den lies west of the Ruined Watchtower. The Old Grey is bigger and stronger than any wolf of the pack: come ready.'
-  rank: 4
+  journalNotes: 'The Wolf Den lies about 75 m north-east of the Ruined Watchtower, back toward home. The Old Grey is bigger and stronger than any of its pack: come ready.'
+  rank: 1
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
@@ -59,7 +59,7 @@ MonoBehaviour:
   startsInAFight: 0
   startsWithoutWaiting: 1
   onStarted: []
-  objectivesInOrder: 1
+  objectivesInOrder: 0
   objectives:
   - type: 10
     description: Find the Old Grey's den

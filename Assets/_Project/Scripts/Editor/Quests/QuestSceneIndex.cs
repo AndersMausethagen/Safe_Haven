@@ -200,7 +200,8 @@ public static class QuestSceneIndex
         return GivingResident(quest) != null;
     }
 
-    /// <summary>The resident whose quest line at home offers it (ResidentDefinition › Quest Line: a QuestGiver made on them), or null.</summary>
+    /// <summary>The resident whose quests at home offer it (ResidentDefinition › Quest Line or Side Quests: a QuestGiver made on them),
+    /// or null.</summary>
     public static ResidentDefinition GivingResident(QuestDefinition quest)
     {
         if (quest == null)
@@ -211,7 +212,7 @@ public static class QuestSceneIndex
         foreach (string guid in AssetDatabase.FindAssets("t:ResidentDefinition"))
         {
             var resident = AssetDatabase.LoadAssetAtPath<ResidentDefinition>(AssetDatabase.GUIDToAssetPath(guid));
-            if (resident != null && resident.QuestLine != null && System.Linq.Enumerable.Any(resident.QuestLine, offer => offer != null && offer.Quest == quest))
+            if (resident != null && (Offers(resident.QuestLine, quest) || Offers(resident.SideQuests, quest)))
             {
                 return resident;
             }
@@ -219,6 +220,9 @@ public static class QuestSceneIndex
 
         return null;
     }
+
+    private static bool Offers(IReadOnlyList<QuestOffer> offers, QuestDefinition quest) =>
+        offers != null && System.Linq.Enumerable.Any(offers, offer => offer != null && offer.Quest == quest);
 
     /// <summary>Saved scene and prefab objects that are this person, place or thing for quests.</summary>
     public static List<QuestSceneUse> MarkedAs(UnityEngine.Object identity)

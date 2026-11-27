@@ -17,7 +17,7 @@ MonoBehaviour:
   description: The wolf the watch fled from, grey to the muzzle and twice the size of any in the pack. The Wolfwood's oldest story, and still hunting.
   combatStats: {fileID: 11400000, guid: 8c6276288b08a8c42abf045683121e77, type: 2}
   faction: 1
-  lootTable: {fileID: 11400000, guid: ce8b069f2cb8dee4cb88e47f7f080247, type: 2}
+  lootTable: {fileID: 11400000, guid: 7bed303deebd1d44099f9c3e80752807, type: 2}
   drops:
     entries: []
   unlocksRecipes: []

@@ -402,7 +402,8 @@ Shader "Hidden/Safe Haven/Atmosphere"
                         if (i == _TerrainMistRegionIndex)
                         {
                             float4 region = SAMPLE_TEXTURE2D_LOD(_TerrainMistRegionTex, sampler_LinearClamp, saturate(local / rect.zw), 0);
-                            shape.x = max(shape.x, _TerrainMistRegionDensity * region.r);
+                            // HavenLand's map (tinted) holds its density at half scale, so a forgotten region can be thicker than painted.
+                            shape.x = max(shape.x, _TerrainMistRegionDensity * region.r * (1.0 + _TerrainMistRegionTinted));
                             regionTint = lerp(regionTint, region.gba, _TerrainMistRegionTinted);
                         }
                         // Low over the ground the wake parts the mist and curls its pattern aside; above Reach it drifts on.
@@ -641,25 +642,17 @@ Shader "Hidden/Safe Haven/Atmosphere"
                 float3 color = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_LinearClamp, uv).rgb;
                 float4 fog = SAMPLE_TEXTURE2D(_AtmosphereFog, sampler_LinearClamp, uv);
                 float3 shafts = max(0.0, SAMPLE_TEXTURE2D(_AtmosphereShafts, sampler_LinearClamp, uv).rgb);
-                // Shafts are light in the air only: surfaces keep their own colour (no tint or gain). The beam is a
-                // soft, mostly neutral screen blend, masked by scene luminance so it never clips bright areas.
-                shafts /= 1.0 + max(max(shafts.r, shafts.g), shafts.b);
-                float beamLuma = dot(shafts, float3(0.2126, 0.7152, 0.0722));
-                float3 beam = lerp(beamLuma.xxx, shafts, 0.35) * _ShaftParams.w;
-                color *= fog.a;
-                color += beam * (1.0 - saturate(dot(color, float3(0.2126, 0.7152, 0.0722))));
-                color += fog.rgb;
 
-                if (_WarParams.x <= 0.0 && _WarParams.y <= 0.0 && _LandParams.x <= 0.0)
+                float rawDepth = 0.0;
+                float3 positionWS = float3(0.0, 0.0, 0.0);
+                if (_WarParams.x > 0.0 || _WarParams.y > 0.0 || _LandParams.x > 0.0)
                 {
-                    return float4(color, 1.0);
+                    positionWS = WorldPositionAt(uv, rawDepth);
                 }
 
-                float rawDepth;
-                float3 positionWS = WorldPositionAt(uv, rawDepth);
-
                 // The Haven's lands: each region's own colour, and forgotten land grey under the forest's forgetting (HavenLand).
-                // At the surface seen, so a remembered wood stands in colour against the grey beyond it.
+                // On the surface seen, before the mist over it is laid on: the mist and the light shafts keep their own colour, not
+                // the grey of whatever lies beyond them (bands at a region's border, darkened mist: the code review).
                 if (_LandParams.x > 0.0 && !IsFar(rawDepth))
                 {
                     float2 landUV = (positionWS.xz - _LandRect.xy) * _LandRect.zw;
@@ -674,6 +667,15 @@ Shader "Hidden/Safe Haven/Atmosphere"
                         color = lerp(color, lerp(own, forgotten, land.a), _LandParams.x);
                     }
                 }
+
+                // Shafts are light in the air only: surfaces keep their own colour (no tint or gain). The beam is a
+                // soft, mostly neutral screen blend, masked by scene luminance so it never clips bright areas.
+                shafts /= 1.0 + max(max(shafts.r, shafts.g), shafts.b);
+                float beamLuma = dot(shafts, float3(0.2126, 0.7152, 0.0722));
+                float3 beam = lerp(beamLuma.xxx, shafts, 0.35) * _ShaftParams.w;
+                color *= fog.a;
+                color += beam * (1.0 - saturate(dot(color, float3(0.2126, 0.7152, 0.0722))));
+                color += fog.rgb;
 
                 if (_WarParams.x <= 0.0 && _WarParams.y <= 0.0)
                 {

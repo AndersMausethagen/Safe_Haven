@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: eastwoodremembered
   displayName: Eastwood Remembered
-  description: Keep the fire, and the wood keeps faith. Let it go cold, and it takes back what it gave. That was all the pact ever was. Light Eastwood's stone, and the wood where it was sworn is the Haven's again.
+  description: Keep the fire, and the wood keeps faith. Let it go cold, and it takes back what it gave. That was all the pact ever was. Light Eastwood's stone, and tell Liv.
   chain: Liv
-  journalNotes: A region's stone wants some of its places found first, and sometimes a Pact Rune.
-  rank: 4
+  journalNotes: Eastwood's stone stands beside a path, about 380 m north-east of the portal. A stone your errand asks for lights without a Pact Rune.
+  rank: 1
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
@@ -89,11 +89,9 @@ MonoBehaviour:
     mark: {fileID: 0}
   unlocksBuildings: []
   unlocksModules: []
-  turnInToGiver: 0
-  turnInTo: 
-  rewardItems:
-  - item: {fileID: 11400000, guid: 7e57bf86766de2341bd9c47b5830cf76, type: 2}
-    amount: 3
+  turnInToGiver: 1
+  turnInTo: Liv
+  rewardItems: []
   rewardResources: []
   rewardRecipes: []
   rewardSkills: []

@@ -19,6 +19,7 @@ MonoBehaviour:
     placeId: haven.mother_maple.0
     needsRemembered: 1
     afterQuest: {fileID: 0}
+    untilQuest: {fileID: 0}
     when: 0
     dressing: {fileID: 0}
     offset: {x: 0, y: 0}
@@ -30,13 +31,14 @@ MonoBehaviour:
     item: {fileID: 11400000, guid: 1dd65120c9bb0304c8a45a8012af934c, type: 2}
     amount: 3
     taken: Sticky, and stung only twice.
-    findOffset: {x: 3, y: 1}
-    findMarker: {fileID: 0}
+    findOffset: {x: 2, y: -9}
+    findMarker: {fileID: 6636398860116550178, guid: 51ca6153c8697d84398f230f8cb78295, type: 3}
     foretold: Bees have swarmed in the Mother Maple. There's honey for whoever goes.
   - id: felled-oak
     placeId: haven.woodland_camp.1
-    needsRemembered: 1
+    needsRemembered: 0
     afterQuest: {fileID: 0}
+    untilQuest: {fileID: 0}
     when: 0
     dressing: {fileID: 8895611290362796324, guid: 15e4a49cc87bafb4e98e809c9b1bf3f4, type: 3}
     offset: {x: 6, y: -4}
@@ -55,6 +57,7 @@ MonoBehaviour:
     placeId: haven.fisher_s_rest.0
     needsRemembered: 1
     afterQuest: {fileID: 0}
+    untilQuest: {fileID: 0}
     when: 0
     dressing: {fileID: 0}
     offset: {x: 0, y: 0}
@@ -67,12 +70,13 @@ MonoBehaviour:
     amount: 5
     taken: Silver and quick. The basket fills.
     findOffset: {x: -3, y: -4}
-    findMarker: {fileID: 0}
+    findMarker: {fileID: 5195330831412958856, guid: 3d48ccf9ae3e04b4c8f9bec524e6fe0b, type: 3}
     foretold: The perch are running at Stillwater. The Fisher's Rest is the place.
   - id: pedlar
     placeId: haven.wayfarer_s_stones.0
     needsRemembered: 1
     afterQuest: {fileID: 0}
+    untilQuest: {fileID: 0}
     when: 0
     dressing: {fileID: 8572130453576143446, guid: 5d342d69571ebf843aef467ab9afc47f, type: 3}
     offset: {x: 4, y: 3}
@@ -91,6 +95,7 @@ MonoBehaviour:
     placeId: haven.authored.tarn_shrine
     needsRemembered: 0
     afterQuest: {fileID: 11400000, guid: bd7dd70969be8174c8acfefd449bf963, type: 2}
+    untilQuest: {fileID: 11400000, guid: 2ff21f94c2dcf4c4db8b14b299b0a393, type: 2}
     when: 2
     dressing: {fileID: 8622070203979909747, guid: 33d53f5fdf7586649bcd01d1ee8c9331, type: 3}
     offset: {x: 0, y: -3}
@@ -109,6 +114,7 @@ MonoBehaviour:
     placeId: haven.drowned_stones.0
     needsRemembered: 1
     afterQuest: {fileID: 0}
+    untilQuest: {fileID: 0}
     when: 0
     dressing: {fileID: 0}
     offset: {x: 0, y: 0}
@@ -121,12 +127,13 @@ MonoBehaviour:
     amount: 6
     taken: The fen's gold. Yrsa will know what to do with these.
     findOffset: {x: 4, y: -3}
-    findMarker: {fileID: 0}
+    findMarker: {fileID: 6636398860116550178, guid: 51ca6153c8697d84398f230f8cb78295, type: 3}
     foretold: The cloudberries are ripe on the Drowning Fen.
   - id: chanterelles
     placeId: haven.authored.old_steading
     needsRemembered: 1
     afterQuest: {fileID: 0}
+    untilQuest: {fileID: 0}
     when: 0
     dressing: {fileID: 0}
     offset: {x: 0, y: 0}
@@ -139,5 +146,43 @@ MonoBehaviour:
     amount: 5
     taken: A good handful. The old yard still feeds somebody.
     findOffset: {x: -3, y: -6}
-    findMarker: {fileID: 0}
+    findMarker: {fileID: 6636398860116550178, guid: 51ca6153c8697d84398f230f8cb78295, type: 3}
     foretold: Chanterelles have come up in the Old Steading's yard after the rain.
+  - id: fold-lingonberries
+    placeId: haven.shepherd_s_fold.0
+    needsRemembered: 1
+    afterQuest: {fileID: 0}
+    untilQuest: {fileID: 0}
+    when: 0
+    dressing: {fileID: 0}
+    offset: {x: 0, y: 0}
+    turn: 0
+    thoughts:
+    - Lingonberries along the fold's wall, red as a warning, and nobody picking them.
+    findName: Lingonberries
+    findVerb: Pick
+    item: {fileID: 11400000, guid: 74c0a8be248a5264aaf67f85d390ee8b, type: 2}
+    amount: 4
+    taken: A good handful. The sheep never cared for them.
+    findOffset: {x: 4, y: -2}
+    findMarker: {fileID: 6636398860116550178, guid: 51ca6153c8697d84398f230f8cb78295, type: 3}
+    foretold: The lingonberries are red along the Shepherd's Fold wall.
+  - id: ewe-fold-herbs
+    placeId: haven.shepherd_s_fold.1
+    needsRemembered: 1
+    afterQuest: {fileID: 0}
+    untilQuest: {fileID: 0}
+    when: 0
+    dressing: {fileID: 0}
+    offset: {x: 0, y: 0}
+    turn: 0
+    thoughts:
+    - Healing herb in flower by the Ewe Fold. Somebody planted it here once, by the gate.
+    findName: Healing herb in flower
+    findVerb: Pick
+    item: {fileID: 11400000, guid: 7e57bf86766de2341bd9c47b5830cf76, type: 2}
+    amount: 3
+    taken: Ingrid will want these before they seed.
+    findOffset: {x: -3, y: 2}
+    findMarker: {fileID: 6636398860116550178, guid: 51ca6153c8697d84398f230f8cb78295, type: 3}
+    foretold: Healing herb is flowering by the Ewe Fold.

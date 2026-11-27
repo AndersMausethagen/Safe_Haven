@@ -17,7 +17,7 @@ MonoBehaviour:
   description: The fishers rowed their dead out to the Island Stones and lit a lantern on the shore, so they would find their way. Nobody has lit it in a hundred winters. Go after dark.
   chain: Yrsa
   journalNotes: The lantern stands at the Netmender's Rest, south of the Fisher's Rest, facing the isle. It takes a flame only at night.
-  rank: 4
+  rank: 1
   availableObjective: 
   announceStart: 1
   announceCompletion: 1

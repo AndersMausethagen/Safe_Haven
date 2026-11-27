@@ -73,7 +73,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 56e2fd4d1b777f24ca26e167686a976c, type: 2}
   favouriteDish: {fileID: 11400000, guid: a3555452b33a4b34696e02d4dc405a7f, type: 2}
   homeLiking:
-    resident: {fileID: 0}
+    resident: {fileID: 11400000}
     likes: Lit lane
     line: '"A light on the path. I come home late."'
     thanks: '"Light on my path. I came home late and saw every step of it."'
@@ -93,3 +93,16 @@ MonoBehaviour:
     askText: 
     thanksText: 
   questLineDone: 
+  sideQuests:
+  - quest: {fileID: 11400000, guid: 368885b39fb47ac438073d5978b8c2ab, type: 2}
+    text: I walked those cairns once for a man in grey, counting stones. Now I want each to have one more from home, or the way forgets itself. The Lookout Cairn, then the Raven Cairn.
+    acceptText: A stone on each.
+    waitingText: West, on the knolls. A stone on each cairn.
+    askText: The cairns on Westwood's knolls?
+    thanksText: 
+  - quest: {fileID: 11400000, guid: b081c1e8118da03499dab7818ac2ea12, type: 2}
+    text: 
+    acceptText: I'll do it.
+    waitingText: Light Westwood's stone, and the ways run between the lit stones again.
+    askText: 
+    thanksText: The old ways are open. Touch any lit stone, and it knows the way to the others.

@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: wolfwoodremembered
   displayName: Wolfwood Remembered
-  description: The Old Grey is dead, and the Wolfwood's oldest story has an end. Light its stone, and the watch can be kept at the tower again.
+  description: The Old Grey is dead, and the Wolfwood's oldest story has an end. Light its stone, and tell Eirik.
   chain: Eirik
-  journalNotes: A region's stone wants some of its places found first, and sometimes a Pact Rune.
-  rank: 4
+  journalNotes: The Wolfwood's stone stands beside a path, about 450 m south-west of the portal. A stone your errand asks for lights without a Pact Rune.
+  rank: 1
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
@@ -89,8 +89,8 @@ MonoBehaviour:
     mark: {fileID: 0}
   unlocksBuildings: []
   unlocksModules: []
-  turnInToGiver: 0
-  turnInTo: 
+  turnInToGiver: 1
+  turnInTo: Eirik
   rewardItems:
   - item: {fileID: 11400000, guid: 5148bc82bfb79f94ca5482ed8e4ea69f, type: 2}
     amount: 3

@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: thehollowpinesremembered
   displayName: The Hollow Pines Remembered
-  description: They buried one of their own in the pines and went on. Light the Hollow Pines' boundary stone, and Asa can sow the old seed where they meant to.
+  description: 'They buried one of their own in the pines and went on. Light the Hollow Pines'' stone, and tell Asa: she can sow the old seed where they meant to.'
   chain: Asa
-  journalNotes: A region's stone wants some of its places found first, and sometimes a Pact Rune.
-  rank: 4
+  journalNotes: The Hollow Pines's stone stands beside a path, about 370 m south-east of the portal. A stone your errand asks for lights without a Pact Rune.
+  rank: 1
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
@@ -89,8 +89,8 @@ MonoBehaviour:
     mark: {fileID: 0}
   unlocksBuildings: []
   unlocksModules: []
-  turnInToGiver: 0
-  turnInTo: 
+  turnInToGiver: 1
+  turnInTo: Asa
   rewardItems:
   - item: {fileID: 11400000, guid: 17b016991a7aa4846a121d6027443bf2, type: 2}
     amount: 2

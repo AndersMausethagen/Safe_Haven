@@ -39,6 +39,8 @@ public sealed class HavenLand : MonoBehaviour
     private readonly List<HavenRegionSettings.RegionLook> looks = new List<HavenRegionSettings.RegionLook>();
     // How remembered each region is now (0 forgotten, 1 remembered), easing toward its stone's state.
     private float[] remembered;
+    // Whether each region's remembering has been told (once each time it comes).
+    private bool[] announced;
     private float nextRemake;
     private bool dirty;
     // Worked places in the land (a relit clamp: HavenPlaceScenes' smoking stages) keep it in mind round them, before their region is
@@ -164,8 +166,10 @@ public sealed class HavenLand : MonoBehaviour
 
     private void Build()
     {
+        var indexOf = new Dictionary<string, int>();
         foreach (WorldAtlas.Region region in atlas.Regions)
         {
+            indexOf[region.name] = names.Count;
             names.Add(region.name);
             looks.Add(settings.LookOf(region.name));
         }
@@ -184,7 +188,7 @@ public sealed class HavenLand : MonoBehaviour
             {
                 var world = new Vector3(area.xMin + (x + 0.5f) / MapSize * area.width, 0f, area.yMin + (y + 0.5f) / MapSize * area.height);
                 WorldAtlas.Region region = atlas.RegionAt(world);
-                int index = region != null ? names.IndexOf(region.name) : -1;
+                int index = region != null && indexOf.TryGetValue(region.name, out int found) ? found : -1;
                 if (index >= 0)
                 {
                     shares[index][y * MapSize + x] = 1f;
@@ -222,9 +226,11 @@ public sealed class HavenLand : MonoBehaviour
 
         authored = ReadAuthored(mist != null ? mist.AuthoredRegionMap : null, MapSize);
         remembered = new float[count];
+        announced = new bool[count];
         for (int r = 0; r < count; r++)
         {
             remembered[r] = Target(r);
+            announced[r] = remembered[r] > 0.5f;
         }
 
         lookPixels = new Color32[MapSize * MapSize];
@@ -247,17 +253,20 @@ public sealed class HavenLand : MonoBehaviour
     // 1 for a region remembered (and home, and a region with no look: as painted), 0 for one forgotten.
     private float Target(int region) => looks[region] == null || IsRemembered(names[region]) ? 1f : 0f;
 
+    // Told once as a region is remembered, not on every change while its mist draws back (a rune offered, a co-op mirror arriving);
+    // a region forgotten again may be told again. Update sees the targets move: no remake here.
     private void OnLandsChanged()
     {
         for (int r = 0; r < names.Count; r++)
         {
-            if (Target(r) > remembered[r] + 0.001f && looks[r] != null)
+            bool now = Target(r) > 0.5f;
+            if (now && !announced[r] && looks[r] != null)
             {
                 Remembered(names[r], looks[r]);
             }
-        }
 
-        dirty = true;
+            announced[r] = now;
+        }
     }
 
     // The moment the mist draws back: said once, as it starts (the land itself shows the rest).
@@ -354,7 +363,8 @@ public sealed class HavenLand : MonoBehaviour
             }
 
             lookPixels[i] = new Color32(Byte(filter.x * 0.5f), Byte(filter.y * 0.5f), Byte(filter.z * 0.5f), Byte(forgotten));
-            mistPixels[i] = new Color32(Byte(density), Byte(tint.x), Byte(tint.y), Byte(tint.z));
+            // Density at half scale: Forgotten Mist above 1 thickens even fully painted mist (the shader doubles a tinted map's R).
+            mistPixels[i] = new Color32(Byte(density * 0.5f), Byte(tint.x), Byte(tint.y), Byte(tint.z));
         }
 
         lookTexture.SetPixels32(lookPixels);
