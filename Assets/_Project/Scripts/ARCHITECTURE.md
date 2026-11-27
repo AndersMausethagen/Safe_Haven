@@ -3316,7 +3316,15 @@ sample textures and flames are in `Art/Effects/VFX Graph/Additions` (Unity Compa
   another; a light flash and a shake at the release. `SkillFx` plays them from pools (one runner per scene); `VfxValues` on each prefab sets
   its graph's exposed values. `SkillAreaMark` shows the attack's area on the ground in the school's colour while it winds up (the projected
   telegraph's shader, faint, a softer flash than a monster's). `PlayerSkills` calls `SkillFx.Cast` and, after its hit (collecting what it
-  struck through `Damageable.AnyDamaged`), `SkillFx.Release`.
+  struck through `Damageable.AnyDamaged`), `SkillFx.Release`. A cast that draws on the caster's own ground (its rune circle, dust at the
+  feet: `SkillLook.CasterGroundSeconds`) plants the feet until that mark is gone (`PlayerSkills.HoldsStillFor`, speed scale 0; never for
+  a lunge; a dodge, stagger or death lets go). `SkillAimTests.ACastsRuneCircle_HoldsTheCasterInItUntilItIsGone`.
+- **From the VFX pack** (2026-11-27, `SkillFxPrefabs.Pack`, Safe Haven › Tools › Effects › Dress From the VFX Pack, also run by
+  `DressMoments`): frost, earth, fire and blood cues and status looks swapped to toned copies of the Game VFX Mega Pack (URP)'s particle
+  effects (`Art/Effects/Skills/Prefabs/Pack`, materials in `Pack Materials`), each school's saturation and brightness cut (`Tone`), HDR
+  glows damped, copies capped per cue; our own frost/fire/earth layers toned once (importer marker). The pack itself
+  (`Assets/Game VFX Mega Pack(URP)`) is gitignored and kept in Plastic; its shaders were renamed `Eric/...` (they shadowed built-ins).
+  `SkillFx` restarts a pooled effect's particle systems; `StatusBearerLook` stops a status's particles emitting and lets them fade.
 - **Dressed so far** (`SkillFxPrefabs`, Safe Haven › Tools › Effects › Dress the First Skills; prefabs in `Art/Effects/Skills/Prefabs`):
   Frost Rune (frost rune circle, hand mist; spikes, shards and mist racing along a lance now 25° wide; chills, and
   `AttackDefinition.OnRepeatStatus` freezes what is already chilled: Frozen, 1.5 s rooted, 4 s before again), the Ash Lad's Ember (ember
