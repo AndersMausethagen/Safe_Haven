@@ -17,7 +17,8 @@ public sealed class BuildingModuleTests
     // Two crafts of different things, ticked until the station can do no more.
     private static StationQueue Run(int outputSlots, out RecipeDefinition first, out RecipeDefinition second)
     {
-        first = Recipe("Bandage");
+        // Two crafts of the same station: bandages are made by hand since 2026-11-25 (the user's playtest list), so a fang necklace.
+        first = Recipe("FangNecklace");
         second = Recipe("BoneCharm");
         Assert.IsNotNull(first);
         Assert.IsNotNull(second);

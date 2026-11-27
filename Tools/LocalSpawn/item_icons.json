@@ -269,8 +269,8 @@
   "mist_custard": "A small pale custard in a clay dish, cold and smooth, a cloudberry on top, a faint wisp of mist over it",
   "anglers_flatbread": "A round golden flatbread speckled with green wild garlic, folded in half, a small fish hook on a string beside it",
   "riders_draught": "A small glass bottle of honey-coloured draught with a cork, a little sprig of red lingonberries and a strand of horse hair tied round its neck",
-  "fimbulsagastave": "a short carved wooden rune-stave rimed with frost, pale blue runes glowing faintly along its length, a small icicle hanging from one end",
-  "sagastaveofsurtr": "a short carved rune-stave scorched black, its runes glowing like embers, faint smoke curling from the charred wood",
-  "ravenbonerunes": "three small bird bones carved with runes and bound with a black thread and a single raven feather",
-  "berserkersbeartooth": "a huge bear fang on a leather thong, carved with small runes, with a tuft of brown fur at the knot"
+  "lore.fimbulsagastave": "a short carved wooden rune-stave rimed with frost, pale blue runes glowing faintly along its length, a small icicle hanging from one end",
+  "lore.sagastaveofsurtr": "a short carved rune-stave scorched black, its runes glowing like embers, faint smoke curling from the charred wood",
+  "lore.ravenbonerunes": "three small bird bones carved with runes and bound with a black thread and a single raven feather",
+  "lore.berserkersbeartooth": "a huge bear fang on a leather thong, carved with small runes, with a tuft of brown fur at the knot"
 }

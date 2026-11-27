@@ -256,6 +256,25 @@ public static partial class SkillFxPrefabs
                 }
             }
 
+            // What the pack points at but doesn't ship (a few textures, materials, meshes): cleared in our copy, which draws the same (a
+            // missing reference draws as an empty one) and leaves nothing dangling (ContentAudit, EngineHazardTests). A part left with no
+            // material at all is switched off.
+            foreach (Component part in copy.GetComponentsInChildren<Component>(true))
+            {
+                if (part != null)
+                {
+                    DropMissing(part);
+                }
+            }
+
+            foreach (Renderer renderer in copy.GetComponentsInChildren<Renderer>(true))
+            {
+                if (renderer.sharedMaterial == null)
+                {
+                    renderer.enabled = false;
+                }
+            }
+
             if (turn.HasValue)
             {
                 root = new GameObject(name);
@@ -364,8 +383,31 @@ public static partial class SkillFxPrefabs
             }
         }
 
+        DropMissing(toned);
         EditorUtility.SetDirty(toned);
         return true;
+    }
+
+    // Clears every reference to an asset that isn't there (a value of none with an object id behind it).
+    private static void DropMissing(Object target)
+    {
+        var data = new SerializedObject(target);
+        SerializedProperty property = data.GetIterator();
+        bool changed = false;
+        while (property.Next(true))
+        {
+            if (property.propertyType == SerializedPropertyType.ObjectReference && property.objectReferenceValue == null
+                && property.objectReferenceEntityIdValue != default(EntityId))
+            {
+                property.objectReferenceValue = null;
+                changed = true;
+            }
+        }
+
+        if (changed)
+        {
+            data.ApplyModifiedPropertiesWithoutUndo();
+        }
     }
 
     private static Color Toned(Color colour, Tone tone)

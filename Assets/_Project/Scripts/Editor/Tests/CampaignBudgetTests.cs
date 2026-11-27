@@ -19,9 +19,13 @@ public sealed class CampaignBudgetTests
     [Test]
     public void TheHorse_ComesWithTheCarts()
     {
+        // Since 2026-11-27 (the user: "lets get the quest to unlock it before the second walking quest") the horse comes after the first
+        // walk out, and its stable, whose planks need the Workshop, after Heavy Loads: the carts still come with a horse to pull them.
         QuestDefinition horse = Quest("AHorseOfYourOwn");
-        CollectionAssert.AreEqual(new[] { Quest("HeavyLoads") }, horse.Prerequisites.ToArray(), "after the Wainwright's Yard: a cart to pull");
+        CollectionAssert.AreEqual(new[] { Quest("SmokeInTheGreyPines") }, horse.Prerequisites.ToArray(), "after the first long walk out");
         StringAssert.Contains("cart", horse.Description, "its reason is said");
+        CollectionAssert.AreEquivalent(new[] { horse, Quest("HeavyLoads") }, Quest("AStableForYourHorse").Prerequisites.ToArray(),
+            "the stable after the horse and the Wainwright's Yard");
     }
 
     [Test]

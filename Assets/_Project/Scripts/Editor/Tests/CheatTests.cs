@@ -22,22 +22,22 @@ public sealed class CheatTests
         CheatSettings settings = CheatSettings.Current;
         foreach (MonsterDefinition monster in All<MonsterDefinition>().Where(one => one.Prefab != null))
         {
-            CollectionAssert.Contains(settings.Creatures, monster, "Run AgentScripts/BuildCheatMenu.cs");
+            CollectionAssert.Contains(settings.Creatures, monster, "add it to Resources/CheatSettings (BuildCheatMenu.cs is retired: a targeted edit)");
         }
 
         foreach (RaidDefinition raid in All<RaidDefinition>())
         {
-            CollectionAssert.Contains(settings.Raids, raid, "Run AgentScripts/BuildCheatMenu.cs");
+            CollectionAssert.Contains(settings.Raids, raid, "add it to Resources/CheatSettings (BuildCheatMenu.cs is retired: a targeted edit)");
         }
 
         foreach (WeatherDefinition weather in All<WeatherDefinition>())
         {
-            CollectionAssert.Contains(settings.Weathers, weather, "Run AgentScripts/BuildCheatMenu.cs");
+            CollectionAssert.Contains(settings.Weathers, weather, "add it to Resources/CheatSettings (BuildCheatMenu.cs is retired: a targeted edit)");
         }
 
         foreach (ResourceDefinition essence in All<ResourceDefinition>())
         {
-            CollectionAssert.Contains(settings.Essences, essence, "Run AgentScripts/BuildCheatMenu.cs");
+            CollectionAssert.Contains(settings.Essences, essence, "add it to Resources/CheatSettings (BuildCheatMenu.cs is retired: a targeted edit)");
         }
     }
 

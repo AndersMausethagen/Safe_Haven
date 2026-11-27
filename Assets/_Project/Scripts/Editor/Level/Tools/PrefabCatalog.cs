@@ -79,7 +79,9 @@ public static class PrefabCatalog
             return "Creatures";
         }
 
-        if (n.Contains("spruce") || n.Contains("pine") || n.Contains("oak") || n.Contains("tree") && !n.Contains("stump"))
+        // A trunk already down (the Haven's Storm-felled Oak) is forest floor, not a tree to fell.
+        bool down = n.Contains("felled") || n.Contains("fallen");
+        if (!down && (n.Contains("spruce") || n.Contains("pine") || n.Contains("oak") || n.Contains("tree") && !n.Contains("stump")))
         {
             return "Trees";
         }
@@ -89,7 +91,7 @@ public static class PrefabCatalog
             return "Rocks & Cliffs";
         }
 
-        if (n.Contains("stump") || n.Contains("log") || n.Contains("branch") || n.Contains("root") || n.Contains("fern") ||
+        if (down || n.Contains("stump") || n.Contains("log") || n.Contains("branch") || n.Contains("root") || n.Contains("fern") ||
             n.Contains("bush") || n.Contains("moss"))
         {
             return "Forest Floor";
