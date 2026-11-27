@@ -52,6 +52,7 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
     private ItemSlotView dragSource;
     private ItemSlotView hovered;
     private bool laidOut;
+    private PlayerCombat combat;
     private bool byElement;
     private RectTransform bookContent;
     private (TMP_Text label, Image shown) byTypeTab;
@@ -72,8 +73,15 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
             LayOut();
         }
 
+        Fit();
         skills.Loadout.SlotChanged += OnLoadoutChanged;
         skills.KnownSkillsChanged += RebuildBook;
+        combat = skills.GetComponent<PlayerCombat>();
+        if (combat != null)
+        {
+            combat.WeaponChanged += OnWeaponChanged;
+        }
+
         BuildBar();
         RebuildBook();
         dragIcon.gameObject.SetActive(false);
@@ -86,6 +94,11 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
         {
             skills.Loadout.SlotChanged -= OnLoadoutChanged;
             skills.KnownSkillsChanged -= RebuildBook;
+        }
+
+        if (combat != null)
+        {
+            combat.WeaponChanged -= OnWeaponChanged;
         }
 
         CancelDrag();
@@ -300,19 +313,10 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
     {
         laidOut = true;
         byElement = PlayerPrefs.GetInt(GroupingKey, 0) == 1;
-        // As tall as the screen allows, above the HUD's skill bar at the bottom (a small game view cut its title off).
-        var window = (RectTransform)transform;
-        Canvas canvas = GetComponentInParent<Canvas>();
-        float screen = canvas != null ? ((RectTransform)canvas.rootCanvas.transform).rect.height : WindowHeight + ScreenTop + ScreenBottom;
-        windowHeight = Mathf.Clamp(screen - ScreenTop - ScreenBottom, 480f, WindowHeight);
-        window.sizeDelta = new Vector2(WindowWidth, windowHeight);
-        window.anchoredPosition = new Vector2(window.anchoredPosition.x, (ScreenBottom - ScreenTop) * 0.5f);
-
         float barWidth = SkillLoadout.SlotCount * 64f + (SkillLoadout.SlotCount - 1) * 6f;
         Place(barGrid, Margin, BarTop, barWidth, 64f);
         Place(Child("Bar Hint"), Margin + barWidth + 20f, BarTop, WindowWidth - barWidth - Margin * 2f - 20f, 64f);
         Place(Child("Book Title"), Margin, BookTop - 42f, 300f, 26f);
-        Place(Child("Book Hint"), Margin, windowHeight - FooterHeight + 8f, WindowWidth - Margin * 2f, 22f);
 
         // Two framed tabs at the right of the book's title: its sections by type (what slot takes it) or by element.
         UIStyle style = UIStyle.Current;
@@ -333,7 +337,6 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
             DestroyImmediate(grid);
         }
 
-        Place(bookGrid, Margin, BookTop, WindowWidth - Margin * 2f, windowHeight - BookTop - FooterHeight);
         var scroll = bookGrid.gameObject.AddComponent<ScrollRect>();
         scroll.horizontal = false;
         scroll.movementType = ScrollRect.MovementType.Clamped;
@@ -344,8 +347,34 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
         bookContent = CodeUI.At("Sections", bookGrid, 0f, 0f, WindowWidth - Margin * 2f, 0f);
         scroll.content = bookContent;
         scroll.viewport = bookGrid;
+        // A bar skill dropped anywhere in the book (between cards, on a heading) is taken off the bar, as on a card (review 2026-11-27:
+        // only the cards took the drop, the rest lost it).
+        bookGrid.gameObject.AddComponent<DropArea>().Dropped += () =>
+        {
+            if (dragSource != null && IsBar(dragSource))
+            {
+                skills.Loadout.Clear(dragSource.Index);
+            }
+        };
         ShowGrouping();
     }
+
+    // As tall as the screen allows, above the HUD's skill bar at the bottom (a small game view cut its title off): measured each time
+    // it opens, so a new resolution is fitted too.
+    private void Fit()
+    {
+        var window = (RectTransform)transform;
+        Canvas canvas = GetComponentInParent<Canvas>();
+        float screen = canvas != null ? ((RectTransform)canvas.rootCanvas.transform).rect.height : WindowHeight + ScreenTop + ScreenBottom;
+        windowHeight = Mathf.Clamp(screen - ScreenTop - ScreenBottom, 480f, WindowHeight);
+        window.sizeDelta = new Vector2(WindowWidth, windowHeight);
+        window.anchoredPosition = new Vector2(window.anchoredPosition.x, (ScreenBottom - ScreenTop) * 0.5f);
+        Place(Child("Book Hint"), Margin, windowHeight - FooterHeight + 8f, WindowWidth - Margin * 2f, 22f);
+        Place(bookGrid, Margin, BookTop, WindowWidth - Margin * 2f, windowHeight - BookTop - FooterHeight);
+    }
+
+    // A weapon taken up or put down while the window is open: the weapon-art cards take the new art's name.
+    private void OnWeaponChanged(WeaponDefinition weapon) => RebuildBook();
 
     private RectTransform Child(string name) => transform.Find(name) as RectTransform;
 
@@ -389,6 +418,19 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
     // by element (Steel, Beast, Frost, Ember, Wyrd), each by type within. A card is the skill's picture with its name under it.
     private void RebuildBook()
     {
+        // A card under the pointer or being dragged is about to go: its tooltip and drag go with it (its Index would name a skill of
+        // the new order, and a destroyed card never ends its drag).
+        if (hovered != null && bookSlots.Contains(hovered))
+        {
+            hovered = null;
+            tooltip.Hide();
+        }
+
+        if (dragSource != null && bookSlots.Contains(dragSource))
+        {
+            CancelDrag();
+        }
+
         for (int i = bookContent.childCount - 1; i >= 0; i--)
         {
             Destroy(bookContent.GetChild(i).gameObject);
