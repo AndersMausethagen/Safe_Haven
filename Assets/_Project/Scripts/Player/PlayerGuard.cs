@@ -104,16 +104,20 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
         }
     }
 
-    // With a bow the guard button aims instead (PlayerArchery).
+    // The button; whether the hand can guard is judged each frame (HandGuards), not at the press: a bow swapped in with the button held
+    // kept the guard up, blocking while it drew and shot (review 2026-11-27).
     private void OnGuardRequested(bool raised)
     {
         bool wasHeld = held;
-        held = raised && (combat == null || combat.Weapon == null || !combat.Weapon.TakesAttackInput);
+        held = raised;
         if (held && !wasHeld)
         {
             heldSince = Time.time;
         }
     }
+
+    // With a bow (or a rod) the guard button aims instead (PlayerArchery).
+    private bool HandGuards => combat == null || combat.Weapon == null || !combat.Weapon.TakesAttackInput;
 
     // When the button went down: a press during a wind-up that gives way to the guard (a light swing, a held charge) breaks it off
     // (PlayerCombat.CanGuardFrom); one held since before the attack doesn't.
@@ -129,7 +133,8 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
                         && (combat == null || combat.CanGuardFrom(heldSince)) && (eating == null || !eating.IsEating);
         // The guard goes up the moment it is pressed, always (the user, 2026-11-25: "it should happen the instant we press it"). The
         // relock that kept a tapped guard down for 0.3-0.6 s, and so raised it late, now only takes the parry out of a raise that soon.
-        if (held && !IsGuarding && canRaise)
+        bool hand = HandGuards;
+        if (held && hand && !IsGuarding && canRaise)
         {
             if (combat != null)
             {
@@ -137,7 +142,7 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
             }
             SetGuarding(true);
         }
-        else if (IsGuarding && (!held || stunned || !stateMachine.CanMove))
+        else if (IsGuarding && (!held || !hand || stunned || !stateMachine.CanMove))
         {
             SetGuarding(false);
         }

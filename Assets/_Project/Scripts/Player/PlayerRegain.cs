@@ -59,14 +59,21 @@ public sealed class PlayerRegain : MonoBehaviour
             return;
         }
 
-        // What is left of the last window carries into the new one.
-        pool = Mathf.Min(health.MaxHealth, Regainable + result.Damage * Rules.RegainShare);
+        // What is left of the last window carries into the new one. Health lost, not the blow's size: one a floor held off (downed,
+        // sparring) cost nothing to win back (review 2026-11-27).
+        if (result.HealthLost <= 0f)
+        {
+            return;
+        }
+
+        pool = Mathf.Min(health.MaxHealth, Regainable + result.HealthLost * Rules.RegainShare);
         hurtAt = Time.time;
     }
 
     private void OnDamageDealt(IDamageable target, DamageInfo damage, DamageResult result)
     {
-        if ((damage.Technique & HitTechnique.Melee) == 0 || result.Damage <= 0f || !health.IsAlive)
+        // Won back by fighting (FightBlows): a crate or a fence healed (review 2026-11-27).
+        if ((damage.Technique & HitTechnique.Melee) == 0 || !health.IsAlive || !FightBlows.Counts(combatant, target, damage, result))
         {
             return;
         }

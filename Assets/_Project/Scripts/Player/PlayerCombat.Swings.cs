@@ -14,7 +14,9 @@ public sealed partial class PlayerCombat
         queuedKind = SwingKind.None;
         // A press held over from a swing or a dodge fires later than it was made: by then the player may be swimming, at the oars or
         // at work, where a new swing is refused (the state machine's own gate, which a fresh press passes through).
-        if ((health != null && !health.IsAlive) || (stateMachine != null && !stateMachine.CanStartAttack))
+        // Nor under a hold on the controls (a cinematic, a grab, being downed): a press buffered before it came started a swing there
+        // (review 2026-11-27). No hold keeps the attack key.
+        if ((health != null && !health.IsAlive) || (stateMachine != null && !stateMachine.CanStartAttack) || PlayerControl.HeldOn(gameObject))
         {
             return false;
         }

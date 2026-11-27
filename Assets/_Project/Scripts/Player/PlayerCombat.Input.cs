@@ -130,6 +130,21 @@ public sealed partial class PlayerCombat
         pressTime = -1f;
     }
 
+    // The key taken away (a pause, a window, a hold), not let go: the press is spent, nothing queued starts, and a heavy waiting at the
+    // top of its charge is broken off unstruck, as the guard breaks it off (review 2026-11-27: it struck, charged, as the game resumed).
+    private void OnAttackKeyTaken()
+    {
+        attackHeld = false;
+        heldEarlyPress = false;
+        pressTime = -1f;
+        queuedKind = SwingKind.None;
+        heavyAfterLight = false;
+        if (charging && activeKind == SwingKind.Heavy && hitPending)
+        {
+            EndSwing();
+        }
+    }
+
     // An attack out of a dodge, or on the run toward where it aims, is the weapon's rush attack.
     private bool WantsRush()
     {

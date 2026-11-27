@@ -89,11 +89,25 @@ public static class AttackResolver
         }
 
         DamageResult result = hit.Target.ApplyDamage(damage);
-        attacker.ReportDamageDealt(hit.Target, damage, result);
-        StatusEffects.BeforeHitStatuses(hit.Target, damage, result);
-        StatusEffects.AfterHit(attack, hit.Target, attacker, result);
-        ForcedMove.AfterHit(attack, hit.Target, attacker, result);
+        Landed(attacker, attack, hit.Target, damage, result);
         return result;
+    }
+
+    /// <summary>
+    /// What a blow of <paramref name="attack"/> does once it has landed, however it came (a swing, a bolt, an arrow): told to the attacker,
+    /// the statuses it uses up (a heavy shattering Frozen), the status it lays and its pull. Each way of delivering a blow kept its own
+    /// list, and a staff's bolt never shattered Frozen while an arrow laid nothing (review 2026-11-27).
+    /// </summary>
+    public static void Landed(Combatant attacker, AttackDefinition attack, IDamageable target, DamageInfo damage, DamageResult result)
+    {
+        if (attacker != null)
+        {
+            attacker.ReportDamageDealt(target, damage, result);
+        }
+
+        StatusEffects.BeforeHitStatuses(target, damage, result);
+        StatusEffects.AfterHit(attack, target, attacker, result);
+        ForcedMove.AfterHit(attack, target, attacker, result);
     }
 
     // Entering Play doesn't reload scripts in this project: statics carry over from the last session unless cleared.

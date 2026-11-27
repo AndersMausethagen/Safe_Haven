@@ -203,11 +203,13 @@ public sealed class SkillLookTests
             HitTechnique.Melee), landed);
         Assert.IsTrue(effects.Has(frozen), "an ordinary swing doesn't shatter it");
 
+        // Armour: the blow has been through it already, so the shards are a share of what it landed, not cut down again.
+        combatant.Stats.SetBase(StatType.Armor, 60f);
         float before = body.CurrentHealth;
         StatusEffects.BeforeHitStatuses(body, new DamageInfo(null, null, 40f, DamageType.Physical, false, Vector3.zero, Vector3.forward, 0f,
             HitTechnique.Heavy | HitTechnique.Melee), landed);
         Assert.IsFalse(effects.Has(frozen), "a heavy shatters it");
-        Assert.Greater(before - body.CurrentHealth, 0f, "and the shards hurt");
+        Assert.AreEqual(40f * frozen.ConsumeDamage, before - body.CurrentHealth, 0.05f, "and the shards hurt: a share of the blow as it landed");
         Assert.IsTrue(effects.Has(frostbite), "the chill under it stays");
     }
 

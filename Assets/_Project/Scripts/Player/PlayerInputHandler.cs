@@ -36,6 +36,8 @@ public sealed class PlayerInputHandler : MonoBehaviour
     private bool mouseAttackPending;
     private bool mouseGuardPending;
     private bool mouseAttackReleasePending;
+    // True while SetActionsEnabled switches the keys off: their cancels are the keys taken, not let go.
+    private bool keysGoing;
 
     private void Awake()
     {
@@ -131,7 +133,16 @@ public sealed class PlayerInputHandler : MonoBehaviour
         }
 
         // Through GameInput, the map's one switch: it stays off while gameplay is suspended (a name typed), and comes back with it.
-        GameInput.SetPlayerKeys(enable);
+        // Switched off, a held key comes up as a cancel (the Input System cancels an action in progress): that is no release.
+        keysGoing = !enable;
+        try
+        {
+            GameInput.SetPlayerKeys(enable);
+        }
+        finally
+        {
+            keysGoing = false;
+        }
 
         if (enable)
         {
@@ -142,7 +153,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         mouseAttackPending = false;
         mouseGuardPending = false;
         mouseAttackReleasePending = false;
-        stateMachine.ReleaseAttack();
+        stateMachine.TakeAttackKey();
         stateMachine.RequestGuard(false);
         movement.SetMovementInput(Vector3.zero);
         movement.SetMoveKeys(Vector2.zero);
@@ -510,6 +521,12 @@ public sealed class PlayerInputHandler : MonoBehaviour
     // A release that comes before its press was processed (a very quick click) waits for it.
     private void OnAttackReleased(InputAction.CallbackContext context)
     {
+        // The key taken away, not let go (SetActionsEnabled tells TakeAttackKey once it is off).
+        if (keysGoing)
+        {
+            return;
+        }
+
         if (mouseAttackPending)
         {
             mouseAttackReleasePending = true;

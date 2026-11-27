@@ -54,13 +54,43 @@ public sealed class PlayerFocus : MonoBehaviour
         health = GetComponent<Damageable>();
     }
 
-    // An arrow that strikes earns as a swing does, and a perfect release as a finisher: an archer has skills to pay for too.
+    // What fighting pays, blow by blow as each lands on a foe (FightBlows): a swing per foe it struck, up to Focus Targets Counted, and
+    // an arrow as a swing does (a perfect release as a finisher: an archer has skills to pay for too). Counted from the targets a swing
+    // found, a crate, a fence or a creature's parry paid as a creature did (review 2026-11-27).
+    private float countedSwing = float.NaN;
+    private int countedBlows;
+
     private void OnDamageDealt(IDamageable target, DamageInfo damage, DamageResult result)
     {
+        if (!FightBlows.Counts(combatant, target, damage, result))
+        {
+            return;
+        }
+
         WeaponDefinition weapon = combat.Weapon;
-        if (weapon != null && weapon.IsBow && damage.Attack == weapon.ShotAttack && result.Damage > 0f && !damage.IsOverTime)
+        if (weapon != null && weapon.IsBow && damage.Attack == weapon.ShotAttack)
         {
             Earn(Rules.FocusPerHit * (result.IsCritical ? 2f : 1f));
+            return;
+        }
+
+        float worth = ForBlow(damage.Technique, Rules);
+        if (worth <= 0f)
+        {
+            return;
+        }
+
+        // A swing's blows land over its sweep: counted against the swing they belong to.
+        if (combat.SwingStartTime != countedSwing)
+        {
+            countedSwing = combat.SwingStartTime;
+            countedBlows = 0;
+        }
+
+        if (countedBlows < Rules.FocusTargetsCounted)
+        {
+            countedBlows++;
+            Earn(worth);
         }
     }
 
@@ -81,7 +111,6 @@ public sealed class PlayerFocus : MonoBehaviour
 
     private void OnEnable()
     {
-        combat.SwingLanded += OnSwingLanded;
         combat.PerfectDodge += OnPerfectDodge;
         if (combatant != null)
         {
@@ -102,7 +131,6 @@ public sealed class PlayerFocus : MonoBehaviour
 
     private void OnDisable()
     {
-        combat.SwingLanded -= OnSwingLanded;
         combat.PerfectDodge -= OnPerfectDodge;
         if (combatant != null)
         {
@@ -150,17 +178,28 @@ public sealed class PlayerFocus : MonoBehaviour
             return 0f;
         }
 
-        float gain = rules.FocusPerHit * Mathf.Min(hits, rules.FocusTargetsCounted);
-        if (swing.IsFinisher)
+        bool heavy = swing.Kind == SwingKind.Heavy || swing.Kind == SwingKind.GuardCounter;
+        return Worth(swing.IsFinisher, heavy, swing.IsCounter, rules) * Mathf.Min(hits, rules.FocusTargetsCounted);
+    }
+
+    /// <summary>Focus one landed blow of a swing earns, by its technique: none for a shield bash, an art, an ability or a tick; else as
+    /// <see cref="ForSwing"/> counts one target.</summary>
+    public static float ForBlow(HitTechnique technique, CombatTechniqueSettings rules)
+    {
+        const HitTechnique earnsNothing = HitTechnique.ShieldBash | HitTechnique.WeaponArt | HitTechnique.Ability | HitTechnique.OverTime;
+        if ((technique & HitTechnique.Melee) == 0 || (technique & earnsNothing) != 0)
         {
-            gain *= 2f;
-        }
-        else if (swing.Kind == SwingKind.Heavy || swing.Kind == SwingKind.GuardCounter)
-        {
-            gain *= 1.5f;
+            return 0f;
         }
 
-        return swing.IsCounter ? gain * 1.5f : gain;
+        bool heavy = (technique & (HitTechnique.Heavy | HitTechnique.GuardCounter)) != 0;
+        return Worth((technique & HitTechnique.Finisher) != 0, heavy, (technique & HitTechnique.Counter) != 0, rules);
+    }
+
+    private static float Worth(bool finisher, bool heavy, bool counter, CombatTechniqueSettings rules)
+    {
+        float gain = rules.FocusPerHit * (finisher ? 2f : heavy ? 1.5f : 1f);
+        return counter ? gain * 1.5f : gain;
     }
 
     /// <summary>Focus a blow that took <paramref name="damage"/> of <paramref name="maxHealth"/> earns: Focus When Hurt for a whole bar.</summary>
@@ -188,8 +227,6 @@ public sealed class PlayerFocus : MonoBehaviour
         Gain(earned);
         Earned?.Invoke(earned);
     }
-
-    private void OnSwingLanded(SwingInfo swing, int hits) => Earn(ForSwing(swing, hits, Rules));
 
     private void OnParried(DamageInfo damage) => Earn(Rules.FocusOnParry);
 

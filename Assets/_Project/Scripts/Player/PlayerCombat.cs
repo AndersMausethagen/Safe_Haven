@@ -452,6 +452,7 @@ public sealed partial class PlayerCombat : MonoBehaviour
     {
         stateMachine.AttackRequested += OnAttackPressed;
         stateMachine.AttackReleased += OnAttackReleased;
+        stateMachine.AttackKeyTaken += OnAttackKeyTaken;
         stateMachine.ShieldBashRequested += OnShieldBashRequested;
         stateMachine.ArrowCycleRequested += OnArtRequested;
         combatant.DamageDealt += OnDamageDealt;
@@ -496,6 +497,7 @@ public sealed partial class PlayerCombat : MonoBehaviour
 
         stateMachine.AttackRequested -= OnAttackPressed;
         stateMachine.AttackReleased -= OnAttackReleased;
+        stateMachine.AttackKeyTaken -= OnAttackKeyTaken;
         stateMachine.ShieldBashRequested -= OnShieldBashRequested;
         stateMachine.ArrowCycleRequested -= OnArtRequested;
         combatant.DamageDealt -= OnDamageDealt;

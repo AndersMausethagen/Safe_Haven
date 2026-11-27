@@ -124,6 +124,16 @@ public sealed class PlayerStateMachine : MonoBehaviour
         AttackReleased?.Invoke();
     }
 
+    /// <summary>Raised when the attack key is taken away (a pause, a window, a hold on the controls): no release. What the press was
+    /// doing is given up, not let go: a drawn arrow isn't loosed, a held heavy isn't struck, a cast isn't thrown (review 2026-11-27:
+    /// taking the keys came as a release, and Esc or the map fired the bow and struck the charged heavy as the game resumed).</summary>
+    public event Action AttackKeyTaken;
+
+    public void TakeAttackKey()
+    {
+        AttackKeyTaken?.Invoke();
+    }
+
     /// <summary>Raising the guard is refused while busy with an interaction; lowering it always goes through.</summary>
     public void RequestGuard(bool raised)
     {

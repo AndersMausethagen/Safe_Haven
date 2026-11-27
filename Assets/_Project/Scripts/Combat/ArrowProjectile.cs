@@ -279,7 +279,7 @@ public sealed class ArrowProjectile : MonoBehaviour
                 * ambush);
 
             DamageResult result = victim.ApplyDamage(info);
-            owner.ReportDamageDealt(victim, info, result);
+            AttackResolver.Landed(owner, attack, victim, info, result);
             if (arrow != null && arrow.Burns && victim is Damageable body && victim.Category == TargetCategory.Creature)
             {
                 Burning.Apply(body, owner, arrow.BurnDamagePerSecond, arrow.BurnSeconds);

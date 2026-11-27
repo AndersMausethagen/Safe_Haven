@@ -127,6 +127,7 @@ public sealed class PlayerFishing : MonoBehaviour, IPlayerActivity
         Current = this;
         stateMachine.AttackRequested += OnAttackPressed;
         stateMachine.AttackReleased += OnAttackReleased;
+        stateMachine.AttackKeyTaken += OnAttackKeyTaken;
         stateMachine.GuardRequested += OnGuard;
         PlayerInterrupts.For(gameObject).Add(this);
     }
@@ -142,6 +143,7 @@ public sealed class PlayerFishing : MonoBehaviour, IPlayerActivity
     {
         stateMachine.AttackRequested -= OnAttackPressed;
         stateMachine.AttackReleased -= OnAttackReleased;
+        stateMachine.AttackKeyTaken -= OnAttackKeyTaken;
         stateMachine.GuardRequested -= OnGuard;
         if (TryGetComponent(out PlayerInterrupts interrupts))
         {
@@ -219,6 +221,16 @@ public sealed class PlayerFishing : MonoBehaviour, IPlayerActivity
         if (State == Phase.Charging)
         {
             Release();
+        }
+    }
+
+    // The key taken away (a pause, a window, a hold), not let go: a cast being wound up isn't thrown; a line out stays out.
+    private void OnAttackKeyTaken()
+    {
+        held = false;
+        if (State == Phase.Charging)
+        {
+            EndLine(null);
         }
     }
 

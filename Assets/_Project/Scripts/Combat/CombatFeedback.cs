@@ -617,7 +617,14 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
                 Spawn(feel.ParryEffect, point, -damage.Direction);
                 AudioManager.Play(Sounds != null ? Sounds.Parry : null, point);
                 CombatTechniqueSettings rules = CombatTechniqueSettings.Current;
-                SlowTime(rules.SlowMotionScale, rules.SlowMotionSeconds);
+                // Only a parry the player is in slows time, as with a block: a creature parrying a companion across the clearing slowed
+                // the player's fight (review 2026-11-27).
+                bool playersParry = playerParried || (damage.Source != null && Player.IsPlayer(damage.Source.gameObject));
+                if (playersParry)
+                {
+                    SlowTime(rules.SlowMotionScale, rules.SlowMotionSeconds);
+                }
+
                 // The player's parry lands as hard as a heavy blow; a monster's parry of the player keeps the small hitch above.
                 if (playerParried)
                 {

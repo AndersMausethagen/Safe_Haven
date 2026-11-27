@@ -255,8 +255,15 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
 
             if (definition.ConsumeDamage > 0f && target.IsAlive)
             {
+                // A share of the blow as it landed, so sent as what comes to that after the bearer's armour and the damage it takes
+                // (as the heart strike is): the blow had been through both already, and the burst went through them again, a staggered
+                // frozen creature taking 1.2 x 1.2 (review 2026-11-27).
+                float share = result.Damage * definition.ConsumeDamage;
+                float amount = target.TryGetComponent(out Combatant bearer)
+                    ? DamageCalculator.BeforeDefenses(share, definition.DamageType, StrikeKind.None, bearer.Stats, bearer.Rules, target.TakenScale)
+                    : share;
                 // A finisher's weight; not a technique that could burst another status in turn.
-                var burst = new DamageInfo(blow.Source, null, result.Damage * definition.ConsumeDamage, definition.DamageType, false,
+                var burst = new DamageInfo(blow.Source, null, amount, definition.DamageType, false,
                     blow.HitPoint, blow.Direction, 0f, HitTechnique.None);
                 DamageResult burstResult = target.ApplyDamage(burst);
                 // The striker's as the blow was (lifesteal, Focus, a kill's Second Wind); no technique, so it bursts nothing in turn.

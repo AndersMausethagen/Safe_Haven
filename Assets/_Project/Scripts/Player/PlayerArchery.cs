@@ -188,6 +188,7 @@ public sealed class PlayerArchery : MonoBehaviour
     {
         stateMachine.AttackRequested += OnAttackPressed;
         stateMachine.AttackReleased += OnAttackReleased;
+        stateMachine.AttackKeyTaken += OnAttackKeyTaken;
         stateMachine.GuardRequested += OnGuardRequested;
         stateMachine.ArrowCycleRequested += CycleArrow;
         if (combat != null)
@@ -213,6 +214,7 @@ public sealed class PlayerArchery : MonoBehaviour
     {
         stateMachine.AttackRequested -= OnAttackPressed;
         stateMachine.AttackReleased -= OnAttackReleased;
+        stateMachine.AttackKeyTaken -= OnAttackKeyTaken;
         stateMachine.GuardRequested -= OnGuardRequested;
         stateMachine.ArrowCycleRequested -= CycleArrow;
         if (combat != null)
@@ -324,6 +326,14 @@ public sealed class PlayerArchery : MonoBehaviour
         float draw = ArcheryRules.DrawShare(heldFor, DrawTime(bow));
         bool perfect = IsPerfect(bow, heldFor);
         Loose(bow, draw, SpreadNow(bow), perfect ? bow.PerfectReleaseDamage : 1f, perfect, false);
+    }
+
+    // The key taken away (a pause, a window, a hold), not let go: the draw is eased off, the arrow kept (review 2026-11-27: Esc or the
+    // map mid-draw loosed it behind the menu).
+    private void OnAttackKeyTaken()
+    {
+        held = false;
+        CancelDraw();
     }
 
     // How far the shot would stray if let go now.

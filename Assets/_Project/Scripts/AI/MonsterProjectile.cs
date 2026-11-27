@@ -87,9 +87,7 @@ public sealed class MonsterProjectile : MonoBehaviour
                     : DamageCalculator.Build(owner, attack, damage, victim.Category, hit.point, direction, Random.value);
                 info = info.WithAmount(info.Amount * CombatFeelSettings.HighGroundFor(owner.transform.position, victim is Component struck ? struck.transform.position : hit.point));
                 DamageResult result = victim.ApplyDamage(info);
-                owner.ReportDamageDealt(victim, info, result);
-                StatusEffects.AfterHit(attack, victim, owner, result);
-                ForcedMove.AfterHit(attack, victim, owner, result);
+                AttackResolver.Landed(owner, attack, victim, info, result);
                 WebLasso.AfterHit(attack, victim, owner, result);
             }
             Splash(victim is Component splashed && splashed != null ? splashed.transform.position : hit.point);

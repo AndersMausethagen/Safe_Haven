@@ -39,7 +39,14 @@ public static class GuardRules
         facing.y = 0f;
         Vector3 fromAttacker = -hitDirection;
         fromAttacker.y = 0f;
-        if (facing.sqrMagnitude > 1e-6f && fromAttacker.sqrMagnitude > 1e-6f && Vector3.Angle(facing, fromAttacker) > blockArc * 0.5f)
+        // A blow from no side (a fall into a chasm, a trap's spikes from below, a tick): nothing for a guard or a shield to meet. It was
+        // guarded from every side, so a guard raised as the player fell parried the fall each frame (review 2026-11-27).
+        if (fromAttacker.sqrMagnitude <= 1e-6f)
+        {
+            return GuardOutcome.None;
+        }
+
+        if (facing.sqrMagnitude > 1e-6f && Vector3.Angle(facing, fromAttacker) > blockArc * 0.5f)
         {
             return GuardOutcome.None; // from behind or the side: the guard doesn't cover it
         }

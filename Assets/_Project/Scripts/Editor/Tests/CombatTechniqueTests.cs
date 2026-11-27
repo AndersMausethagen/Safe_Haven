@@ -80,6 +80,44 @@ public sealed class CombatTechniqueTests
         Assert.AreEqual(GuardOutcome.GuardBroken, GuardRules.Resolve(true, window + 0.1f, facing, fromFront, rules.BlockArc, window, 5f, 10f));
         Assert.AreEqual(GuardOutcome.None, GuardRules.Resolve(true, window * 0.5f, facing, Vector3.forward, rules.BlockArc, window, 100f, 10f),
             "a hit from behind isn't covered, not even by a fresh guard");
+        Assert.AreEqual(GuardOutcome.None, GuardRules.Resolve(true, window * 0.5f, facing, Vector3.down, rules.BlockArc, window, 100f, 10f),
+            "a fall (a blow from no side) is never parried");
+        Assert.AreEqual(GuardOutcome.None, GuardRules.ResolveShield(120f, facing, Vector3.up, HitTechnique.None),
+            "nor does a creature's shield take a trap's spikes from below");
+    }
+
+    [Test]
+    public void FocusAndRegain_ComeFromFighting_NotFromCratesOrParriedBlows()
+    {
+        var player = new GameObject("player").AddComponent<Combatant>();
+        var foe = new GameObject("foe").AddComponent<Combatant>();
+        var crate = new GameObject("crate").AddComponent<Combatant>();
+        try
+        {
+            player.SetFaction(Faction.Player);
+            foe.SetFaction(Faction.Enemy);
+            crate.SetFaction(Faction.Neutral);
+            var foeBody = foe.gameObject.AddComponent<Damageable>();
+            var crateBody = crate.gameObject.AddComponent<Damageable>();
+            var swing = new DamageInfo(player, null, 10f, DamageType.Physical, false, Vector3.zero, Vector3.forward, 0f, HitTechnique.Melee);
+            var landed = new DamageResult(10f, 10f, 10f, false, false, DamageType.Physical);
+            Assert.IsTrue(FightBlows.Counts(player, foeBody, swing, landed));
+            Assert.IsFalse(FightBlows.Counts(player, crateBody, swing, landed), "a crate is no fight");
+            Assert.IsFalse(FightBlows.Counts(player, foeBody, swing, new DamageResult(10f, 10f, 10f, false, false, DamageType.Physical, GuardOutcome.Parried)),
+                "nor a parried blow");
+            Assert.IsFalse(FightBlows.Counts(player, foeBody, swing, new DamageResult(10f, 10f, 0f, false, false, DamageType.Physical)),
+                "nor one a floor held off");
+            Assert.Greater(PlayerFocus.ForBlow(HitTechnique.Melee, rules), 0f);
+            Assert.AreEqual(0f, PlayerFocus.ForBlow(HitTechnique.Melee | HitTechnique.Ability, rules), "an ability's blow pays nothing");
+            Assert.AreEqual(PlayerFocus.ForSwing(new SwingInfo(SwingKind.Heavy, null, 0, 1, 0, 1f, HitTechnique.Heavy, Vector3.forward), 1, rules),
+                PlayerFocus.ForBlow(HitTechnique.Melee | HitTechnique.Heavy, rules), 1e-4f, "a blow is worth what a swing pays a target");
+        }
+        finally
+        {
+            Object.DestroyImmediate(player.gameObject);
+            Object.DestroyImmediate(foe.gameObject);
+            Object.DestroyImmediate(crate.gameObject);
+        }
     }
 
     [Test]
