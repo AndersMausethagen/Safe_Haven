@@ -40,6 +40,60 @@ public sealed class SkillFxCue
     [Min(0.05f)] public float scale = 1f;
 }
 
+/// <summary>When a sound layer is heard: as the skill is cast, or as it lands.</summary>
+public enum SkillSoundPhase
+{
+    Cast = 0,
+    Release = 1,
+}
+
+/// <summary>One more sound a skill plays, on top of its cast and release sounds: a riser under the wind-up, a boom under the impact, a
+/// tail of falling debris or wind after it (the user, 2026-11-27: "make sure that ultimates look, feel and sound satisfying").</summary>
+[Serializable]
+public sealed class SkillSoundCue
+{
+    public SoundDefinition sound;
+    public SkillSoundPhase phase = SkillSoundPhase.Release;
+    [Tooltip("Real seconds after its phase begins (slow motion doesn't stretch it).")]
+    [Min(0f)] public float delay;
+}
+
+/// <summary>
+/// The big moment of a skill (an ultimate's): the camera pushes in through the wind-up; at the impact the screen punches (a flash of
+/// exposure, colour fringing, a lens bulge, a tint), time slows for a beat after the hit stop, and the world keeps the skill's colour a
+/// while (an afterglow: frost leaves it cold and grey, fire warm). Played by SkillMoments; empty (the defaults) does nothing.
+/// </summary>
+[Serializable]
+public sealed class SkillMomentLook
+{
+    [Tooltip("The camera's distance through the wind-up, times its own (0.85 pushes in 15%). 1: none.")]
+    [Range(0.6f, 1f)] public float windUpZoom = 1f;
+    [Tooltip("For a skill with no blow (a war cry): when its moment comes, in seconds after the cast.")]
+    [Min(0f)] public float impactDelay;
+    [Tooltip("Time after the hit stop: this slow, for Slow Seconds of real time (0.3 for 0.4 s). 1: none.")]
+    [Range(0.1f, 1f)] public float slowScale = 1f;
+    [Min(0f)] public float slowSeconds;
+    [Tooltip("How long the screen punch takes to fade, in real seconds.")]
+    [Min(0.05f)] public float punchSeconds = 0.6f;
+    [Tooltip("Exposure added at the punch's peak (EV): a white flash.")]
+    [Range(0f, 3f)] public float exposure;
+    [Tooltip("Colour fringing at the peak.")]
+    [Range(0f, 1f)] public float chromatic;
+    [Tooltip("Lens distortion at the peak: below 0 the screen bulges out from the blow, above 0 it pinches in (a roar's pull).")]
+    [Range(-0.6f, 0.6f)] public float distortion;
+    [Tooltip("A colour over the screen at the peak (white: none).")]
+    public Color tint = Color.white;
+    [Tooltip("The world keeps this colour a while after (clear: none), at Afterglow Strength, fading over Afterglow Seconds.")]
+    public Color afterglow = Color.clear;
+    [Range(0f, 1f)] public float afterglowStrength = 0.5f;
+    [Min(0f)] public float afterglowSeconds;
+    [Tooltip("Saturation through the afterglow (-40: the cold greys the world).")]
+    [Range(-80f, 40f)] public float afterglowSaturation;
+
+    public bool HasPunch => exposure > 0f || chromatic > 0f || Mathf.Abs(distortion) > 0.001f || tint != Color.white;
+    public bool IsEmpty => windUpZoom >= 0.999f && slowScale >= 0.999f && !HasPunch && afterglowSeconds <= 0f;
+}
+
 /// <summary>
 /// How a skill looks (Docs/CombatSkillsResearch_2026-11-24.md §6), in three phases: as it is cast (under the caster: the school's rune
 /// circle, a glow, a mist), as it is let go (spread over the attack's own reach and arc, so the effect shows the area it strikes), and on
@@ -71,6 +125,10 @@ public sealed class SkillLook
     public SoundDefinition releaseSound;
     [Tooltip("Seconds after the release that its sound is heard (a war cry's roar comes into its loudest a moment in).")]
     [Min(0f)] public float releaseSoundDelay;
+    [Tooltip("More sound layers: a riser, a boom, a tail.")]
+    public List<SkillSoundCue> sounds = new List<SkillSoundCue>();
+    [Tooltip("Its big moment: a camera push, a screen punch, slow time, an afterglow (the ultimates).")]
+    public SkillMomentLook moment = new SkillMomentLook();
 
     public bool IsEmpty => cast.Count == 0 && release.Count == 0 && struck.Count == 0 && castSound == null && releaseSound == null;
 }

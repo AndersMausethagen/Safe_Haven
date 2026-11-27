@@ -275,6 +275,16 @@ public sealed class EliteCreature : MonoBehaviour
         {
             List<ItemAmount> rolled = EliteLoot(difficulty).Roll(difficulty.tier, 1f);
             rolled.RemoveAll(drop => !difficulty.Allows(drop.Item));
+            // Now and then lore lies on its body with the rest (SkillLore; this branch returned before the roll, bug hunt 2026-11-27).
+            if (UnityEngine.Random.value < SkillLoreSettings.Current.EliteChance(difficulty.tier))
+            {
+                ItemDefinition lore = SkillLore.Pick(killer, new System.Random(UnityEngine.Random.Range(0, int.MaxValue)));
+                if (lore != null)
+                {
+                    rolled.Add(new ItemAmount(lore, 1));
+                }
+            }
+
             bool relic = difficulty.eliteRelicChance > 0f && UnityEngine.Random.value < difficulty.eliteRelicChance;
             LootableRemains body = LootableRemains.Leave(victim, Title, rolled, EliteLoot(difficulty).RollResources(difficulty.tier, 1f), relic,
                 difficulty.tier, PickInscription(killer, difficulty.tier));

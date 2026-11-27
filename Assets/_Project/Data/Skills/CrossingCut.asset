@@ -43,34 +43,21 @@ MonoBehaviour:
     value: 0.15
   buffDuration: 5
   buffName: Keen Edge
+  focusFromBlows: 1
   playAttackAnimation: 1
   animationState: Sword Heavy X
   animationSpeed: 1
   look:
-    showArea: 0
+    showArea: 1
     cast:
-    - prefab: {fileID: 5452306783253759216, guid: 51b518cd3d5ee044c8e13224eaa9fc9a, type: 3}
-      place: 1
-      count: 1
-      delay: 0
-      stepDelay: 0
-      seconds: 0.8
-      scale: 1
     - prefab: {fileID: 1616147937783209550, guid: 8b79baefabcb7fc4ea48f2b75485a424, type: 3}
       place: 0
       count: 1
-      delay: 0.06
-      stepDelay: 0
-      seconds: 0.5
-      scale: 1
-    release:
-    - prefab: {fileID: 5452306783253759216, guid: 51b518cd3d5ee044c8e13224eaa9fc9a, type: 3}
-      place: 1
-      count: 1
       delay: 0
       stepDelay: 0
-      seconds: 0.9
+      seconds: 0.4
       scale: 1
+    release:
     - prefab: {fileID: 6681213866509498761, guid: be5271f288744d54a95ead89c19e56c0, type: 3}
       place: 1
       count: 1
@@ -78,29 +65,51 @@ MonoBehaviour:
       stepDelay: 0
       seconds: 0.3
       scale: 1
+    - prefab: {fileID: 6681213866509498761, guid: be5271f288744d54a95ead89c19e56c0, type: 3}
+      place: 1
+      count: 1
+      delay: 0.08
+      stepDelay: 0
+      seconds: 0.3
+      scale: 1.1
     struck:
-    - prefab: {fileID: 4949841515135002252, guid: 1cfbce94292b32c4ca45ff82070f35aa, type: 3}
+    - prefab: {fileID: 7948493385885557333, guid: 31ddf1bf1f95521489a61edd92b92253, type: 3}
       place: 5
       count: 1
       delay: 0
       stepDelay: 0
-      seconds: 0.8
+      seconds: 0.9
       scale: 1
-    - prefab: {fileID: 8509353883847779146, guid: 8abdb0aebf3f09847992abc018aa8e1c, type: 3}
+    - prefab: {fileID: 7695878944792941921, guid: 91c82be48bd6a2c46b2cbd1b38c5f670, type: 3}
       place: 5
       count: 1
       delay: 0
       stepDelay: 0
       seconds: 0.7
       scale: 1
-    light: {r: 1, g: 0.5, b: 0.4, a: 1}
-    lightIntensity: 3
-    lightRange: 5
-    lightSeconds: 0.2
-    shake: 0.2
-    hitStop: 0.04
-    kick: 0.08
+    light: {r: 0, g: 0, b: 0, a: 0}
+    lightIntensity: 6
+    lightRange: 8
+    lightSeconds: 0.35
+    shake: 0.25
+    hitStop: 0.05
+    kick: 0.1
     castSound: {fileID: 11400000, guid: 3a13086423537444aa766d9db0602564, type: 2}
     releaseSound: {fileID: 0}
     releaseSoundDelay: 0
+    sounds: []
+    moment:
+      windUpZoom: 1
+      impactDelay: 0
+      slowScale: 1
+      slowSeconds: 0
+      punchSeconds: 0.6
+      exposure: 0
+      chromatic: 0
+      distortion: 0
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      afterglow: {r: 0, g: 0, b: 0, a: 0}
+      afterglowStrength: 0.5
+      afterglowSeconds: 0
+      afterglowSaturation: 0
   weaponArt: 0

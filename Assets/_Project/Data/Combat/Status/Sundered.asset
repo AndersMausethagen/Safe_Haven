@@ -27,8 +27,8 @@ MonoBehaviour:
   damageDealt: 1
   consumedBy: 0
   consumeDamage: 0
-  consumeLook: {fileID: 0}
-  consumeSound: {fileID: 0}
+  consumeLook: {fileID: 2467315714057474118, guid: 1f93b83f1aaf4c24f8a9b542ed98b133, type: 3}
+  consumeSound: {fileID: 11400000, guid: 17e7481c5f41c9148a38f82be1a274ec, type: 2}
   consumeLine: 
   reactions: []
   refreshes: 1

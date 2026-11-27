@@ -71,8 +71,8 @@ public static class SkillLore
     }
 
     /// <summary>
-    /// Puts a lore item in the player's bag (at their feet when it is full), with a legendary find's sound and words, and notes it for the
-    /// raid's report and the playtest log. <paramref name="from"/>: "the Old Moss Troll", "a supply cache".
+    /// Puts a lore item in the player's bag (at their feet when it is full) and notes it for the raid's report. The bag announces it as it
+    /// arrives (Announce), as it does lore taken from a body or a Haven place. <paramref name="from"/>: "the Old Moss Troll", "a supply cache".
     /// </summary>
     public static bool Grant(GameObject player, ItemDefinition lore, string from)
     {
@@ -85,13 +85,34 @@ public static class SkillLore
         if (ItemDelivery.Give(bag, new ItemStack(lore, 1), newFind: true, toStash: false).Fell)
         {
             GameMessages.Post("Bag full: it falls at your feet.", MessageKind.Warning);
+            // On the ground it isn't in the bag yet: said now, and again (by the bag) when it is picked up.
+            Announce(player, lore);
+        }
+
+        if (RaidDirector.Current != null)
+        {
+            RaidDirector.Current.Session.RecordEvent($"Found {lore.DisplayName} ({from})");
+        }
+
+        return true;
+    }
+
+    /// <summary>Lore has come into the bag (any way: a grant, a body's loot, a Haven place): a legendary find's sound and words, and the
+    /// playtest log's LoreFound row (PlayerSkills listens to the bag).</summary>
+    public static void Announce(GameObject player, ItemDefinition lore)
+    {
+        if (lore == null || lore.TeachesSkill == null)
+        {
+            return;
         }
 
         GameMessages.Post($"{lore.DisplayName}! It holds {lore.TeachesSkill.DisplayName}: read it at home to learn it.", MessageKind.Gain);
-        AudioManager.Play(Rarity.StyleOf(ItemRarity.Legendary).PickupSound, bag.transform.position);
-        RaidDirector.Current?.Session.RecordEvent($"Found {lore.DisplayName}");
-        PlaytestLogger.Note(PlaytestLog.LoreFound, lore.TeachesSkill.Id, 1, from);
-        return true;
+        if (player != null)
+        {
+            AudioManager.Play(Rarity.StyleOf(ItemRarity.Legendary).PickupSound, player.transform.position);
+        }
+
+        PlaytestLogger.Note(PlaytestLog.LoreFound, lore.TeachesSkill.Id, 1, RaidDirector.Current != null ? "raid" : "home");
     }
 
     /// <summary>
@@ -121,8 +142,7 @@ public static class SkillLore
         }
 
         from.RemoveAt(slot, 1);
-        skills.Learn(skill);
-        GameMessages.Post($"You take in what {stack.Item.DisplayName} holds: {skill.DisplayName} is yours ({SkillKinds.Name(skill.Kind)}).", MessageKind.Gain);
+        skills.Learn(skill, true, $"You take in what {stack.Item.DisplayName} holds: {skill.DisplayName} is yours ({SkillKinds.Name(skill.Kind)}).");
         PlaytestLogger.Note(PlaytestLog.LoreRead, skill.Id, 1, stack.Item.Id);
         GameEvents.Raise(new GameEvent(GameEventKind.Consumed, stack.Item, 1, reader));
         return true;

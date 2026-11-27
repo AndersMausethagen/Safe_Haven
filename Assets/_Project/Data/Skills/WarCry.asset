@@ -28,6 +28,10 @@ MonoBehaviour:
   foesStatus: {fileID: 11400000, guid: 05e74601a31d1534297fa262575659f3, type: 2}
   foesRadius: 7
   foesDelay: 0.75
+  weapons: 
+  needsWeapon: 0
+  favouredDamage: 1.25
+  combos: []
   options:
   - id: cry_breath
     displayName: Long Breath
@@ -167,6 +171,7 @@ MonoBehaviour:
     value: 0.15
   buffDuration: 12
   buffName: Battle Fury
+  focusFromBlows: 1
   playAttackAnimation: 1
   animationState: War Cry
   animationSpeed: 1
@@ -202,15 +207,61 @@ MonoBehaviour:
       stepDelay: 0.03
       seconds: 0.8
       scale: 1
+    - prefab: {fileID: 4506804763837238046, guid: 29786edfc90de8246a5d2be965a869f9, type: 3}
+      place: 0
+      count: 1
+      delay: 0.55
+      stepDelay: 0
+      seconds: 0.5
+      scale: 1
+    - prefab: {fileID: 2071560662299752964, guid: be0a520aa5d9627409cc5bbe83f05847, type: 3}
+      place: 1
+      count: 1
+      delay: 0.55
+      stepDelay: 0
+      seconds: 0.8
+      scale: 1
+    - prefab: {fileID: 2071560662299752964, guid: be0a520aa5d9627409cc5bbe83f05847, type: 3}
+      place: 1
+      count: 1
+      delay: 0.72
+      stepDelay: 0
+      seconds: 0.8
+      scale: 1.25
+    - prefab: {fileID: 2071560662299752964, guid: be0a520aa5d9627409cc5bbe83f05847, type: 3}
+      place: 1
+      count: 1
+      delay: 0.9
+      stepDelay: 0
+      seconds: 0.8
+      scale: 1.5
     struck: []
     light: {r: 1, g: 0.85, b: 0.6, a: 1}
     lightIntensity: 2.5
     lightRange: 6
     lightSeconds: 0.25
-    shake: 0.3
+    shake: 0.9
     hitStop: 0
-    kick: 0.1
+    kick: 0.15
     castSound: {fileID: 0}
     releaseSound: {fileID: 11400000, guid: 727830385124e9e418b338d10622354a, type: 2}
     releaseSoundDelay: 0.5
+    sounds:
+    - sound: {fileID: 11400000, guid: 98c78bae69a2a3241b290e90059177de, type: 2}
+      phase: 1
+      delay: 0.45
+    moment:
+      windUpZoom: 0.9
+      impactDelay: 0.55
+      slowScale: 1
+      slowSeconds: 0
+      punchSeconds: 0.75
+      exposure: 0.35
+      chromatic: 0.65
+      distortion: -0.32
+      tint: {r: 1.2, g: 0.88, b: 0.82, a: 1}
+      afterglow: {r: 0, g: 0, b: 0, a: 0}
+      afterglowStrength: 0.5
+      afterglowSeconds: 0
+      afterglowSaturation: 0
   weaponArt: 0

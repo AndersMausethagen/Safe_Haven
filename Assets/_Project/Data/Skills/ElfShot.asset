@@ -46,36 +46,66 @@ MonoBehaviour:
     value: 0.1
   buffDuration: 6
   buffName: Elf-Sight
+  focusFromBlows: 1
   playAttackAnimation: 1
   animationState: Cast
   animationSpeed: 1
   look:
-    showArea: 0
+    showArea: 1
     cast:
     - prefab: {fileID: 4653774577823323000, guid: 7c7ec14584dc7934697942dde0122860, type: 3}
       place: 1
       count: 1
       delay: 0
       stepDelay: 0
-      seconds: 1.6
+      seconds: 1
+      scale: 1
+    - prefab: {fileID: 8746849460566642358, guid: 611f57415f12dda4ab7af583e3472f4d, type: 3}
+      place: 0
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 0.6
       scale: 1
     release:
-    - prefab: {fileID: 5086883781002387737, guid: 35837e3be50e9534382b56e262e7d126, type: 3}
-      place: 1
+    - prefab: {fileID: 1017984351386007321, guid: 599290ef79539de4fa48be53bbe27462, type: 3}
+      place: 0
       count: 1
-      delay: 0.055
+      delay: 0
       stepDelay: 0
-      seconds: 2
+      seconds: 0.4
       scale: 1
-    struck: []
-    light: {r: 0.6, g: 1, b: 0.45, a: 1}
-    lightIntensity: 3
-    lightRange: 6
-    lightSeconds: 0.6
-    shake: 0
-    hitStop: 0
-    kick: 0
+    struck:
+    - prefab: {fileID: 1017984351386007321, guid: 599290ef79539de4fa48be53bbe27462, type: 3}
+      place: 5
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 0.4
+      scale: 1
+    light: {r: 0, g: 0, b: 0, a: 0}
+    lightIntensity: 6
+    lightRange: 8
+    lightSeconds: 0.35
+    shake: 0.1
+    hitStop: 0.03
+    kick: 0.06
     castSound: {fileID: 11400000, guid: ae7b547cc5f56d5498e0e31fa723ade1, type: 2}
     releaseSound: {fileID: 0}
     releaseSoundDelay: 0
+    sounds: []
+    moment:
+      windUpZoom: 1
+      impactDelay: 0
+      slowScale: 1
+      slowSeconds: 0
+      punchSeconds: 0.6
+      exposure: 0
+      chromatic: 0
+      distortion: 0
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      afterglow: {r: 0, g: 0, b: 0, a: 0}
+      afterglowStrength: 0.5
+      afterglowSeconds: 0
+      afterglowSaturation: 0
   weaponArt: 0

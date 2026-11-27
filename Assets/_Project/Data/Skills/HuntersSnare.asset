@@ -43,25 +43,19 @@ MonoBehaviour:
     value: 0.2
   buffDuration: 6
   buffName: Hunter's Patience
+  focusFromBlows: 1
   playAttackAnimation: 1
   animationState: KI 1H Backhand
   animationSpeed: 1
   look:
-    showArea: 0
+    showArea: 1
     cast:
     - prefab: {fileID: 4047249316231547844, guid: 470b560476fcda647a51ec6ad778232e, type: 3}
       place: 1
       count: 1
       delay: 0
       stepDelay: 0
-      seconds: 0.7
-      scale: 1
-    - prefab: {fileID: 2681584111135180071, guid: 3944ddcf25c73224393184634d06ba50, type: 3}
-      place: 1
-      count: 1
-      delay: 0.055
-      stepDelay: 0
-      seconds: 1
+      seconds: 0.5
       scale: 1
     release:
     - prefab: {fileID: 2203060802714908154, guid: 8dce18523c46f7a4aa7f08b0e559b780, type: 3}
@@ -72,28 +66,36 @@ MonoBehaviour:
       seconds: 0.4
       scale: 1
     struck:
-    - prefab: {fileID: 2681584111135180071, guid: 3944ddcf25c73224393184634d06ba50, type: 3}
+    - prefab: {fileID: 4047249316231547844, guid: 470b560476fcda647a51ec6ad778232e, type: 3}
       place: 5
       count: 1
       delay: 0
       stepDelay: 0
-      seconds: 1
-      scale: 1
-    - prefab: {fileID: 9094924754952946362, guid: f6aa8ea3f98f40f49909360b12272fcb, type: 3}
-      place: 5
-      count: 1
-      delay: 0
-      stepDelay: 0
-      seconds: 0.3
+      seconds: 0.7
       scale: 1
     light: {r: 0, g: 0, b: 0, a: 0}
     lightIntensity: 6
     lightRange: 8
     lightSeconds: 0.35
-    shake: 0.2
-    hitStop: 0.04
+    shake: 0.15
+    hitStop: 0
     kick: 0.08
     castSound: {fileID: 11400000, guid: f863ead39fc8d3d4d907ef6cddc3d6a2, type: 2}
     releaseSound: {fileID: 0}
     releaseSoundDelay: 0
+    sounds: []
+    moment:
+      windUpZoom: 1
+      impactDelay: 0
+      slowScale: 1
+      slowSeconds: 0
+      punchSeconds: 0.6
+      exposure: 0
+      chromatic: 0
+      distortion: 0
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      afterglow: {r: 0, g: 0, b: 0, a: 0}
+      afterglowStrength: 0.5
+      afterglowSeconds: 0
+      afterglowSaturation: 0
   weaponArt: 0

@@ -43,6 +43,7 @@ MonoBehaviour:
     value: 0.25
   buffDuration: 6
   buffName: Rime Skin
+  focusFromBlows: 1
   playAttackAnimation: 1
   animationState: Staff Ward
   animationSpeed: 1
@@ -54,53 +55,68 @@ MonoBehaviour:
       count: 1
       delay: 0
       stepDelay: 0
-      seconds: 1.1
+      seconds: 1
       scale: 1
-    - prefab: {fileID: 7111475273592852384, guid: ddfa773ec994cab4a8cd975371e75aa5, type: 3}
+    release:
+    - prefab: {fileID: 2769778595078416903, guid: dff9d6d474be50d488d78a05a20c5297, type: 3}
+      place: 1
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 0.6
+      scale: 1
+    - prefab: {fileID: 261918180221770225, guid: 825e776e1296f01479aa7eb50703c8f0, type: 3}
+      place: 4
+      count: 10
+      delay: 0.02
+      stepDelay: 0.015
+      seconds: 1.8
+      scale: 0.9
+    - prefab: {fileID: 986340325662445630, guid: 1116604358266ae42911fd8384114ebb, type: 3}
+      place: 4
+      count: 6
+      delay: 0.04
+      stepDelay: 0
+      seconds: 1.4
+      scale: 1
+    - prefab: {fileID: 8063518176566901398, guid: 52bf0551dbca60d4fbfc2c42477c1ab7, type: 3}
       place: 0
       count: 1
       delay: 0
       stepDelay: 0
-      seconds: 0.8
-      scale: 1
-    release:
-    - prefab: {fileID: 261918180221770225, guid: 825e776e1296f01479aa7eb50703c8f0, type: 3}
-      place: 2
-      count: 6
-      delay: 0
-      stepDelay: 0.05
-      seconds: 1.8
-      scale: 1
-    - prefab: {fileID: 3692144912798170073, guid: 08accf0fab8405947a6e76ec46876823, type: 3}
-      place: 2
-      count: 6
-      delay: 0
-      stepDelay: 0.05
-      seconds: 1.2
-      scale: 1
-    - prefab: {fileID: 986340325662445630, guid: 1116604358266ae42911fd8384114ebb, type: 3}
-      place: 2
-      count: 3
-      delay: 0.05
-      stepDelay: 0.08
-      seconds: 1.5
+      seconds: 1.6
       scale: 1
     struck:
     - prefab: {fileID: 7316791224874305878, guid: 369155612734293469367b382ceb189b, type: 3}
       place: 5
       count: 1
-      delay: 0.05
+      delay: 0
       stepDelay: 0
-      seconds: 1
+      seconds: 0.9
       scale: 1
-    light: {r: 0.55, g: 0.8, b: 1, a: 1}
-    lightIntensity: 6
-    lightRange: 8
-    lightSeconds: 0.3
-    shake: 0.25
+    light: {r: 0.6, g: 0.85, b: 1, a: 1}
+    lightIntensity: 9
+    lightRange: 11
+    lightSeconds: 0.35
+    shake: 0.3
     hitStop: 0.04
     kick: 0.08
     castSound: {fileID: 11400000, guid: 3953010596fe1c944bbc42af8fe3d92b, type: 2}
     releaseSound: {fileID: 11400000, guid: de511fd243c1e2546b818b7dc31fd029, type: 2}
     releaseSoundDelay: 0
+    sounds: []
+    moment:
+      windUpZoom: 1
+      impactDelay: 0
+      slowScale: 1
+      slowSeconds: 0
+      punchSeconds: 0.6
+      exposure: 0
+      chromatic: 0
+      distortion: 0
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      afterglow: {r: 0, g: 0, b: 0, a: 0}
+      afterglowStrength: 0.5
+      afterglowSeconds: 0
+      afterglowSaturation: 0
   weaponArt: 0

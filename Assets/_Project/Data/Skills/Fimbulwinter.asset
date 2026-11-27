@@ -33,7 +33,7 @@ MonoBehaviour:
   favouredDamage: 1.25
   combos: []
   options: []
-  leaves: {fileID: 67207903237708939, guid: f8b1e9160d7ba314b8c4c987d7025ec9, type: 3}
+  leaves: {fileID: 0}
   leavesCount: 6
   attack: {fileID: 11400000, guid: e813d9b88a2775647839199159dac38d, type: 2}
   heal: 0
@@ -51,60 +51,147 @@ MonoBehaviour:
   animationState: KI Pole Slam
   animationSpeed: 1
   look:
-    showArea: 1
+    showArea: 0
     cast:
-    - prefab: {fileID: 6071590681812878017, guid: 94154eda488c5c5439cf0c3b6b52f315, type: 3}
+    - prefab: {fileID: 8386635081131392730, guid: f66ff67c7ada230429b10a6f53f210bc, type: 3}
       place: 1
       count: 1
       delay: 0
       stepDelay: 0
-      seconds: 1.1
+      seconds: 1.4
       scale: 1
-    - prefab: {fileID: 7111475273592852384, guid: ddfa773ec994cab4a8cd975371e75aa5, type: 3}
+    - prefab: {fileID: 9073172295190089132, guid: 8fd478f77f3e6f14d9f51986151228b7, type: 3}
       place: 0
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 0.7
+      scale: 1
+    - prefab: {fileID: 3744876283950387050, guid: df078bdcfb421074081acc5a855c8110, type: 3}
+      place: 1
+      count: 1
+      delay: 0.05
+      stepDelay: 0
+      seconds: 1.2
+      scale: 1
+    release:
+    - prefab: {fileID: 4232246873137523402, guid: 395f792c450d54b4592955076bf810fe, type: 3}
+      place: 0
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 0.5
+      scale: 1
+    - prefab: {fileID: 2765206793440089542, guid: 3106d70c5bc4691488f201605eac4a29, type: 3}
+      place: 1
+      count: 1
+      delay: 0
+      stepDelay: 0
+      seconds: 1
+      scale: 1
+    - prefab: {fileID: 7390748180031857113, guid: 5a81fb410184cfa4f9bfb65fbb4e494d, type: 3}
+      place: 1
       count: 1
       delay: 0
       stepDelay: 0
       seconds: 0.8
       scale: 1
-    release:
-    - prefab: {fileID: 261918180221770225, guid: 825e776e1296f01479aa7eb50703c8f0, type: 3}
-      place: 2
-      count: 6
+    - prefab: {fileID: 7390748180031857113, guid: 5a81fb410184cfa4f9bfb65fbb4e494d, type: 3}
+      place: 1
+      count: 1
+      delay: 0.14
+      stepDelay: 0
+      seconds: 0.8
+      scale: 1.3
+    - prefab: {fileID: 3102005971556095472, guid: 5a541dab6f8a077418f78b3a09c1b43b, type: 3}
+      place: 1
+      count: 1
       delay: 0
-      stepDelay: 0.05
-      seconds: 1.8
+      stepDelay: 0
+      seconds: 3.4
       scale: 1
-    - prefab: {fileID: 3692144912798170073, guid: 08accf0fab8405947a6e76ec46876823, type: 3}
-      place: 2
-      count: 6
+    - prefab: {fileID: 2930438962245188068, guid: 273728e94053e444f9a7083c444369fc, type: 3}
+      place: 1
+      count: 1
+      delay: 0.02
+      stepDelay: 0
+      seconds: 3.6
+      scale: 1
+    - prefab: {fileID: 8981855811541817981, guid: 751fd2551872c794a89ebcff30135c65, type: 3}
+      place: 4
+      count: 14
+      delay: 0.04
+      stepDelay: 0.012
+      seconds: 3.6
+      scale: 1
+    - prefab: {fileID: 8981855811541817981, guid: 751fd2551872c794a89ebcff30135c65, type: 3}
+      place: 3
+      count: 9
+      delay: 0.02
+      stepDelay: 0.012
+      seconds: 3.6
+      scale: 0.8
+    - prefab: {fileID: 4015096746529357709, guid: f826c32fdede9fb4ea79b666a2559005, type: 3}
+      place: 0
+      count: 1
       delay: 0
-      stepDelay: 0.05
-      seconds: 1.2
+      stepDelay: 0
+      seconds: 2
       scale: 1
-    - prefab: {fileID: 986340325662445630, guid: 1116604358266ae42911fd8384114ebb, type: 3}
-      place: 2
-      count: 3
-      delay: 0.05
-      stepDelay: 0.08
-      seconds: 1.5
-      scale: 1
-    struck:
-    - prefab: {fileID: 7316791224874305878, guid: 369155612734293469367b382ceb189b, type: 3}
-      place: 5
+    - prefab: {fileID: 826186860059372991, guid: d102bab3edf15154abb9bc004787bb40, type: 3}
+      place: 1
       count: 1
       delay: 0.05
       stepDelay: 0
-      seconds: 1
+      seconds: 3.6
       scale: 1
-    light: {r: 0.55, g: 0.8, b: 1, a: 1}
-    lightIntensity: 6
-    lightRange: 8
-    lightSeconds: 0.3
-    shake: 0.25
-    hitStop: 0.04
-    kick: 0.08
+    - prefab: {fileID: 403568837375110056, guid: 4d678418ae60b254982e6d2e7490d897, type: 3}
+      place: 0
+      count: 1
+      delay: 0.1
+      stepDelay: 0
+      seconds: 3.8
+      scale: 1
+    struck:
+    - prefab: {fileID: 105420369310068332, guid: a5cd86b19b5bf164f87d95bd9728341d, type: 3}
+      place: 5
+      count: 1
+      delay: 0.03
+      stepDelay: 0
+      seconds: 1.2
+      scale: 1
+    light: {r: 0.6, g: 0.85, b: 1, a: 1}
+    lightIntensity: 26
+    lightRange: 24
+    lightSeconds: 0.9
+    shake: 1.4
+    hitStop: 0.12
+    kick: 0.3
     castSound: {fileID: 11400000, guid: 3953010596fe1c944bbc42af8fe3d92b, type: 2}
     releaseSound: {fileID: 11400000, guid: de511fd243c1e2546b818b7dc31fd029, type: 2}
     releaseSoundDelay: 0
+    sounds:
+    - sound: {fileID: 11400000, guid: cd731a616ecdcdc47a5f51726f26b06d, type: 2}
+      phase: 0
+      delay: 0
+    - sound: {fileID: 11400000, guid: c95ebec948f949542a494813c0e474ad, type: 2}
+      phase: 1
+      delay: 0
+    - sound: {fileID: 11400000, guid: c143852a1140b61459460a5e887db84b, type: 2}
+      phase: 1
+      delay: 0.3
+    moment:
+      windUpZoom: 0.84
+      impactDelay: 0
+      slowScale: 0.3
+      slowSeconds: 0.45
+      punchSeconds: 0.9
+      exposure: 1
+      chromatic: 0.9
+      distortion: -0.38
+      tint: {r: 0.85, g: 0.97, b: 1.25, a: 1}
+      afterglow: {r: 0.78, g: 0.9, b: 1.12, a: 1}
+      afterglowStrength: 0.55
+      afterglowSeconds: 3.2
+      afterglowSaturation: -35
   weaponArt: 0

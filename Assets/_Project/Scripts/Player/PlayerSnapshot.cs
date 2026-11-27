@@ -359,6 +359,12 @@ public sealed class PlayerSnapshot
             equipment.Restore(gear, hasGear, condition.EquippedSlot);
         }
 
+        // The weapon back in hand teaches its kind's technique, if it is of the tier that does and the book doesn't have it yet.
+        if (skills != null && player.TryGetComponent(out PlayerCombat fighter))
+        {
+            skills.LearnWeaponTechnique(fighter.Weapon);
+        }
+
         PlayerBoons playerBoons = player.GetComponent<PlayerBoons>();
         if (playerBoons != null)
         {

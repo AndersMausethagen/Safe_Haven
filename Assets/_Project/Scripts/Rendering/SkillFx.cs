@@ -58,6 +58,42 @@ public sealed class SkillFx : MonoBehaviour
         {
             AudioManager.Play(look.castSound, caster.position);
         }
+
+        Runner.PlaySounds(look, SkillSoundPhase.Cast, caster.position);
+        // Its big moment's wind-up: the camera pushes in until it lands (or, with no blow, until its moment comes).
+        SkillMoments.WindUp(look.moment, windUp > 0.05f ? windUp : look.moment.impactDelay);
+    }
+
+    // The look's extra sound layers of a phase, each after its delay in real time (slow motion doesn't stretch a riser or a tail).
+    private void PlaySounds(SkillLook look, SkillSoundPhase phase, Vector3 at)
+    {
+        if (look.sounds == null)
+        {
+            return;
+        }
+
+        foreach (SkillSoundCue cue in look.sounds)
+        {
+            if (cue == null || cue.sound == null || cue.phase != phase)
+            {
+                continue;
+            }
+
+            if (cue.delay > 0f)
+            {
+                StartCoroutine(SoundLaterRealtime(cue.sound, at, cue.delay));
+            }
+            else
+            {
+                AudioManager.Play(cue.sound, at);
+            }
+        }
+    }
+
+    private static IEnumerator SoundLaterRealtime(SoundDefinition sound, Vector3 at, float delay)
+    {
+        yield return new WaitForSecondsRealtime(delay);
+        AudioManager.Play(sound, at);
     }
 
     /// <summary>A weapon art begins (its attack's own look, AttackDefinition.Look): its cast cues round the striker.</summary>
@@ -123,11 +159,18 @@ public sealed class SkillFx : MonoBehaviour
             CameraShake.Add(look.shake);
         }
 
-        // Its weight by size (Docs/SkillsImprovementResearch_2026-11-24.md 6): a freeze when it struck something, and the frame pushed
-        // toward the blow.
-        if (look.hitStop > 0f && struck != null && struck.Count > 0 && CombatFeedback.Current != null)
+        PlaySounds(look, SkillSoundPhase.Release, origin);
+        // Its weight by size (Docs/SkillsImprovementResearch_2026-11-24.md 6): a freeze when it struck something (an ultimate's always:
+        // its moment is the blow), and the frame pushed toward the blow.
+        bool moment = look.moment != null && !look.moment.IsEmpty;
+        if (look.hitStop > 0f && (moment || struck != null && struck.Count > 0) && CombatFeedback.Current != null)
         {
             CombatFeedback.Current.HitStop(look.hitStop);
+        }
+
+        if (moment)
+        {
+            SkillMoments.Impact(look.moment);
         }
 
         if (look.kick > 0f)

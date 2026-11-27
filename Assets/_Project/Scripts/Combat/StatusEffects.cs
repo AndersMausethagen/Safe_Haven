@@ -186,6 +186,9 @@ public sealed class StatusEffects : MonoBehaviour, ICopyAware
     /// <summary>A status burst by a blow (Shatter): its bearer, the status and where (StatusBearerLook shows it).</summary>
     public static event System.Action<Damageable, StatusEffectDefinition, Vector3> Consumed;
 
+    /// <summary>A status used up by a skill's payoff (PlayerSkills' combos): shown and heard as a burst is, by its Consume Look and Sound.</summary>
+    public static void NoteConsumed(Damageable target, StatusEffectDefinition definition, Vector3 at) => Consumed?.Invoke(target, definition, at);
+
     public static StatusEffects Apply(Damageable target, StatusEffectDefinition effect, Combatant source)
     {
         if (target == null || effect == null || !target.IsAlive)

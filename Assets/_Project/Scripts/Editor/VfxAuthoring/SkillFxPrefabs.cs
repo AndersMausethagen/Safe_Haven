@@ -10,7 +10,7 @@ using UnityEngine.VFX;
 /// prefabs and statuses it makes, the three skills' Look, and their attacks' status fields (and Frost Rune's arc, a lance now).
 /// Run again after changing a design here. Safe Haven › Tools › Effects › Dress the First Skills.
 /// </summary>
-public static class SkillFxPrefabs
+public static partial class SkillFxPrefabs
 {
     private const string Prefabs = "Assets/_Project/Art/Effects/Skills/Prefabs";
     private const string Graphs = SkillVfxArchetypes.Folder;
@@ -458,6 +458,8 @@ public static class SkillFxPrefabs
             log.AppendLine($"art {file}: {look.cast.Count} cast, {look.release.Count} release, {look.struck.Count} struck");
         }
 
+        // The ultimates' moments, the newer skills' own looks and the payoffs' bursts (SkillFxPrefabs.Moments.cs), on top of the above.
+        log.Append(DressMoments());
         AssetDatabase.SaveAssets();
         return log.ToString();
     }

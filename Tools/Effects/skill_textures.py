@@ -1,168 +1,146 @@
-"""Textures for the skill effects (Docs/CombatSkillsResearch_2026-11-24.md section 6), drawn procedurally so they stay ours.
+"""Procedural textures for the skills' effects (the ultimates' 2026-11-27 dressing): white shapes on transparent, coloured by the effect.
 
-Writes white-on-transparent RGBA PNGs (the effect's colour comes from the graph), 512 px, into
-Assets/_Project/Art/Effects/Skills/Textures:
-  Glow.png         a soft round glow with a bright core
-  Ring.png         a thin soft ring (shockwaves, cast rings)
-  Shard.png        a long thin diamond (ice shards, splinters)
-  Rune Circle.png  a double ring carrying runes of the elder futhark (the cast circle under the feet)
-  Ember.png        a small hot ember with a faint tail
-  Slash.png        a crescent swept by a blade: bright at its leading edge, thin at the tips (physical arts)
-  Streak.png       a long soft line, for speed lines along a dash
-Run: python Tools/Effects/skill_textures.py
+  Cracks     glowing cracks running out from a centre, branching: the ground split by an ultimate (a flat quad, additive)
+  Beam       a soft vertical column with a bright core: a pillar of light or fire, stretched tall
+  Flare      a star with long rays and a hot centre: the moment of impact
+  Shockwave  a band with a bright leading edge and a soft trail inward: a wave rolling out over the ground
+  Feather    a dark feather's silhouette: the raven's
+  Snowflake  a six-armed crystal: the blizzard's
+
+Run with any Python that has numpy and Pillow; writes into Assets/_Project/Art/Effects/Skills/Textures (512 px, RGBA).
+  python Tools/Effects/skill_textures.py
 """
 import math
 import os
-import random
 
+import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
+HERE = os.path.dirname(os.path.abspath(__file__))
+OUT = os.path.join(HERE, "..", "..", "Assets", "_Project", "Art", "Effects", "Skills", "Textures")
 SIZE = 512
-OUT = os.path.join(os.path.dirname(__file__), "..", "..", "Assets", "_Project", "Art", "Effects", "Skills", "Textures")
 
 
-def blank():
-    return Image.new("L", (SIZE, SIZE), 0)
+def grid():
+    y, x = np.mgrid[0:SIZE, 0:SIZE].astype(np.float32)
+    x = (x + 0.5) / SIZE * 2.0 - 1.0
+    y = (y + 0.5) / SIZE * 2.0 - 1.0
+    return x, y
 
 
-def save(alpha, name):
-    rgba = Image.new("RGBA", (SIZE, SIZE), (255, 255, 255, 0))
-    rgba.putalpha(alpha)
-    os.makedirs(OUT, exist_ok=True)
-    rgba.save(os.path.join(OUT, name))
+def save(name, alpha, glow=None):
+    """White with this alpha (0-1); glow adds a soft halo under it."""
+    a = np.clip(alpha, 0.0, 1.0)
+    if glow is not None:
+        a = np.clip(np.maximum(a, glow), 0.0, 1.0)
+    rgba = np.zeros((SIZE, SIZE, 4), np.uint8)
+    rgba[..., :3] = 255
+    rgba[..., 3] = (a * 255).astype(np.uint8)
+    Image.fromarray(rgba, "RGBA").save(os.path.join(OUT, name + ".png"))
+    print("wrote", name)
 
 
-def glow():
-    a = blank()
-    px = a.load()
+def blur(alpha, radius):
+    im = Image.fromarray((np.clip(alpha, 0, 1) * 255).astype(np.uint8), "L").filter(ImageFilter.GaussianBlur(radius))
+    return np.asarray(im).astype(np.float32) / 255.0
+
+
+def cracks(rng):
+    """Jagged cracks out from the middle, each branching once or twice, thinner and fainter as they run; a hot core."""
+    im = Image.new("L", (SIZE, SIZE), 0)
+    draw = ImageDraw.Draw(im)
     c = SIZE / 2
-    for y in range(SIZE):
-        for x in range(SIZE):
-            d = math.hypot(x - c, y - c) / c
-            v = max(0.0, 1 - d) ** 2.2 + 0.6 * max(0.0, 1 - d * 4) ** 2
-            px[x, y] = int(min(1.0, v) * 255)
-    save(a, "Glow.png")
+
+    def crack(x, y, angle, length, width, depth):
+        steps = int(length / 9)
+        for _ in range(steps):
+            angle += rng.uniform(-0.45, 0.45)
+            nx = x + math.cos(angle) * 9
+            ny = y + math.sin(angle) * 9
+            draw.line([(x, y), (nx, ny)], fill=int(255 * min(1.0, 0.35 + width / 6)), width=max(1, int(width)))
+            x, y = nx, ny
+            width = max(1.0, width * 0.965)
+            if depth < 2 and rng.random() < 0.06:
+                crack(x, y, angle + rng.choice([-1, 1]) * rng.uniform(0.5, 1.0), length * rng.uniform(0.3, 0.55), width * 0.7, depth + 1)
+
+    for i in range(11):
+        a = i / 11 * math.tau + rng.uniform(-0.2, 0.2)
+        crack(c, c, a, rng.uniform(170, 245), rng.uniform(8.0, 11.0), 0)
+    line = np.asarray(im).astype(np.float32) / 255.0
+    x, y = grid()
+    r = np.sqrt(x * x + y * y)
+    fade = np.clip(1.0 - (r - 0.7) / 0.3, 0.0, 1.0)
+    core = np.exp(-(r / 0.12) ** 2) * 0.9
+    save("Cracks", line * fade + core, blur(line, 6) * 0.55 * fade)
 
 
-def ring():
-    a = blank()
-    px = a.load()
+def beam():
+    """A column: bright thin core, soft wide glow, fading out at the top and in at the bottom."""
+    x, y = grid()
+    across = np.exp(-(x / 0.08) ** 2) + 0.45 * np.exp(-(x / 0.32) ** 2)
+    up = (1.0 - y) / 2.0  # 0 at the bottom, 1 at the top (image rows run down)
+    along = np.clip(up / 0.08, 0.0, 1.0) * np.clip((1.0 - up) / 0.55, 0.0, 1.0) ** 0.8
+    save("Beam", across * along)
+
+
+def flare():
+    """A star: a hot centre, a soft halo and long thin rays (four strong, four faint)."""
+    x, y = grid()
+    r = np.sqrt(x * x + y * y)
+    a = np.arctan2(y, x)
+    core = np.exp(-(r / 0.07) ** 2)
+    halo = np.exp(-(r / 0.35) ** 2) * 0.45
+    rays = (np.abs(np.cos(2 * a)) ** 60 * 0.9 + np.abs(np.cos(2 * a + math.pi / 4)) ** 80 * 0.45) * np.exp(-r / 0.35)
+    save("Flare", (core + halo + rays) * np.clip(1.0 - r, 0.0, 1.0))
+
+
+def shockwave():
+    """A ring with a hard bright outer edge and a soft trail inward."""
+    x, y = grid()
+    r = np.sqrt(x * x + y * y)
+    edge = np.exp(-((r - 0.9) / 0.025) ** 2)
+    trail = np.clip((r - 0.55) / 0.35, 0.0, 1.0) ** 2.2 * (r < 0.9)
+    save("Shockwave", edge + trail * 0.3)
+
+
+def feather():
+    """A feather's silhouette, quill along the diagonal, barbs to both sides with a few splits."""
+    x, y = grid()
+    u = (x + y) / math.sqrt(2)  # along
+    v = (x - y) / math.sqrt(2)  # across
+    t = (u + 0.85) / 1.7
+    width = 0.22 * np.clip(np.sin(np.clip(t, 0, 1) * math.pi), 0, 1) ** 0.7
+    vane = (np.abs(v) < width) & (t > 0.08) & (t < 0.98)
+    splits = np.sin(t * 40.0 + np.sign(v) * 3.0) > 0.92
+    quill = (np.abs(v) < 0.012) & (t > 0.0) & (t < 1.0)
+    alpha = (vane & ~(splits & (np.abs(v) > width * 0.4))).astype(np.float32) * 0.95 + quill.astype(np.float32)
+    save("Feather", blur(alpha, 1.0))
+
+
+def snowflake():
+    """A six-armed crystal with side branches."""
+    im = Image.new("L", (SIZE, SIZE), 0)
+    draw = ImageDraw.Draw(im)
     c = SIZE / 2
-    for y in range(SIZE):
-        for x in range(SIZE):
-            d = math.hypot(x - c, y - c) / c
-            v = math.exp(-((d - 0.86) / 0.045) ** 2) + 0.25 * math.exp(-((d - 0.8) / 0.12) ** 2)
-            px[x, y] = int(min(1.0, v) * 255)
-    save(a, "Ring.png")
-
-
-def shard():
-    a = blank()
-    d = ImageDraw.Draw(a)
-    c = SIZE / 2
-    d.polygon([(c, 8), (c + 46, c - 20), (c, SIZE - 8), (c - 46, c + 20)], fill=150)
-    d.polygon([(c, 30), (c + 14, c), (c, SIZE - 40), (c - 14, c)], fill=255)
-    save(a.filter(ImageFilter.GaussianBlur(3)), "Shard.png")
-
-
-# Elder futhark runes as strokes on a unit box (0..1), drawn upright and laid round the ring.
-RUNES = {
-    "fehu": [((0.3, 0), (0.3, 1)), ((0.3, 0.55), (0.75, 0.25)), ((0.3, 0.8), (0.75, 0.5))],
-    "uruz": [((0.3, 1), (0.3, 0)), ((0.3, 0), (0.75, 0.35)), ((0.75, 0.35), (0.75, 1))],
-    "thurisaz": [((0.3, 0), (0.3, 1)), ((0.3, 0.3), (0.7, 0.5)), ((0.7, 0.5), (0.3, 0.7))],
-    "isa": [((0.5, 0), (0.5, 1))],
-    "kenaz": [((0.7, 0.15), (0.3, 0.5)), ((0.3, 0.5), (0.7, 0.85))],
-    "algiz": [((0.5, 1), (0.5, 0)), ((0.5, 0.4), (0.2, 0.05)), ((0.5, 0.4), (0.8, 0.05))],
-    "tiwaz": [((0.5, 1), (0.5, 0)), ((0.5, 0), (0.2, 0.3)), ((0.5, 0), (0.8, 0.3))],
-    "sowilo": [((0.65, 0), (0.35, 0.4)), ((0.35, 0.4), (0.65, 0.6)), ((0.65, 0.6), (0.35, 1))],
-}
-
-
-def rune_circle():
-    big = SIZE * 2
-    a = Image.new("L", (big, big), 0)
-    d = ImageDraw.Draw(a)
-    c = big / 2
-    for r, w in ((0.97, 10), (0.86, 6), (0.62, 5)):
-        rr = r * c
-        d.ellipse([c - rr, c - rr, c + rr, c + rr], outline=255, width=w)
-    names = list(RUNES)
-    random.seed(7)
-    count = 16
-    for i in range(count):
-        ang = i / count * math.tau
-        glyph = RUNES[names[i % len(names)]]
-        mid = 0.74 * c
-        h = 0.085 * c * 2
-        cx, cy = c + math.cos(ang) * mid, c + math.sin(ang) * mid
-        # Upright along the radius: the glyph's up points outward.
-        up = (math.cos(ang), math.sin(ang))
-        side = (-up[1], up[0])
-        for (x0, y0), (x1, y1) in glyph:
-            p0 = (cx + side[0] * (x0 - 0.5) * h + up[0] * (0.5 - y0) * h, cy + side[1] * (x0 - 0.5) * h + up[1] * (0.5 - y0) * h)
-            p1 = (cx + side[0] * (x1 - 0.5) * h + up[0] * (0.5 - y1) * h, cy + side[1] * (x1 - 0.5) * h + up[1] * (0.5 - y1) * h)
-            d.line([p0, p1], fill=255, width=9)
-    # Ticks on the inner ring.
-    for i in range(48):
-        ang = i / 48 * math.tau
-        r0, r1 = 0.62 * c, (0.58 if i % 4 else 0.54) * c
-        d.line([(c + math.cos(ang) * r0, c + math.sin(ang) * r0), (c + math.cos(ang) * r1, c + math.sin(ang) * r1)], fill=255, width=5)
-    a = a.resize((SIZE, SIZE), Image.LANCZOS)
-    soft = a.filter(ImageFilter.GaussianBlur(5))
-    save(Image.eval(Image.merge("L", [Image.blend(soft, a, 0.7)]), lambda v: v), "Rune Circle.png")
-
-
-def ember():
-    a = blank()
-    px = a.load()
-    c = SIZE / 2
-    for y in range(SIZE):
-        for x in range(SIZE):
-            dx, dy = (x - c) / c, (y - c) / c
-            tail = math.exp(-(dx / 0.12) ** 2) * max(0.0, 1 - abs(dy)) * (0.35 if dy > 0 else 0.0)
-            core = max(0.0, 1 - math.hypot(dx, dy) * 2.2) ** 1.5
-            px[x, y] = int(min(1.0, core + tail) * 255)
-    save(a, "Ember.png")
-
-
-def slash():
-    a = blank()
-    px = a.load()
-    c = SIZE / 2
-    for y in range(SIZE):
-        for x in range(SIZE):
-            dx, dy = (x - c) / c, (y - c) / c
-            r = math.hypot(dx, dy)
-            ang = math.atan2(dy, dx)  # the crescent spans the upper half, its middle at the top
-            along = (ang + math.pi) / math.pi - 1.0  # -1..1 over the upper half
-            if dy > 0.05:
-                continue
-            span = max(0.0, 1 - abs(along + 0.5) / 0.5) if -1 <= along <= 0 else 0.0
-            width = 0.07 + 0.11 * span
-            band = math.exp(-((r - 0.8) / width) ** 2)
-            edge = math.exp(-((r - 0.86) / 0.025) ** 2) * 0.8
-            px[x, y] = int(min(1.0, (band * 0.7 + edge) * span ** 0.6) * 255)
-    save(a, "Slash.png")
-
-
-def streak():
-    a = blank()
-    px = a.load()
-    c = SIZE / 2
-    for y in range(SIZE):
-        for x in range(SIZE):
-            dx, dy = (x - c) / c, (y - c) / c
-            v = math.exp(-(dx / 0.06) ** 2) * max(0.0, 1 - abs(dy)) ** 1.5
-            px[x, y] = int(min(1.0, v) * 255)
-    save(a, "Streak.png")
+    for i in range(6):
+        a = i * math.pi / 3
+        ex, ey = c + math.cos(a) * 220, c + math.sin(a) * 220
+        draw.line([(c, c), (ex, ey)], fill=255, width=14)
+        for k, along in enumerate((0.35, 0.55, 0.75)):
+            bx, by = c + math.cos(a) * 220 * along, c + math.sin(a) * 220 * along
+            length = 80 * (1.0 - along) + 20
+            for side in (-1, 1):
+                b = a + side * math.pi / 4
+                draw.line([(bx, by), (bx + math.cos(b) * length, by + math.sin(b) * length)], fill=255, width=9)
+    line = np.asarray(im).astype(np.float32) / 255.0
+    save("Snowflake", line, blur(line, 8) * 0.5)
 
 
 if __name__ == "__main__":
-    glow()
-    ring()
-    shard()
-    rune_circle()
-    ember()
-    slash()
-    streak()
-    print("written to", os.path.abspath(OUT))
+    rng = __import__("random").Random(1127)
+    cracks(rng)
+    beam()
+    flare()
+    shockwave()
+    feather()
+    snowflake()

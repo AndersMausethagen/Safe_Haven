@@ -62,6 +62,7 @@ MonoBehaviour:
     value: 0.1
   buffDuration: 6
   buffName: Harvest Fury
+  focusFromBlows: 1
   playAttackAnimation: 1
   animationState: KI 2H Spin Sweep
   animationSpeed: 1
@@ -74,52 +75,53 @@ MonoBehaviour:
       count: 1
       delay: 0
       stepDelay: 0
-      seconds: 0.3
-      scale: 1
+      seconds: 0.35
+      scale: 1.6
     - prefab: {fileID: 8785999770213858728, guid: 14c8f11c88321f04391b1939aad7404a, type: 3}
       place: 1
       count: 1
       delay: 0.02
       stepDelay: 0
       seconds: 0.4
+      scale: 1.1
+    - prefab: {fileID: 4047249316231547844, guid: 470b560476fcda647a51ec6ad778232e, type: 3}
+      place: 3
+      count: 5
+      delay: 0.03
+      stepDelay: 0.015
+      seconds: 0.6
       scale: 1
-    - prefab: {fileID: 3154179782875152266, guid: 87495a844a9e250459903f01b131159a, type: 3}
-      place: 1
-      count: 1
-      delay: 0
-      stepDelay: 0
-      seconds: 0.5
-      scale: 1
-    - prefab: {fileID: 6158681216303808434, guid: ff15bfba6cf61c646b5fa18097f327a8, type: 3}
-      place: 0
+    struck:
+    - prefab: {fileID: 7948493385885557333, guid: 31ddf1bf1f95521489a61edd92b92253, type: 3}
+      place: 5
       count: 1
       delay: 0
       stepDelay: 0
       seconds: 0.9
       scale: 1
-    - prefab: {fileID: 4047249316231547844, guid: 470b560476fcda647a51ec6ad778232e, type: 3}
-      place: 4
-      count: 5
-      delay: 0.03
-      stepDelay: 0
-      seconds: 0.6
-      scale: 1
-    struck:
-    - prefab: {fileID: 6158681216303808434, guid: ff15bfba6cf61c646b5fa18097f327a8, type: 3}
-      place: 5
-      count: 1
-      delay: 0
-      stepDelay: 0
-      seconds: 0.8
-      scale: 1
-    light: {r: 1, g: 0.8, b: 0.45, a: 1}
-    lightIntensity: 4
-    lightRange: 6
-    lightSeconds: 0.25
-    shake: 0.15
-    hitStop: 0.06
-    kick: 0.15
+    light: {r: 0, g: 0, b: 0, a: 0}
+    lightIntensity: 6
+    lightRange: 8
+    lightSeconds: 0.35
+    shake: 0.3
+    hitStop: 0.05
+    kick: 0.12
     castSound: {fileID: 0}
     releaseSound: {fileID: 11400000, guid: 1133663c9bddf574e93092b4bd5d456b, type: 2}
     releaseSoundDelay: 0
+    sounds: []
+    moment:
+      windUpZoom: 1
+      impactDelay: 0
+      slowScale: 1
+      slowSeconds: 0
+      punchSeconds: 0.6
+      exposure: 0
+      chromatic: 0
+      distortion: 0
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      afterglow: {r: 0, g: 0, b: 0, a: 0}
+      afterglowStrength: 0.5
+      afterglowSeconds: 0
+      afterglowSaturation: 0
   weaponArt: 0

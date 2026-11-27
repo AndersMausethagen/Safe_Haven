@@ -23,6 +23,109 @@ public static class SkillVfxArchetypes
         Spikes();
         Flames();
         Debris();
+        Gather();
+        Pillar();
+    }
+
+    /// <summary>
+    /// Power drawn in (an ultimate's wind-up, 2026-11-27): motes born on a sphere's surface, pulled to its centre and streaking as they
+    /// come, a loop while the effect lives. Snow for Fimbulwinter, embers for Surtr's Brand, dust and pebbles for Trollsbane Wrath.
+    /// </summary>
+    public static string Gather()
+    {
+        EnsureFolder();
+        string path = Folder + "/Skill Gather.vfx";
+        VfxBuilder b = VfxBuilder.Create(path);
+        VFXContext spawn = b.Context("Spawn");
+        VFXBlock rate = b.Block(spawn, "Constant Spawn Rate");
+        VFXContext init = b.Context("Initialize Particle");
+        VfxBuilder.SetEnum(init.GetData(), "boundsMode", "Automatic");
+        init.GetData().SetSettingValue("capacity", 1024u);
+        VFXBlock position = b.Block(init, "|Set|_Position Shape|Sphere");
+        VfxBuilder.SetEnum(position, "positionMode", "Surface");
+        VFXBlock lifetime = b.Block(init, "|Set|_Lifetime");
+        VfxBuilder.SetEnum(lifetime, "Random", "Uniform");
+        VFXBlock size = b.Block(init, "|Set|_Size");
+        VfxBuilder.SetEnum(size, "Random", "Uniform");
+        VFXBlock colour = b.Block(init, "|Set|_Color");
+        VFXContext update = b.Context("Update Particle");
+        VFXBlock pull = b.Block(update, "Attractor Shape|Sphere");
+        VFXBlock turbulence = b.Block(update, "Turbulence");
+        VFXContext output = b.Context("Output Particle|Unlit|Quad");
+        VfxBuilder.SetEnum(output, "blendMode", "Additive");
+        b.Block(output, "Orient|Along Velocity");
+        VFXBlock sizeOverLife = b.Block(output, "|Set|_Size|Over Life");
+        VFXBlock colourOverLife = b.Block(output, "|Set|_Color|Over Life");
+        VfxBuilder.SetEnum(sizeOverLife, "Composition", "Multiply");
+        VfxBuilder.SetEnum(colourOverLife, "Composition", "Multiply");
+        VfxBuilder.Flow(spawn, init);
+        VfxBuilder.Flow(init, update);
+        VfxBuilder.Flow(update, output);
+        b.Expose("Rate", 160f, VfxBuilder.Slot(rate, "Rate"));
+        b.Expose("Radius", 4f, VfxBuilder.Slot(position, "radius"));
+        b.Expose("Lifetime Min", 0.5f, VfxBuilder.Slot(lifetime, "A"));
+        b.Expose("Lifetime Max", 0.9f, VfxBuilder.Slot(lifetime, "B"));
+        b.Expose("Size Min", 0.08f, VfxBuilder.Slot(size, "A"));
+        b.Expose("Size Max", 0.2f, VfxBuilder.Slot(size, "B"));
+        b.Expose("Color", new Vector3(1.5f, 2.5f, 4f), VfxBuilder.Slot(colour, "_Color"));
+        b.Expose("Pull Speed", 7f, VfxBuilder.Slot(pull, "attractionSpeed"));
+        b.Expose("Pull Force", 14f, VfxBuilder.Slot(pull, "attractionForce"));
+        b.Expose("Turbulence", 1.5f, VfxBuilder.Slot(turbulence, "Intensity"));
+        b.Expose("Texture", Tex(Textures + "/Streak.png"), VfxBuilder.Slot(output, "mainTexture"));
+        // Pulled to a small sphere at the effect's middle, a little above its feet (the effect sits on the caster's chest or the ground).
+        VfxBuilder.Set(pull, "radius", 0.15f);
+        VfxBuilder.Set(sizeOverLife, "Size", new AnimationCurve(new Keyframe(0f, 0.3f), new Keyframe(0.3f, 1f), new Keyframe(1f, 0.6f)));
+        VfxBuilder.Set(colourOverLife, "Color", FadeInOut(0.25f, 0.75f));
+        b.Save();
+        return VfxGraphAuthoring.Describe(path);
+    }
+
+    /// <summary>
+    /// A column of light or fire standing up from the ground (an ultimate's impact, a payoff's burst, 2026-11-27): one or a few tall quads
+    /// that face the camera but keep upright, flaring wide then thinning as they fade, so it reads from the high camera as a column.
+    /// </summary>
+    public static string Pillar()
+    {
+        EnsureFolder();
+        string path = Folder + "/Skill Pillar.vfx";
+        VfxBuilder b = VfxBuilder.Create(path);
+        VFXContext spawn = b.Context("Spawn");
+        VFXBlock burst = b.Block(spawn, "Single Burst");
+        VFXContext init = b.Context("Initialize Particle");
+        VfxBuilder.SetEnum(init.GetData(), "boundsMode", "Automatic");
+        VFXBlock position = b.Block(init, "|Set|_Position");
+        VFXBlock lifetime = b.Block(init, "|Set|_Lifetime");
+        VFXBlock size = b.Block(init, "|Set|_Size");
+        VFXBlock scale = b.Block(init, "|Set|_Scale");
+        VFXBlock colour = b.Block(init, "|Set|_Color");
+        VFXContext update = b.Context("Update Particle");
+        VFXContext output = b.Context("Output Particle|Unlit|Quad");
+        VfxBuilder.SetEnum(output, "blendMode", "Additive");
+        VFXBlock orient = b.Block(output, "Orient|Face Camera Plane");
+        VfxBuilder.SetEnum(orient, "mode", "FixedAxis");
+        VFXBlock sizeOverLife = b.Block(output, "|Set|_Size|Over Life");
+        VFXBlock colourOverLife = b.Block(output, "|Set|_Color|Over Life");
+        VfxBuilder.SetEnum(sizeOverLife, "Composition", "Multiply");
+        VfxBuilder.SetEnum(colourOverLife, "Composition", "Multiply");
+        VfxBuilder.Flow(spawn, init);
+        VfxBuilder.Flow(init, update);
+        VfxBuilder.Flow(update, output);
+        b.Expose("Count", 1f, VfxBuilder.Slot(burst, "Count"));
+        // The quad is centred: lift it by half its height so it stands on the ground.
+        b.Expose("Lift", new Vector3(0f, 4f, 0f), VfxBuilder.Slot(position, "_Position"));
+        b.Expose("Lifetime", 0.6f, VfxBuilder.Slot(lifetime, "_Lifetime"));
+        b.Expose("Width", 1.6f, VfxBuilder.Slot(size, "_Size"));
+        b.Expose("Shape", new Vector3(1f, 5f, 1f), VfxBuilder.Slot(scale, "_Scale"));
+        b.Expose("Color", new Vector3(4f, 3.5f, 2.5f), VfxBuilder.Slot(colour, "_Color"));
+        b.Expose("Texture", Tex(Textures + "/Beam.png"), VfxBuilder.Slot(output, "mainTexture"));
+        VfxBuilder.Set(orient, "Up", new DirectionType { direction = Vector3.up });
+        // Flares wide at once, then thins away.
+        b.Expose("Width Over Life", new AnimationCurve(new Keyframe(0f, 0.4f, 0f, 12f), new Keyframe(0.1f, 1.25f), new Keyframe(1f, 0.15f)),
+            VfxBuilder.Slot(sizeOverLife, "Size"));
+        VfxBuilder.Set(colourOverLife, "Color", FadeInOut(0.04f, 0.35f));
+        VfxBuilder.SetEnum(output, "cullMode", "Off");
+        b.Save();
+        return VfxGraphAuthoring.Describe(path);
     }
 
     private static Texture2D Tex(string path) => AssetDatabase.LoadAssetAtPath<Texture2D>(path);

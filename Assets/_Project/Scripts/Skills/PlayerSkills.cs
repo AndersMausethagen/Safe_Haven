@@ -205,6 +205,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         if (TryGetComponent(out bagItems))
         {
             bagItems.ConsumableArrived += OnConsumableArrived;
+            bagItems.Received += OnBagReceived;
         }
 
         if (combat != null)
@@ -222,13 +223,12 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     {
         EnsureInitialised();
         SkillDefinition technique = weapon != null && settings != null ? settings.TechniqueOf(weapon.Signature) : null;
-        if (technique == null || IsKnown(technique) || TierOf(weapon) < settings.LearnAtTier || !Learn(technique))
+        if (technique == null || IsKnown(technique) || TierOf(weapon) < settings.LearnAtTier)
         {
             return false;
         }
 
-        GameMessages.Post($"Your hands learn the way of {WeaponFamilies.Name(weapon.Signature)}: {technique.DisplayName}.", MessageKind.Gain);
-        return true;
+        return Learn(technique, true, $"Your hands learn the way of {WeaponFamilies.Name(weapon.Signature)}: {technique.DisplayName}.");
     }
 
     // The item tier of a weapon: the one in hand, or the first item that is it. Bare fists are no item: always one's own, so they teach
@@ -252,10 +252,20 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             }
         }
 
-        return weapon.Signature == WeaponSignature.Flurry ? int.MaxValue : 0;
+        // Bare fists are no item: always one's own, but they teach on a blow landed barehanded, not by being wielded (OnAnyDamaged).
+        return weapon.Signature == WeaponSignature.Flurry && fistsLanded ? int.MaxValue : 0;
     }
 
     private ItemInventory bagItems;
+
+    // Lore come into the bag, whichever way: the find is announced (SkillLore).
+    private void OnBagReceived(ItemDefinition item, int count)
+    {
+        if (item != null && item.IsSkillLore)
+        {
+            SkillLore.Announce(gameObject, item);
+        }
+    }
 
     private void OnAnyDamaged(Damageable victim, DamageInfo damage, DamageResult result)
     {
@@ -286,8 +296,45 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         {
             struck.Add(victim.transform.position);
             struckFoes.Add((victim, result.Damage));
+            NoteStatusesBefore(victim);
+        }
+
+        // Bare fists teach theirs on a blow landed barehanded: sheathing a weapon swaps fists in, and that taught it at every load
+        // (bug hunt 2026-11-27).
+        if (!collectingStruck && damage.Source == combatant && result.Damage > 0f && combat != null && combat.Weapon != null
+            && combat.Weapon.Signature == WeaponSignature.Flurry && (damage.Technique & HitTechnique.Melee) != 0)
+        {
+            fistsLanded = true;
+            LearnWeaponTechnique(combat.Weapon);
+            fistsLanded = false;
         }
     }
+
+    // What the skill being resolved can use up, on a foe it struck, as the foe had it before this blow: AfterHit lays the blow's own
+    // status after this, and Surtr's Brand used up the Burning it had just laid on every foe (bug hunt 2026-11-27).
+    private void NoteStatusesBefore(Damageable victim)
+    {
+        if (collectingFor == null || !victim.TryGetComponent(out StatusEffects effects))
+        {
+            return;
+        }
+
+        foreach (SkillOption option in Both(SkillChoices.For(collectingFor).Chosen, collectingFor.Combos))
+        {
+            if (option.consumes != null && effects.Has(option.consumes))
+            {
+                hadBefore.Add((victim, option.consumes));
+            }
+        }
+    }
+
+    // The skill whose blow is being resolved now (while Collecting Struck), and the statuses its foes had before it.
+    private SkillDefinition collectingFor;
+    private readonly List<(Damageable foe, StatusEffectDefinition status)> hadBefore = new List<(Damageable, StatusEffectDefinition)>();
+    // True while a barehanded blow is teaching the fists' technique (TierOf lets fists, which are no item, through only then).
+    private bool fistsLanded;
+    // The weapon a pending skill blow was begun with.
+    private WeaponDefinition pendingWeapon;
 
     // A consumable new to the bag goes on the first empty slot of the bar, 1 to 9 (the user, 2026-11-15: with 1-5 full they
     // went nowhere). One already on the bar stays where the player put it.
@@ -338,6 +385,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         if (bagItems != null)
         {
             bagItems.ConsumableArrived -= OnConsumableArrived;
+            bagItems.Received -= OnBagReceived;
         }
 
         if (combat != null)
@@ -415,7 +463,8 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         {
             SkillDefinition skill = pendingHit;
             pendingHit = null;
-            float weaponDamage = combat != null && combat.Weapon != null ? combat.Weapon.Damage : 0f;
+            WeaponDefinition weapon = pendingWeapon;
+            float weaponDamage = weapon != null ? weapon.Damage : 0f;
             // The Runecraft skill scales every spell's damage; its hits carry the Spell technique, which trains it. A physical skill
             // (Steel, Beast) is a heavy melee blow instead: Melee trains, and a frozen foe shatters under it.
             float runecraft = skill.IsPhysical ? 1f : Mathf.Max(0f, 1f + combatant.Stats.Get(StatType.SpellDamage));
@@ -423,10 +472,12 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             // What it strikes, for the effects that land on each creature hit (SkillLook.struck).
             struck.Clear();
             struckFoes.Clear();
+            hadBefore.Clear();
+            collectingFor = skill;
             collectingStruck = true;
             try
             {
-                float multiplier = Power(skill) * runecraft * SkillChoices.For(skill).Damage * skill.WeaponScale(combat != null ? combat.Weapon : null);
+                float multiplier = Power(skill) * runecraft * SkillChoices.For(skill).Damage * skill.WeaponScale(weapon);
                 if (skill.Throws)
                 {
                     Throw(skill, weaponDamage, multiplier, kind);
@@ -479,7 +530,10 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         skill != null && skill.WeaponArt != WeaponArtSlot.None ? (combat != null ? combat.ArtCooldownFraction : 0f) : cooldowns.Fraction(skill, Time.time);
 
     /// <summary>Learns a skill. Returns false when it was already known.</summary>
-    public bool Learn(SkillDefinition skill, bool announce = true)
+    public bool Learn(SkillDefinition skill, bool announce = true) => Learn(skill, announce, null);
+
+    /// <summary>Learns a skill, announced in <paramref name="words"/> (null: "New skill: ..."). Returns false when it was already known.</summary>
+    public bool Learn(SkillDefinition skill, bool announce, string words)
     {
         EnsureInitialised();
         if (!AddKnown(skill))
@@ -489,7 +543,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
         if (announce)
         {
-            GameMessages.Post("New skill: " + skill.DisplayName, MessageKind.Gain);
+            GameMessages.Post(words ?? "New skill: " + skill.DisplayName, MessageKind.Gain);
             // Seen at once: into the first free slot of 1-5 that takes its kind (the user, 2026-11-24: "the skills should be visible";
             // 2026-11-27: each slot a kind); moved after to any other that takes it.
             int free = loadout.IndexOf(skill) < 0 ? loadout.FirstFittingEmpty(skill) : -1;
@@ -564,11 +618,8 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             }
         }
 
-        // A weapon wielded before this restore (a scene's start) is looked at again: a technique it taught then was replaced by the save's book.
-        if (combat != null)
-        {
-            LearnWeaponTechnique(combat.Weapon);
-        }
+        // The weapon's own technique is looked at once the gear is back (PlayerSnapshot, after PlayerEquipment.Restore): here the hand
+        // still held the prefab's fists, and every load taught Rib-Breaker (bug hunt 2026-11-27).
         KnownSkillsChanged?.Invoke();
     }
 
@@ -768,6 +819,8 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         if (skill.Attack != null)
         {
             pendingHit = skill;
+            // The weapon the blow was begun with: swapped mid-cast, a dagger's technique landed with a greatsword's damage (bug hunt).
+            pendingWeapon = combat != null ? combat.Weapon : null;
             pendingHitAt = now + hitAfter + skill.Attack.HitDelay;
             busyUntil = Mathf.Max(busyUntil, skill.ChannelSeconds > 0f ? channelEndsAt : pendingHitAt);
             pendingDirection = direction;
@@ -913,6 +966,8 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 
         struck.Clear();
         struckFoes.Clear();
+        hadBefore.Clear();
+        collectingFor = channeling;
         collectingStruck = true;
         try
         {
@@ -946,6 +1001,8 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     // The chosen altar options on what the skill struck (Docs/SkillsImprovementResearch_2026-11-24.md 4): a status laid, or one used
     // up for a payoff (health back, a burst of extra damage, another status in its place).
     // And the skill's own built-in combos (SkillDefinition.Combos, Docs/SkillChoiceResearch_2026-11-27.md 3.4), with the same rules.
+    private const float PayoffHitStop = 0.07f;
+    private const float PayoffShake = 0.35f;
     private void AfterOptions(SkillDefinition skill, List<(Damageable foe, float took)> foes)
     {
         SkillChoices.Totals options = SkillChoices.For(skill);
@@ -965,7 +1022,8 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             foreach (SkillOption option in Both(options.Chosen, skill.Combos))
             {
                 // Not on a friend's copy of the host's creature: the host keeps its statuses, so it would be used up here and tick on there.
-                if (option.consumes != null && foe.TryGetComponent(out StatusEffects effects) && !effects.IsCopy && effects.Has(option.consumes))
+                if (option.consumes != null && foe.TryGetComponent(out StatusEffects effects) && !effects.IsCopy && effects.Has(option.consumes)
+                    && hadBefore.Contains((foe, option.consumes)))
                 {
                     if (option.consumeHeal > 0f)
                     {
@@ -981,8 +1039,15 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
                         combatant.ReportDamageDealt(foe, burst, foe.ApplyDamage(burst));
                     }
 
-                    // Used up after the burst, so the burst still has what the status gave (Sundered: takes more).
+                    // Used up after the burst, so the burst still has what the status gave (Sundered: takes more). Seen and heard as a
+                    // burst (its Consume Look and Sound), with a beat of hit stop and a jolt: the set-up paying off has to feel it.
                     effects.End(option.consumes);
+                    StatusEffects.NoteConsumed(foe, option.consumes, foe.transform.position + Vector3.up);
+                    if (called.Count == 0)
+                    {
+                        if (CombatFeedback.Current != null) CombatFeedback.Current.HitStop(PayoffHitStop);
+                        CameraShake.Add(PayoffShake);
+                    }
 
                     if (option.consumeInto != null && foe.IsAlive)
                     {
@@ -1224,7 +1289,8 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
             aimFocus = GetComponent<PlayerFocus>();
         }
 
-        bool refused = CheckCast(skill) == SkillCastResult.CoolingDown || (aimFocus != null && aimFocus.Circles < CirclesFor(skill));
+        bool refused = CheckCast(skill) == SkillCastResult.CoolingDown || (aimFocus != null && aimFocus.Circles < CirclesFor(skill))
+            || !skill.CastsWith(combat != null ? combat.Weapon : null);
         Color colour = refused ? new Color(0.55f, 0.55f, 0.55f, 0.6f) : SkillSchools.ColorOf(skill.School);
         // A throw is marked along its flight, out to where it can reach, as wide as its volley spreads; a blow by its own reach and arc.
         if (skill.Throws)
