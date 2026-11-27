@@ -203,12 +203,12 @@ MonoBehaviour:
       stepDelay: 0
       seconds: 0.9
       scale: 1
-    - prefab: {fileID: 6681213866509498761, guid: be5271f288744d54a95ead89c19e56c0, type: 3}
+    - prefab: {fileID: 4068049152551779755, guid: ff99beb8cc3f5814f8c70c789a2a78e6, type: 3}
       place: 1
       count: 1
       delay: 0
       stepDelay: 0
-      seconds: 0.3
+      seconds: 0.5
       scale: 1
     struck:
     - prefab: {fileID: 4949841515135002252, guid: 1cfbce94292b32c4ca45ff82070f35aa, type: 3}

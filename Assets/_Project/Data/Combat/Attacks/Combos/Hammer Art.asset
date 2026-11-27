@@ -74,12 +74,12 @@ MonoBehaviour:
       seconds: 0.8
       scale: 1
     struck:
-    - prefab: {fileID: 7695878944792941921, guid: 91c82be48bd6a2c46b2cbd1b38c5f670, type: 3}
+    - prefab: {fileID: 1787616520135960314, guid: e5df638db5ad8de4f805707b670122c4, type: 3}
       place: 5
       count: 1
       delay: 0
       stepDelay: 0
-      seconds: 0.8
+      seconds: 0.5
       scale: 1
     light: {r: 1, g: 0.85, b: 0.65, a: 1}
     lightIntensity: 3.75

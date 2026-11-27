@@ -38,12 +38,12 @@ MonoBehaviour:
     showArea: 0
     cast: []
     release:
-    - prefab: {fileID: 6681213866509498761, guid: be5271f288744d54a95ead89c19e56c0, type: 3}
+    - prefab: {fileID: 4068049152551779755, guid: ff99beb8cc3f5814f8c70c789a2a78e6, type: 3}
       place: 1
       count: 1
       delay: 0
       stepDelay: 0
-      seconds: 0.3
+      seconds: 0.5
       scale: 0.88
     - prefab: {fileID: 8785999770213858728, guid: 14c8f11c88321f04391b1939aad7404a, type: 3}
       place: 1
@@ -60,12 +60,12 @@ MonoBehaviour:
       seconds: 0.6
       scale: 1
     struck:
-    - prefab: {fileID: 7695878944792941921, guid: 91c82be48bd6a2c46b2cbd1b38c5f670, type: 3}
+    - prefab: {fileID: 1787616520135960314, guid: e5df638db5ad8de4f805707b670122c4, type: 3}
       place: 5
       count: 1
       delay: 0
       stepDelay: 0
-      seconds: 0.8
+      seconds: 0.5
       scale: 1
     light: {r: 0, g: 0, b: 0, a: 0}
     lightIntensity: 6

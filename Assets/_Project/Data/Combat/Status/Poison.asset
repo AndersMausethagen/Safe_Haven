@@ -17,7 +17,21 @@ MonoBehaviour:
   description: Venom in the blood. Health drains until it runs its course or an antidote clears it.
   color: {r: 0.55, g: 0.85, b: 0.35, a: 1}
   icon: {fileID: 21300000, guid: c37877ee2a74160468d27999d2fd5bc0, type: 3}
+  look: {fileID: 3021385027045203907, guid: c71b6777d4df0134fa7ac127d605a7c8, type: 3}
   seconds: 7
   damagePerSecond: 3
   damageType: 3
   moveSpeed: 1
+  damageTaken: 1
+  stopsStrikes: 0
+  damageDealt: 1
+  consumedBy: 0
+  consumeDamage: 0
+  consumeLook: {fileID: 0}
+  consumeSound: {fileID: 0}
+  consumeLine: 
+  reactions: []
+  refreshes: 1
+  endsOnDodge: 0
+  restSeconds: 0
+  takesHoldLine: 

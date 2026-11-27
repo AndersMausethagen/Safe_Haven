@@ -160,6 +160,46 @@ public sealed class SkillLookTests
         Assert.AreEqual(plain * sundered.DamageTaken, before - body.CurrentHealth, 0.01f, "the same blow bites deeper on cracked armour");
     }
 
+    // SkillFx pools its cues itself: a cue's prefab with a PooledEffect (a blow's sparks from Combat Feel) hands itself to PrefabPool
+    // when played, which destroys what it doesn't own, and the skill's pool loses it (2026-11-27, the VFX pack's second group).
+    [Test]
+    public void NoSkillOrArtCue_UsesAnEffectMadeForTheBlowsPool()
+    {
+        var wrong = new List<string>();
+        void Check(string owner, SkillLook look)
+        {
+            if (look == null)
+            {
+                return;
+            }
+
+            foreach (List<SkillFxCue> cues in new[] { look.cast, look.release, look.struck })
+            {
+                foreach (SkillFxCue cue in cues)
+                {
+                    if (cue.prefab != null && cue.prefab.GetComponentInChildren<PooledEffect>(true) != null)
+                    {
+                        wrong.Add($"{owner}: {cue.prefab.name}");
+                    }
+                }
+            }
+        }
+
+        foreach (string guid in AssetDatabase.FindAssets("t:SkillDefinition"))
+        {
+            var skill = AssetDatabase.LoadAssetAtPath<SkillDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            Check(skill.name, skill.Look);
+        }
+
+        foreach (string guid in AssetDatabase.FindAssets("t:AttackDefinition"))
+        {
+            var attack = AssetDatabase.LoadAssetAtPath<AttackDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            Check(attack.name, attack.Look);
+        }
+
+        CollectionAssert.IsEmpty(wrong);
+    }
+
     [Test]
     public void TheSchoolsStatuses_ShowOnTheirBearer_WithAnEffectThatKeepsGoing()
     {

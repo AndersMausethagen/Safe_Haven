@@ -873,7 +873,11 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     /// <summary>How long casting <paramref name="skill"/> plants the caster's feet: as long as the marks its cast draws on the caster's
     /// own ground last (SkillLook.CasterGroundSeconds), and never for a lunge or a leap, whose whole point is the move.</summary>
     public static float HoldsStillFor(SkillDefinition skill) =>
-        skill == null || skill.Look == null || skill.LungeDistance > 0f ? 0f : skill.Look.CasterGroundSeconds;
+        skill == null || skill.Look == null || skill.LungeDistance > 0f ? 0f : Mathf.Min(skill.Look.CasterGroundSeconds, LongestHold);
+
+    // The longest the feet stay planted: as long as our own circles last (Huldra's 1.6 s). The VFX pack's circles dissolve for seconds
+    // more, round a player already walking: held all that while, a quick blessing stood the player still for six (2026-11-27).
+    private const float LongestHold = 1.6f;
 
     // Held from the cast until its circle is gone; never shortened by a quicker circle cast inside it. A lunge or a leap lets go at once:
     // carried out of the circle, the player was left frozen where it landed until the old circle's time ran out (review 2026-11-27).

@@ -108,6 +108,9 @@ public sealed class SkillAimTests
         Assert.Greater(PlayerSkills.HoldsStillFor(winter), winter.Attack.HitDelay, "still in the circle when the blow lands");
         Assert.AreEqual(0f, PlayerSkills.HoldsStillFor(Skill("SurtrsBrand")), "a lunge is the move: never held");
         Assert.AreEqual(0f, PlayerSkills.HoldsStillFor(Skill("ReapingArc")), "nothing drawn at the feet: free to walk");
+        SkillDefinition blessing = Skill("HuldrasBlessing");
+        Assert.Greater(blessing.Look.CasterGroundSeconds, 2f, "the pack's circle dissolves for seconds (else this checks nothing)");
+        Assert.LessOrEqual(PlayerSkills.HoldsStillFor(blessing), 1.6f, "but a quick blessing never stands the player still that long");
     }
 
     // The hold on a real player: it plants the feet, outlasts a quicker circle, and is let go when the circle is gone, by a dodge, and

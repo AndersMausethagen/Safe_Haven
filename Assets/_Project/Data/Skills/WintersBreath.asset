@@ -78,7 +78,7 @@ MonoBehaviour:
       count: 1
       delay: 0
       stepDelay: 0
-      seconds: 6
+      seconds: 1.05
       scale: 1
     light: {r: 0, g: 0, b: 0, a: 0}
     lightIntensity: 6

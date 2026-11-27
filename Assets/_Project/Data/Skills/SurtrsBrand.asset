@@ -147,7 +147,7 @@ MonoBehaviour:
       count: 1
       delay: 0
       stepDelay: 0
-      seconds: 6
+      seconds: 1.6
       scale: 1
     - prefab: {fileID: 2595930943193031825, guid: 973dc13e98b7e644ba082aa9a794b28b, type: 3}
       place: 4
@@ -190,7 +190,7 @@ MonoBehaviour:
       count: 1
       delay: 0.03
       stepDelay: 0
-      seconds: 1
+      seconds: 0.7
       scale: 1
     light: {r: 1, g: 0.55, b: 0.2, a: 1}
     lightIntensity: 30

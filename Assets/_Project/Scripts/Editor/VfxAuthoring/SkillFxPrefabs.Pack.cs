@@ -35,8 +35,17 @@ public static partial class SkillFxPrefabs
     private static readonly Tone Fire = new Tone(0.65f, 0.6f);
     // Blood stays red, but darker and less candy: toward a deep, brownish red.
     private static readonly Tone Blood = new Tone(0.85f, 0.62f);
+    // The second group (2026-11-27): steel is all but grey, sparks keep a little of their heat, the Wyrd's gold and the poison's green
+    // are kept faint, and the Heartroot's rot is the poison darkened to a murky, near-black green.
+    private static readonly Tone Steel = new Tone(0.15f, 0.75f);
+    private static readonly Tone Sparks = new Tone(0.55f, 0.7f);
+    // Brighter than the rest: at 0.55 the gold circle sank into the brown earth and couldn't be seen.
+    private static readonly Tone Wyrd = new Tone(0.6f, 0.9f);
+    private static readonly Tone Wind = new Tone(0.25f, 0.6f);
+    private static readonly Tone Venom = new Tone(0.6f, 0.5f);
+    private static readonly Tone Rot = new Tone(0.25f, 0.3f);
 
-    [MenuItem("Safe Haven/Tools/Effects/Dress From the VFX Pack (Frost, Earth, Fire, Blood)")]
+    [MenuItem("Safe Haven/Tools/Effects/Dress From the VFX Pack")]
     private static void DressFromPackMenu()
     {
         Debug.Log(DressFromPack());
@@ -94,6 +103,20 @@ public static partial class SkillFxPrefabs
         Plan("Phys Blood Hit", MakeFromPack("Pack Blood Gush", "FX - BloodSkill/Prefabs/FX_Spurting blood.prefab", 0.6f, Blood));
         Plan("Status Rend", MakeFromPack("Pack Bleeding", "FX - BloodSkill/Prefabs/FX_Spurblood_Loop.prefab", 0.4f, Blood));
         Plan("Payoff Bleed", MakeFromPack("Pack Blood Slash", "FX - BloodSkill/Prefabs/FX_BloodSlash.prefab", 0.5f, Blood));
+
+        // The second group: hit sparks, slashes, circles and the poisons (the user, 2026-11-27: "go ahead with the next group"). The
+        // pack's rain and snow are left: ours already slant with the wind, splash where they land and drip off eaves.
+        // Two copies of the sparks: the blows' (PrefabPool, returned by PooledEffect) and the skills' (SkillFx's own pool, which a
+        // PooledEffect would hand to PrefabPool, and that destroys what isn't its own).
+        GameObject hit = MakeFromPack("Pack Hit Sparks", "FX - Hit/Prefabs/FX_Yellow_Hit_04.prefab", 0.5f, Sparks, pooled: true);
+        Plan("Phys Hit Sparks", MakeFromPack("Pack Skill Sparks", "FX - Hit/Prefabs/FX_Yellow_Hit_04.prefab", 0.5f, Sparks));
+        GameObject critical = MakeFromPack("Pack Critical Sparks", "FX - Hit/Prefabs/FX_Yellow_Hit_03.prefab", 0.45f, Sparks, pooled: true);
+        log.Append(SetFeel("hitEffect", hit)).Append(SetFeel("criticalHitEffect", critical));
+        Plan("Phys Slash", MakeFromPack("Pack Slash", "FX - Slash/Prefabs/Orange_Slash_1.prefab", 0.5f, Steel, turn: new Vector3(90f, 0f, 0f)));
+        Plan("Wyrd Cast Circle", MakeFromPack("Pack Wyrd Circle", "FX - Dissolving Magic Circle/Prefabs/FX_DMagicCircle_GoldLine.prefab", 1.4f, Wyrd));
+        Plan("Steel Ring", MakeFromPack("Pack Wind Circle", "FX - Dissolving Magic Circle/Prefabs/FX_DMagicCircle_Wind.prefab", 1.6f, Wind), 1, SkillFxPlace.CasterGround);
+        log.Append(SetLook("Poison", MakeFromPack("Pack Poison", "FX - Buff Vol2/Prefabs/FX_Buff_Poison.prefab", 0.7f, Venom)));
+        log.Append(SetLook("Heartrot", MakeFromPack("Pack Heartrot", "FX - Buff Vol2/Prefabs/FX_Buff_Poison.prefab", 0.7f, Rot)));
 
         foreach ((string ours, GameObject pack, int most, SkillFxPlace? place) in swaps)
         {
@@ -175,7 +198,10 @@ public static partial class SkillFxPrefabs
     }
 
     // Our copy of a pack effect: unpacked, toned, scaled through the hierarchy, its coloured materials copied. Null when the pack lacks it.
-    private static GameObject MakeFromPack(string name, string packPath, float scale, Tone tone)
+    // pooled: spawned through PrefabPool (a blow's sparks), so it carries a PooledEffect that hands it back when it has played.
+    // turn: the pack's effect turned inside a root of our own (SkillFx aims the root along the cast; the pack's slash, built to face the
+    // camera, stood upright under our high camera).
+    private static GameObject MakeFromPack(string name, string packPath, float scale, Tone tone, bool pooled = false, Vector3? turn = null)
     {
         string source = FindInPack(packPath);
         var prefab = source != null ? AssetDatabase.LoadAssetAtPath<GameObject>(source) : null;
@@ -188,6 +214,7 @@ public static partial class SkillFxPrefabs
         // Made in a preview scene: the open scene isn't touched, so no save prompt is left behind (review 2026-11-27).
         UnityEngine.SceneManagement.Scene stage = UnityEditor.SceneManagement.EditorSceneManager.NewPreviewScene();
         var copy = (GameObject)PrefabUtility.InstantiatePrefab(prefab, stage);
+        GameObject root = copy;
         try
         {
             PrefabUtility.UnpackPrefabInstance(copy, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
@@ -227,10 +254,30 @@ public static partial class SkillFxPrefabs
                 }
             }
 
+            if (turn.HasValue)
+            {
+                root = new GameObject(name);
+                UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(root, stage);
+                root.transform.localScale = copy.transform.localScale;
+                copy.transform.SetParent(root.transform, false);
+                copy.transform.localScale = Vector3.one;
+                copy.transform.localRotation = Quaternion.Euler(turn.Value);
+                copy.name = "Turned";
+            }
+
+            if (pooled)
+            {
+                // Back to the pool once its drawing parts are done (the pack's empty roots run five seconds).
+                var effect = root.AddComponent<PooledEffect>();
+                var data = new SerializedObject(effect);
+                data.FindProperty("lifetime").floatValue = PlayLength(root);
+                data.ApplyModifiedPropertiesWithoutUndo();
+            }
+
             // The toned materials on disk before the prefab that names them.
             AssetDatabase.SaveAssets();
             string path = $"{PackPrefabs}/{name}.prefab";
-            GameObject saved = PrefabUtility.SaveAsPrefabAsset(copy, path, out bool success);
+            GameObject saved = PrefabUtility.SaveAsPrefabAsset(root, path, out bool success);
             if (!success)
             {
                 Debug.LogError($"VFX pack: {name} wasn't saved to {path}");
@@ -240,7 +287,7 @@ public static partial class SkillFxPrefabs
         }
         finally
         {
-            Object.DestroyImmediate(copy);
+            Object.DestroyImmediate(root);
             UnityEditor.SceneManagement.EditorSceneManager.ClosePreviewScene(stage);
         }
     }
@@ -381,10 +428,22 @@ public static partial class SkillFxPrefabs
 
         float length = PlayLength(pack);
         int swapped = 0;
+        // The skills' looks and the weapon arts' (AttackDefinition.Look: a slash, its sparks).
+        var owners = new List<(Object asset, SkillLook look)>();
         foreach (string guid in AssetDatabase.FindAssets("t:SkillDefinition"))
         {
             var skill = AssetDatabase.LoadAssetAtPath<SkillDefinition>(AssetDatabase.GUIDToAssetPath(guid));
-            SkillLook look = skill != null ? skill.Look : null;
+            owners.Add((skill, skill != null ? skill.Look : null));
+        }
+
+        foreach (string guid in AssetDatabase.FindAssets("t:AttackDefinition"))
+        {
+            var attack = AssetDatabase.LoadAssetAtPath<AttackDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            owners.Add((attack, attack != null ? attack.Look : null));
+        }
+
+        foreach ((Object owner, SkillLook look) in owners)
+        {
             if (look == null)
             {
                 continue;
@@ -398,7 +457,8 @@ public static partial class SkillFxPrefabs
                     if (cue.prefab != null && (cue.prefab.name == ours || cue.prefab == pack))
                     {
                         cue.prefab = pack;
-                        cue.seconds = Mathf.Max(cue.seconds, length);
+                        // As long as the pack's effect plays (ours were timed for our effects).
+                        cue.seconds = length;
                         cue.count = Mathf.Min(cue.count, mostCopies);
                         if (place.HasValue)
                         {
@@ -412,7 +472,7 @@ public static partial class SkillFxPrefabs
 
             if (changed)
             {
-                EditorUtility.SetDirty(skill);
+                EditorUtility.SetDirty(owner);
             }
         }
 
@@ -436,22 +496,75 @@ public static partial class SkillFxPrefabs
         log.Append($" {ours} -> {pack.name} ({swapped});");
     }
 
+    // A blow's effect in Combat Feel (its hit or critical sparks).
+    private static string SetFeel(string field, GameObject effect)
+    {
+        if (effect == null)
+        {
+            return $" {field}: no pack effect;";
+        }
+
+        foreach (string guid in AssetDatabase.FindAssets("t:CombatFeelSettings"))
+        {
+            var data = new SerializedObject(AssetDatabase.LoadAssetAtPath<CombatFeelSettings>(AssetDatabase.GUIDToAssetPath(guid)));
+            data.FindProperty(field).objectReferenceValue = effect;
+            data.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        return $" Combat Feel {field} -> {effect.name};";
+    }
+
+    // A status that showed nothing on its bearer shows this while it lasts.
+    private static string SetLook(string status, GameObject effect)
+    {
+        var definition = AssetDatabase.LoadAssetAtPath<StatusEffectDefinition>($"Assets/_Project/Data/Combat/Status/{status}.asset");
+        if (definition == null || effect == null)
+        {
+            return $" {status}: not dressed;";
+        }
+
+        var data = new SerializedObject(definition);
+        data.FindProperty("look").objectReferenceValue = effect;
+        data.ApplyModifiedPropertiesWithoutUndo();
+        return $" {status} look -> {effect.name};";
+    }
+
     // How long the effect plays: its drawing systems' delay, duration and particle life (a loop, a few seconds of it).
     private static float PlayLength(GameObject effect)
     {
         float length = 0.5f;
         foreach (ParticleSystem system in effect.GetComponentsInChildren<ParticleSystem>(true))
         {
+            // Only what draws: the pack's roots are empty five-second loops (counted, every effect ran its full six seconds).
             var renderer = system.GetComponent<ParticleSystemRenderer>();
-            if (renderer == null || renderer.sharedMaterial == null)
+            if (renderer == null || !renderer.enabled || renderer.sharedMaterial == null)
             {
                 continue;
             }
 
             ParticleSystem.MainModule main = system.main;
-            length = Mathf.Max(length, main.startDelay.constantMax + (main.loop ? 2f : main.duration) + main.startLifetime.constantMax);
+            length = Mathf.Max(length, main.startDelay.constantMax + (main.loop ? 2f : EmitsFor(system)) + main.startLifetime.constantMax);
         }
 
         return Mathf.Min(length, 6f);
+    }
+
+    // How long a system goes on making particles: its whole duration if it emits over time, else until its last burst.
+    private static float EmitsFor(ParticleSystem system)
+    {
+        ParticleSystem.EmissionModule emission = system.emission;
+        if (emission.rateOverTime.constantMax > 0f || emission.rateOverDistance.constantMax > 0f)
+        {
+            return system.main.duration;
+        }
+
+        float last = 0f;
+        for (int i = 0; i < emission.burstCount; i++)
+        {
+            ParticleSystem.Burst burst = emission.GetBurst(i);
+            last = Mathf.Max(last, burst.time + Mathf.Max(0, burst.cycleCount - 1) * burst.repeatInterval);
+        }
+
+        return Mathf.Min(last, system.main.duration);
     }
 }

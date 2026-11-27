@@ -17,7 +17,21 @@ MonoBehaviour:
   description: The Heartroot's black sap in the blood. Health drains for a long while unless an antidote clears it.
   color: {r: 0.42, g: 0.3, b: 0.18, a: 1}
   icon: {fileID: 21300000, guid: 8bf00e2d604f14d4fb772796ab426f83, type: 3}
+  look: {fileID: 3453107801114575884, guid: c0620c625c25c784798e9962c9ea24ba, type: 3}
   seconds: 15
   damagePerSecond: 3
   damageType: 3
   moveSpeed: 1
+  damageTaken: 1
+  stopsStrikes: 0
+  damageDealt: 1
+  consumedBy: 0
+  consumeDamage: 0
+  consumeLook: {fileID: 0}
+  consumeSound: {fileID: 0}
+  consumeLine: 
+  reactions: []
+  refreshes: 1
+  endsOnDodge: 0
+  restSeconds: 0
+  takesHoldLine: 
