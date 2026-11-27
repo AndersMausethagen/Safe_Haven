@@ -1266,8 +1266,10 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         aimingSlot = -1;
         SkillAreaMark.Hide();
         // Aimed, then the hands were taken (a cart's handles, the oars, deep water) or an interaction began: let go without a cast.
-        // So is a release that is the game pausing or the controls being taken (the Player map switched off lets its keys up).
-        if ((stateMachine == null || stateMachine.CanUseSkills) && !GamePause.IsPaused && !PlayerControl.HeldOn(gameObject))
+        // So is a release that is the game pausing or the controls being taken (the Player map switched off lets its keys up), the
+        // world map or a name being typed among them (gameplay suspended: review 2026-11-27, it cast behind the map).
+        if ((stateMachine == null || stateMachine.CanUseSkills) && !GamePause.IsPaused && !PlayerControl.HeldOn(gameObject)
+            && !GameInput.KeysGoing && !GameInput.IsGameplaySuspended)
         {
             TryCast(slot);
         }

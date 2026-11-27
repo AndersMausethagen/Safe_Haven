@@ -47,6 +47,13 @@ public static class ItemDelivery
         int inBag = bag == null ? 0 : newFind ? bag.GiveMade(stack, cause) : bag.Container.AddStack(stack);
         ItemContainer stash = toStash && GameSession.Stash != null ? GameSession.Stash.Items : null;
         Delivery rest = Give(null, stack.WithCount(stack.Count - inBag), stash, dropAt != null ? dropAt : bag != null ? bag.transform : null);
+        // A find the stash took is had as surely as one in the bag: a full bag at home made a request's 10 Iron Ore count 0 for a
+        // collect quest (review 2026-11-27). What fell to the ground counts when picked up, as any drop does not: open.
+        if (newFind && bag != null && rest.Stash > 0)
+        {
+            GameEvents.Raise(new GameEvent(GameEventKind.ItemObtained, stack.Item, rest.Stash, bag.gameObject, cause: cause));
+        }
+
         return new Delivery(inBag, rest.Stash, rest.Ground);
     }
 

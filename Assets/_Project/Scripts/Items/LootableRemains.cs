@@ -345,7 +345,8 @@ public sealed class LootableRemains : MonoBehaviour, IInteractionVerb, IInteract
             return false;
         }
 
-        int given = bag.Give(stack.Item, stack.Count, ArrivalCause.Found);
+        // The stack as it lies, not re-made from its item: wear, size or an inscription would have been lost (review 2026-11-27).
+        int given = bag.GiveMade(stack, ArrivalCause.Found);
         if (given > 0)
         {
             Items.RemoveAt(index, given);

@@ -17,14 +17,16 @@ public static class SceneLoader
     /// <param name="ifItFails">Undoes what was got ready for the trip, however the load fails: refused now (false is returned too), or
     /// broken off later, with the game going on where it stands (Docs/BugPatterns.md, fifth round: a caller that undid only the first
     /// left a player frozen at the portal with a raid under way that never came).</param>
-    public static bool Load(string scene, string caption = null, System.Action ifItFails = null)
+    /// <param name="asItCommits">Called once the load can no longer break off, just before the new scene comes in: what the trip swaps
+    /// into the game (a loaded save) goes in then, not while the old scene still plays on it (SceneTransition).</param>
+    public static bool Load(string scene, string caption = null, System.Action ifItFails = null, System.Action asItCommits = null)
     {
-        return SceneTransition.Load(scene, caption, ifItFails);
+        return SceneTransition.Load(scene, caption, ifItFails, asItCommits);
     }
 
-    public static bool Load(int buildIndex, string caption = null, System.Action ifItFails = null)
+    public static bool Load(int buildIndex, string caption = null, System.Action ifItFails = null, System.Action asItCommits = null)
     {
-        return SceneTransition.Load(buildIndex, caption, ifItFails);
+        return SceneTransition.Load(buildIndex, caption, ifItFails, asItCommits);
     }
 
     /// <summary>Records every saveable object and marks the scene as leaving. Called by SceneTransition just before it loads.</summary>

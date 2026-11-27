@@ -53,29 +53,37 @@ public static class SceneTransition
     /// <summary>Loads a scene behind the loading screen. Returns false if a scene change is already under way.</summary>
     /// <param name="caption">Shown on the loading screen, e.g. "Entering the Misty Woods". Null shows "Loading".</param>
     /// <param name="ifItFails">Called however this load fails: refused now, or broken off before its scene is ready (SceneLoader.Load).</param>
-    public static bool Load(string scene, string caption = null, Action ifItFails = null)
+    /// <param name="asItCommits">Called once the load can no longer break off, just before the new scene comes in and the old one stops:
+    /// what the trip swaps in (a loaded save) goes in then, not while the old scene still runs on it.</param>
+    public static bool Load(string scene, string caption = null, Action ifItFails = null, Action asItCommits = null)
     {
         if (string.IsNullOrEmpty(scene))
         {
             throw new ArgumentException("A scene name is required.", nameof(scene));
         }
 
-        return Begin(scene, -1, caption, ifItFails);
+        return Begin(scene, -1, caption, ifItFails, asItCommits);
     }
 
-    public static bool Load(int buildIndex, string caption = null, Action ifItFails = null)
+    public static bool Load(int buildIndex, string caption = null, Action ifItFails = null, Action asItCommits = null)
     {
-        return Begin(null, buildIndex, caption, ifItFails);
+        return Begin(null, buildIndex, caption, ifItFails, asItCommits);
     }
 
     // What the load under way undoes if it breaks off (its caller's ifItFails), until its scene is ready.
     private static Action failing;
+
+    // What the load under way swaps in once it can't break off (its caller's asItCommits). A save loaded at once was played on by the old
+    // scene for the whole loading screen: the Haven left behind raised the loaded Haven's rank, moved settlers in and finished its rank
+    // quests (review 2026-11-27).
+    private static Action committing;
 
     // A load broke off before its scene was ready: the game goes on where it stands, and what got ready for it undoes itself.
     private static void BrokeOff()
     {
         Action failed = failing;
         failing = null;
+        committing = null;
         MarkReady(SceneManager.GetActiveScene());
         try
         {
@@ -162,7 +170,7 @@ public static class SceneTransition
         return true;
     }
 
-    private static bool Begin(string scene, int buildIndex, string caption, Action ifItFails)
+    private static bool Begin(string scene, int buildIndex, string caption, Action ifItFails, Action asItCommits)
     {
         if (IsBusy)
         {
@@ -174,6 +182,7 @@ public static class SceneTransition
         IsBusy = true;
         generation++;
         failing = ifItFails;
+        committing = asItCommits;
         GetRunner().StartTransition(scene, buildIndex, caption);
         return true;
     }
@@ -262,6 +271,7 @@ public static class SceneTransition
     {
         IsBusy = false;
         failing = null;
+        committing = null;
         runningSteps = null;
         var actions = new List<Action>(waitingForReady);
         waitingForReady.Clear();
@@ -299,6 +309,7 @@ public static class SceneTransition
         preloadedScene = null;
         IsBusy = false;
         failing = null;
+        committing = null;
         runningStep = 0;
     }
 
@@ -437,6 +448,21 @@ public static class SceneTransition
             }
 
             SceneManager.sceneLoaded += OnLoaded;
+            // From here the load can't break off: what it swaps in goes in now, before the new scene's Awake reads it.
+            Action commit = committing;
+            committing = null;
+            if (commit != null)
+            {
+                try
+                {
+                    commit();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(exception);
+                }
+            }
+
             operation.allowSceneActivation = true;
             while (!operation.isDone || !setupsDone)
             {

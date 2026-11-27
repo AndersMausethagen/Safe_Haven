@@ -337,9 +337,11 @@ public sealed class ItemInventory : MonoBehaviour
             return false;
         }
 
+        // Every slot, as the count the bar shows (CountCarried) and right-click do: a slot locked by a smaller bag only refuses what
+        // arrives. The bar showed 3 Healing Draughts in slots a broken backpack had locked, then said none were left (review 2026-11-27).
         foreach (ItemContainer source in new[] { Container, SafePocket })
         {
-            for (int i = 0; source != null && i < source.UnlockedSlots; i++)
+            for (int i = 0; source != null && i < source.SlotCount; i++)
             {
                 ItemStack stack = source.GetSlot(i);
                 if (!stack.IsEmpty && stack.Item == item)

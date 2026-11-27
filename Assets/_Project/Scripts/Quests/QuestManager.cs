@@ -615,8 +615,10 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         Pacing.QuestCompleted(Time.time);
         SpaceWaitingFrom(Time.time);
         string rewards;
-        // Once a raid is decided, what the player takes home is already settled, so rewards wait until they arrive.
-        if (Place.RaidDecided && quest.DescribeRewards().Length > 0)
+        // On a raid rewards wait for home: paid there into the bag (the stash past it), not into a raid bag a fall empties or onto
+        // ground the raid takes with it. Only once the raid was decided did they wait, so a quest done a second before its end paid
+        // where it could be lost and one done a second after was safe (review 2026-11-27).
+        if (Place.OnRaid && quest.DescribeRewards().Length > 0)
         {
             log.HoldRewards(quest);
             rewards = "rewards waiting at home";

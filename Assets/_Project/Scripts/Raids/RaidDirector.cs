@@ -49,7 +49,33 @@ public sealed class RaidDirector : MonoBehaviour
     public static RaidDirector Current { get; private set; }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForNewPlaySession() => Current = null;
+    private static void ResetForNewPlaySession()
+    {
+        Current = null;
+        Application.wantsToQuit -= LeaveRaidOnQuit;
+        Application.wantsToQuit += LeaveRaidOnQuit;
+    }
+
+    // The game closed mid-raid (the window's X, Alt+F4, Steam's quit) ends the raid as a fall, saved before the game goes, as quitting
+    // from the pause menu does (Abandon). It undid the raid for free: the next load was the launch save, bag full, gear unworn, and on
+    // Harsh it dodged "a fall takes everything" (review 2026-11-27). In a build only: stopping Play in the Editor must never write a
+    // save. A crash still comes back to the launch save.
+    private static bool LeaveRaidOnQuit()
+    {
+        if (!Application.isEditor && Place.InRaidScene && !Current.IsDecided)
+        {
+            try
+            {
+                Current.Abandon();
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+            }
+        }
+
+        return true;
+    }
 
     /// <summary>The people with the player: the resident who came along and the lost one found out here.</summary>
     public RaidCompanions Companions { get; private set; }

@@ -166,12 +166,18 @@ public static class SaveGameService
         }
 
         raidUnderWay = raid.DisplayName;
-        if (!TrySave(out string problem))
+        try
         {
-            Debug.LogWarning("Couldn't save before the raid: " + problem);
+            if (!TrySave(out string problem))
+            {
+                Debug.LogWarning("Couldn't save before the raid: " + problem);
+            }
         }
-
-        raidUnderWay = null;
+        finally
+        {
+            // However the save went: left set by a throw, every later save said the raid was cut short (review 2026-11-27).
+            raidUnderWay = null;
+        }
     }
 
     /// <summary>
@@ -434,8 +440,10 @@ public static class SaveGameService
             return false;
         }
 
+        // At once, unlike a save loaded (TryLoad): the visit's own state (HavenVisit.IsVisiting, its home) is set as this returns, and
+        // must agree with the game in place.
         GameSession.LoadGame(SaveMapper.FromSaveData(data, content));
-        Go(data.scene, null, caption);
+        Go(data.scene, null, caption, null);
         return true;
     }
 
@@ -610,17 +618,31 @@ public static class SaveGameService
             game.Pose = null;
         }
 
+        // Swapped in once the load can't break off (Go): the old scene played on the loaded game through the loading screen, and a load
+        // broken off left it in place, with F5 then writing the old character into the other save (review 2026-11-27).
         ForgetWaitingSave();
-        GameSession.LoadGame(game);
-        SendOnTheirWay(data.arriving);
-        CurrentSlot = slot;
-        CurrentName = SaveSlotInfo.NameFor(slot, data);
-        Go(scene, notice, "Returning to your journey");
-        if (!string.IsNullOrEmpty(data.raidUnderWay))
+        Go(scene, notice, "Returning to your journey", () =>
         {
-            // Once told, the save stops saying so.
-            SaveOnceHome();
-        }
+            // The slot with the game, before anything that could throw: the scene comes in whatever the commit does, and a game played
+            // under the last journey's slot would be saved over it.
+            GameSession.LoadGame(game);
+            CurrentSlot = slot;
+            CurrentName = SaveSlotInfo.NameFor(slot, data);
+            try
+            {
+                SendOnTheirWay(data.arriving);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+            }
+
+            if (!string.IsNullOrEmpty(data.raidUnderWay))
+            {
+                // Once told, the save stops saying so.
+                SaveOnceHome();
+            }
+        });
 
         return true;
     }
@@ -638,14 +660,17 @@ public static class SaveGameService
         }
 
         ForgetWaitingSave();
-        GameSession.StartNewGame(look);
-        CurrentSlot = null;
-        CurrentName = null;
-        Go(scene, null, "A new journey begins");
+        Go(scene, null, "A new journey begins", () =>
+        {
+            GameSession.StartNewGame(look);
+            CurrentSlot = null;
+            CurrentName = null;
+        });
         return true;
     }
 
-    private static void Go(string scene, string notice, string caption)
+    // Goes to the scene; <paramref name="swapIn"/> puts the game being gone to in place once the load can no longer break off.
+    private static void Go(string scene, string notice, string caption, Action swapIn)
     {
         // The player stays in the old scene until the new one is ready, so keep them still meanwhile.
         GameObject held = Player.Current != null ? Player.Current.gameObject : null;
@@ -679,7 +704,7 @@ public static class SaveGameService
 
         pendingArrival = OnLoaded;
         SceneManager.sceneLoaded += pendingArrival;
-        SceneLoader.Load(scene, caption, ifItFails: OnAbandoned);
+        SceneLoader.Load(scene, caption, ifItFails: OnAbandoned, asItCommits: swapIn);
     }
 
     // The load's own hold on the player's controls while the next scene comes up (PlayerControl).

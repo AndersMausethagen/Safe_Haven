@@ -126,13 +126,17 @@ public sealed class WaterSource : MonoBehaviour, IInteractionName
         ItemInventory bag = user.GetComponentInParent<ItemInventory>();
         if (bag != null)
         {
-            filled = Refill(bag.Container);
+            filled = Refill(bag.Container) + (bag.SafePocket != null ? Refill(bag.SafePocket) : 0);
         }
 
         if (bag != null && fillItem != null)
         {
-            // Hands out containers up to Fill Up To (a water container comes full).
-            int missing = fillUpTo - bag.Container.Count(fillItem);
+            // Hands out containers up to Fill Up To (a water container comes full), counting every one the player has to hand: carried,
+            // in the pocket, and at home the stash. Counting the bag alone, three waterskins put in a chest came back as three new full
+            // ones, again and again (review 2026-11-27). Away (a raid pond, a friend's Haven, whose stash is the host's) the stash
+            // can't be reached, so it doesn't count: one left at home mustn't keep a raid without water.
+            int owned = bag.CountCarried(fillItem) + (Place.AtHome && GameSession.Stash != null ? GameSession.Stash.Items.Count(fillItem) : 0);
+            int missing = fillUpTo - owned;
             if (missing > 0)
             {
                 filled += bag.Give(fillItem, missing, ArrivalCause.Filled);

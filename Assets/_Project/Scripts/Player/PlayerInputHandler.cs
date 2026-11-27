@@ -36,8 +36,6 @@ public sealed class PlayerInputHandler : MonoBehaviour
     private bool mouseAttackPending;
     private bool mouseGuardPending;
     private bool mouseAttackReleasePending;
-    // True while SetActionsEnabled switches the keys off: their cancels are the keys taken, not let go.
-    private bool keysGoing;
 
     private void Awake()
     {
@@ -98,9 +96,19 @@ public sealed class PlayerInputHandler : MonoBehaviour
     private void OnEnable()
     {
         GamePause.Changed += OnPauseChanged;
+        GameInput.PlayerKeysTaken += OnKeysTaken;
         BackHandlers.Register(BackHandlers.InteractionPriority, CancelInteraction);
         Subscribe(true);
         SetActionsEnabled(!GamePause.IsPaused);
+    }
+
+    // The keys taken however it was done (the world map, a name being typed suspend gameplay without a pause or a hold): what the attack
+    // press was doing is given up, not let go.
+    private void OnKeysTaken()
+    {
+        mouseAttackPending = false;
+        mouseAttackReleasePending = false;
+        stateMachine.TakeAttackKey();
     }
 
     private void OnDisable()
@@ -111,6 +119,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         }
 
         GamePause.Changed -= OnPauseChanged;
+        GameInput.PlayerKeysTaken -= OnKeysTaken;
         BackHandlers.Unregister(CancelInteraction);
         Subscribe(false);
         SetActionsEnabled(false);
@@ -133,16 +142,8 @@ public sealed class PlayerInputHandler : MonoBehaviour
         }
 
         // Through GameInput, the map's one switch: it stays off while gameplay is suspended (a name typed), and comes back with it.
-        // Switched off, a held key comes up as a cancel (the Input System cancels an action in progress): that is no release.
-        keysGoing = !enable;
-        try
-        {
-            GameInput.SetPlayerKeys(enable);
-        }
-        finally
-        {
-            keysGoing = false;
-        }
+        // Switched off, a held key comes up as a cancel, which is no release (GameInput.KeysGoing).
+        GameInput.SetPlayerKeys(enable);
 
         if (enable)
         {
@@ -521,8 +522,8 @@ public sealed class PlayerInputHandler : MonoBehaviour
     // A release that comes before its press was processed (a very quick click) waits for it.
     private void OnAttackReleased(InputAction.CallbackContext context)
     {
-        // The key taken away, not let go (SetActionsEnabled tells TakeAttackKey once it is off).
-        if (keysGoing)
+        // The key taken away, not let go (GameInput.PlayerKeysTaken tells TakeAttackKey once it is off).
+        if (GameInput.KeysGoing)
         {
             return;
         }

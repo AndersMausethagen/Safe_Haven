@@ -374,3 +374,56 @@ Open:
 - "Failed to create agent because there is no valid NavMesh" at three scene loads (all agents in the scenes as saved stand on a mesh
   for their own type, so the cause is something spawned at load).
 - Stations away keep the worker speed set at home.
+
+## Eighth round: the core systems (2026-11-27)
+
+The user's request: "do another systematic bug hunt as well. focus on the core systems for now. same practice as usuall". Evidence first: there were no build runs since the seventh round, the Editor console held only test noise, and `EngineHazardTests` plus the three live tests (`GameLoopLiveTests`, `QuitToMenuLiveTests`, `SceneSmokeLiveTests`) all passed. So this round rests on three read-only hunters: saving, the session and the raid's life; items, crafting and survival; the player and combat. The hunters reported 22 findings. Every one was checked in the code before it was fixed. A review of the moments commit (skill presentation) ran alongside, then one reviewer checked all of my fixes.
+
+**The patterns, and the guard for each.**
+1. **An interruption delivered as input.** Taking the keys (a pause, a hold, the world map, a name being typed) reached the bow, the swing and the rod as the attack button let go. The Input System cancels a held action as its map goes off, and the cancel came through as a release:
+   - Esc or the map mid-draw loosed the arrow;
+   - a charged heavy struck as the game resumed;
+   - an aimed skill was cast behind the map.
+
+   The seventh round fixed this for skills only, and only for the pause and holds.
+   - Guard: `GameInput.ApplyPlayerKeys`, the one place the Player map is switched, sets `GameInput.KeysGoing` while it switches the map off and raises `PlayerKeysTaken`. `PlayerStateMachine.TakeAttackKey` gives up what the press was doing.
+   - Test: `InputActionsTests.TakingTheKeys_ComesAsKeysTaken_NotAsTheAttackLetGo`.
+   - Related fixes: a buffered press no longer starts a swing under a hold, and the guard judges the hand each frame (a bow swapped in kept it up).
+2. **What a landed blow means, assembled per listener and per path.** Focus, Regain and lifesteal each had their own test for a fight blow, and crates, fences and parried blows paid all three. Swings, bolts and arrows each had their own list of what happens after a hit: a staff bolt never shattered Frozen, and an arrow laid nothing.
+   - Guards: `FightBlows.Counts` (a foe on a side, through guard and parry, taking health) and `AttackResolver.Landed`.
+   - Focus is now paid per blow that lands (`PlayerFocus.ForBlow`), not per target a swing found.
+3. **Pure rules that accept degenerate input.**
+   - A blow with no horizontal direction was guarded from every side: a guard raised during a fall parried the fall each frame.
+   - `SlowTime` merged overlaps into the slowest speed for the latest end, so a hit stop inside a slow beat froze all of it.
+   - A status burst went through armour and the damage-taken multiplier a second time.
+   - Tests: `CombatTechniqueTests`, `PauseTests`, `SkillLookTests`.
+4. **A handover done when asked, not when done.** A save loaded with F6 was swapped in before the loading screen. The old Haven played on it for the whole load: it raised the loaded Haven's rank, moved settlers in and finished rank quests. A load that broke off left the other save in place, so F5 wrote the old character into it.
+   - Guard: `SceneLoader.Load(..., asItCommits)`. It runs once the load can no longer break off, just before the new scene's Awake. `TryLoad` and `TryStartNewGame` swap the game there.
+   - `TryPlay` (co-op) stays immediate, because the visit's state is set as it returns.
+5. **A rule kept at one exit.**
+   - Quitting counted as a fall only from the pause menu, while the window's X or Alt+F4 undid the raid. `RaidDirector.LeaveRaidOnQuit` on `Application.wantsToQuit` now closes this, in builds only.
+   - Quest rewards were held only once the raid was decided. Now they are held whenever the player is on a raid.
+   - The "raid cut short" flag was cleared only when the launch save went well. It is now cleared in a `finally`.
+6. **A piece identified by its item type where the piece matters.**
+   - Z and L took out the first matching item in the bag, broken or a lesser copy. Now `FindPiece` and `FindInBag` work on stacks, unbroken first.
+   - Body loot was rebuilt from its item type. It now uses `GiveMade`.
+   - A same-item swap into the stash counted nothing.
+   - Guard: `SharedStateTests` now also fails on `Give(x.Item, x.Count`.
+7. **"Carried" has a different scope at each call site.**
+   - The bar counted every slot but used only unlocked ones.
+   - Wells counted the bag alone and handed out new waterskins for the ones in a chest. My fix counted the stash everywhere, and the review caught that it would leave raids without water. It now counts the stash at home only.
+   - A reward the stash took counted for no collect quest.
+
+**The review of my own fixes found 4 of about 25 wrong or incomplete.**
+- Keys taken by a gameplay suspension (the world map) still came as a release. This led to the `GameInput` choke point above.
+- The wells regression.
+- The load commit set the save slot after a step that could throw.
+- The new static `committing` was not reset at Play start. `EngineHazardTests` caught it too.
+
+Open:
+- A station craft's refund gives back the recipe's list, not what was paid. This matters with Free Costs on, and when the materials were paid from the stash. `HandCraftQueue` already does it right (`MaterialPool.Payment`). The fix is a payment kept and saved with each queued craft.
+- The horse and the cart are missing from the save written on coming home, until they are set down, so a crash in those seconds loses them.
+- The Sparks and modifiers paid for a launch whose save throws are not refunded.
+- End-of-raid listeners run in an order nobody chose: a companion lost on an extraction is mourned one raid less. The fix is one ordered step in `RaidDirector.Finish`.
+- A reward's ground share counts for no quest when picked up.
+- A downed co-op player's swing already under way still lands, because `CoopDowned` raises no interrupt.

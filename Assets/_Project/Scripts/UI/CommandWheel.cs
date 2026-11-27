@@ -399,7 +399,8 @@ public sealed class CommandWheel : MonoBehaviour
             return;
         }
 
-        for (int i = 0; i < container.UnlockedSlots && choices.Count < MaxChoices; i++)
+        // Every slot: what a locked slot holds is still carried, and used as anywhere else (ItemInventory.UseFirst).
+        for (int i = 0; i < container.SlotCount && choices.Count < MaxChoices; i++)
         {
             ItemStack stack = container.GetSlot(i);
             if (stack.IsEmpty || stack.Item.Category != ItemCategory.Consumable || !stack.Item.IsConsumable)

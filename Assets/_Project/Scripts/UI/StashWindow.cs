@@ -287,8 +287,10 @@ public sealed partial class StashWindow : MonoBehaviour
         if (ItemDrag.DropOn(grid.Container, index) && grid == stash && source != stash.Container && !moving.IsEmpty)
         {
             // Put away by hand, as a click would: a quest can ask for it ("A Safe Place").
+            // A piece that doesn't stack went whole (a swap with another Iron Sword left one of the same item behind and counted none:
+            // review 2026-11-27); a stack may have gone in part, the rest left of the same kind.
             ItemStack left = source.GetSlot(from);
-            int moved = left.Item == moving.Item ? moving.Count - left.Count : moving.Count;
+            int moved = moving.Item.Stackable && left.SameKind(moving) ? moving.Count - left.Count : moving.Count;
             if (moved > 0)
             {
                 GameEvents.Raise(new GameEvent(GameEventKind.Stored, moving.Item, moved, player));

@@ -242,6 +242,15 @@ public static class GameInput
         ApplyPlayerKeys();
     }
 
+    /// <summary>True while the Player map is being switched off: a key held then comes up as a cancel (the Input System cancels an
+    /// action in progress as it goes off), which is the key taken away, not let go. Listeners of a release ignore it then.</summary>
+    public static bool KeysGoing { get; private set; }
+
+    /// <summary>Raised once the attack key has been taken away (the map switched off by a pause, a hold, a window that suspends gameplay):
+    /// what the press was doing is given up (PlayerStateMachine.TakeAttackKey), not let go. The world map took the keys this way while the
+    /// input handler stayed on, and its cancel loosed a drawn arrow behind the map (review 2026-11-27).</summary>
+    public static event System.Action PlayerKeysTaken;
+
     private static void ApplyPlayerKeys()
     {
         InputActionMap map = PlayerMap;
@@ -256,20 +265,35 @@ public static class GameInput
             return;
         }
 
-        map.Disable();
-        if (IsGameplaySuspended)
+        InputAction attack = Attack;
+        bool attackWasOn = attack != null && attack.enabled;
+        KeysGoing = true;
+        try
         {
-            foreach (InputAction kept in KeptBy.Values)
+            map.Disable();
+            if (IsGameplaySuspended)
             {
-                kept?.Enable();
+                foreach (InputAction kept in KeptBy.Values)
+                {
+                    kept?.Enable();
+                }
             }
-
-            return;
+            else
+            {
+                foreach (InputAction action in PlayerKeysSome)
+                {
+                    action.Enable();
+                }
+            }
+        }
+        finally
+        {
+            KeysGoing = false;
         }
 
-        foreach (InputAction action in PlayerKeysSome)
+        if (attackWasOn && !attack.enabled)
         {
-            action.Enable();
+            PlayerKeysTaken?.Invoke();
         }
     }
 
@@ -568,6 +592,8 @@ public static class GameInput
         playerKeysAll = false;
         PlayerKeysSome.Clear();
         KeptBy.Clear();
+        KeysGoing = false;
+        PlayerKeysTaken = null;
     }
 
     // Quiet when only looking: a key token's action is searched for in each map in turn.

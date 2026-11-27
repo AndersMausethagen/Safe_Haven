@@ -245,6 +245,15 @@ public sealed class SharedStateTests
                 {
                     remade.Add($"{file}:{i + 1}: {code.Trim()}");
                 }
+
+                // Given on by its item and count (a body's loot taken into the bag): the same re-making, through Give (GiveMade keeps it).
+                foreach (Match given in Regex.Matches(code, @"\.Give\s*\(\s*(\w+)\s*\.\s*Item\s*,\s*\1\s*\.\s*Count\b"))
+                {
+                    if (names.Contains(given.Groups[1].Value))
+                    {
+                        remade.Add($"{file}:{i + 1}: {code.Trim()}");
+                    }
+                }
             }
         }
 

@@ -33,6 +33,12 @@ public sealed class PlayerEquipment : MonoBehaviour, LeaseWatch.ILastingHold
     // The weapon in hand now and the one before it (however it changed: Z, the bag, a story), for SwapWeapon.
     private ItemDefinition heldWeapon;
     private ItemDefinition previousWeapon;
+    // The pieces themselves (quality, maker, empowering, inscription): taken out again by the piece, not the first of its item in the
+    // bag. Z back from the bow equipped a plain Iron Sword carried before the Masterwork one put away (review 2026-11-27).
+    private ItemStack heldPiece;
+    private ItemStack previousPiece;
+    private ItemStack stowedPiece;
+    private ItemStack stowedShieldPiece;
     private PlayerCombat combat;
     private Combatant combatant;
     private bool restoring;
@@ -269,11 +275,14 @@ public sealed class PlayerEquipment : MonoBehaviour, LeaseWatch.ILastingHold
     /// Puts on this item from the bag right away, such as a weapon handed over in a story: what is in its slot goes back
     /// to the bag, and a two-handed weapon puts the off-hand item (the torch) away first.
     /// </summary>
-    public bool EquipFromBag(ItemDefinition item)
+    public bool EquipFromBag(ItemDefinition item) => EquipFromBagAt(FindInBag(found => found.Item == item));
+
+    // The piece in that bag slot: as EquipFromBag, for a piece already chosen.
+    private bool EquipFromBagAt(int index)
     {
         ItemContainer bag = Inventory.Container;
-        int index = FindInBag(found => found == item);
-        if (index < 0 || !item.IsEquippable)
+        ItemDefinition item = index >= 0 ? bag.GetSlot(index).Item : null;
+        if (item == null || !item.IsEquippable)
         {
             return false;
         }
@@ -284,6 +293,18 @@ public sealed class PlayerEquipment : MonoBehaviour, LeaseWatch.ILastingHold
         }
 
         return Equip(bag, index);
+    }
+
+    // The bag slot holding this piece (by SameKind), else any of its item.
+    private int FindPiece(ItemDefinition item, ItemStack piece)
+    {
+        if (item == null)
+        {
+            return -1;
+        }
+
+        int same = piece.IsEmpty || piece.Item != item ? -1 : FindInBag(found => found.SameKind(piece));
+        return same >= 0 && !Inventory.Container.GetSlot(same).IsBroken ? same : FindInBag(found => found.Item == item);
     }
 
     /// <summary>
@@ -304,20 +325,26 @@ public sealed class PlayerEquipment : MonoBehaviour, LeaseWatch.ILastingHold
             stowedWeapon = null;
             if (weapon != null && MainHand.IsEmpty)
             {
-                EquipFromBag(weapon);
+                EquipFromBagAt(FindPiece(weapon, stowedPiece));
             }
 
             ItemDefinition shield = stowedShield;
             stowedShield = null;
             if (shield != null && OffHand.IsEmpty)
             {
-                EquipFromBag(shield);
+                EquipFromBagAt(FindPiece(shield, stowedShieldPiece));
             }
 
             return true;
         }
 
-        int torch = FindInBag(IsTorch);
+        // An unbroken torch: a broken one first in the bag put the bow and the shield away, then couldn't be lit (review 2026-11-27).
+        int torch = FindInBag(found => IsTorch(found.Item));
+        if (torch >= 0 && Inventory.Container.GetSlot(torch).IsBroken)
+        {
+            GameMessages.Post($"{Inventory.Container.GetSlot(torch).Item.DisplayName} is broken. Repair it at a Workshop first.", MessageKind.Warning);
+            return false;
+        }
         if (torch < 0)
         {
             GameMessages.Post("You have no torch.", MessageKind.Warning);
@@ -326,24 +353,26 @@ public sealed class PlayerEquipment : MonoBehaviour, LeaseWatch.ILastingHold
 
         if (!MainHand.IsEmpty && MainHand.Item.IsWeapon && MainHand.Item.Weapon.RequiresBothHands)
         {
-            ItemDefinition held = MainHand.Item;
+            ItemStack held = MainHand;
             if (!gear.Unequip(GearSlot.MainHand, bag, out string reason))
             {
                 return Report(false, reason, null);
             }
 
-            stowedWeapon = held;
+            stowedWeapon = held.Item;
+            stowedPiece = held;
         }
 
         if (!OffHand.IsEmpty)
         {
-            ItemDefinition shield = OffHand.Item;
+            ItemStack shield = OffHand;
             if (!gear.Unequip(GearSlot.OffHand, bag, out string reason))
             {
                 return Report(false, reason, null);
             }
 
-            stowedShield = shield;
+            stowedShield = shield.Item;
+            stowedShieldPiece = shield;
         }
 
         return EquipTo(bag, torch, GearSlot.OffHand);
@@ -386,20 +415,21 @@ public sealed class PlayerEquipment : MonoBehaviour, LeaseWatch.ILastingHold
         }
 
         ItemDefinition held = MainHand.IsEmpty ? null : MainHand.Item;
-        ItemDefinition next = previousWeapon != null && previousWeapon != held && FindInBag(found => found == previousWeapon) >= 0
-            ? previousWeapon
-            : null;
-        if (next == null)
+        // The piece held before (by the piece), else the next weapon in the bag; unbroken ones first (FindInBag): a broken spear first
+        // in the bag was all Z ever tried, and the good axe behind it never came out (review 2026-11-27).
+        int nextIndex = previousWeapon != null && previousWeapon != held ? FindPiece(previousWeapon, previousPiece) : -1;
+        if (nextIndex < 0 || Inventory.Container.GetSlot(nextIndex).IsBroken)
         {
-            int index = FindInBag(found => IsSwappable(found) && found != held);
-            next = index >= 0 ? Inventory.Container.GetSlot(index).Item : null;
+            int other = FindInBag(found => IsSwappable(found.Item) && found.Item != held);
+            nextIndex = other >= 0 && (nextIndex < 0 || !Inventory.Container.GetSlot(other).IsBroken) ? other : nextIndex;
         }
 
+        ItemDefinition next = nextIndex >= 0 ? Inventory.Container.GetSlot(nextIndex).Item : null;
         if (next != null)
         {
             ItemDefinition worn = Stowed;
             ItemDefinition was = MainHand.IsEmpty ? null : MainHand.Item;
-            bool equipped = EquipFromBag(next);
+            bool equipped = EquipFromBagAt(nextIndex);
             if (equipped && wasMoving && shownBefore == next)
             {
                 EndHandMove();
@@ -453,7 +483,7 @@ public sealed class PlayerEquipment : MonoBehaviour, LeaseWatch.ILastingHold
             ItemDefinition held = MainHand.IsEmpty ? null : MainHand.Item;
             foreach (ItemDefinition candidate in new[] { stowedWeapon, previousWeapon })
             {
-                if (candidate != null && candidate != held && FindInBag(found => found == candidate) >= 0)
+                if (candidate != null && candidate != held && FindInBag(found => found.Item == candidate) >= 0)
                 {
                     return candidate;
                 }
@@ -481,6 +511,11 @@ public sealed class PlayerEquipment : MonoBehaviour, LeaseWatch.ILastingHold
         ItemDefinition now = MainHand.IsEmpty ? null : MainHand.Item;
         if (now == heldWeapon)
         {
+            if (now != null)
+            {
+                heldPiece = MainHand;
+            }
+
             return;
         }
 
@@ -490,23 +525,38 @@ public sealed class PlayerEquipment : MonoBehaviour, LeaseWatch.ILastingHold
         if (IsSwappable(heldWeapon) && !restoring)
         {
             previousWeapon = heldWeapon;
+            previousPiece = heldPiece;
         }
 
         heldWeapon = now;
+        heldPiece = MainHand;
     }
 
-    private int FindInBag(Predicate<ItemDefinition> match)
+    // The first unbroken piece in the bag the match takes, else the first broken one (so equipping it says why it can't be).
+    private int FindInBag(Predicate<ItemStack> match)
     {
         ItemContainer bag = Inventory.Container;
+        int broken = -1;
         for (int i = 0; i < bag.SlotCount; i++)
         {
-            if (!bag.GetSlot(i).IsEmpty && match(bag.GetSlot(i).Item))
+            ItemStack stack = bag.GetSlot(i);
+            if (stack.IsEmpty || !match(stack))
+            {
+                continue;
+            }
+
+            if (!stack.IsBroken)
             {
                 return i;
             }
+
+            if (broken < 0)
+            {
+                broken = i;
+            }
         }
 
-        return -1;
+        return broken;
     }
 
     /// <summary>

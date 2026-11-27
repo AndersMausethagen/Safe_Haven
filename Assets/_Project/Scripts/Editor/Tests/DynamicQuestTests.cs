@@ -101,6 +101,21 @@ public sealed class DynamicQuestTests
     }
 
     [Test]
+    public void TakingGearOff_IntoABagTooHeavyForIt_SaysWhy()
+    {
+        var gear = new GearSet();
+        var bag = new ItemContainer(4, 4);
+        var axe = Weapon(WeaponStance.OneHanded);
+        Edit(axe, d => d.FindProperty("weight").floatValue = 5f);
+        bag.SetSlot(0, new ItemStack(axe, 1));
+        Assert.IsTrue(gear.EquipTo(bag, 0, GearSlot.MainHand, out _));
+        bag.SetWeightCapacity(2f);
+        Assert.IsFalse(gear.Unequip(GearSlot.MainHand, bag, out string reason), "the bag can't carry it");
+        StringAssert.Contains("too heavy", reason, "and the player is told why, not left clicking at nothing");
+        Assert.AreSame(axe, gear.Get(GearSlot.MainHand).Item);
+    }
+
+    [Test]
     public void HeldTorch_PreservesOnlyItsSafeLightComponents()
     {
         var model = GameObject.CreatePrimitive(PrimitiveType.Cube);

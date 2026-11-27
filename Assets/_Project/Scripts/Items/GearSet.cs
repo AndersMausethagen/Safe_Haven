@@ -137,6 +137,14 @@ public sealed class GearSet
             return false;
         }
 
+        // The bag's weight refuses it too, and said nothing: a click on the worn helmet, a swap for a lighter piece and L putting the
+        // bow away all did nothing (review 2026-11-27).
+        if (into.FitsByWeight(stack.Item) < stack.Count)
+        {
+            reason = $"{stack.Item.DisplayName} is too heavy for your bag.";
+            return false;
+        }
+
         return Slots.MoveTo((int)slot, into, free);
     }
 

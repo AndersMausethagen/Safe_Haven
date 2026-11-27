@@ -153,6 +153,43 @@ public sealed class InputActionsTests : InputTestFixture
     }
 
     [Test]
+    public void TakingTheKeys_ComesAsKeysTaken_NotAsTheAttackLetGo()
+    {
+        var mouse = InputSystem.AddDevice<Mouse>();
+        bool cancelled = false;
+        bool cancelledWhileGoing = false;
+        bool taken = false;
+        System.Action<InputAction.CallbackContext> onCancel = _ =>
+        {
+            cancelled = true;
+            cancelledWhileGoing = GameInput.KeysGoing;
+        };
+        System.Action onTaken = () => taken = true;
+        var worldMap = new object();
+        GameInput.Attack.canceled += onCancel;
+        GameInput.PlayerKeysTaken += onTaken;
+        try
+        {
+            GameInput.SetPlayerKeys(true);
+            Press(mouse.leftButton);
+            Assert.IsTrue(GameInput.Attack.IsPressed(), "the bow drawn");
+
+            // The world map opens: gameplay suspended, with no pause and no hold (the input handler stays on and listening).
+            GameInput.SuspendGameplay(worldMap);
+            Assert.IsTrue(cancelled, "the Input System cancels the held press as its keys go off");
+            Assert.IsTrue(cancelledWhileGoing, "while the keys are going, so it is no release: no arrow loosed behind the map");
+            Assert.IsTrue(taken, "and the keys taken are told, so the draw is eased off");
+        }
+        finally
+        {
+            GameInput.ResumeGameplay(worldMap);
+            GameInput.Attack.canceled -= onCancel;
+            GameInput.PlayerKeysTaken -= onTaken;
+            Release(mouse.leftButton);
+        }
+    }
+
+    [Test]
     public void Gamepad_PlaysTheGame()
     {
         var gamepad = InputSystem.AddDevice<Gamepad>();
