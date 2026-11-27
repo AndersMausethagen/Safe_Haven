@@ -3445,6 +3445,38 @@ sample textures and flames are in `Art/Effects/VFX Graph/Additions` (Unity Compa
   game does those, and its touches reach the host's creatures as that player's blows). `StatusCatalog` finds statuses by id for both.
   Wire format 33.
 
+## Skill moments, payoffs and lore (2026-11-27)
+
+The user: "make sure that ultimates look, feel and sound satisfying ... non-ultimates can be a bit more grounded", and "we could also
+unlock abilities other ways. through exploring or finding rare items".
+- **A skill's moment** (`SkillLook.moment`, `SkillMomentLook`; `Rendering/SkillMoments`, one runner per scene made on first use):
+  `SkillFx.Cast` calls `SkillMoments.WindUp` (the camera pushes in to Wind Up Zoom through `PlayerCameraController.SetCloseness` with its
+  own `LeaseKey`, let go by itself if the cast never lands); `SkillFx.Land` calls `Impact` (after Impact Delay for a skill with no blow):
+  a punch on a runtime global volume at priority 1101 (post exposure, chromatic aberration, lens distortion, a colour tint), slow time
+  after the hit stop (`CombatFeedback.SlowTimeAfterStop`), a camera recoil, and an afterglow on a second volume (1100: colour filter and
+  saturation fading out). Screen Flashes scales the flash, tint and afterglow, Screen Shake the bulge and recoil; real time throughout.
+  A moment always gets the hit stop, struck or not. Ultimates carry one; techniques and powers mostly don't.
+- **Sound layers** (`SkillLook.sounds`, `SkillSoundCue`: Cast or Release, a real-time delay) on top of cast and release sounds:
+  an ultimate's rise, impact and tail (`Tools/Audio/skill_moments.py`, synthesized, two takes each; `Audio/Sounds/Skills`).
+- **Payoffs**: when a skill uses up a status (`PlayerSkills.AfterOptions`) it raises `StatusEffects.NoteConsumed` ->
+  `StatusBearerLook` plays the status's Consume Look and Consume Sound (Payoff Bleed, Sunder, Roots, Cowed, Burn), and the cast's first
+  payoff gets a hit stop (0.07 s) and a shake. Only statuses the foe had before the blow count (`NoteStatusesBefore`, `hadBefore`):
+  Surtr's Brand can't pay off on the Burning it lays itself.
+- **The effects builder** (`SkillFxPrefabs.Moments.cs`, menu Dress the Moments and Newer Skills; also the end of Dress All, safe to
+  run again): the four ultimates' layered prefabs (rune, gathering, flare, pillar or column, waves, cracks, quakes in
+  `Data/Combat/GroundImpacts`), the grounded looks of the weapon techniques and newer powers, the payoff composites. New graphs
+  Skill Gather and Skill Pillar (`SkillVfxArchetypes`); textures from `Tools/Effects/skill_textures.py`. An ultimate shows no flat
+  area disc (its own rune circle says where).
+- **Lore** (`Skills/SkillLore`, `Resources/SkillLoreSettings`: Systems Editor): an item with `ItemDefinition.teachesSkill` is read from
+  the bag (`IsSkillLore`; `ItemInventory`) and teaches its ability (`PlayerSkills.Learn` with the lore's words, one announcement).
+  Found in a raid's rare moments (`SkillLore.Roll`/`Pick`: a great creature, sure the first time, `LootOnDeath`; an elite,
+  `EliteCreature`; one of the Lost struck down, `RaidLostOnes`; a rare supply cache, `LootCache`) and in strange places
+  (`GiveLoreOutcome` in `RaidEventOutcomes`; the Haven's Windy Cairn, Wayfarer's Stones, Grandmother Cedar). Lore found
+  on a body is announced when it reaches the bag (`OnBagReceived` -> `SkillLore.Announce`). Teaches Fimbulwinter, Surtr's Brand,
+  Raven's Mark, Bear-Hide. Playtest rows LoreFound, LoreRead. `SkillLoreTests`.
+- **Weapon techniques on load**: `PlayerSnapshot` learns the restored weapon's technique after the gear is back; bare hands learn
+  theirs on a landed blow, not on an empty hand at load.
+
 ## Loot on bodies (2026-11-24)
 
 The user: "killing enemies is gonna change so we have to go to the killed monster and loot it. a window with the loot shows. The monster

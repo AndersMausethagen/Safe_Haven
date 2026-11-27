@@ -98,8 +98,9 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
     /// <summary>Nearly freezes the game for a moment of real time. Overlapping requests keep the longest.</summary>
     public void HitStop(float seconds) => SlowTime(feel.HitStopTimeScale, seconds);
 
-    /// <summary>Slows the game to <paramref name="scale"/> for <paramref name="seconds"/> of real time. Overlapping requests
-    /// keep the slowest and the longest.</summary>
+    /// <summary>Slows the game to <paramref name="scale"/> for <paramref name="seconds"/> of real time. Overlapping requests keep
+    /// the slowest for as long as it asked: a short stop inside a longer, gentler slow runs on its own and the slow takes up again
+    /// after it for what is left of it, and a gentler, longer slow asked during a stop follows the stop.</summary>
     public void SlowTime(float scale, float seconds)
     {
         // Hosting friends in co-op, time is theirs too (GamePause.TimeIsShared): the camera shake carries the blow alone.
@@ -108,16 +109,38 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
             return;
         }
 
-        hitStopScale = hitStopUntil >= 0f ? Mathf.Min(hitStopScale, scale) : scale;
-        hitStopUntil = Mathf.Max(hitStopUntil, Time.unscaledTime + seconds);
+        float until = Time.unscaledTime + seconds;
+        if (hitStopUntil < 0f)
+        {
+            hitStopScale = scale;
+            hitStopUntil = until;
+        }
+        else if (scale < hitStopScale && until < hitStopUntil)
+        {
+            // Keeping the slowest and the latest end made a hurt during an ultimate's slow beat, or a skill's stop during the last
+            // kill's slow, freeze the whole rest of the slow (review 2026-11-27).
+            WaitAfterTheStop(hitStopScale, hitStopUntil - until);
+            hitStopScale = scale;
+            hitStopUntil = until;
+        }
+        else if (scale > hitStopScale && until > hitStopUntil)
+        {
+            WaitAfterTheStop(scale, until - hitStopUntil);
+            return;
+        }
+        else
+        {
+            hitStopScale = Mathf.Min(hitStopScale, scale);
+            hitStopUntil = Mathf.Max(hitStopUntil, until);
+        }
+
         if (!GamePause.IsTimeFrozen)
         {
             Time.timeScale = hitStopScale;
         }
     }
 
-    /// <summary>Slows the game once the stop running now has ended (at once when none runs): a beat after a blow, not a longer freeze
-    /// (SlowTime keeps the slowest of overlapping requests).</summary>
+    /// <summary>Slows the game once the stop running now has ended (at once when none runs): a beat after a blow, not a longer freeze.</summary>
     public void SlowTimeAfterStop(float scale, float seconds)
     {
         if (hitStopUntil < 0f)
@@ -126,24 +149,43 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
             return;
         }
 
-        thenScale = scale;
-        thenSeconds = seconds;
+        WaitAfterTheStop(scale, seconds);
+    }
+
+    // One slow waits at most: the slowest and the longest of those asked (the last one asked used to win).
+    private void WaitAfterTheStop(float scale, float seconds)
+    {
+        if (seconds <= 0f)
+        {
+            return;
+        }
+
+        bool none = thenScale < 0f;
+        thenScale = none ? scale : Mathf.Min(thenScale, scale);
+        thenSeconds = none ? seconds : Mathf.Max(thenSeconds, seconds);
     }
 
     private void Update()
     {
-        if (hitStopUntil >= 0f && Time.unscaledTime >= hitStopUntil)
+        EndStopsDueBy(Time.unscaledTime);
+        PlayPendingSwingSound();
+        UpdateChargeSound();
+    }
+
+    /// <summary>Ends the stop or slow due by <paramref name="now"/> (real time) and starts the slow waiting after it. Update's own;
+    /// public for tests, which hand it a later time.</summary>
+    public void EndStopsDueBy(float now)
+    {
+        if (hitStopUntil >= 0f && now >= hitStopUntil)
         {
             float then = thenScale;
+            float thenFor = thenSeconds;
             EndHitStop();
             if (then > 0f)
             {
-                SlowTime(then, thenSeconds);
+                SlowTime(then, thenFor);
             }
         }
-
-        PlayPendingSwingSound();
-        UpdateChargeSound();
     }
 
     private void UpdateChargeSound()

@@ -101,6 +101,41 @@ public sealed class PauseTests
     }
 
     [Test]
+    public void AStopInsideASlow_StopsOnlyForItself_ThenTheSlowGoesOn()
+    {
+        float hitStopBefore = GameOptions.HitStop.Value;
+        GameOptions.HitStop.Value = 1f;
+        var feedback = new GameObject("feedback").AddComponent<CombatFeedback>();
+        try
+        {
+            float now = Time.unscaledTime;
+            // An ultimate's slow beat, then the player is struck: a hit stop inside it.
+            feedback.SlowTime(0.3f, 0.45f);
+            feedback.SlowTime(0.05f, 0.07f);
+            Assert.AreEqual(0.05f, Time.timeScale, 1e-4f, "the stop stops time");
+
+            feedback.EndStopsDueBy(now + 0.1f);
+            Assert.AreEqual(0.3f, Time.timeScale, 1e-4f, "once the stop is over the slow goes on: not a freeze for the rest of it");
+            Assert.IsTrue(feedback.IsHitStopped);
+
+            feedback.EndStopsDueBy(now + 0.1f + 0.45f);
+            Assert.AreEqual(1f, Time.timeScale, 1e-4f, "and it ends");
+
+            // A gentler, longer slow asked during a stop follows the stop.
+            feedback.SlowTime(0.05f, 0.07f);
+            feedback.SlowTime(0.3f, 0.45f);
+            Assert.AreEqual(0.05f, Time.timeScale, 1e-4f);
+            feedback.EndStopsDueBy(Time.unscaledTime + 0.1f);
+            Assert.AreEqual(0.3f, Time.timeScale, 1e-4f, "the slow comes after the stop");
+        }
+        finally
+        {
+            UnityEngine.Object.DestroyImmediate(feedback.gameObject);
+            GameOptions.HitStop.Value = hitStopBefore;
+        }
+    }
+
+    [Test]
     public void BackHandlersRunHighestPriorityFirstAndStopWhenUsed()
     {
         var calls = new List<string>();

@@ -300,9 +300,10 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         }
 
         // Bare fists teach theirs on a blow landed barehanded: sheathing a weapon swaps fists in, and that taught it at every load
-        // (bug hunt 2026-11-27).
+        // (bug hunt 2026-11-27). A swing of the hands themselves: Troll's Hurl's boulder lands as a melee blow too (review 2026-11-27).
         if (!collectingStruck && damage.Source == combatant && result.Damage > 0f && combat != null && combat.Weapon != null
-            && combat.Weapon.Signature == WeaponSignature.Flurry && (damage.Technique & HitTechnique.Melee) != 0)
+            && combat.Weapon.Signature == WeaponSignature.Flurry && (damage.Technique & HitTechnique.Melee) != 0
+            && (damage.Technique & HitTechnique.Ability) == 0 && damage.Attack != null && damage.Attack == combat.ActiveAttack)
         {
             fistsLanded = true;
             LearnWeaponTechnique(combat.Weapon);
@@ -953,7 +954,9 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         }
 
         nextChannelTick += channeling.ChannelTick;
-        float weaponDamage = combat != null && combat.Weapon != null ? combat.Weapon.Damage : 0f;
+        // The weapon the channel began with, as its first blow (review 2026-11-27: a swap mid-channel changed its damage).
+        WeaponDefinition weapon = pendingWeapon;
+        float weaponDamage = weapon != null ? weapon.Damage : 0f;
         float runecraft = channeling.IsPhysical ? 1f : Mathf.Max(0f, 1f + combatant.Stats.Get(StatType.SpellDamage));
         HitTechnique kind = AbilityTechnique(channeling);
         Vector3 aim = movement.AimDirection;
@@ -972,7 +975,7 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
         try
         {
             AttackResolver.Execute(combatant, channeling.Attack, weaponDamage, transform.position, pendingDirection, hitLayers,
-                Power(channeling) * runecraft * SkillChoices.For(channeling).Damage * channeling.WeaponScale(combat != null ? combat.Weapon : null), 1f, kind);
+                Power(channeling) * runecraft * SkillChoices.For(channeling).Damage * channeling.WeaponScale(weapon), 1f, kind);
         }
         finally
         {

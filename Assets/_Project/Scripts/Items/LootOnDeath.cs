@@ -264,6 +264,7 @@ public sealed class LootOnDeath : MonoBehaviour
             if (lore != null)
             {
                 items.Add(new ItemAmount(lore, 1));
+                SkillLore.NoteFound(lore, "on " + title);
             }
         }
 

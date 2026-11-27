@@ -61,7 +61,10 @@ public sealed class SkillFx : MonoBehaviour
 
         Runner.PlaySounds(look, SkillSoundPhase.Cast, caster.position);
         // Its big moment's wind-up: the camera pushes in until it lands (or, with no blow, until its moment comes).
-        SkillMoments.WindUp(look.moment, windUp > 0.05f ? windUp : look.moment.impactDelay);
+        if (look.moment != null)
+        {
+            SkillMoments.WindUp(look.moment, windUp > 0.05f ? windUp : look.moment.impactDelay);
+        }
     }
 
     // The look's extra sound layers of a phase, each after its delay in real time (slow motion doesn't stretch a riser or a tail).

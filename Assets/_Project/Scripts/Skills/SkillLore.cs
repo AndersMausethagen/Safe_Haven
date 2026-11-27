@@ -94,11 +94,22 @@ public static class SkillLore
             RaidDirector.Current.Session.RecordEvent($"Found {lore.DisplayName} ({from})");
         }
 
+        NoteFound(lore, from);
         return true;
     }
 
-    /// <summary>Lore has come into the bag (any way: a grant, a body's loot, a Haven place): a legendary find's sound and words, and the
-    /// playtest log's LoreFound row (PlayerSkills listens to the bag).</summary>
+    /// <summary>The playtest log's LoreFound row, once per find and naming where it came from: written where lore is given or laid on a
+    /// body, not as it reaches the bag (a full bag's drop picked up, or lore bought back, logged it again: review 2026-11-27).</summary>
+    public static void NoteFound(ItemDefinition lore, string from)
+    {
+        if (lore != null && lore.TeachesSkill != null)
+        {
+            PlaytestLogger.Note(PlaytestLog.LoreFound, lore.TeachesSkill.Id, 1, from);
+        }
+    }
+
+    /// <summary>Lore has come into the bag (any way: a grant, a body's loot, a Haven place): a legendary find's sound and words
+    /// (PlayerSkills listens to the bag).</summary>
     public static void Announce(GameObject player, ItemDefinition lore)
     {
         if (lore == null || lore.TeachesSkill == null)
@@ -111,8 +122,6 @@ public static class SkillLore
         {
             AudioManager.Play(Rarity.StyleOf(ItemRarity.Legendary).PickupSound, player.transform.position);
         }
-
-        PlaytestLogger.Note(PlaytestLog.LoreFound, lore.TeachesSkill.Id, 1, RaidDirector.Current != null ? "raid" : "home");
     }
 
     /// <summary>

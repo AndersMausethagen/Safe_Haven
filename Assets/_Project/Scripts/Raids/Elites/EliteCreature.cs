@@ -282,6 +282,7 @@ public sealed class EliteCreature : MonoBehaviour
                 if (lore != null)
                 {
                     rolled.Add(new ItemAmount(lore, 1));
+                    SkillLore.NoteFound(lore, "on " + Title);
                 }
             }
 
