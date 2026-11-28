@@ -82,9 +82,11 @@ public sealed class AltarStage : MonoBehaviour
         shock.color = Color.clear;
         // The result card (Docs/AltarUXResearch_2026-11-28.md, review): a dark plate across the ring's foot, so its words read over the
         // sparks and glow; it rises in, ticks as it lands, stays and fades.
-        RectTransform plate = CodeUI.At("Result Card", stage, -size * 0.45f, size * 0.72f, size * 1.9f, 40f);
+        // Under the ring, over the name it repeats while it shows (review: across the ring's foot it read as runes over text).
+        RectTransform plate = CodeUI.At("Result Card", stage, -size * 0.45f, size + 2f, size * 1.9f, 40f);
         var plateImage = plate.gameObject.AddComponent<Image>();
-        plateImage.color = new Color(0.05f, 0.04f, 0.035f, 0.9f);
+        // Solid: it lies over the offer's name while it shows, which must not read through it.
+        plateImage.color = new Color(0.07f, 0.055f, 0.045f, 1f);
         plateImage.raycastTarget = false;
         // Thin rules of the kind's colour above and below (an Outline on a filled plate copies the whole fill in the rule's
         // colour, which washed it gold).
@@ -414,6 +416,9 @@ public sealed class AltarStage : MonoBehaviour
         // Purifying is done often: its own sound carries it, no tick on top.
         ShowResult(line, false);
     }
+
+    /// <summary>True while the result card is up.</summary>
+    public bool ShowingResult => resultAge >= 0f;
 
     /// <summary>A working under way (the purifying queue), 0 to 1: the ring turns with it.</summary>
     public float Working { get; set; }

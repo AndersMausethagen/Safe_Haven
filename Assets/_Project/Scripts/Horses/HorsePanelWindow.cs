@@ -198,7 +198,8 @@ public sealed class HorsePanelWindow : MonoBehaviour
         summary = CodeUI.Paragraph("Summary", panel, x, Margin + 134f, 384f, 120f, 20f, style.Muted);
         for (int i = 0; i < StatNames.Length; i++)
         {
-            headerRows[i] = new KitStatRow(panel, Width - Margin - 360f, Margin + 14f + i * 50f, 352f, StatNames[i], StatIcons[i], i == 0 || i == 1 || i == 4, 21f);
+            // Ending clear of the close button (review: "143 / 143" ran under it).
+            headerRows[i] = new KitStatRow(panel, Width - Margin - 360f, Margin + 14f + i * 50f, 312f, StatNames[i], StatIcons[i], i == 0 || i == 1 || i == 4, 21f);
         }
     }
 

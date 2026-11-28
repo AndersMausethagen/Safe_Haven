@@ -200,7 +200,10 @@ public static class HavenLands
 
         if (info != null)
         {
-            entry.Details.Add(new HavenDetail("Danger", info.danger.ToString()));
+            // Skulls by how deadly, its word beside them (review: "Danger: Dangerous" was the enum's name).
+            int skulls = (int)info.danger;
+            string word = info.danger.ToString();
+            entry.Details.Add(new HavenDetail("Danger", (skulls > 0 ? string.Concat(Enumerable.Repeat(HearthKit.InlineIcon("Skull", UIStyle.Current.Danger), skulls)) + "  " : "") + word));
             entry.Details.Add(new HavenDetail("What it gives", info.gives));
         }
 
@@ -221,8 +224,10 @@ public static class HavenLands
 
         if (info != null && info.tithe.Count > 0)
         {
-            string tithe = string.Join(", ", info.tithe.Where(t => t.Item != null).Select(t => $"{t.Amount} {t.Item.DisplayName}"));
-            entry.Details.Add(new HavenDetail(standing == RegionStanding.Secure ? "Sends home each dawn" : "Would send home each dawn, once Secure", tithe));
+            // The same thing listed twice reads as one, added up ("1 Rough Hide, 2 Rough Hide").
+            string tithe = string.Join(", ", info.tithe.Where(t => t.Item != null).GroupBy(t => t.Item)
+                .Select(kind => $"{kind.Sum(t => t.Amount)} {kind.Key.DisplayName}"));
+            entry.Details.Add(new HavenDetail(standing == RegionStanding.Secure ? "Each dawn it sends" : "Each dawn, once secure", tithe));
         }
 
         if (standing == RegionStanding.Wild)

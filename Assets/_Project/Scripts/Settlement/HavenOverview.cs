@@ -139,6 +139,41 @@ public sealed class HavenOverview
         }
     }
 
+    // Someone home without work while a place of their own trade stands with nobody at it (review 2026-11-28: the altar sat cold, "it
+    // needs a resident working as the Alchemist", while Ingrid, the expedition's alchemist, had no job, and nothing said so here).
+    private void ReadIdleWorkStep()
+    {
+        var here = GameSession.Here;
+        if (here == null)
+        {
+            return;
+        }
+
+        var standing = new HashSet<BuildingDefinition>(BuildingObject.Active.Where(building => building.Definition != null).Select(building => building.Definition));
+        // At most two, so the rest of the list still shows.
+        int shown = 0;
+        foreach (ResidentRecord record in here.Residents)
+        {
+            if (record.Resident == null || record.Job != null || shown >= 2)
+            {
+                continue;
+            }
+
+            foreach (JobDefinition job in here.JobsOpenTo(record.Resident))
+            {
+                bool theirs = record.Resident.Jobs != null && System.Array.IndexOf(record.Resident.Jobs, job) >= 0;
+                bool idle = job != null && job.Workplace != null && standing.Contains(job.Workplace) && !here.Residents.Any(other => other.Job == job);
+                if (theirs && idle)
+                {
+                    Steps.Add(new Step($"Give {record.Resident.DisplayName} work: {job.DisplayName}",
+                        $"The {job.Workplace.DisplayName} stands idle. Speak to them, or see People.", "", 0));
+                    shown++;
+                    break;
+                }
+            }
+        }
+    }
+
     private void ReadSteps(HavenSettings settings, GameObject user)
     {
         string use = GameInput.KeyLabel(GameInput.Interact);
@@ -154,6 +189,8 @@ public sealed class HavenOverview
         {
             Steps.Add(new Step("Mend the clearing", $"{hurt} building{(hurt == 1 ? " is" : "s are")} damaged. Pay for repairs at the portal.", use, 0));
         }
+
+        ReadIdleWorkStep();
 
         // The portal's next tier: its materials, or what it still waits for (decision 8.4).
         SettlementSettings.WardLevel nextTier = PortalTiers.Next(GameSession.Here);

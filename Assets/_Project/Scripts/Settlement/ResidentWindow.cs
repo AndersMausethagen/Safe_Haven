@@ -189,7 +189,8 @@ public sealed class ResidentWindow : MonoBehaviour
         string[] icons = { "House", "Hammer", "Star", "Sword" };
         for (int i = 0; i < names.Length; i++)
         {
-            headerRows[i] = new KitStatRow(panel, Width - Margin - 360f, Margin + 14f + i * 58f, 352f, names[i], icons[i], i == 0 || i == 2, 21f);
+            // Ending clear of the close button (review: "By the fire" ran under it).
+            headerRows[i] = new KitStatRow(panel, Width - Margin - 360f, Margin + 14f + i * 58f, 312f, names[i], icons[i], i == 0 || i == 2, 21f);
         }
     }
 
@@ -286,7 +287,8 @@ public sealed class ResidentWindow : MonoBehaviour
         spiritsMeans = CodeUI.Paragraph("Means", left, 24f, 94f, leftWidth - 48f, 44f, 15f, style.Muted);
         for (int i = 0; i < reasonRows.Length; i++)
         {
-            reasonRows[i] = new KitFactRow(left, 22f, 146f + i * 54f, leftWidth - 44f, 315f);
+            // Room for the +1 / -1 on the right (it had 13 px, so a lift and a lower looked alike: review 2026-11-28).
+            reasonRows[i] = new KitFactRow(left, 22f, 146f + i * 54f, leftWidth - 44f, leftWidth - 54f);
         }
 
         RectTransform middle = HearthKit.Card(page, "Standings Card", leftWidth + 16f, 0f, middleWidth, BodyHeight);
@@ -1104,8 +1106,10 @@ public sealed class ResidentWindow : MonoBehaviour
         for (int i = 0; i < reasonRows.Length; i++)
         {
             bool shown = i < reasons.Count;
-            reasonRows[i].Set(shown ? $"{HearthKit.InlineIcon(reasons[i].Icon)} {reasons[i].Words}" : "",
-                shown ? $"<color=#{(reasons[i].Steps > 0 ? good : bad)}>{(reasons[i].Steps > 0 ? "+" : "")}{reasons[i].Steps}</color>" : "");
+            // A lift in the good colour, a lower in the warning one, words and number alike.
+            string tone = shown && reasons[i].Steps > 0 ? good : bad;
+            // The step first, so a long reason can't run into it.
+            reasonRows[i].Set(shown ? $"<color=#{tone}><b>{(reasons[i].Steps > 0 ? "+" : "")}{reasons[i].Steps}</b>  {HearthKit.InlineIcon(reasons[i].Icon)} {reasons[i].Words}</color>" : "", "");
         }
 
         var standings = new List<(ResidentRecord other, int level)>();

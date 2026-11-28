@@ -256,6 +256,12 @@ public sealed class AltarWindow : MonoBehaviour
             return;
         }
 
+        // The result card lies where the name is and says it again: the name steps aside while it shows.
+        if (offerName != null && stage != null)
+        {
+            offerName.alpha = stage.ShowingResult ? 0f : 1f;
+        }
+
         if (Time.unscaledTime >= nextRead)
         {
             Read();
@@ -391,11 +397,15 @@ public sealed class AltarWindow : MonoBehaviour
     private void DrawOffer(AltarOffer offer, Sprite picture)
     {
         UIStyle style = UIStyle.Current;
-        if (offer != shownOffer && offer != null && shownOffer != null)
+        // The offers are made anew at every read (twice a second): compare what is chosen, not the objects, or the select bell
+        // rang twice a second for as long as the window was open (the user, 2026-11-28: "that ringing sound ... is annoying").
+        (Page, int, int) chosen = (page, subjectIndex, offerIndex);
+        if (offer != null && shownOffer != null && chosen != shownChoice)
         {
             stage.Selected();
         }
 
+        shownChoice = chosen;
         shownOffer = offer;
         bool any = offer != null;
         Sprite shown = any && offer.Picture != null && offer.Kind != AltarOfferKind.Unknown ? offer.Picture : picture;
@@ -677,6 +687,8 @@ public sealed class AltarWindow : MonoBehaviour
         // Held, not clicked: the stage charges while it is held and answers when it is done.
         stage.Attach(applyButton, () => shownOffer != null && shownOffer.Problem == null, Apply,
             () => (shownOffer != null ? shownOffer.Moment : AltarMoment.Small, ResultLine()));
+        // Drawn over the words below it: its sparks fly over the text.
+        stage.transform.SetAsLastSibling();
     }
 
     // What the stage says when a working is done.
@@ -698,6 +710,7 @@ public sealed class AltarWindow : MonoBehaviour
 
     private AltarStage stage;
     private AltarStage purifyStage;
+    private (Page, int, int) shownChoice = ((Page)(-1), -1, -1);
 
     private static float HorizontalDistance(Vector3 a, Vector3 b)
     {

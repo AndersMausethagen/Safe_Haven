@@ -189,9 +189,11 @@ public static class AltarWork
                     // The first level is a step; the higher ones matter more, the last is a milestone.
                     Moment = level >= settings.EmpowerLevels.Count ? AltarMoment.Milestone : level > 1 ? AltarMoment.Large : AltarMoment.Small,
                     Name = $"{stack.Item.DisplayName} +{level}",
-                    // Before → after (Monster Hunter, Elden Ring): what the level before it gives, then this one.
-                    Summary = level > 1
-                        ? $"<color=#{Hex(UIStyle.Current.Muted)}>{ItemTooltipView.DescribeBonuses(GearPower.EmpowerBonuses(stack.Item, level - 1, settings))}</color>  →  <color=#{Hex(UIStyle.Current.Good)}>{ItemTooltipView.DescribeBonuses(bonuses)}</color>"
+                    // Before → after (Monster Hunter, Elden Ring): what the piece has now, then this level (review: the level below
+                    // the one picked read as "now" when the piece hadn't reached it).
+                    Summary = stack.Empower > 0 && stack.Empower < level
+                        ? $"<color=#{Hex(UIStyle.Current.Muted)}>{ItemTooltipView.DescribeBonuses(GearPower.EmpowerBonuses(stack.Item, stack.Empower, settings))}</color>  →  <color=#{Hex(UIStyle.Current.Good)}>{ItemTooltipView.DescribeBonuses(bonuses)}</color>"
+                        : level <= stack.Empower ? $"<color=#{Hex(UIStyle.Current.Good)}>{ItemTooltipView.DescribeBonuses(bonuses)}</color>"
                         : $"<color=#{Hex(UIStyle.Current.Muted)}>nothing</color>  →  <color=#{Hex(UIStyle.Current.Good)}>{ItemTooltipView.DescribeBonuses(bonuses)}</color>",
                     Lore = "The essence is worked into what it was made from: the old work, made stronger.",
                 };
@@ -579,7 +581,9 @@ public static class AltarWork
     private static AltarSubject Subject(Held held)
     {
         ItemStack stack = held.Stack;
-        return new AltarSubject { Title = stack.DisplayName, Detail = held.Place, Icon = stack.Item.Icon };
+        // What has been done to it, before where it is (review: every row said "Worn"): "+1 · Ashwarded · Worn".
+        string done = (stack.Empower > 0 ? $"+{stack.Empower}" : "") + (stack.Enchantment != null ? (stack.Empower > 0 ? " · " : "") + stack.Enchantment.DisplayName : "");
+        return new AltarSubject { Title = stack.DisplayName, Detail = done.Length > 0 ? $"{done} · {held.Place}" : held.Place, Icon = stack.Item.Icon };
     }
 
     private static string Missing(GameObject user, RepairCost cost)
