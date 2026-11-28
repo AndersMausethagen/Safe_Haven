@@ -120,7 +120,9 @@ public sealed class HorseStable : MonoBehaviour, ISaveable, ICargoHold
         ResidentRecord hand = !HavenVisit.IsVisiting ? Stablehands.BestOf(GameSession.Home, out tends) : null;
         string tended = hand != null ? $" {hand.Resident.DisplayName} tends them each morning: +{tends:0.#} bond a day, and none lost while you are away."
             : !HavenVisit.IsVisiting && Stablehands.Known(GameSession.Home) ? " A Stablehand would tend them each morning (Who does what)." : "";
-        var page = new MenuPage { Title = "Stable", Body = $"{Occupants} of {Stalls} stalls taken. Horses here are safe, mend and rest; a mare and a stallion both fond of you may foal.{tended}" };
+        // Its painting over the menu (the UX pass of 2026-11-28: the stable was a title, a paragraph and two buttons).
+        var page = new MenuPage { Title = "Stable", Body = $"{Occupants} of {Stalls} stalls taken. Horses here are safe, mend and rest; a mare and a stallion both fond of you may foal.{tended}",
+            Picture = Resources.Load<Sprite>("WindowArt/Stable") };
         bool visiting = HavenVisit.IsVisiting;
         GameObject user = interactable.Interactor;
         page.Add(new MenuAction($"Feed trough ({Meals()} meals)", "Fed horses mend twice as fast and grow fonder", !visiting && user != null,

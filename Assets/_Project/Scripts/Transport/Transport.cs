@@ -242,7 +242,9 @@ public sealed class Transport : MonoBehaviour, ISaveable, ICargoHold
     private MenuPage Page(GameObject user)
     {
         bool empty = Cargo.CurrentWeight <= 0f && Cargo.CountItems() == 0;
-        var page = new MenuPage { Title = definition.DisplayName, Body = $"{definition.Description}\n\n{LoadText()}" };
+        // Its painting over the menu, as over its cargo window.
+        var page = new MenuPage { Title = definition.DisplayName, Body = $"{definition.Description}\n\n{LoadText()}",
+            Picture = string.IsNullOrEmpty(definition.WindowArt) ? null : Resources.Load<Sprite>("WindowArt/" + definition.WindowArt) };
         if (IsOverturned)
         {
             page.Add(new MenuAction("Set it upright", null, true, SetUpright));

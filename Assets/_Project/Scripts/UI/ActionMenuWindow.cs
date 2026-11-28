@@ -115,6 +115,7 @@ public sealed class ActionMenuWindow : MonoBehaviour
 
     private readonly List<ActionRowView> rows = new List<ActionRowView>();
     private Image picture;
+    private LayoutElement pictureLayout;
     private Func<MenuPage> source;
     private Action closed;
     private Transform anchor;
@@ -198,6 +199,15 @@ public sealed class ActionMenuWindow : MonoBehaviour
 
         picture.sprite = page.Picture;
         picture.gameObject.SetActive(page.Picture != null);
+        if (page.Picture != null)
+        {
+            // As tall as its shape asks at the panel's width, up to the most: a wide painting (a building's banner) left bands
+            // of empty panel above and below it in a fixed box.
+            float width = ((RectTransform)picture.transform).rect.width;
+            Rect shape = page.Picture.rect;
+            pictureLayout.preferredHeight = width > 1f && shape.width > 1f ? Mathf.Min(PictureHeight, width * shape.height / shape.width) : PictureHeight;
+            pictureLayout.minHeight = pictureLayout.preferredHeight;
+        }
         // Keys named by their actions ({key:Interact}) become the keys bound now.
         titleLabel.text = GameInput.WithRebinds(page.Title);
         // Hearthline 3: its numbers stand out (HearthKit.ToneNumbers).
@@ -267,9 +277,9 @@ public sealed class ActionMenuWindow : MonoBehaviour
         picture = holder.AddComponent<Image>();
         picture.preserveAspect = true;
         picture.raycastTarget = false;
-        var layout = holder.AddComponent<LayoutElement>();
-        layout.preferredHeight = PictureHeight;
-        layout.minHeight = PictureHeight;
+        pictureLayout = holder.AddComponent<LayoutElement>();
+        pictureLayout.preferredHeight = PictureHeight;
+        pictureLayout.minHeight = PictureHeight;
         holder.SetActive(false);
     }
 

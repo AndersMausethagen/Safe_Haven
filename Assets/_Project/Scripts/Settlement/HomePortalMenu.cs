@@ -129,6 +129,10 @@ public sealed class HomePortalMenu
         string noSteam = $"<color={UIStyle.Hex(UIStyle.Current.Danger)}>I can't reach the other doors: Steam isn't running.</color>";
         switch (coop.State)
         {
+            case CoopState.Offline when !coop.SteamReady:
+                // One quiet row, not two red ones: playing alone without Steam is ordinary, not an error (the UX pass of 2026-11-28).
+                page.Add(new MenuAction("Friends' Havens", "I can't reach the other doors while Steam isn't running", false, null) { Icon = "Lead" });
+                break;
             case CoopState.Offline:
                 page.Add(new MenuAction("Call friends to Safe Haven", coop.SteamReady ? "I'll open my way and call to them" : noSteam, coop.SteamReady,
                     () => CallFriends(coop), closesMenu: true));
