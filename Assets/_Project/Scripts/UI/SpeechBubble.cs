@@ -138,7 +138,10 @@ public sealed class SpeechBubble : MonoBehaviour
             return;
         }
 
-        group.alpha = 1f;
+        // A passing line over the world keeps out of a window being read (it was drawn over the resident window's tabs); the
+        // conversation's own bubble is the window, so it stays.
+        bool covered = UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen && !DialogueBox.IsOpen;
+        group.alpha = covered ? 0f : 1f;
         if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(area, screen, null, out Vector2 point))
         {
             return;

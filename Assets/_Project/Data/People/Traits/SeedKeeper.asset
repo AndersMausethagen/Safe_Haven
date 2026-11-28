@@ -15,6 +15,7 @@ MonoBehaviour:
   id: seed_keeper
   displayName: Seed-Keeper
   icon: Wheat
+  picture: {fileID: 21300000, guid: 0178e557cee134948b49b0a73493532b, type: 3}
   description: 'Saves a seed from everything: half her harvests give one more.'
   doubleEdged: 0
   effects:
@@ -27,3 +28,4 @@ MonoBehaviour:
   - The first sheaf goes back in the ground. Always.
   - My village grew this. It still grows, here.
   excludes: []
+  habits: []

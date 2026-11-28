@@ -15,6 +15,7 @@ MonoBehaviour:
   id: hammer_gruff
   displayName: Hammer-Gruff
   icon: Hammer
+  picture: {fileID: 21300000, guid: e7798afa4cf94024391772efecab31b9, type: 3}
   description: Grumbles at praise and warms slowly (friendships half as fast), but pays twice over for what he asks of you.
   doubleEdged: 1
   effects:
@@ -32,3 +33,4 @@ MonoBehaviour:
   - Don't thank me. Hand me the tongs.
   - It's iron. It doesn't care how you feel about it.
   excludes: []
+  habits: []

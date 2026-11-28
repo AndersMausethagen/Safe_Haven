@@ -15,6 +15,7 @@ MonoBehaviour:
   id: patient_hands
   displayName: Patient Hands
   icon: Hammer
+  picture: {fileID: 21300000, guid: 250dbad36b59a7e4dae0f33bd39eea1e, type: 3}
   description: 'Slow, careful work: a tenth slower, and gear from his bench more often comes out finer.'
   doubleEdged: 1
   effects:

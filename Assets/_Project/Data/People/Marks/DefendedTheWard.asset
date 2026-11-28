@@ -15,6 +15,7 @@ MonoBehaviour:
   id: defended_the_ward
   displayName: Defended the Ward
   icon: Star
+  picture: {fileID: 21300000, guid: dd7bbd3b5d4d08b40841fdcb01afbae3, type: 3}
   description: 'Stood at the ward when it broke and held: a tenth more health defending the Haven.'
   good: 1
   effects:

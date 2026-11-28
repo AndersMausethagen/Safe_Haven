@@ -15,6 +15,7 @@ MonoBehaviour:
   id: opinionated
   displayName: Opinionated
   icon: Hammer
+  picture: {fileID: 21300000, guid: 7d6a26bfebff32c4c83278afce64758f, type: 3}
   description: 'Builds quickly and right, and tells you so: a sixth faster at a scaffold, but friendships come slower.'
   doubleEdged: 1
   effects:
@@ -32,3 +33,4 @@ MonoBehaviour:
   - Your footings again. I'll say nothing. I'll think it loudly.
   - Stone forgives nothing. Neither do I.
   excludes: []
+  habits: []

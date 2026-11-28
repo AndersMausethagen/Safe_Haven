@@ -15,6 +15,7 @@ MonoBehaviour:
   id: afraid_of_widows
   displayName: Afraid of Widows
   icon: Drop
+  picture: {fileID: 21300000, guid: 130d0ab0d63bd88409ecf46adc60bc5e, type: 3}
   description: 'Went down with legs all round them and still dreams of it: a tenth softer against spiders.'
   good: 0
   effects:

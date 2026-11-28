@@ -15,6 +15,7 @@ MonoBehaviour:
   id: steadfast
   displayName: Steadfast
   icon: Sword
+  picture: {fileID: 21300000, guid: 57be4507d761c824f8de0919b8474608, type: 3}
   description: 'Holds the line: a fifth more health defending the Haven, though he steps aside from blows less often.'
   doubleEdged: 1
   effects:
@@ -32,3 +33,4 @@ MonoBehaviour:
   - I stood at the stones when they broke. I can stand here.
   - Let them come to the ward. I'll be at it.
   excludes: []
+  habits: []

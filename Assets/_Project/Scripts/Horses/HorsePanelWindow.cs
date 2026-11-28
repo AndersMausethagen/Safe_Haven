@@ -65,10 +65,14 @@ public sealed class HorsePanelWindow : MonoBehaviour
     private readonly RectTransform[] pages = new RectTransform[TabNames.Length];
 
     private TMP_Text about;
-    private readonly KitStatRow[] statRows = new KitStatRow[5];
+    private readonly KitFactRow[] todayRows = new KitFactRow[3];
     private KitChips chips;
-    private TMP_Text careLine;
     private readonly KitStatRow[] careRows = new KitStatRow[3];
+    private readonly TMP_Text[] careNotes = new TMP_Text[3];
+    private readonly KitPictureCard[] treatCards = new KitPictureCard[4];
+    private TMP_Text treatNote;
+    private TMP_Text workHeading;
+    private KitActionList workList;
     private KitButton feedButton;
     private KitButton groomButton;
     private TMP_Text groomedLine;
@@ -206,39 +210,33 @@ public sealed class HorsePanelWindow : MonoBehaviour
         HearthKit.Section(left, "About", "Info", 22f, 18f);
         about = CodeUI.Paragraph("About", left, 24f, 58f, leftWidth - 48f, 78f, 19f, style.Text);
         CodeUI.Hairline(left, 22f, 142f, leftWidth - 44f, 1f, style);
-        HearthKit.Section(left, "Stats", "Stats", 22f, 156f);
-        string[] names = { "Health", "Stamina", "Carry capacity", "Speed", "Bond" };
-        for (int i = 0; i < names.Length; i++)
+        // Its numbers are in the header already (the UX pass of 2026-11-28: the overview's Stats and Care bars said them twice and
+        // thrice); here what it is and how it is today.
+        HearthKit.Section(left, "Traits", "Star", 22f, 156f);
+        chips = new KitChips(left, 24f, 196f, leftWidth - 48f);
+        CodeUI.Hairline(left, 22f, 244f, leftWidth - 44f, 1f, style);
+        HearthKit.Section(left, "Today", "Sun", 22f, 258f);
+        for (int i = 0; i < todayRows.Length; i++)
         {
-            statRows[i] = new KitStatRow(left, 24f, 196f + i * 38f, leftWidth - 48f, names[i], StatIcons[i], i == 0 || i == 1 || i == 4, 18f, inline: true);
+            todayRows[i] = new KitFactRow(left, 22f, 298f + i * 52f, leftWidth - 44f, 190f);
         }
-
-        CodeUI.Hairline(left, 22f, 392f, leftWidth - 44f, 1f, style);
-        HearthKit.Section(left, "Traits", "Star", 22f, 404f);
-        chips = new KitChips(left, 24f, 444f, leftWidth - 48f);
 
         float rx = leftWidth + 16f;
         float rightWidth = Width - Margin * 2f - rx;
         RectTransform right = HearthKit.Card(page, "Care Card", rx, 0f, rightWidth, BodyHeight);
-        HearthKit.Section(right, "Care", "Wheat", 22f, 18f);
-        careLine = CodeUI.Label("Line", right, 24f, 54f, rightWidth - 48f, 26f, 17f, style.Muted);
-        string[] care = { "Health", "Stamina", "Bond" };
-        string[] careIcons = { "Heart", "Bolt", "Bond" };
-        for (int i = 0; i < care.Length; i++)
-        {
-            careRows[i] = new KitStatRow(right, 24f, 92f + i * 46f, rightWidth - 190f, care[i], careIcons[i], true, 18f, inline: true, labelWidth: 100f, valueWidth: 50f);
-        }
-
-        feedButton = new KitButton(right, rightWidth - 150f, 86f, 126f, 38f, Choose, KitButtonShape.Compact);
-        groomButton = new KitButton(right, rightWidth - 150f, 178f, 126f, 38f, Choose, KitButtonShape.Compact);
-        groomedLine = CodeUI.Label("Groomed", right, 24f, 226f, rightWidth - 48f, 24f, 17f, style.Muted);
-        CodeUI.Hairline(right, 22f, 262f, rightWidth - 44f, 1f, style);
-        HearthKit.Section(right, "Actions", "Gear", 22f, 276f);
+        HearthKit.Section(right, "Actions", "Gear", 22f, 18f);
         const float buttonWidth = 122f;
         for (int i = 0; i < 4; i++)
         {
-            mainButtons.Add(new KitButton(right, 24f + i * (buttonWidth + 9f), 316f, buttonWidth, 84f, Choose));
+            mainButtons.Add(new KitButton(right, 24f + i * (buttonWidth + 9f), 58f, buttonWidth, 84f, Choose));
         }
+
+        CodeUI.Hairline(right, 22f, 162f, rightWidth - 44f, 1f, style);
+        HearthKit.Section(right, "Quick care", "Wheat", 22f, 176f);
+        float half = (rightWidth - 44f - 12f) / 2f;
+        feedButton = new KitButton(right, 22f, 216f, half, 62f, Choose, KitButtonShape.Row);
+        groomButton = new KitButton(right, 22f + half + 12f, 216f, half, 62f, Choose, KitButtonShape.Row);
+        groomedLine = CodeUI.Paragraph("Groomed", right, 24f, 290f, rightWidth - 48f, 48f, 17f, style.Muted);
 
         RectTransform tipBox = HearthKit.Card(right, "Tip", 22f, 418f, rightWidth - 44f, 72f, 0.6f);
         HearthKit.Icon(tipBox, "Info", 16f, 21f, 30f);
@@ -250,10 +248,38 @@ public sealed class HorsePanelWindow : MonoBehaviour
     {
         UIStyle style = UIStyle.Current;
         float width = Width - Margin * 2f;
-        RectTransform card = HearthKit.Card(page, "Care Card", 0f, 0f, width, BodyHeight);
-        HearthKit.Section(card, "Care and work", "Brush", 22f, 18f);
-        careSummary = CodeUI.Paragraph("Summary", card, 24f, 56f, width - 48f, 54f, 18f, style.Muted);
-        careList = new KitActionList(card, 22f, 118f, width - 44f, Choose);
+        // Left: how it is, each bar with what moves it. Right: what it can be fed from the bag, as pictures, then its work
+        // (the UX pass of 2026-11-28: the tab was two buttons and a paragraph).
+        const float leftWidth = 548f;
+        RectTransform left = HearthKit.Card(page, "Condition Card", 0f, 0f, leftWidth, BodyHeight);
+        HearthKit.Section(left, "Its condition", "Heart", 22f, 18f);
+        string[] care = { "Health", "Stamina", "Bond" };
+        string[] careIcons = { "Heart", "Bolt", "Bond" };
+        for (int i = 0; i < care.Length; i++)
+        {
+            careRows[i] = new KitStatRow(left, 24f, 62f + i * 92f, leftWidth - 48f, care[i], careIcons[i], true, 19f, inline: true, labelWidth: 120f, valueWidth: 90f);
+            careNotes[i] = CodeUI.Paragraph("Note " + i, left, 58f, 96f + i * 92f, leftWidth - 82f, 46f, 15f, style.Muted);
+        }
+
+        CodeUI.Hairline(left, 22f, 340f, leftWidth - 44f, 1f, style);
+        careSummary = CodeUI.Paragraph("Summary", left, 24f, 354f, leftWidth - 48f, 120f, 16f, style.Muted);
+
+        float rx = leftWidth + 16f;
+        float rightWidth = width - rx;
+        RectTransform right = HearthKit.Card(page, "Feeding Card", rx, 0f, rightWidth, BodyHeight);
+        HearthKit.Section(right, "Treats in your bag", "Wheat", 22f, 18f);
+        float treat = (rightWidth - 44f - 3f * 10f) / 4f;
+        for (int i = 0; i < treatCards.Length; i++)
+        {
+            treatCards[i] = new KitPictureCard(right, "Treat " + i, treat, Mathf.Min(treat, 92f), 2, 14f, null, null);
+            treatCards[i].Place(22f + i * (treat + 10f), 58f);
+        }
+
+        treatNote = CodeUI.Paragraph("Treat Note", right, 24f, 62f, rightWidth - 48f, 60f, 17f, style.Muted);
+        careList = new KitActionList(right, 22f, 196f, rightWidth - 44f, Choose, columns: 2, rowHeight: 62f, nothing: "");
+        workHeading = HearthKit.Section(right, "Its work", "Gear", 22f, 280f);
+        workList = new KitActionList(right, 22f, 320f, rightWidth - 44f, Choose, columns: 1, rowHeight: 58f,
+            nothing: "Out of the stable and grown, it can work at a station for you.");
     }
 
     private void BuildEquipment(RectTransform page)
@@ -370,8 +396,7 @@ public sealed class HorsePanelWindow : MonoBehaviour
                 RefreshOverview(style, kind, stats, health, breath, bond);
                 break;
             case Tab.Care:
-                careSummary.text = CareSummary(horse);
-                careList.Show(Actions("Care"));
+                RefreshCare(style, health, breath, bond);
                 break;
             case Tab.Equipment:
                 RefreshEquipment();
@@ -405,7 +430,6 @@ public sealed class HorsePanelWindow : MonoBehaviour
     private void RefreshOverview(UIStyle style, HorseDefinition kind, HorseStats stats, float health, float breath, float bond)
     {
         about.text = About(horse);
-        SetStats(statRows, health, breath, bond, style);
         float Share(float value, Vector2 range) => Mathf.InverseLerp(Mathf.Min(range.x, range.y), Mathf.Max(range.x, range.y), value);
         var shown = new List<(string, Color)> { (Capital(HorseTemperamentRules.NameOf(stats.temperament)), style.Good) };
         foreach (var (trait, name, _, _) in Traits)
@@ -421,13 +445,13 @@ public sealed class HorsePanelWindow : MonoBehaviour
         if (!stats.IsGrown) shown.Add(("Foal", style.Warning));
         chips.Show(shown);
 
-        careLine.text = $"Keep {horse.HorseName} well, and it does more for you.";
-        careRows[0].Set($"{horse.Health.CurrentHealth:0}", health, style.Good, style.Danger);
-        careRows[1].Set($"{horse.Stamina:0}", breath, style.Water, style.Warning);
-        careRows[2].Set($"{horse.CurrentBond():0}", bond, style.Accent, style.Danger);
-        feedButton.Bind(Find("Care", "Feed it"), "Feed");
-        groomButton.Bind(Find("Care", "Groom it"), "Groom");
         bool groomed = horse.GroomedToday;
+        ItemDefinition treat = Horse.TreatIn(user != null ? user.GetComponent<ItemInventory>() : null);
+        todayRows[0].Set("Where", Doing(horse));
+        todayRows[1].Set("Groomed", groomed ? "Yes, it is content" : "Not yet today");
+        todayRows[2].Set("Next treat", treat != null ? $"{treat.DisplayName} from your bag" : "None in your bag");
+        feedButton.Bind(Find("Care", "Feed it"));
+        groomButton.Bind(Find("Care", "Groom it"));
         groomedLine.text = groomed ? "Groomed today: it is content." : "Not groomed today: a brush once a day grows its bond.";
         List<MenuAction> main = Actions("Main");
         for (int i = 0; i < mainButtons.Count; i++)
@@ -437,6 +461,68 @@ public sealed class HorsePanelWindow : MonoBehaviour
 
         tip.text = Tip(horse, groomed);
     }
+
+    private void RefreshCare(UIStyle style, float health, float breath, float bond)
+    {
+        careRows[0].Set($"{horse.Health.CurrentHealth:0} / {horse.Health.MaxHealth:0}", health, style.Good, style.Danger);
+        careRows[1].Set($"{horse.Stamina:0} / {horse.MaxStamina:0}", breath, style.Water, style.Warning);
+        careRows[2].Set($"{horse.CurrentBond():0} / 100", bond, style.Accent, style.Danger);
+        careNotes[0].text = health >= 0.999f ? "Whole." : horse.IsStabled ? "Healing in the stable." : "A treat mends it; the stable heals it.";
+        careNotes[1].text = "Spent galloping and swimming; comes back at a walk.";
+        float strike = HorseSettings.Current.StrikeBond;
+        careNotes[2].text = horse.StrikesOnCommand ? "Fond of you: it strikes out at your command."
+            : $"Grooming, treats and long rides grow it. At {strike:0} it strikes out at your command.";
+        careSummary.text = CareSummary(horse);
+
+        // The treats in the player's bag, best first, as pictures with how many and what each is worth.
+        ItemInventory items = user != null ? user.GetComponent<ItemInventory>() : null;
+        var treats = new List<ItemDefinition>();
+        foreach (ItemContainer container in items != null ? new[] { items.Container, items.SafePocket } : new ItemContainer[0])
+        {
+            for (int i = 0; container != null && i < container.SlotCount; i++)
+            {
+                ItemStack stack = container.GetSlot(i);
+                if (!stack.IsEmpty && stack.Item.IsHorseTreat && !treats.Contains(stack.Item))
+                {
+                    treats.Add(stack.Item);
+                }
+            }
+        }
+
+        treats.Sort((a, b) => b.HorseTreat.CompareTo(a.HorseTreat));
+        for (int i = 0; i < treatCards.Length; i++)
+        {
+            bool shown = i < treats.Count;
+            treatCards[i].SetActive(shown);
+            if (!shown)
+            {
+                continue;
+            }
+
+            ItemDefinition treat = treats[i];
+            treatCards[i].ShowPicture(treat.Icon, "Wheat");
+            treatCards[i].SetName(i == 0 ? $"{treat.DisplayName}\n<color={style.AccentHex}>Next</color>" : treat.DisplayName);
+            treatCards[i].SetBadge(items.CountCarried(treat).ToString());
+            treatCards[i].SetLook(false, null);
+        }
+
+        treatNote.gameObject.SetActive(treats.Count == 0);
+        treatNote.text = "No treats in your bag. Barley, a turnip or bread mends it and grows its bond.";
+
+        var care = new List<MenuAction>();
+        var work = new List<MenuAction>();
+        foreach (MenuAction action in Actions("Care"))
+        {
+            (action.Label == "Feed it" || action.Label == "Groom it" ? care : work).Add(action);
+        }
+
+        careList.Show(care);
+        workList.Show(work);
+    }
+
+    private static string Doing(Horse horse) =>
+        horse.IsStabled ? "In the stable" : horse.Order == Horse.Orders.Follow ? "Following you" : horse.Order == Horse.Orders.Stay ? "Staying where it is"
+        : horse.Order == Horse.Orders.Work ? "At work" : horse.Rider != null ? "Ridden" : "Grazing";
 
     private void RefreshEquipment()
     {
@@ -457,8 +543,7 @@ public sealed class HorsePanelWindow : MonoBehaviour
         string owner = horse.IsMine ? "You" : string.IsNullOrWhiteSpace(horse.OwnerName) ? "A friend" : horse.OwnerName;
         string origin = stats.generation > 0 ? $"Born in your stable, generation {stats.generation}" : "Caught wild and broken to the saddle";
         string age = stats.IsGrown ? "Fully grown" : $"A foal, {stats.growth * 100f:0}% grown";
-        string doing = horse.IsStabled ? "In the stable" : horse.Order == Horse.Orders.Follow ? "Following you" : horse.Order == Horse.Orders.Stay ? "Staying where it is"
-            : horse.Order == Horse.Orders.Work ? "At work" : horse.Rider != null ? "Ridden" : "Grazing";
+        string doing = Doing(horse);
         historyRows[0].Set("Where it came from", origin);
         historyRows[1].Set("Age", age);
         historyRows[2].Set("Ridden", horse.RiddenMetres >= 1000f ? $"{horse.RiddenMetres / 1000f:0.0} km" : $"{horse.RiddenMetres:0} m");
@@ -591,8 +676,38 @@ public sealed class HorsePanelWindow : MonoBehaviour
     /// <summary>A horse's portrait: from its right and a little ahead, at the height of its neck.</summary>
     public static (Vector3 eye, Vector3 look) Shot(Transform body)
     {
-        Vector3 look = body.position + Vector3.up * 1.45f + body.forward * 0.35f;
-        return (look + body.right * 3.4f + body.forward * 2.6f + Vector3.up * 0.25f, look);
+        // At its neck as it stands now: a horse lying in the stable was framed at a standing horse's neck and fell out of the
+        // picture (the UX pass of 2026-11-28). Three quarters of its drawn height, measured twice a second.
+        float neck = NeckHeight(body);
+        Vector3 look = body.position + Vector3.up * neck + body.forward * 0.35f;
+        float back = Mathf.Lerp(0.75f, 1f, Mathf.InverseLerp(0.6f, 1.45f, neck));
+        return (look + (body.right * 3.4f + body.forward * 2.6f) * back + Vector3.up * 0.25f, look);
+    }
+
+    private static Transform measured;
+    private static float measuredNeck = 1.45f;
+    private static float measuredAt = -1f;
+
+    private static float NeckHeight(Transform body)
+    {
+        if (body == measured && Time.unscaledTime < measuredAt + 0.5f)
+        {
+            return measuredNeck;
+        }
+
+        measured = body;
+        measuredAt = Time.unscaledTime;
+        float top = 0f;
+        foreach (Renderer part in body.GetComponentsInChildren<Renderer>())
+        {
+            if (part.enabled && !(part is ParticleSystemRenderer))
+            {
+                top = Mathf.Max(top, part.bounds.max.y - body.position.y);
+            }
+        }
+
+        measuredNeck = top > 0.3f ? Mathf.Clamp(top * 0.75f, 0.55f, 1.45f) : 1.45f;
+        return measuredNeck;
     }
 
     private void OnDestroy()

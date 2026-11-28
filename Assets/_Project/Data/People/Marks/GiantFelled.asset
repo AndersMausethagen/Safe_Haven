@@ -15,6 +15,7 @@ MonoBehaviour:
   id: giant_felled
   displayName: Giant-felled
   icon: Crit
+  picture: {fileID: 21300000, guid: f1bc89c871139d44a9d446010fe5ec26, type: 3}
   description: 'Stood beside you when something enormous fell: a tenth more health beside you.'
   good: 1
   effects:

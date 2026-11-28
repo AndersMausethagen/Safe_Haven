@@ -1096,8 +1096,10 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
 
         Add("Main", "HorseHead", new MenuAction("Ride", !IsGrown ? "Too young to ride" : IsStabled ? "Lead it out first" : $"Tap {GameInput.KeyLabel(GameInput.HorseGallop)} to canter, hold it to gallop; {GameInput.KeyLabel(GameInput.Dodge)} jumps. {GameInput.KeyLabel(GameInput.Whistle)} gets you down.",
             riding != null && Rider == null && IsGrown && !IsStabled, () => riding.Mount(this), closesMenu: true));
-        Add("Care", "Wheat", new MenuAction("Feed it", "Barley, a turnip or bread from your bag", items != null, () => Feed(items)));
-        Add("Care", "Brush", new MenuAction("Groom it", GroomedToday ? "Groomed today" : "Once a day, for its bond", true, Groom));
+        // Short: the window's half-width care cards cut the longer lines ("Barley, a turnip or br"); the Care tab says what it eats.
+        ItemDefinition treat = TreatIn(items);
+        Add("Care", "Wheat", new MenuAction("Feed it", treat != null ? $"A {treat.DisplayName.ToLowerInvariant()}, for health" : "No treat in your bag", items != null, () => Feed(items)));
+        Add("Care", "Brush", new MenuAction("Groom it", GroomedToday ? "Done today" : "Once a day, for bond", true, Groom));
         // A friend's bags are theirs; a visitor uses the host's horses' bags as they would the stash, with the host's yes.
         bool bags = mine || (visiting && HavenVisit.StashAllowed);
         Add("Gear", "Bags", new MenuAction("Saddle bags", saddle == null ? "It needs a saddle" : bags ? $"{Weight:0} / {Capacity:0} weight" : visiting ? "Ask to use the stores first" : theirs,

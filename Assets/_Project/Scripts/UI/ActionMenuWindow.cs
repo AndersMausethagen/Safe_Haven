@@ -48,6 +48,9 @@ public sealed class MenuAction
     public string Icon { get; set; } = "";
     /// <summary>A short state shown at its right by windows that have room ("Not enough", "Ready"); empty for none.</summary>
     public string Status { get; set; } = "";
+    /// <summary>What is already so (their job now, a comfort built): not chosen again, but shown lit with a gold rim rather than
+    /// greyed as if refused.</summary>
+    public bool Current { get; set; }
 }
 
 /// <summary>Things a MenuPage shows as cards with their pictures and counts (KitHaul): a heading, then each item and essence.</summary>

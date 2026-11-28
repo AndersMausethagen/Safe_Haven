@@ -15,6 +15,7 @@ MonoBehaviour:
   id: brave
   displayName: Brave
   icon: Sword
+  picture: {fileID: 21300000, guid: fbbe5c018ff3ff547936292bab9b042c, type: 3}
   description: 'Goes in first: a tenth more damage beside you, and steps aside from blows less often.'
   doubleEdged: 1
   effects:
@@ -32,3 +33,4 @@ MonoBehaviour:
   - If it bleeds, it can be beaten. Most things bleed.
   excludes:
   - {fileID: 11400000, guid: f476e68c961b14a4b9b2d6dc1738ffeb, type: 2}
+  habits: []

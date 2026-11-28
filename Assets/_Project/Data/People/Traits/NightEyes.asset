@@ -15,6 +15,7 @@ MonoBehaviour:
   id: night_eyes
   displayName: Night Eyes
   icon: Eye
+  picture: {fileID: 21300000, guid: d7ec619bb5469bf4793482fe0496fd18, type: 3}
   description: Sees in the dark. Works two hours into the evening and starts an hour late; beside you at night, spots foes a third further off.
   doubleEdged: 1
   effects:

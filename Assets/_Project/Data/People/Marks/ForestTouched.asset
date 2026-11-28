@@ -15,6 +15,7 @@ MonoBehaviour:
   id: forest_touched
   displayName: Forest-touched
   icon: Skull
+  picture: {fileID: 21300000, guid: 78361474f158d2f4291f603d076bb506, type: 3}
   description: 'The forest had them a while and gave them back changed: a little less health beside you.'
   good: 0
   effects:

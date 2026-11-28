@@ -38,6 +38,8 @@ public sealed class MarkDefinition : ScriptableObject
     [SerializeField] private string id;
     [SerializeField] private string displayName;
     [SerializeField] private string icon = "Star";
+    [Tooltip("Its painted picture (LocalSpawn, Tools/LocalSpawn/trait_icons.json); none: the kit icon above.")]
+    [SerializeField] private Sprite picture;
     [SerializeField, TextArea(2, 4)] private string description;
     [Tooltip("A good mark (kept in the good three) or a hard one (the hard three).")]
     [SerializeField] private bool good;
@@ -66,6 +68,7 @@ public sealed class MarkDefinition : ScriptableObject
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public string Icon => string.IsNullOrWhiteSpace(icon) ? "Star" : icon;
+    public Sprite Picture => picture;
     public string Description => description;
     public bool Good => good;
     public IReadOnlyList<TraitEffect> Effects => effects;

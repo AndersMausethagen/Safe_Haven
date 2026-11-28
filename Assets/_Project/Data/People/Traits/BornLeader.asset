@@ -15,6 +15,7 @@ MonoBehaviour:
   id: born_leader
   displayName: Born Leader
   icon: Flag
+  picture: {fileID: 21300000, guid: 70f2522d20e32af4f95342ee56f4d032, type: 3}
   description: 'Everyone she goes with is stronger: each other one on a foray with her brings a tenth more.'
   doubleEdged: 0
   effects:

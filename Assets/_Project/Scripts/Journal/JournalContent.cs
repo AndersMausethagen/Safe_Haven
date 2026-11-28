@@ -160,6 +160,7 @@ public static class JournalContent
                         Status = manager.HeldReason(quest),
                         Description = GameInput.WithRebinds(quest.Description),
                     });
+                    SetQuestPicture(held.Entries[held.Entries.Count - 1], quest);
                 }
             }
         }
@@ -485,6 +486,7 @@ public static class JournalContent
             Status = StatusOf(entry, progress),
             Description = GameInput.WithRebinds(quest.Description),
         };
+        SetQuestPicture(shown, quest);
 
         if (quest.Objectives.Count > 0)
         {
@@ -503,6 +505,48 @@ public static class JournalContent
         }
 
         return shown;
+    }
+
+    // A quest's picture in place of its first letter (the UX pass of 2026-11-28: every row was a gold "T" or "A"): the face of the
+    // one a rescue brings home, else its rank's sign in its rank's colour.
+    private static void SetQuestPicture(HavenEntry shown, QuestDefinition quest)
+    {
+        // A rescue: the one brought home. A resident's own arc (its chain is their name, "Ingrid, 4 of 9"): their face.
+        ResidentDefinition who = quest.BroughtHome ?? ChainPerson(quest.Chain);
+        if (who != null && who.Portrait != null)
+        {
+            shown.Icon = who.Portrait;
+            return;
+        }
+
+        string sign = quest.Rank switch
+        {
+            QuestRank.MainStory => "Flag",
+            QuestRank.SideQuest => "Book",
+            QuestRank.Rescue => "Lantern",
+            QuestRank.Haven => "House",
+            _ => "Star",
+        };
+        shown.Icon = UIStyle.Current.Icon(sign);
+        shown.IconTint = QuestMarkerSettings.Current != null ? QuestMarkerSettings.Current.RankColor(quest.Rank) : (UnityEngine.Color?)null;
+    }
+
+    private static ResidentDefinition ChainPerson(string chain)
+    {
+        if (string.IsNullOrWhiteSpace(chain) || GameSession.Home == null)
+        {
+            return null;
+        }
+
+        foreach (ResidentRecord record in GameSession.Home.Residents)
+        {
+            if (record.Resident != null && string.Equals(record.Resident.DisplayName, chain.Trim(), System.StringComparison.OrdinalIgnoreCase))
+            {
+                return record.Resident;
+            }
+        }
+
+        return null;
     }
 
     // Where it stands in its chain: how far along that thread of the story is.

@@ -15,6 +15,7 @@ MonoBehaviour:
   id: sharp_tongued
   displayName: Sharp-Tongued
   icon: Spark
+  picture: {fileID: 21300000, guid: 38e23a1aa53ad82478c7b4e03ee781c8, type: 3}
   description: 'Says what she thinks: arguments with her go further either way, and friendships come slower.'
   doubleEdged: 1
   effects:
@@ -32,3 +33,4 @@ MonoBehaviour:
   - If you wanted it sweet you should have asked for honey.
   excludes:
   - {fileID: 11400000, guid: 690702dd3ae7af640af8275b584c044f, type: 2}
+  habits: []

@@ -62,6 +62,7 @@ public sealed class ResidentWindow : MonoBehaviour
     private TMP_Text qualityTitle;
     private TMP_Text qualityLines;
     private TMP_Text bonusLine;
+    private TMP_Text comfortsNote;
     private readonly KitButton[] comfortButtons = new KitButton[2];
     private KitActionList houseList;
 
@@ -205,8 +206,9 @@ public sealed class ResidentWindow : MonoBehaviour
         for (int i = 0; i < MostTraits; i++)
         {
             int index = i;
-            var card = new KitPictureCard(left, "Trait " + i, 118f, 62f, 2, 15f, () => ShowTip(traitTips, index), HideTip);
-            card.Place(24f + i * 128f, 238f);
+            // Square, for their painted pictures (trait_icons.json).
+            var card = new KitPictureCard(left, "Trait " + i, 104f, 96f, 2, 15f, () => ShowTip(traitTips, index), HideTip);
+            card.Place(24f + i * 116f, 236f);
             traitCards.Add(card);
         }
 
@@ -309,8 +311,8 @@ public sealed class ResidentWindow : MonoBehaviour
         for (int i = 0; i < 6; i++)
         {
             int index = i;
-            var card = new KitPictureCard(right, "Mark " + i, markWidth, 64f, 2, 14f, () => ShowTip(markTips, index), HideTip);
-            card.Place(22f + (i % 3) * (markWidth + 8f), 58f + (i / 3) * 130f);
+            var card = new KitPictureCard(right, "Mark " + i, markWidth, Mathf.Min(markWidth, 86f), 2, 14f, () => ShowTip(markTips, index), HideTip);
+            card.Place(22f + (i % 3) * (markWidth + 8f), 58f + (i / 3) * 140f);
             markCards.Add(card);
         }
 
@@ -410,6 +412,9 @@ public sealed class ResidentWindow : MonoBehaviour
             comfortButtons[i] = new KitButton(right, 22f + i * (half + 12f), 58f, half, 62f, Choose, KitButtonShape.Row);
         }
 
+        // Without a house the section stood empty under its heading.
+        comfortsNote = CodeUI.Paragraph("Comforts Note", right, 26f, 62f, rightWidth - 52f, 56f, 17f, style.Muted);
+
         HearthKit.Section(right, "Move them", "House", 22f, 136f);
         houseList = new KitActionList(right, 22f, 176f, rightWidth - 44f, Choose, columns: 1, rowHeight: 62f,
             nothing: "No house stands yet. A Hut or a Cottage gives beds of their own.");
@@ -422,7 +427,10 @@ public sealed class ResidentWindow : MonoBehaviour
         RectTransform card = HearthKit.Card(page, "Work Card", 0f, 0f, width, BodyHeight);
         HearthKit.Section(card, "Where they work", "Hammer", 22f, 18f);
         workCard = new KitSlotCard(card, 22f, 58f, 520f, "Works at", "Hammer");
-        workLine = CodeUI.Paragraph("Line", card, 566f, 62f, width - 590f, 90f, 17f, style.Muted);
+        workLine = CodeUI.Paragraph("Line", card, 566f, 58f, width - 590f, 100f, 17f, style.Muted);
+        workLine.enableAutoSizing = true;
+        workLine.fontSizeMin = 13f;
+        workLine.fontSizeMax = 17f;
         CodeUI.Hairline(card, 22f, 166f, width - 44f, 1f, style);
         ordersTitle = HearthKit.Section(card, "What they keep making", "Gear", 22f, 178f);
         for (int i = 0; i < orderRows.Length; i++)
@@ -628,6 +636,20 @@ public sealed class ResidentWindow : MonoBehaviour
         }
 
         IReadOnlyList<HomeLifeSettings.Comfort> comforts = HomeLifeSettings.Current.Comforts;
+        comfortsNote.gameObject.SetActive(house == null);
+        if (house == null)
+        {
+            var names = new List<string>();
+            foreach (HomeLifeSettings.Comfort comfort in comforts)
+            {
+                if (comfort != null)
+                {
+                    names.Add(comfort.name);
+                }
+            }
+
+            comfortsNote.text = names.Count > 0 ? $"Once they have a house of their own: {string.Join(", ", names)}. Each makes it a better home." : "";
+        }
         for (int i = 0; i < comfortButtons.Length; i++)
         {
             HomeLifeSettings.Comfort comfort = i < comforts.Count ? comforts[i] : null;
@@ -643,7 +665,7 @@ public sealed class ResidentWindow : MonoBehaviour
             BuildingObject inHouse = house;
             comfortButtons[i].Bind(new MenuAction(comfort.name, has ? "In the house" : AmountText.Describe(comfort.cost), !has && afford,
                 () => HomeLife.Furnish(inHouse, chosen, Player.Current != null ? Player.Current.gameObject : null))
-            { Icon = comfort.icon, Status = has ? "Done" : "" });
+            { Icon = comfort.icon, Status = has ? "Done" : "", Current = has });
         }
 
         houseList.Show(HouseActions(record));
@@ -657,8 +679,9 @@ public sealed class ResidentWindow : MonoBehaviour
             CraftingStation station = work.GetComponent<CraftingStation>();
             float walk = HavenHomes.Walk(house != null ? house.Door(out _) : (ResidentNpc.Of(who) != null ? ResidentNpc.Of(who).HomeSpot : work.transform.position), work.transform.position);
             workCard.Set(HavenHomes.Describe(work), station != null ? $"Works at {station.Speed * 100f:0}% speed there" : $"{job.DisplayName}'s place", true);
-            workLine.text = $"{walk:0} m from {(house != null ? "their house" : "where they sleep")}. They work at the {work.Definition.DisplayName} nearest home: " +
-                            "build one near their house, or move them nearer, and the walk is short." + CarryLine(record);
+            // Short enough for the card beside it (the longer words ran off its last line).
+            workLine.text = $"{walk:0} m from {(house != null ? "their house" : "where they sleep")} to the {work.Definition.DisplayName} nearest it. " +
+                            "A nearer one, or a home nearer this, shortens the walk." + CarryLine(record);
         }
         else
         {
@@ -706,7 +729,7 @@ public sealed class ResidentWindow : MonoBehaviour
         var actions = new List<MenuAction>();
         if (job != null && job.WorkOrders.Count > 0)
         {
-            actions.Add(new MenuAction(record.PausedByPlayer ? "Back to work" : "Pause their work", record.PausedByPlayer ? "They are resting" : "Stops them using the stash",
+            actions.Add(new MenuAction(record.PausedByPlayer ? "Back to work" : "Pause their work", record.PausedByPlayer ? "They are resting" : "Leaves the stash be",
                 true, () => HavenDecisions.Do("resident.pause", who.Id)) { Icon = "Hourglass" });
         }
 
@@ -763,7 +786,7 @@ public sealed class ResidentWindow : MonoBehaviour
             string level = skill != null ? $"{skill.DisplayName} {ResidentTalents.LevelOf(record, skill)} {ResidentTalents.Flames(ResidentTalents.PassionOf(record, skill))}"
                 : job.Workplace != null ? $"At the {job.Workplace.DisplayName}" : "About the Haven";
             actions.Add(new MenuAction(job.DisplayName, level, !holds,
-                () => ResidentNpc.GiveJob(who, offered, Player.Current != null ? Player.Current.gameObject : null)) { Icon = "Hammer", Status = holds ? "Now" : "" });
+                () => ResidentNpc.GiveJob(who, offered, Player.Current != null ? Player.Current.gameObject : null)) { Icon = "Hammer", Status = holds ? "Now" : "", Current = holds });
         }
 
         if (GameSession.Here.KnownJobs().Count >= 3)
@@ -860,7 +883,7 @@ public sealed class ResidentWindow : MonoBehaviour
             walk += rival != null ? $" · <color={UIStyle.Current.WarningHex}>{rival.Resident.DisplayName}, a rival, " +
                                     $"{(HavenHomes.HomeOf(rival) == house ? "lives here" : "next door")}</color>" : "";
             actions.Add(new MenuAction(HavenHomes.Describe(house), $"{(lives ? "Lives here · " : "")}{HavenHomes.LivingIn(house).Count} of {house.Beds} beds{walk}", !lives && room,
-                () => HavenHomes.Choose(who, id)) { Icon = "House", Status = lives || room ? "" : "Promised" });
+                () => HavenHomes.Choose(who, id)) { Icon = "House", Status = lives ? "Home" : room ? "" : "Promised", Current = lives });
         }
 
         if (!string.IsNullOrEmpty(record.HomeChosen))
@@ -959,7 +982,7 @@ public sealed class ResidentWindow : MonoBehaviour
         CarryLimits hand = WorkerCarry.ByHand(record, settings);
         int strength = WorkerCarry.Strength(record, settings);
         string gear = record.WorkGear != null ? $", with their {record.WorkGear.DisplayName}" : "";
-        return $"\nCarries {hand.Weight:0} a trip, {hand.Slots} kind{(hand.Slots == 1 ? "" : "s")} at once (Strength {strength}{gear}). A cart or a working horse carries more.";
+        return $"\nCarries {hand.Weight:0} a trip, {hand.Slots} kind{(hand.Slots == 1 ? "" : "s")} at once (Strength {strength}{gear}); a cart or a working horse, more.";
     }
 
     // Their traits as picture cards (a double-edged one in the warm colour), each one's words for its hover.
@@ -978,7 +1001,7 @@ public sealed class ResidentWindow : MonoBehaviour
             }
 
             Color colour = trait.DoubleEdged ? style.Warning : style.Good;
-            traitCards[i].ShowPicture(null, trait.Icon, colour);
+            traitCards[i].ShowPicture(trait.Picture, trait.Icon, colour);
             traitCards[i].SetName(trait.DisplayName);
             traitTips.Add((trait.DisplayName, trait.Description, colour));
         }
@@ -1002,7 +1025,8 @@ public sealed class ResidentWindow : MonoBehaviour
             int level = ResidentTalents.LevelOf(record, skill);
             Passion passion = ResidentTalents.PassionOf(record, skill);
             bool works = skill == job && record.Job != null;
-            skillRows[i].SetName(works ? $"{skill.DisplayName} · their work" : skill.DisplayName, IconOf(skill));
+            // "· their work" was cut by the level beside it ("their wor"); the row's gold already says it, the word stays short.
+            skillRows[i].SetName(works ? $"{skill.DisplayName} · work" : skill.DisplayName, IconOf(skill));
             skillRows[i].Set($"{ResidentTalents.Flames(passion)} {level} {ResidentTalents.RankNameAt(level)}", ResidentTalents.LevelShare(record, skill),
                 works ? style.Accent : style.Info, style.Info);
             skillTips.Add(($"{skill.DisplayName} {level}", SkillWords(record, skill, level, passion, works), works ? style.Accent : style.Text));
@@ -1135,7 +1159,7 @@ public sealed class ResidentWindow : MonoBehaviour
             }
 
             Color colour = mark.Good ? style.Good : style.Warning;
-            markCards[i].ShowPicture(null, mark.Icon, colour);
+            markCards[i].ShowPicture(mark.Picture, mark.Icon, colour);
             markCards[i].SetName(mark.DisplayName);
             markCards[i].SetLook(false, colour);
             string way = mark.Good ? "" : mark.HeldByTheForest && record.Forgotten.Count > 0 ? "\nIt stays until every memory is back."
@@ -1155,9 +1179,14 @@ public sealed class ResidentWindow : MonoBehaviour
         {
             bool weapon = i == 0;
             ItemStack piece = weapon ? record.KitWeapon : record.KitBody;
-            kitCards[i].SetActive(fights);
+            // Before their first raid the two places still show, empty, so the note beside them has something to speak of.
+            kitCards[i].SetActive(record.Resident.RaidCompanion != null);
             if (!fights)
             {
+                kitCards[i].ShowPicture(null, weapon ? "Sword" : "Bags");
+                kitCards[i].SetName(weapon ? "A weapon" : "Clothes");
+                kitCards[i].SetBadge("");
+                kitCards[i].SetLook(true, null);
                 continue;
             }
 

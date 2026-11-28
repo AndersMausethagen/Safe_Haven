@@ -94,6 +94,8 @@ public sealed class ResidentTraitDefinition : ScriptableObject
     [SerializeField] private string displayName;
     [Tooltip("A kit icon's name (Star, Flame, Eye, Heart, Sword, Book, Hammer...).")]
     [SerializeField] private string icon = "Star";
+    [Tooltip("Its painted picture (LocalSpawn, Tools/LocalSpawn/trait_icons.json); none: the kit icon above.")]
+    [SerializeField] private Sprite picture;
     [Tooltip("What it means, in a line or two: shown on hover.")]
     [SerializeField, TextArea(2, 4)] private string description;
     [Tooltip("True for a double-edged trait: shown in the warm colour, not the good one.")]
@@ -109,6 +111,7 @@ public sealed class ResidentTraitDefinition : ScriptableObject
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public string Icon => string.IsNullOrWhiteSpace(icon) ? "Star" : icon;
+    public Sprite Picture => picture;
     public string Description => description;
     public bool DoubleEdged => doubleEdged;
     public IReadOnlyList<TraitEffect> Effects => effects;

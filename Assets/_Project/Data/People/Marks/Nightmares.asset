@@ -15,6 +15,7 @@ MonoBehaviour:
   id: nightmares
   displayName: Nightmares
   icon: Drop
+  picture: {fileID: 21300000, guid: 41010526632a80847a96089d54dfc5be, type: 3}
   description: 'Wakes in the night from the raid that went wrong: a little slower at work.'
   good: 0
   effects:

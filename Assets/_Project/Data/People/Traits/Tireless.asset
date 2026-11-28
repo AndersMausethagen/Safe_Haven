@@ -15,6 +15,7 @@ MonoBehaviour:
   id: tireless
   displayName: Tireless
   icon: Hammer
+  picture: {fileID: 21300000, guid: 882102f79a1c04747819a631dc1dd206, type: 3}
   description: Works an hour longer every day.
   doubleEdged: 0
   effects:
@@ -26,3 +27,4 @@ MonoBehaviour:
   lines:
   - Light's still good. One more.
   excludes: []
+  habits: []

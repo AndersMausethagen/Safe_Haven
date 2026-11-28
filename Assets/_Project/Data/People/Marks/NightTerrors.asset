@@ -15,6 +15,7 @@ MonoBehaviour:
   id: night_terrors
   displayName: Night Terrors
   icon: Drop
+  picture: {fileID: 21300000, guid: 7857fcd08848e5b49984a016a942099e, type: 3}
   description: 'Went down in the dark when the corruption came: steps aside from blows less, and sleeps badly.'
   good: 0
   effects:

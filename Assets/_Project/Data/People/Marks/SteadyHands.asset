@@ -15,6 +15,7 @@ MonoBehaviour:
   id: steady_hands
   displayName: Steady Hands
   icon: Star
+  picture: {fileID: 21300000, guid: 3057dd9bd9229ab4fa9ae550fb272078, type: 3}
   description: 'Came home from a clean raid with a calm hand: steps aside from blows a little more often.'
   good: 1
   effects:

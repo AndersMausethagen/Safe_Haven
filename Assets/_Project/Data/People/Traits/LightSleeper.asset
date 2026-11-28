@@ -15,6 +15,7 @@ MonoBehaviour:
   id: light_sleeper
   displayName: Light Sleeper
   icon: Lantern
+  picture: {fileID: 21300000, guid: 3afea6b6ead32254ca845f2774764aa0, type: 3}
   description: 'Wakes at the first sound: a sixth more health defending the Haven.'
   doubleEdged: 0
   effects:

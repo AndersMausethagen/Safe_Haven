@@ -15,6 +15,7 @@ MonoBehaviour:
   id: troll_wary
   displayName: Troll-wary
   icon: Skull
+  picture: {fileID: 21300000, guid: 01cb8cb047a5ab3428bc89e765b847aa, type: 3}
   description: 'Has seen enough trolls fall to know where to hit: a sixth more against trolls.'
   good: 1
   effects:

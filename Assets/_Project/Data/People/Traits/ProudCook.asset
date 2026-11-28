@@ -15,6 +15,7 @@ MonoBehaviour:
   id: proud_cook
   displayName: Proud Cook
   icon: Pot
+  picture: {fileID: 21300000, guid: 87f193e4137009b4f8a0991ee7a8ddbf, type: 3}
   description: 'Won''t hurry a meal: cooks a tenth slower, but everyone she feeds well works half as well again for it.'
   doubleEdged: 1
   effects:
@@ -32,3 +33,4 @@ MonoBehaviour:
   - The jarl's table had nothing on this. Nothing.
   - You'll eat it hot or not at all.
   excludes: []
+  habits: []

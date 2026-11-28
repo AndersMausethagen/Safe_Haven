@@ -15,6 +15,7 @@ MonoBehaviour:
   id: bookish
   displayName: Bookish
   icon: Book
+  picture: {fileID: 21300000, guid: 2b87c784268915240b63324efb1c78c4, type: 3}
   description: Learns Runecraft and Alchemy half as fast again, and carries a tenth less.
   doubleEdged: 1
   effects:

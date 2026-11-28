@@ -15,6 +15,7 @@ MonoBehaviour:
   id: spider_bane
   displayName: Spider-bane
   icon: Skull
+  picture: {fileID: 21300000, guid: c2e8e48bbfd3aba4599797d5cb015138, type: 3}
   description: 'Has seen enough widows fall to know where their legs join: a fifth more against spiders.'
   good: 1
   effects:

@@ -329,7 +329,8 @@ public sealed class KitButton
                 icon = CodeUI.At("Icon", rect, 18f, (height - 34f) * 0.5f, 34f, 34f).gameObject.AddComponent<Image>();
                 label = CodeUI.Label("Label", rect, 68f, 8f, width - 90f, 28f, 20f, style.Text);
                 detail = CodeUI.Label("Detail", rect, 68f, 36f, width - 90f, 24f, 16f, style.Muted);
-                status = CodeUI.Label("Status", rect, width - 190f, 0f, 172f, height, 16f, style.Accent, TextAlignmentOptions.MidlineRight);
+                // On the name's line, so the detail under it keeps the card's whole width.
+                status = CodeUI.Label("Status", rect, width - 190f, 8f, 172f, 28f, 16f, style.Accent, TextAlignmentOptions.MidlineRight);
                 break;
             case KitButtonShape.Compact:
                 icon = CodeUI.At("Icon", rect, 12f, (height - 22f) * 0.5f, 22f, 22f).gameObject.AddComponent<Image>();
@@ -371,10 +372,12 @@ public sealed class KitButton
         {
             bool hasStatus = !string.IsNullOrEmpty(shown.Status);
             status.text = shown.Status ?? "";
-            status.color = shown.Enabled ? style.AccentBright : style.Danger;
-            float room = width - 90f - (hasStatus ? 180f : 0f);
+            // A state held is good news, a refusal a warning; red was for neither ("Now" on their own job read as an error).
+            status.color = shown.Current ? style.Good : shown.Enabled ? style.AccentBright : style.Warning;
+            // The status takes only the room its words need (a fixed 180 left a narrow card's name no room at all).
+            float room = width - 90f - (hasStatus ? Mathf.Min(180f, status.GetPreferredValues(status.text).x + 12f) : 0f);
             label.rectTransform.sizeDelta = new Vector2(room, label.rectTransform.sizeDelta.y);
-            detail.rectTransform.sizeDelta = new Vector2(room, detail.rectTransform.sizeDelta.y);
+            detail.rectTransform.sizeDelta = new Vector2(width - 90f, detail.rectTransform.sizeDelta.y);
         }
 
         icon.sprite = style.Icon(shown.Icon);
@@ -388,6 +391,18 @@ public sealed class KitButton
         if (detail != null)
         {
             detail.color = shown.Enabled ? style.Muted : style.Inactive;
+        }
+
+        if (shown.Current)
+        {
+            fill.color = shape == KitButtonShape.Row ? style.Inset : style.Control;
+            rim.color = HearthKit.Faded(style.AccentBright, 0.9f);
+            label.color = style.Text;
+            icon.color = style.AccentBright;
+            if (detail != null)
+            {
+                detail.color = style.Muted;
+            }
         }
 
         ColorBlock colors = button.colors;
@@ -419,7 +434,8 @@ public sealed class KitActionList
         this.chosen = chosen;
         this.columns = Mathf.Max(1, columns);
         this.rowHeight = rowHeight;
-        empty = CodeUI.Label("Nothing", parent, x + 4f, y + 8f, width, 26f, 18f, UIStyle.Current.Muted);
+        // Wrapped: a longer line ran out of its card ("beds of their o").
+        empty = CodeUI.Paragraph("Nothing", parent, x + 4f, y + 8f, width - 8f, 52f, 17f, UIStyle.Current.Muted);
         empty.text = nothing;
     }
 

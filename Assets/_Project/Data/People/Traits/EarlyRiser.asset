@@ -15,6 +15,7 @@ MonoBehaviour:
   id: early_riser
   displayName: Early Riser
   icon: Sun
+  picture: {fileID: 21300000, guid: b182c54e3d6ed3946839e67880adab48, type: 3}
   description: Up and at work an hour before the rest.
   doubleEdged: 0
   effects:

@@ -15,6 +15,7 @@ MonoBehaviour:
   id: mist_walker
   displayName: Mist-walker
   icon: Eye
+  picture: {fileID: 21300000, guid: 4f80b0f495003554cac945aa072455c3, type: 3}
   description: 'Knows the mist now: sees foes a fifth further in the dark.'
   good: 1
   effects:
