@@ -540,10 +540,11 @@ public sealed class OptionsScreen : MonoBehaviour
                 resetRow.gameObject.SetActive(false);
             }
 
+            // The tab's own line where a setting's value goes, the how-to under the rule: the space under the name stood empty
+            // (UX pass 2026-11-28).
             detailName.text = TabNames[Mathf.Clamp(tab, 0, TabNames.Length - 1)];
-            detailValue.text = "";
-            detailHelp.text = TabIntros[Mathf.Clamp(tab, 0, TabIntros.Length - 1)] +
-                              "\n\nPoint at a setting to read what it does. Changed settings turn gold and wait until you press Save Changes.";
+            detailValue.text = $"<color={UIStyle.Current.TextHex}>{TabIntros[Mathf.Clamp(tab, 0, TabIntros.Length - 1)]}</color>";
+            detailHelp.text = $"<color={UIStyle.Current.MutedHex}>Point at a setting to read what it does. Changed settings turn gold and wait until you press Save Changes.</color>";
             return;
         }
 

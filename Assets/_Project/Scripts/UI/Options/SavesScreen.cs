@@ -148,7 +148,9 @@ public sealed class SavesScreen : MonoBehaviour
 
         TMP_Text title = OptionsWidgets.Text("Title", panel, "Saved Games", 38f, OptionsWidgets.Title);
         OptionsWidgets.Place((RectTransform)title.transform, new Vector2(0f, 1f), new Vector2(600f, 56f), new Vector2(36f, -22f));
-        title.fontStyle = FontStyles.Bold;
+        // The carved display face, as every window's title (it was the body face, bold); never bold on that face.
+        UIStyle.Current.Display(title);
+        title.overflowMode = TextOverflowModes.Overflow;
 
         RectTransform view = OptionsWidgets.Rect("View", panel);
         OptionsWidgets.Stretch(view, new Vector2(36f, 138f), new Vector2(-36f, -92f));
@@ -232,6 +234,9 @@ public sealed class SavesScreen : MonoBehaviour
 
     private static bool InGame => Player.Current != null;
 
+    // Whether a row above has had its mark (the newest is listed first).
+    private bool newestShown;
+
     private void Refresh()
     {
         for (int i = content.childCount - 1; i >= 0; i--)
@@ -242,6 +247,7 @@ public sealed class SavesScreen : MonoBehaviour
         }
 
         List<SaveSlotInfo> saves = SaveGameService.ListSaves();
+        newestShown = false;
         emptyLine.gameObject.SetActive(saves.Count == 0);
         foreach (SaveSlotInfo save in saves)
         {
@@ -268,8 +274,11 @@ public sealed class SavesScreen : MonoBehaviour
         row.gameObject.AddComponent<Image>().color = OptionsWidgets.Track;
         bool playing = InGame && save.Slot == SaveGameService.CurrentSlot;
         int actions = InGame ? 4 : 3;
-        float textRight = 16f + actions * (ActionWidth + 8f);
-        TMP_Text name = OptionsWidgets.Text("Name", row, playing ? $"{save.Name}  <size=70%><color={UIStyle.Current.AccentHex}>playing now</color></size>" : save.Name, 26f, OptionsWidgets.Body);
+        float textRight = 36f + actions * (ActionWidth + 8f);
+        // The game being played, else the newest save (the list's first), says so: the one most likely wanted.
+        string mark = playing ? "playing now" : newestShown ? "" : "latest";
+        newestShown = true;
+        TMP_Text name = OptionsWidgets.Text("Name", row, mark.Length > 0 ? $"{save.Name}  <size=70%><color={UIStyle.Current.AccentHex}>{mark}</color></size>" : save.Name, 26f, OptionsWidgets.Body);
         OptionsWidgets.Stretch((RectTransform)name.transform, new Vector2(18f, 44f), new Vector2(-textRight, -8f));
         name.fontStyle = FontStyles.Bold;
         name.textWrappingMode = TextWrappingModes.NoWrap;
@@ -279,23 +288,33 @@ public sealed class SavesScreen : MonoBehaviour
         details.textWrappingMode = TextWrappingModes.NoWrap;
         details.overflowMode = TextOverflowModes.Truncate; // Not Ellipsis: the fonts have no "…" (TMP warned and truncated anyway), and the UI shows none.
 
+        // UX pass 2026-11-28 (submenus): the four actions no longer weigh the same. Load is the one to press (the accent), Delete is
+        // set apart at the end in the danger tone, Rename and Overwrite between, plain.
         float x = -14f;
-        Action<string, Action, bool> add = (label, clicked, enabled) =>
+        UIStyle style = UIStyle.Current;
+        Action<string, Action, bool, Color?> add = (label, clicked, enabled, tone) =>
         {
-            Button button = OptionsWidgets.Button(label, row, label, 20f, clicked, out _);
+            Button button = OptionsWidgets.Button(label, row, label, 20f, clicked, out TMP_Text text);
             OptionsWidgets.Place((RectTransform)button.transform, new Vector2(1f, 0.5f), new Vector2(ActionWidth, 56f), new Vector2(x, 0f));
             button.interactable = enabled;
+            if (tone.HasValue && enabled)
+            {
+                text.color = tone.Value;
+                text.fontStyle = FontStyles.Bold;
+            }
+
             x -= ActionWidth + 8f;
         };
 
-        add("Delete", () => AskDelete(save), true);
-        add("Rename", () => StartRename(save), save.IsReadable);
+        add("Delete", () => AskDelete(save), true, style.Danger);
+        x -= 20f;
+        add("Rename", () => StartRename(save), save.IsReadable, null);
         if (InGame)
         {
-            add("Overwrite", () => AskOverwrite(save), !playing && SaveGameService.CheckPlayerSave() == null);
+            add("Overwrite", () => AskOverwrite(save), !playing && SaveGameService.CheckPlayerSave() == null, null);
         }
 
-        add("Load", () => AskLoad(save), save.IsReadable && SaveGameService.CheckLoad() == null);
+        add("Load", () => AskLoad(save), save.IsReadable && SaveGameService.CheckLoad() == null, style.AccentBright);
     }
 
     // ----- Actions -----

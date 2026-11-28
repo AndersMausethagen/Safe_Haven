@@ -435,6 +435,10 @@ public sealed class PauseMenu : MonoBehaviour
     {
         mainPage.SetActive(page == mainPage);
         confirmPage.SetActive(page == confirmPage);
+        if (pauseBox != null)
+        {
+            pauseBox.anchoredPosition = pauseBoxHome - new Vector2(page == mainPage ? pairShift : 0f, 0f);
+        }
     }
 
     private void Refresh()
@@ -462,6 +466,9 @@ public sealed class PauseMenu : MonoBehaviour
     private TMP_Text nowGoal;
     private TMP_Text nowStep;
     private TMP_Text nowKicker;
+    private RectTransform pauseBox;
+    private Vector2 pauseBoxHome;
+    private float pairShift;
     private readonly System.Collections.Generic.List<(KitPictureCard card, UIWindowId id, Func<bool> shown, InputAction key)> jumps =
         new System.Collections.Generic.List<(KitPictureCard, UIWindowId, Func<bool>, InputAction)>();
 
@@ -497,11 +504,15 @@ public sealed class PauseMenu : MonoBehaviour
         go.characterSpacing = 8f;
 
         // The menu's box and the card centred as one pair (design review: the box stayed centred and the card hung off to the right).
+        // Only while the main page (and so the card) shows: the confirm page stands centred alone (ShowPage).
         foreach (UIRole role in page.GetComponentsInParent<UIRole>(true))
         {
             if (role.Role == UIRole.Kind.Window && role.transform is RectTransform box && box != page)
             {
-                box.anchoredPosition -= new Vector2((48f + width) * 0.5f, 0f);
+                pauseBox = box;
+                pauseBoxHome = box.anchoredPosition;
+                pairShift = (48f + width) * 0.5f;
+                box.anchoredPosition = pauseBoxHome - new Vector2(mainPage.activeSelf ? pairShift : 0f, 0f);
                 break;
             }
         }
@@ -660,8 +671,12 @@ public sealed class PauseMenu : MonoBehaviour
 
     private void AskQuit()
     {
-        Confirm(GameSession.ActiveRaid != null ? "Quit the game?\nYou leave this raid as if you had fallen: everything you carry is lost and your gear wears. You will wake at the portal."
-            : "Quit the game?\nProgress since your last save will be lost.", "Main Menu", QuitToMainMenu, "Desktop", QuitToDesktop);
+        // What leaving costs, said plainly, and buttons that say where they go (design review 2026-11-28).
+        string saved = DescribeLastSave();
+        Confirm(GameSession.ActiveRaid != null
+                ? "Leave the raid?\nYou fall here: everything you carry is lost, except your safe pocket, and your gear wears. You wake at the portal next time."
+                : $"Quit the game?\nWhat happened since your last save is lost.{(string.IsNullOrEmpty(saved) ? "" : $"\n<color={UIStyle.Current.MutedHex}>{saved}</color>")}",
+            "Quit to Main Menu", QuitToMainMenu, "Quit to Desktop", QuitToDesktop);
     }
 
     // A raid left by quitting ends as a fall, saved before the game goes (RaidDirector.Abandon).

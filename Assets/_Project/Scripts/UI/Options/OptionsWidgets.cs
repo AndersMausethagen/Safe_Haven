@@ -239,8 +239,10 @@ public static class OptionsWidgets
             UIStyle style = UIStyle.Current;
             label.text = on ? "On" : "Off";
             image.color = on ? new Color(1.5f, 1.4f, 1f, 1f) : Color.white;
-            rim.color = HearthKit.Faded(style.Accent, on ? 0.85f : 0.25f);
-            label.color = on ? style.AccentBright : Muted;
+            // Off is a setting as much as On, not something disabled: its words in the text colour and a rim that reads, On in gold
+            // (UX pass 2026-11-28: grey is only for what can't be used, and every Off here looked unavailable).
+            rim.color = HearthKit.Faded(style.Accent, on ? 0.85f : 0.45f);
+            label.color = on ? style.AccentBright : style.Text;
             markPending(focus.IsPending);
         }
 

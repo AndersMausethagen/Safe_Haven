@@ -126,6 +126,16 @@ public sealed partial class SkillsWindow : MonoBehaviour
     private void Update()
     {
         Breathe();
+        // The reset's question lapses: the button says its own name again.
+        if (resetArmedUntil > 0f && Time.unscaledTime > resetArmedUntil)
+        {
+            resetArmedUntil = -1f;
+            if (resetLabel != null)
+            {
+                resetLabel.text = "Choose Perks Again";
+            }
+        }
+
         if (watched != GameSession.Progress)
         {
             if (watched != null)
@@ -159,7 +169,8 @@ public sealed partial class SkillsWindow : MonoBehaviour
 
         // Under the detail column, clear of the list (centred, Choose Perks Again sat over the last skill rows).
         float buttonsY = PanelHeight - 63f;
-        CodeUI.AddButton("Choose Again", panel, Width - ListX - 460f, buttonsY, 220f, UIRole.Kind.Button, ResetPerks, out resetButton).text = "Choose Perks Again";
+        resetLabel = CodeUI.AddButton("Choose Again", panel, Width - ListX - 460f, buttonsY, 220f, UIRole.Kind.Button, ResetPerks, out resetButton);
+        resetLabel.text = "Choose Perks Again";
         CodeUI.AddButton("Close", panel, Width - ListX - 230f, buttonsY, 230f, UIRole.Kind.Button, () => window.Close(), out _).text = "Close";
 
         window = root.gameObject.AddComponent<UIWindow>();
@@ -446,12 +457,34 @@ public sealed partial class SkillsWindow : MonoBehaviour
         UIMotion.Sound(AudioManager.Sounds != null ? AudioManager.Sounds.PerkChosen : null);
     }
 
+    // Every chosen perk undone at one click was too easy to do by mistake (UX pass 2026-11-28): the first click asks, a second within a
+    // few seconds does it.
+    private TMP_Text resetLabel;
+    private float resetArmedUntil = -1f;
+
     private void ResetPerks()
     {
         if (!AtHome)
         {
             GameMessages.Post("Perks can only be chosen again at home, beside the portal.", MessageKind.Warning);
             return;
+        }
+
+        if (Time.unscaledTime > resetArmedUntil)
+        {
+            resetArmedUntil = Time.unscaledTime + 4f;
+            if (resetLabel != null)
+            {
+                resetLabel.text = $"<color={UIStyle.Current.WarningHex}>Click again to reset all</color>";
+            }
+
+            return;
+        }
+
+        resetArmedUntil = -1f;
+        if (resetLabel != null)
+        {
+            resetLabel.text = "Choose Perks Again";
         }
 
         GameSession.Progress.ResetPerks();
