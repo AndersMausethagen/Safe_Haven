@@ -56,6 +56,8 @@ public static class HavenLands
                 Name = there != null ? Forays.Where(there) : foray.Destination,
                 Line = $"{Forays.Names(party)} · back in {Mathf.CeilToInt(Mathf.Max(0f, foray.SecondsLeft) / 60f)} min · {foray.Chance * 100f:0}% odds",
                 State = HavenEntryState.Working,
+                Icon = UIStyle.Current.Icon("Path"),
+                IconTint = UIStyle.Current.Accent,
                 Description = "Out through the portal, gathering on their own. Gone wrong, they bring a share home, bruised.",
             };
             if (there != null)
@@ -97,6 +99,8 @@ public static class HavenLands
                 Line = open ? $"{Forays.Chance(power, place.power, settings) * 100f:0}% · {Mathf.CeilToInt(Forays.Seconds(power, place, settings) / 60f)} min · power {power:0} of {place.power:0}"
                     : $"Opens with the portal's Tier {Tiers.ToRoman(place.tier)}",
                 State = open ? HavenEntryState.Good : HavenEntryState.Locked,
+                Icon = UIStyle.Current.Icon("Path"),
+                IconTint = UIStyle.Current.Accent,
             };
             if (open)
             {
@@ -157,8 +161,9 @@ public static class HavenLands
         {
             QuestDefinition opener = TerritorySettings.Current.UnlockedBy;
             bool called = opener != null && GameSession.Quests.StatusOf(opener) != QuestStatus.NotStarted;
-            return $"{all} regions beyond the meadows, each with a cold boundary stone · " +
-                (called ? "the portal wants a word with you about them" : "the portal will speak of them once you have been through it a few times");
+            // One line on the tab: the longer words ran off it.
+            return $"{all} regions beyond the meadows, their stones cold · " +
+                (called ? "the portal wants a word about them" : "the portal will speak of them in time");
         }
 
         string summary = $"{state.ClaimedCount} of {all} regions remembered · {Territory.Renown} renown from them";
@@ -185,7 +190,13 @@ public static class HavenLands
             Description = info != null ? info.description : "",
             State = isPushed || standing == RegionStanding.Slipping ? HavenEntryState.Attention
                 : standing == RegionStanding.Wild ? HavenEntryState.Locked : HavenEntryState.Good,
+            // Its painting, else a sign of its standing (each was its first letter: the UX pass of 2026-11-28).
+            Icon = info != null && info.picture != null ? info.picture : UIStyle.Current.Icon(standing == RegionStanding.Wild ? "Lock" : "Flag"),
         };
+        if (info == null || info.picture == null)
+        {
+            entry.IconTint = UIStyle.Current.Accent;
+        }
 
         if (info != null)
         {

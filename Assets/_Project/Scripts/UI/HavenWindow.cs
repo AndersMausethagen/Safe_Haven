@@ -545,6 +545,10 @@ public sealed class HavenWindow : MonoBehaviour
         fade.texture = HeaderFade();
         fade.color = style.Panel;
         fade.raycastTarget = false;
+        // A dark plate under the figures: they stood on the painting's lit roofs and fire and read poorly (the UX pass of 2026-11-28).
+        var plate = At("Figures Plate", overviewPage, 630f, 34f, Width - Margin - 630f + 8f, 96f).gameObject.AddComponent<Image>();
+        plate.color = new Color(0.04f, 0.035f, 0.03f, 0.72f);
+        plate.raycastTarget = false;
 
         TMP_Text kicker = Label("Kicker", overviewPage, Margin, 34f, 500f, 24f, 17f, style.Accent);
         kicker.text = "SAFE HAVEN";
@@ -664,6 +668,10 @@ public sealed class HavenWindow : MonoBehaviour
             row.Bullet.AddComponent<Image>().color = style.Accent;
             row.Title = Label("Title", parent, 56f, 4f, 440f, 30f, 21f, style.Text);
             row.Detail = Label("Detail", parent, 56f, 32f, 440f, 26f, 17f, style.Muted);
+            // Shrinks to fit rather than running off its line ("deepen a skill at").
+            row.Detail.enableAutoSizing = true;
+            row.Detail.fontSizeMin = 13f;
+            row.Detail.fontSizeMax = 17f;
             row.Renown = Label("Renown", parent, 500f, 8f, 56f, 40f, 24f, style.Accent, TextAlignmentOptions.Right);
             steps.Add(row);
         }

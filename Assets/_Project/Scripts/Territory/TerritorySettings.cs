@@ -37,6 +37,8 @@ public sealed class TerritorySettings : GameSettings<TerritorySettings>
         [Tooltip("The region's name in the atlas.")]
         public string region;
         [TextArea(2, 4)] public string description;
+        [Tooltip("Its painted picture on the Lands tab (LocalSpawn, Tools/LocalSpawn/region_icons.json); none: a sign of its standing.")]
+        public Sprite picture;
         public RegionDanger danger = RegionDanger.Wary;
         [Tooltip("What can be found there, in a few words.")]
         public string gives;

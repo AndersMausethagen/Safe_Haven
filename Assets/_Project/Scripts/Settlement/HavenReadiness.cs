@@ -104,6 +104,8 @@ public static class HavenReadiness
         {
             Key = settings,
             Name = "Time in the woods",
+            Icon = UIStyle.Current.Icon("Hourglass"),
+            IconTint = UIStyle.Current.Accent,
             Line = total > 0f ? $"+{RaidStats.FormatTime(total)} on every raid" : "No extra time yet",
             Badge = total > 0f ? $"+{RaidStats.FormatTime(total)}" : "",
             State = total > 0f ? HavenEntryState.Good : HavenEntryState.Ready,
@@ -127,6 +129,8 @@ public static class HavenReadiness
         {
             Key = HavenSettings.Current,
             Name = RestedName,
+            Icon = UIStyle.Current.Icon("Bed"),
+            IconTint = UIStyle.Current.Accent,
             Line = comfort > 0 ? $"Comfort {comfort}: {Mathf.RoundToInt(RestedShare * 100f)}% of Well Rested, every raid" : "No comfort yet",
             Badge = comfort > 0 ? comfort.ToString() : "",
             State = comfort > 0 ? HavenEntryState.Good : HavenEntryState.Ready,
@@ -164,6 +168,8 @@ public static class HavenReadiness
         {
             Key = post != null ? post.Definition : null,
             Name = "Word from the woods",
+            Icon = UIStyle.Current.Icon("Eye"),
+            IconTint = UIStyle.Current.Accent,
             Line = rumours > 0 ? $"{rumours} more rumour{(rumours == 1 ? "" : "s")} before each raid" : "No extra rumours yet",
             Badge = rumours > 0 ? $"+{rumours}" : "",
             State = rumours > 0 ? HavenEntryState.Good : HavenEntryState.Ready,

@@ -151,6 +151,51 @@ public static class HavenStores
             Description = description,
         };
         entry.Details.Add(new HavenDetail("Where it is", string.Join("\n", tally.Places.Select(place => $"{place.Place}: {place.Amount}"))));
+        AddUses(entry, tally.Definition);
         return entry;
+    }
+
+    // What it goes into and where it is made, from the recipes the player knows (the UX pass of 2026-11-28: the pane said only where
+    // it lay, so whether to keep it or trade it away needed the crafting window open beside it).
+    private static void AddUses(HavenEntry entry, Object definition)
+    {
+        PlayerCrafting crafting = Player.Current != null ? Player.Current.GetComponent<PlayerCrafting>() : null;
+        if (crafting == null)
+        {
+            return;
+        }
+
+        var usedIn = new SortedSet<string>();
+        var madeAt = new SortedSet<string>();
+        foreach (RecipeDefinition recipe in crafting.KnownRecipes)
+        {
+            if (recipe == null || recipe.IsThriftierCopy)
+            {
+                continue;
+            }
+
+            if (recipe.OutputDefinition == definition)
+            {
+                madeAt.Add(recipe.Station.DisplayName());
+            }
+
+            bool uses = recipe.ResourceCost.Any(part => part.Resource == definition) || recipe.ItemCost.Any(part => part.Item == definition);
+            if (uses && recipe.HasOutput)
+            {
+                usedIn.Add(recipe.DisplayName);
+            }
+        }
+
+        if (madeAt.Count > 0)
+        {
+            entry.Details.Add(new HavenDetail("Made at", string.Join(", ", madeAt)));
+        }
+
+        if (usedIn.Count > 0)
+        {
+            const int most = 6;
+            string list = string.Join(", ", usedIn.Take(most)) + (usedIn.Count > most ? $" and {usedIn.Count - most} more" : "");
+            entry.Details.Add(new HavenDetail($"Goes into ({usedIn.Count})", list));
+        }
     }
 }

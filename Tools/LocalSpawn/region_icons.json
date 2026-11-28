@@ -1,0 +1,14 @@
+{
+  "_about": "Pictures for the Haven's regions (TerritorySettings.RegionInfo, keyed by the region's name in lower case with spaces as _), for Tools/LocalSpawn/generate_item_icons.py --set regions, painted whole in the skill icons' dark style (UX pass 2026-11-28: the Lands tab showed each region as its first letter). One clear landscape vignette each, Nordic forest under a curse, readable small.",
+  "ravenwood": "Old dark pines beside a still tarn, ravens perched on a dead branch watching a forest road, grey dusk light",
+  "eastwood": "Open birch and pine woods with a trapper's path leading to an old stone quarry cut into a hillside, soft morning light",
+  "the_hollow_pines": "Tall dead-straight bare pine trunks in rows with nothing growing beneath, pale mist, eerie silence, cold light",
+  "the_wolfwood": "A dark tangled forest with a wolf den under roots and glowing eyes in the shadows, an old barrow mound, red moonlight",
+  "westwood": "Quiet cedar woods on a ridge with an old wooden watchtower and a small mere below, warm evening light",
+  "the_grey_pines": "A strip of thin pines under tall grey cliffs, fallen boulders and old tree stumps, overcast light",
+  "greyfell": "A bare rocky mountain with stone benches climbing to a windswept peak, ore veins glinting in the cliffs, cold wind",
+  "the_drowning_fen": "A black bog with dark pools between hummocks, a wooden causeway leading to standing stones half sunk in water, green mist",
+  "stillwater": "A great calm lake with standing stones on a small island and a wooden landing on the shore, silver light",
+  "hightarn": "A cold black tarn in bare northern hills, very still water reflecting the sky, an old fishing rock, pale light",
+  "alder_mere": "A reedy mere ringed with alder trees, still water and lily pads, soft hushed green light"
+}

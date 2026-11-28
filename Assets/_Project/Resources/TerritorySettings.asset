@@ -64,6 +64,7 @@ MonoBehaviour:
   regions:
   - region: Ravenwood
     description: Old pines north of the meadows, where the ravens sit and watch the road. The tarn lies at its edge.
+    picture: {fileID: 21300000, guid: 532ec34e056abb04b969b062c82128d9, type: 3}
     danger: 2
     gives: Hardwood, iron, stone, game
     task: 0
@@ -79,6 +80,7 @@ MonoBehaviour:
       most: 1
   - region: Eastwood
     description: Open woods between the lake and the hills, crossed by trappers' paths. The old quarries are here.
+    picture: {fileID: 21300000, guid: f911bc25e90b1e74cacf6576d1dad24d, type: 3}
     danger: 1
     gives: Softwood, stone, hides
     task: 0
@@ -91,6 +93,7 @@ MonoBehaviour:
     outpost: []
   - region: The Hollow Pines
     description: Tall, dead-straight pines south of the Haven with nothing growing under them. Sound carries strangely here.
+    picture: {fileID: 21300000, guid: 0050b5aea5e4af5419fdd9a307314b9b, type: 3}
     danger: 2
     gives: Hardwood, mushrooms, iron
     task: 1
@@ -106,6 +109,7 @@ MonoBehaviour:
       most: 3
   - region: The Wolfwood
     description: 'Where the cursed packs den: the Wolf Den is here, and the Old Barrow. Few go in, and fewer come out the same.'
+    picture: {fileID: 21300000, guid: 5b51074e1245a954185337eac7fd7738, type: 3}
     danger: 2
     gives: Fangs, hides; the Wolf Den and the Old Barrow
     task: 0
@@ -121,6 +125,7 @@ MonoBehaviour:
       most: 2
   - region: Westwood
     description: Quiet cedar woods west of the meadows, with the old watchtowers on their ridges and the mere among them.
+    picture: {fileID: 21300000, guid: 86fbcf8429040ef49b27fa6c4e7d6383, type: 3}
     danger: 1
     gives: Hardwood, healing herbs
     task: 1
@@ -133,6 +138,7 @@ MonoBehaviour:
     outpost: []
   - region: The Grey Pines
     description: A thin strip of pines under Greyfell's cliffs, littered with fallen stone and the stumps of old cuttings.
+    picture: {fileID: 21300000, guid: f4c1a9be803b15f40b4f02ce0bf96cf1, type: 3}
     danger: 1
     gives: Softwood, stone
     task: 1
@@ -145,6 +151,7 @@ MonoBehaviour:
     outpost: []
   - region: Greyfell
     description: 'The mountain: bare benches of rock climbing to the highest ground in the land. Ore in the cliffs, and the wind.'
+    picture: {fileID: 21300000, guid: 2bda7e657cd2f8844971ad2c29e82b8e, type: 3}
     danger: 1
     gives: Stone, granite, copper and iron ore. Nothing lives up there but the wind.
     task: 1
@@ -163,6 +170,7 @@ MonoBehaviour:
       most: 3
   - region: The Drowning Fen
     description: 'The bog: black pools between hummocks, and a causeway to the Drowned Stones at its heart. It keeps what it takes.'
+    picture: {fileID: 21300000, guid: a7bed011bf3989442bf121b9241dfd48, type: 3}
     danger: 3
     gives: Bog venom, herbs, cloudberries
     task: 0
@@ -178,6 +186,7 @@ MonoBehaviour:
       most: 2
   - region: Stillwater
     description: The great lake below the Haven, with the Island Stones out on the water and the landing on its shore.
+    picture: {fileID: 21300000, guid: 300ec33ff7e49bb449e1b3ef74603d55, type: 3}
     danger: 0
     gives: Fish, flax
     task: 2
@@ -190,6 +199,7 @@ MonoBehaviour:
     outpost: []
   - region: Hightarn
     description: A cold tarn in the northern hills, its water black and very still. The fish there are old and wary.
+    picture: {fileID: 21300000, guid: 84e8f8c5c92121546806594bf379a60c, type: 3}
     danger: 1
     gives: Fish
     task: 2
@@ -200,6 +210,7 @@ MonoBehaviour:
     outpost: []
   - region: Alder Mere
     description: A reedy mere in the south-west woods, ringed with alders and quiet as a held breath.
+    picture: {fileID: 21300000, guid: 2a10b2c4044fd164cb245c8db755ba13, type: 3}
     danger: 0
     gives: Fish, flax, reeds
     task: 2

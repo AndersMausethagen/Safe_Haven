@@ -70,7 +70,8 @@ public sealed class HavenOverview
         overview.WardRadius = HomePortal.Current != null ? HomePortal.Current.WardRadius : 0f;
         overview.PortalTier = PortalTiers.Current;
         overview.ClearedShare = Overgrowth.ClearedShare;
-        overview.Buildings = BuildingObject.Active.Count(IsStandingBuilding);
+        // Kinds standing, as the Buildings tab counts them: every stretch of path and fence counted one each made it 95 to the tab's 14.
+        overview.Buildings = BuildingObject.Active.Where(IsStandingBuilding).Select(building => building.Definition).Distinct().Count();
         overview.Parts.AddRange(Grouped(parts));
         overview.ReadExpedition(settings);
         overview.ReadSteps(settings, user);

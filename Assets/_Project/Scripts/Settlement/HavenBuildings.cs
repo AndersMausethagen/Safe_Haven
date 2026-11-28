@@ -263,6 +263,8 @@ public static class HavenBuildings
         {
             Key = settings,
             Name = "Portal ward",
+            Icon = UIStyle.Current.Icon("Spark"),
+            IconTint = UIStyle.Current.AccentBright,
             Line = $"Level {level + 1} of {most + 1}, {radius}",
             Badge = $"{level + 1}/{most + 1}",
             State = HavenEntryState.Good,

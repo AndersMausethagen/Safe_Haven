@@ -48,6 +48,10 @@ SETS = {
     "modules": ("module_icons.json", "ModuleIcons"),
     # The altar's enchantments (UX pass 2026-11-28), painted whole and dark as the skill icons: they are magic, not things.
     "enchantments": ("enchantment_icons.json", "EnchantmentIcons"),
+    # Residents' traits and raid marks (UX pass 2026-11-28), painted whole: each card had the same small hammer glyph.
+    "traits": ("trait_icons.json", "TraitIcons"),
+    # The Haven's regions on the Lands tab (UX pass 2026-11-28), painted whole: each was its first letter.
+    "regions": ("region_icons.json", "RegionIcons"),
 }
 SET = sys.argv[sys.argv.index("--set") + 1] if "--set" in sys.argv else "items"
 WANTED = os.path.join(HERE, SETS[SET][0])
@@ -59,7 +63,7 @@ SIZE = 512  # LocalSpawn's "Icon 512x512"
 DEFAULT_MODEL = "chroma"
 # Sets painted whole in their own style, not cut out (the user, 2026-11-25: skill icons "should not have transparent background"):
 # set -> LocalSpawn style. Painted at the model's own square size and scaled down to SIZE.
-OWN_STYLE = {"skills": "Skill Icon dark", "enchantments": "Skill Icon dark"}
+OWN_STYLE = {"skills": "Skill Icon dark", "enchantments": "Skill Icon dark", "traits": "Skill Icon dark", "regions": "Skill Icon dark"}
 NATIVE = {"qwen-image": 1328}
 # Of the frame, how much the object may fill at most (its longer side), so icons of every shape sit alike.
 FILL = 0.86
