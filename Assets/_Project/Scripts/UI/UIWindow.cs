@@ -63,6 +63,12 @@ public sealed class UIWindow : MonoBehaviour
 
     private void Update()
     {
+        // The screen or the UI size changed while open (a window dragged, the option moved): fit again.
+        if (IsOpen && (Screen.width != fittedWidth || Screen.height != fittedHeight || !Mathf.Approximately(fittedRoom, RoomHeight())))
+        {
+            FitToScreen();
+        }
+
         if (fadeShown < 0f)
         {
             return;
@@ -74,7 +80,7 @@ public sealed class UIWindow : MonoBehaviour
         fade.alpha = fadeShown;
         // Hearthline 3: it settles in as it fades in, from a touch smaller and lower.
         float eased = 1f - (1f - fadeShown) * (1f - fadeShown);
-        content.transform.localScale = Vector3.one * Mathf.Lerp(0.965f, 1f, eased);
+        content.transform.localScale = Vector3.one * Mathf.Lerp(0.965f, 1f, eased) * contentFit;
         if (content.transform is RectTransform rect)
         {
             rect.anchoredPosition = new Vector2(rect.anchoredPosition.x, Mathf.Lerp(-14f, 0f, eased) + settledY);
@@ -129,6 +135,11 @@ public sealed class UIWindow : MonoBehaviour
     {
         IsOpen = open;
         content.SetActive(open);
+        if (open)
+        {
+            FitToScreen();
+        }
+
         if (uiState != null)
         {
             uiState.SetWindowOpen(this, open);
@@ -163,7 +174,7 @@ public sealed class UIWindow : MonoBehaviour
         if (fadeShown >= 0f && fade != null)
         {
             fade.alpha = 1f;
-            content.transform.localScale = Vector3.one;
+            content.transform.localScale = Vector3.one * contentFit;
             if (content.transform is RectTransform rect)
             {
                 rect.anchoredPosition = new Vector2(rect.anchoredPosition.x, settledY);
@@ -171,6 +182,90 @@ public sealed class UIWindow : MonoBehaviour
         }
 
         fadeShown = -1f;
+    }
+
+    // ----- Fitting the screen -----
+    // A window is laid out at 1920x1080 units, and the player's UI and Text Size (up to 2x) makes those units bigger: a tall window
+    // (the character sheet, the skills) ran off the screen at 1.5 (UX pass 2026-11-28). On opening, the window's panel (its content
+    // when that is a fixed-size box, else each fixed-size box directly inside it) is shrunk whole, in proportion, to fit; nothing
+    // stretched is touched, and a box that fits again goes back to its own size.
+    private const float ScreenMargin = 24f;
+    private float contentFit = 1f;
+    private int fittedWidth = -1;
+    private int fittedHeight = -1;
+    private float fittedRoom = -1f;
+    private readonly System.Collections.Generic.List<RectTransform> shrunk = new System.Collections.Generic.List<RectTransform>();
+
+    private RectTransform Room()
+    {
+        Canvas canvas = content != null ? content.GetComponentInParent<Canvas>(true) : null;
+        return canvas != null ? canvas.rootCanvas.transform as RectTransform : null;
+    }
+
+    private float RoomHeight()
+    {
+        RectTransform room = Room();
+        return room != null ? room.rect.height : 0f;
+    }
+
+    private void FitToScreen()
+    {
+        fittedWidth = Screen.width;
+        fittedHeight = Screen.height;
+        fittedRoom = RoomHeight();
+        RectTransform room = Room();
+        if (room == null || !(content.transform is RectTransform box))
+        {
+            return;
+        }
+
+        Rect space = room.rect;
+        if (IsFixed(box))
+        {
+            contentFit = Fit(box.rect.size, space);
+            if (fadeShown < 0f)
+            {
+                box.localScale = Vector3.one * contentFit;
+            }
+
+            return;
+        }
+
+        contentFit = 1f;
+        foreach (Transform child in box)
+        {
+            if (!(child is RectTransform panel) || !IsFixed(panel) || !child.gameObject.activeSelf)
+            {
+                continue;
+            }
+
+            float fit = Fit(panel.rect.size, space);
+            if (fit < 1f)
+            {
+                panel.localScale = Vector3.one * fit;
+                if (!shrunk.Contains(panel))
+                {
+                    shrunk.Add(panel);
+                }
+            }
+            else if (shrunk.Remove(panel))
+            {
+                panel.localScale = Vector3.one;
+            }
+        }
+    }
+
+    // A box of its own size (anchored at a point), not one stretched with its parent.
+    private static bool IsFixed(RectTransform rect) => rect.anchorMin == rect.anchorMax;
+
+    private static float Fit(Vector2 size, Rect space)
+    {
+        if (size.x <= 1f || size.y <= 1f || space.width <= 1f || space.height <= 1f)
+        {
+            return 1f;
+        }
+
+        return Mathf.Clamp(Mathf.Min((space.width - ScreenMargin) / size.x, (space.height - ScreenMargin) / size.y), 0.3f, 1f);
     }
 
     private void OnToggleRequested(UIWindowId requested)

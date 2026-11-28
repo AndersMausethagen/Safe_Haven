@@ -37,7 +37,7 @@ public readonly struct FightCard
         WeaponDefinition weapon = combat != null ? combat.Weapon : null;
         float weaponDamage = weapon != null && !weapon.IsBow ? weapon.Damage : 0f;
         string damage = weapon != null && weaponDamage > 0f
-            ? $"×{share:0.00} <color={muted}>{WeaponName(equipment, weapon)} {weaponDamage:0} → {weaponDamage * share:0.#} a blow</color>"
+            ? $"{weaponDamage * share:0.#} a blow <color={muted}>({WeaponName(equipment, weapon)} {weaponDamage:0} ×{share:0.00})</color>"
             : $"×{share:0.00} <color={muted}>of a weapon's</color>";
 
         // Against the raid tier ahead: the one being fought in, else the highest the gear is ready for.
@@ -47,7 +47,7 @@ public readonly struct FightCard
         {
             float kill = weaponDamage > 0f ? FightMath.HitsToKill(weaponDamage * share, ReferenceHealth, ReferenceArmor, tier.enemyHealth, rules) : 0f;
             float die = FightMath.HitsToDie(totals.Toughness(rules), ReferenceDamage, tier.enemyPower);
-            blows = $"{(kill > 0f ? $"fell in {kill:0.#}" : "unarmed")} · take {die:0.#} <color={muted}>(tier {Tiers.ToRoman(tier.tier)})</color>";
+            blows = $"{(kill > 0f ? $"{Mathf.CeilToInt(kill)} blows to win" : "unarmed")} · {Mathf.Max(1, Mathf.FloorToInt(die))} hits to fall <color={muted}>vs tier {Tiers.ToRoman(tier.tier)}</color>";
         }
 
         PlayerStamina stamina = player.GetComponent<PlayerStamina>();
@@ -64,14 +64,14 @@ public readonly struct FightCard
                 ? combat.StaminaCostOf(SwingKind.Light, weapon.Combo[0]) : 0f;
             int dodges = dodgeCost > 0f ? Mathf.FloorToInt(stamina.Max / dodgeCost) : 0;
             int swings = swingCost > 0f ? Mathf.FloorToInt(stamina.Max / swingCost) : 0;
-            staminaText = $"{Mathf.RoundToInt(stamina.Max)} <color={muted}>{dodges} dodges{(swings > 0 ? $" or {swings} swings" : "")}</color>";
+            staminaText = $"{Mathf.RoundToInt(stamina.Max)} <color={muted}>·</color> {dodges} dodges{(swings > 0 ? $" or {swings} swings" : "")}";
         }
 
         string dodgeText = settings == null ? "-" : style switch
         {
-            DodgeStyle.Quickstep => $"Quickstep <color={muted}>load {load:0.#}, a roll past {settings.LightLoad:0.#}</color>",
-            DodgeStyle.HeavyRoll => $"Heavy roll <color={muted}>load {load:0.#}, a roll under {settings.HeavyLoad:0.#}</color>",
-            _ => $"Roll <color={muted}>load {load:0.#}, quickstep at {settings.LightLoad:0.#}</color>",
+            DodgeStyle.Quickstep => $"Quickstep <color={muted}>until {settings.LightLoad:0.#} worn weight (now {load:0.#})</color>",
+            DodgeStyle.HeavyRoll => $"Heavy roll <color={muted}>a roll under {settings.HeavyLoad:0.#} worn weight (now {load:0.#})</color>",
+            _ => $"Roll <color={muted}>quickstep under {settings.LightLoad:0.#} worn weight (now {load:0.#})</color>",
         };
 
         return new FightCard(damage, blows, staminaText, dodgeText);

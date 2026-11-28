@@ -312,7 +312,14 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
                 skill != null ? skill.Icon : null,
                 skill != null ? SkillSchools.ColorOf(skill.School) : Color.clear,
                 PlayerInputHandler.SkillKeyLabel(index));
-            slots[index].view.SetPlaceholder(skill == null ? SkillLoadout.SlotBadge(index) : "");
+            // The kind it takes, in the kind's colour, as in the skill window.
+            Color? takes = null;
+            foreach (SkillKind kind in SkillLoadout.SlotTakes(index))
+            {
+                takes = SkillKinds.Colour(kind);
+            }
+
+            slots[index].view.SetPlaceholder(skill == null ? SkillLoadout.SlotBadge(index) : "", takes);
             slots[index].shownCount = -1;
         }
 
@@ -459,8 +466,9 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
         }
     }
 
-    // Out of the way while a window covers the screen (as the rest of the HUD, HudGivesWay), except the bag and the character
-    // sheet: putting things on the bar from the bag (hover, then a number key) shows where they went.
+    // Out of the way while a window covers the screen (as the rest of the HUD, HudGivesWay), except the bag and the skill window:
+    // putting things on the bar from the bag (hover, then a number key) shows where they went. Not the character sheet any more: its
+    // foot reaches the bar (design review 2026-11-28).
     private void FadeForWindows()
     {
         if (group == null || bound == null)
@@ -469,7 +477,7 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
         }
 
         UIStateManager ui = UIStateManager.Current;
-        bool bagOpen = ui != null && (ui.IsOpen(UIWindowId.Items) || ui.IsOpen(UIWindowId.Character) || ui.IsOpen(UIWindowId.Skills));
+        bool bagOpen = ui != null && (ui.IsOpen(UIWindowId.Items) || ui.IsOpen(UIWindowId.Skills)); // not the character sheet: it covers the bar (review 2026-11-28)
         bool hide = HudGivesWay.Covered && !bagOpen;
         float target = hide ? 0f : 1f;
         if (group.alpha != target)

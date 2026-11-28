@@ -40,6 +40,13 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
     private const float SectionHeading = 34f;
     private const float SectionGap = 14f;
     private const string GroupingKey = "SkillWindow.GroupByElement";
+    // UX pass 2026-11-28 (Docs/MenuUXResearch_2026-11-28.md §3): a detail pane on the right for the skill chosen (hover a short card,
+    // select the full one), every skill in the game in the book (those not learned as dark shapes with where they are learned), each
+    // card and bar slot in its kind's colour, and while a skill is dragged the bar slots that can't take it fade.
+    private const float DetailWidth = 300f;
+    private const float DetailGap = 20f;
+    private const float BookWidth = WindowWidth - Margin * 2f - DetailWidth - DetailGap;
+    private const float DetailX = WindowWidth - Margin - DetailWidth;
     // Kept clear above and below the window: a margin, and the HUD's skill bar.
     private const float ScreenTop = 24f;
     private const float ScreenBottom = 96f;
@@ -57,6 +64,19 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
     private RectTransform bookContent;
     private (TMP_Text label, Image shown) byTypeTab;
     private (TMP_Text label, Image shown) byElementTab;
+    private RectTransform detail;
+    private Image detailIcon;
+    private TMP_Text detailName;
+    private TMP_Text detailKind;
+    private TMP_Text detailBody;
+    private TMP_Text detailHint;
+    private SkillDefinition selected;
+    // A gold rim round each book card's picture, lit on the one chosen (the pane's skill is seen in the book too).
+    private readonly List<Image> bookRims = new List<Image>();
+    private Button equipButton;
+    private float bodyHeight = 160f;
+
+    private bool Knows(SkillDefinition skill) => skill != null && skills.IsKnown(skill);
 
     private void OnEnable()
     {
@@ -118,7 +138,32 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
 
     public void OnSlotClicked(ItemSlotView slot, PointerEventData eventData)
     {
-        if (eventData.dragging || eventData.button != PointerEventData.InputButton.Right)
+        if (eventData.dragging)
+        {
+            return;
+        }
+
+        // A left click (or a pad's press) chooses the skill: its whole card in the pane on the right.
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            // A bar slot clicked while a learned skill is chosen that it takes (and doesn't hold): the skill goes there.
+            if (IsBar(slot) && Knows(selected) && slot.Index < SkillLoadout.SkillSlotCount && SkillLoadout.Fits(slot.Index, selected)
+                && skills.Loadout.Get(slot.Index) != selected)
+            {
+                skills.Equip(slot.Index, selected);
+                return;
+            }
+
+            SkillDefinition chosen = SkillOf(slot);
+            if (chosen != null)
+            {
+                Select(chosen);
+            }
+
+            return;
+        }
+
+        if (eventData.button != PointerEventData.InputButton.Right)
         {
             return;
         }
@@ -132,6 +177,12 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
         SkillDefinition skill = SkillOf(slot);
         if (skill == null)
         {
+            return;
+        }
+
+        if (!Knows(skill))
+        {
+            GameMessages.Post($"{SkillText.Name(skill)} isn't learned yet. {SkillSources.Of(skill, skills.Settings)}", MessageKind.Info);
             return;
         }
 
@@ -165,7 +216,7 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
     public void OnSlotDragStarted(ItemSlotView slot, PointerEventData eventData)
     {
         SkillDefinition skill = SkillOf(slot);
-        if (eventData.button != PointerEventData.InputButton.Left || skill == null)
+        if (eventData.button != PointerEventData.InputButton.Left || skill == null || !Knows(skill))
         {
             return;
         }
@@ -175,6 +226,7 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
         dragIcon.gameObject.SetActive(skill.Icon != null);
         dragIcon.transform.SetAsLastSibling();
         tooltip.Hide();
+        ShowFits(skill);
         OnSlotDragged(eventData);
     }
 
@@ -283,7 +335,12 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
             return;
         }
 
-        tooltip.Show(SkillText.Name(skill), SkillSchools.ColorOf(skill.School), SkillText.Describe(skill, skills.Loadout.IndexOf(skill)));
+        // Hover: a short card (the kind and how it is had); the whole of it is in the pane once chosen.
+        string kindLine = $"<color=#{ColorUtility.ToHtmlStringRGB(SkillKinds.Colour(skill.Kind))}>{SkillKinds.Name(skill.Kind)}</color> · {skill.School}";
+        string body = Knows(skill)
+            ? $"{kindLine}\n{SkillText.Costs(skill)}\n<color={UIStyle.Current.MutedHex}>Click for the whole of it. Drag it to the bar, or right-click.</color>"
+            : $"{kindLine}\n<color={UIStyle.Current.WarningHex}>Not learned yet.</color> {SkillSources.Of(skill, skills.Settings)}";
+        tooltip.Show(SkillText.Name(skill), SkillKinds.Colour(skill.Kind), body);
     }
 
     private void CancelDrag()
@@ -293,6 +350,124 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
         {
             dragIcon.gameObject.SetActive(false);
         }
+
+        ShowFits(null);
+    }
+
+    // While a skill is dragged, the bar slots that can't take it fade (Diablo IV, Last Epoch: where it may go is seen before it drops).
+    private void ShowFits(SkillDefinition moving)
+    {
+        foreach (ItemSlotView slot in barSlots)
+        {
+            if (slot == null)
+            {
+                continue;
+            }
+
+            CanvasGroup group = slot.TryGetComponent(out CanvasGroup had) ? had : slot.gameObject.AddComponent<CanvasGroup>();
+            group.alpha = moving == null || SkillLoadout.Fits(slot.Index, moving) ? 1f : 0.3f;
+        }
+    }
+
+    // ----- The chosen skill's card -----
+
+    private void Select(SkillDefinition skill)
+    {
+        selected = skill;
+        for (int i = 0; i < bookRims.Count && i < bookOrder.Count; i++)
+        {
+            bookRims[i].enabled = bookOrder[i] == selected;
+        }
+
+        ShowDetail();
+    }
+
+    // The pane's button (and a click on a bar slot with a skill chosen): onto the bar without dragging, for a pad as for a mouse.
+    private void EquipSelected(int slot)
+    {
+        if (!Knows(selected))
+        {
+            return;
+        }
+
+        if (slot < 0)
+        {
+            slot = skills.Loadout.FirstFittingEmpty(selected);
+            for (int i = 0; slot < 0 && i < SkillLoadout.SkillSlotCount; i++)
+            {
+                slot = SkillLoadout.Fits(i, selected) ? i : -1;
+            }
+        }
+
+        if (slot < 0 || !SkillLoadout.Fits(slot, selected))
+        {
+            SayDoesNotFit(Mathf.Max(0, slot), selected);
+            return;
+        }
+
+        skills.Equip(slot, selected);
+    }
+
+    private void ShowDetail()
+    {
+        if (detail == null)
+        {
+            return;
+        }
+
+        UIStyle style = UIStyle.Current;
+        SkillDefinition skill = selected;
+        detail.gameObject.SetActive(skill != null);
+        if (skill == null)
+        {
+            return;
+        }
+
+        bool known = Knows(skill);
+        detailIcon.sprite = skill.Icon;
+        detailIcon.enabled = skill.Icon != null;
+        detailIcon.color = known ? Color.white : new Color(0.46f, 0.42f, 0.37f, 0.85f);
+        detailName.text = SkillText.Name(skill);
+        detailName.color = known ? style.Text : style.Muted;
+        detailKind.text = $"<color=#{ColorUtility.ToHtmlStringRGB(SkillKinds.Colour(skill.Kind))}>{SkillKinds.Name(skill.Kind)}</color>  ·  {skill.School}";
+        int equipped = skills.Loadout.IndexOf(skill);
+        detailBody.text = known ? SkillText.Describe(skill, equipped)
+            : $"<color={style.WarningHex}>Not learned yet.</color>\n{SkillSources.Of(skill, skills.Settings)}\n\n{SkillKinds.Explain(skill.Kind)}";
+        detailHint.text = !known ? "" : equipped >= 0 ? $"On the bar: {PlayerInputHandler.SkillKeyLabel(equipped)}. Right-click to take it off."
+            : "Or click a slot of its colour on the bar.";
+        equipButton.gameObject.SetActive(known && equipped < 0);
+        // Without the button, the words take its room.
+        detailBody.rectTransform.sizeDelta = new Vector2(DetailWidth - 36f, bodyHeight + (equipButton.gameObject.activeSelf ? 0f : 50f));
+    }
+
+    private void BuildDetail()
+    {
+        UIStyle style = UIStyle.Current;
+        detail = HearthKit.Card(transform, "Detail", DetailX, BookTop - 48f, DetailWidth, 400f, 0.45f);
+        RectTransform frame = HearthKit.Card(detail, "Picture", (DetailWidth - 96f) * 0.5f, 16f, 96f, 96f, 0.6f);
+        detailIcon = CodeUI.At("Icon", frame, 6f, 6f, 84f, 84f).gameObject.AddComponent<Image>();
+        detailIcon.preserveAspect = true;
+        detailIcon.raycastTarget = false;
+        detailName = CodeUI.Label("Name", detail, 14f, 122f, DetailWidth - 28f, 30f, 22f, style.Text, TextAlignmentOptions.Center);
+        style.Title(detailName);
+        detailName.enableAutoSizing = true;
+        detailName.fontSizeMin = 15f;
+        detailName.fontSizeMax = 22f;
+        detailKind = CodeUI.Label("Kind", detail, 14f, 154f, DetailWidth - 28f, 22f, 15f, style.Muted, TextAlignmentOptions.Center);
+        detailKind.richText = true;
+        HearthKit.Rule(detail, 24f, 184f, DetailWidth - 48f);
+        detailBody = CodeUI.Paragraph("Words", detail, 18f, 194f, DetailWidth - 36f, 160f, 14f, style.Text);
+        detailBody.richText = true;
+        detailBody.enableAutoSizing = true;
+        detailBody.fontSizeMin = 12f;
+        detailBody.fontSizeMax = 14f;
+        detailHint = CodeUI.Paragraph("Hint", detail, 18f, 360f, DetailWidth - 36f, 34f, 13f, style.Muted);
+        TMP_Text equip = CodeUI.AddButton("Equip", detail, (DetailWidth - 180f) * 0.5f, 300f, 180f, UIRole.Kind.PrimaryButton, () => EquipSelected(-1), out equipButton);
+        equip.text = "Put on the bar";
+        equip.fontSize = 17f;
+        ((RectTransform)equipButton.transform).sizeDelta = new Vector2(180f, 40f);
+        equip.rectTransform.sizeDelta = new Vector2(180f, 40f);
+        detail.gameObject.SetActive(false);
     }
 
     // ----- Building and refreshing -----
@@ -317,11 +492,17 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
         Place(barGrid, Margin, BarTop, barWidth, 64f);
         Place(Child("Bar Hint"), Margin + barWidth + 20f, BarTop, WindowWidth - barWidth - Margin * 2f - 20f, 64f);
         Place(Child("Book Title"), Margin, BookTop - 42f, 300f, 26f);
+        // The book shows every skill now, learned or not (keeping the heading's icon, if the kit put one before it).
+        TMP_Text bookTitle = Child("Book Title") != null ? Child("Book Title").GetComponentInChildren<TMP_Text>(true) : null;
+        if (bookTitle != null)
+        {
+            bookTitle.text = bookTitle.text.Replace("Known Skills", "Skill Book");
+        }
 
         // Two framed tabs at the right of the book's title: its sections by type (what slot takes it) or by element.
         UIStyle style = UIStyle.Current;
         const float tabWidth = 150f;
-        float tabX = WindowWidth - Margin - tabWidth * 2f - 8f;
+        float tabX = Margin + BookWidth - tabWidth * 2f - 8f;
         Button type = CodeUI.AddTab("By Type", transform, tabX, BookTop - 48f, tabWidth, 38f, style, out TMP_Text typeLabel, out Image typeShown);
         typeLabel.text = "By Type";
         type.onClick.AddListener(() => GroupBy(false));
@@ -344,7 +525,7 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
         bookGrid.gameObject.AddComponent<RectMask2D>();
         // A clear graphic lets the wheel scroll over the gaps between cards.
         bookGrid.gameObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0f);
-        bookContent = CodeUI.At("Sections", bookGrid, 0f, 0f, WindowWidth - Margin * 2f, 0f);
+        bookContent = CodeUI.At("Sections", bookGrid, 0f, 0f, BookWidth, 0f);
         scroll.content = bookContent;
         scroll.viewport = bookGrid;
         // A bar skill dropped anywhere in the book (between cards, on a heading) is taken off the bar, as on a card (review 2026-11-27:
@@ -357,6 +538,7 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
             }
         };
         ShowGrouping();
+        BuildDetail();
     }
 
     // As tall as the screen allows, above the HUD's skill bar at the bottom (a small game view cut its title off): measured each time
@@ -370,7 +552,15 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
         window.sizeDelta = new Vector2(WindowWidth, windowHeight);
         window.anchoredPosition = new Vector2(window.anchoredPosition.x, (ScreenBottom - ScreenTop) * 0.5f);
         Place(Child("Book Hint"), Margin, windowHeight - FooterHeight + 8f, WindowWidth - Margin * 2f, 22f);
-        Place(bookGrid, Margin, BookTop, WindowWidth - Margin * 2f, windowHeight - BookTop - FooterHeight);
+        Place(bookGrid, Margin, BookTop, BookWidth, windowHeight - BookTop - FooterHeight);
+        if (detail != null)
+        {
+            float height = windowHeight - (BookTop - 48f) - FooterHeight;
+            Place(detail, DetailX, BookTop - 48f, DetailWidth, height);
+            bodyHeight = Mathf.Max(60f, height - 194f - 104f);
+            Place((RectTransform)equipButton.transform, (DetailWidth - 180f) * 0.5f, height - 96f, 180f, 40f);
+            Place(detailHint.rectTransform, 18f, height - 48f, DetailWidth - 36f, 38f);
+        }
     }
 
     // A weapon taken up or put down while the window is open: the weapon-art cards take the new art's name.
@@ -438,16 +628,30 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
 
         bookSlots.Clear();
         bookOrder.Clear();
+        bookRims.Clear();
         UIStyle style = UIStyle.Current;
         float width = bookContent.sizeDelta.x;
         int columns = Mathf.Max(1, Mathf.FloorToInt((width + CardGap) / (CardWidth + CardGap)));
         float y = 0f;
-        foreach (SkillGroup group in SkillGroups.Of(skills.KnownSkills, byElement))
+        // Every skill there is, the known first in each section; those not learned are dark shapes, goals with where they are had.
+        var shown = new List<SkillDefinition>(skills.KnownSkills);
+        foreach (SkillDefinition other in SkillSources.All())
         {
+            if (!shown.Contains(other))
+            {
+                shown.Add(other);
+            }
+        }
+
+        foreach (SkillGroup group in SkillGroups.Of(shown, byElement))
+        {
+            group.Skills.Sort((a, b) => Knows(b).CompareTo(Knows(a)));
+            int knownHere = group.Skills.FindAll(Knows).Count;
             TMP_Text heading = CodeUI.Heading(group.Name, bookContent, 0f, y, width * 0.5f, style);
-            heading.color = group.Colour ?? style.Accent;
+            heading.color = byElement || group.Skills.Count == 0 ? style.Accent : SkillKinds.Colour(group.Skills[0].Kind);
             TMP_Text note = CodeUI.Label("Note", bookContent, width * 0.5f, y + 4f, width * 0.5f, 22f, 14f, style.Muted, TextAlignmentOptions.Right);
-            note.text = group.Note;
+            note.richText = true;
+            note.text = HearthKit.ToneNumbers($"{knownHere}/{group.Skills.Count}  ·  {group.Note}");
             y += SectionHeading;
             for (int i = 0; i < group.Skills.Count; i++)
             {
@@ -462,7 +666,15 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
                 rect.sizeDelta = new Vector2(CardPicture, CardPicture);
                 slot.name = "Skill " + bookOrder.Count;
                 slot.Bind(this, bookOrder.Count);
-                TMP_Text name = CodeUI.Paragraph("Name", card, 0f, CardPicture + 6f, CardWidth, CardHeight - CardPicture - 6f, 14f, style.Text);
+                Image rim = HearthKit.Rim(rect, 1f);
+                rim.color = UIStyle.Current.AccentBright;
+                rim.enabled = false;
+                bookRims.Add(rim);
+                // The kind's colour under the picture, as on the bar's slots.
+                Image kind = CodeUI.At("Kind", card, (CardWidth - 40f) * 0.5f, CardPicture + 3f, 40f, 3f).gameObject.AddComponent<Image>();
+                kind.color = SkillKinds.Colour(skill.Kind);
+                kind.raycastTarget = false;
+                TMP_Text name = CodeUI.Paragraph("Name", card, 0f, CardPicture + 9f, CardWidth, CardHeight - CardPicture - 9f, 14f, Knows(skill) ? style.Text : style.Muted);
                 name.alignment = TextAlignmentOptions.Top;
                 name.text = SkillText.Name(skill);
                 bookSlots.Add(slot);
@@ -520,7 +732,14 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
             ItemDefinition item = skills.Loadout.GetItem(i);
             // A consumable put on the bar from the bag (a skill key over it there).
             barSlots[i].Show(skill != null ? skill.Icon : item != null ? item.Icon : null, Tint(skill), PlayerInputHandler.SkillKeyLabel(i));
-            barSlots[i].SetPlaceholder(skill == null && item == null ? SkillLoadout.SlotBadge(i) : "");
+            // An empty slot's word in the colour of the kind it takes.
+            Color? takes = null;
+            foreach (SkillKind slotKind in SkillLoadout.SlotTakes(i))
+            {
+                takes = SkillKinds.Colour(slotKind); // the last it takes: slot 5's Ultimate, not its Power
+            }
+
+            barSlots[i].SetPlaceholder(skill == null && item == null ? SkillLoadout.SlotBadge(i) : "", takes);
         }
 
         for (int i = 0; i < bookSlots.Count; i++)
@@ -528,7 +747,25 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
             SkillDefinition skill = i < bookOrder.Count ? bookOrder[i] : null;
             int equipped = skills.Loadout.IndexOf(skill);
             bookSlots[i].Show(skill != null ? skill.Icon : null, Tint(skill), equipped >= 0 ? PlayerInputHandler.SkillKeyLabel(equipped) : "");
+            if (skill != null && !Knows(skill))
+            {
+                // Not learned: the locked frame and a grey shape (design review: a dark tint over a dark icon read as an empty slot).
+                bookSlots[i].Show(skill.Icon, Color.clear, "", "?", isLocked: true);
+                bookSlots[i].SetSilhouette();
+            }
+
+            if (i < bookRims.Count)
+            {
+                bookRims[i].enabled = skill != null && skill == selected;
+            }
         }
+
+        if (selected == null || !bookOrder.Contains(selected))
+        {
+            selected = skills.Loadout.Get(0) ?? (skills.KnownSkills.Count > 0 ? skills.KnownSkills[0] : null);
+        }
+
+        ShowDetail();
 
         if (hovered != null && dragSource == null)
         {
@@ -536,5 +773,7 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
         }
     }
 
-    private static Color Tint(SkillDefinition skill) => skill != null ? SkillSchools.ColorOf(skill.School) : Color.clear;
+    // In this window a hue means a kind, one colour one meaning (design review 2026-11-28: the kinds' and the elements' colours were near
+    // twins, so blue meant Technique on the strip and Frost on the frame). The element is named in words.
+    private static Color Tint(SkillDefinition skill) => skill != null ? SkillKinds.Colour(skill.Kind) : Color.clear;
 }

@@ -131,9 +131,68 @@ public sealed partial class CharacterWindow : MonoBehaviour, IItemSlotHandler
         }
 
         UpdateEffects();
+        ShowWhereItFits();
     }
 
     // ----- Slots -----
+
+    // UX pass 2026-11-28 (Docs/MenuUXResearch_2026-11-28.md §2): while a piece is dragged from the bag, the gear slots that can't take it
+    // fade, so the one it goes in stands out before it is dropped.
+    private ItemDefinition fadedFor;
+    private bool anyFaded;
+
+    private void ShowWhereItFits()
+    {
+        ItemDefinition dragged = ItemDrag.Active && ItemDrag.Source != gear ? ItemDrag.Source.GetSlot(ItemDrag.Index).Item : null;
+        if (dragged == fadedFor && (dragged != null || !anyFaded))
+        {
+            return;
+        }
+
+        fadedFor = dragged;
+        anyFaded = dragged != null;
+        foreach (KeyValuePair<GearSlot, ItemSlotView> slot in views)
+        {
+            CanvasGroup group = slot.Value.TryGetComponent(out CanvasGroup had) ? had : slot.Value.gameObject.AddComponent<CanvasGroup>();
+            group.alpha = dragged == null || GearSlots.Accepts(slot.Key, dragged) ? 1f : 0.3f;
+        }
+    }
+
+    // What an empty slot takes, shown faint in it: the plainest piece of its kind there is (Diablo, BG3: a slot's shape says what goes
+    // there before its word). Looked up once.
+    private static Dictionary<GearSlot, Sprite> emptyShapes;
+
+    private static Sprite EmptyShape(GearSlot slot)
+    {
+        if (emptyShapes == null)
+        {
+            emptyShapes = new Dictionary<GearSlot, Sprite>();
+            var lowest = new Dictionary<GearSlot, int>();
+            ContentDatabase content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+            foreach (ItemDefinition item in content != null ? content.Items : (IReadOnlyList<ItemDefinition>)System.Array.Empty<ItemDefinition>())
+            {
+                if (item == null || item.Icon == null)
+                {
+                    continue;
+                }
+
+                for (int i = 0; i < GearSlots.Count; i++)
+                {
+                    var each = (GearSlot)i;
+                    if (GearSlots.Accepts(each, item) && (!lowest.TryGetValue(each, out int tier) || item.Tier < tier))
+                    {
+                        lowest[each] = item.Tier;
+                        emptyShapes[each] = item.Icon;
+                    }
+                }
+            }
+        }
+
+        return emptyShapes.TryGetValue(slot, out Sprite shape) ? shape : null;
+    }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetShapes() => emptyShapes = null;
 
     public void OnSlotClicked(ItemSlotView slot, PointerEventData eventData)
     {
@@ -271,7 +330,10 @@ public sealed partial class CharacterWindow : MonoBehaviour, IItemSlotHandler
         ItemStack stack = gear.GetSlot((int)slot);
         if (stack.IsEmpty)
         {
-            view.Show(null, emptySlotTint, ShortLabel(slot));
+            Sprite shape = EmptyShape(slot);
+            // The frame stays the warm inset of an empty slot (grey is for what is disabled), the shape faint inside it.
+            view.Show(shape, UIStyle.Current.Inset, ShortLabel(slot));
+            view.SetSilhouette(0.3f);
         }
         else
         {

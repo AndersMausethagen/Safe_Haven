@@ -185,7 +185,7 @@ public static class HearthKit
             { "What next", "Star" }, { "Renown", "Star" }, { "Milestones", "Star" }, { "Levels", "Stats" }, { "Expedition", "Lead" },
             { "Raid modifiers", "Crit" }, { "Difficulty", "Crit" }, { "Known dangers", "Skull" }, { "This run", "Hourglass" },
             { "Extra time", "Hourglass" }, { "What it is", "Info" }, { "How it works", "Gear" }, { "Gathering", "Axe" },
-            { "Combat", "Sword" }, { "Stealth", "Eye" }, { "Riding", "HorseHead" }, { "Skill Bar", "Spark" }, { "Known Skills", "Book" },
+            { "Combat", "Sword" }, { "Stealth", "Eye" }, { "Riding", "HorseHead" }, { "Skill Bar", "Spark" }, { "Known Skills", "Book" }, { "Skill Book", "Book" },
             { "Attributes", "Star" }, { "Offense", "Sword" }, { "Resistances", "Barding" },
         };
 

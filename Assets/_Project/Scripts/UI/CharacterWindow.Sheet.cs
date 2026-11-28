@@ -91,7 +91,7 @@ public sealed partial class CharacterWindow
         HearthKit.Section(offense, "Fight", "Sword", 20f, 14f);
         physicalPowerRow = Row(offense, 0, "Damage", "Sword");
         spellPowerRow = Row(offense, 1, "Blows", "Crit");
-        physicalCritRow = Row(offense, 2, "Stamina", "Spark");
+        physicalCritRow = Row(offense, 2, "Stamina", "Bolt");
         spellCritRow = Row(offense, 3, "Dodge", "Weight");
         weaponRow = Row(offense, 4, "Staff and abilities", "Spark");
 
@@ -125,6 +125,11 @@ public sealed partial class CharacterWindow
         }
     }
 
+    private static readonly Color[] ResistanceColours =
+    {
+        new Color(0.86f, 0.72f, 0.42f), new Color(0.96f, 0.5f, 0.25f), new Color(0.55f, 0.78f, 0.95f), new Color(0.6f, 0.8f, 0.4f),
+    };
+
     private static KitStatRow Row(RectTransform card, int index, string name, string icon, bool bar = false) =>
         new KitStatRow(card, 20f, 50f + index * 30f, StatsWidth - 40f, name, icon, bar, 18f, inline: bar, labelWidth: 160f, valueWidth: 110f);
 
@@ -156,7 +161,10 @@ public sealed partial class CharacterWindow
         StatType[] resist = { StatType.PhysicalResistance, StatType.FireResistance, StatType.FrostResistance, StatType.HolyResistance };
         for (int i = 0; i < resist.Length; i++)
         {
-            resistanceRows[i].Set(Percent(rules.ClampResistance(stats.Get(resist[i]))), 0f, style.Text, style.Text);
+            // Each element in its own colour once it guards at all; none is muted, below none is a danger (design review 2026-11-28).
+            float guard = rules.ClampResistance(stats.Get(resist[i]));
+            Color tone = guard < 0f ? style.Danger : guard <= 0f ? style.Muted : ResistanceColours[i];
+            resistanceRows[i].Set($"<color=#{ColorUtility.ToHtmlStringRGB(tone)}>{Percent(guard)}</color>", 0f, style.Text, style.Text);
         }
 
         ToolType[] tools = { ToolType.Axe, ToolType.Pickaxe, ToolType.Sickle };

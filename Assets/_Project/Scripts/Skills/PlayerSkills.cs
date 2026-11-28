@@ -164,6 +164,9 @@ public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
     public SkillLoadout Loadout => loadout;
     public IReadOnlyList<SkillDefinition> KnownSkills => known;
 
+    /// <summary>The starting skills and the weapon techniques (the skill book reads where a skill is learned from them).</summary>
+    public PlayerSkillSettings Settings => settings;
+
     /// <summary>Raised when a skill is cast, with its slot. Animation and the skill bar listen.</summary>
     public event Action<int, SkillDefinition> SkillCast;
 

@@ -150,7 +150,10 @@ public sealed class ItemSlotView : MonoBehaviour,
 
     /// <summary>A faint word centred in the slot while it is empty, saying what goes there ("Tech", "Power"; the skill bar's kinds,
     /// 2026-11-27). Kept on one line, shrunk to fit. Empty or null hides it; it never shows over an icon.</summary>
-    public void SetPlaceholder(string text)
+    public void SetPlaceholder(string text) => SetPlaceholder(text, null);
+
+    /// <summary>The placeholder word in a colour of its own (the skill bar's slot kinds), faint as ever.</summary>
+    public void SetPlaceholder(string text, Color? colour)
     {
         bool show = !string.IsNullOrEmpty(text) && !filled;
         if (placeholder == null)
@@ -180,7 +183,7 @@ public sealed class ItemSlotView : MonoBehaviour,
         }
 
         placeholder.text = show ? text : "";
-        Color muted = UIStyle.Current != null ? UIStyle.Current.Muted : new Color(0.7f, 0.65f, 0.55f);
+        Color muted = colour ?? (UIStyle.Current != null ? UIStyle.Current.Muted : new Color(0.7f, 0.65f, 0.55f));
         muted.a = 0.75f;
         placeholder.color = muted;
         placeholder.enabled = show;
@@ -192,6 +195,16 @@ public sealed class ItemSlotView : MonoBehaviour,
         if (placeholder != null && filled)
         {
             placeholder.enabled = false;
+        }
+    }
+
+    /// <summary>The icon as a dark shape only: something not yet had (a skill not learned), shown as a goal (UX pass 2026-11-28).</summary>
+    public void SetSilhouette(float strength = 0.85f)
+    {
+        if (filled)
+        {
+            // Dark enough to read as not had, light enough that its shape reads on the slot's dark ground.
+            icon.color = new Color(0.46f, 0.42f, 0.37f, strength);
         }
     }
 

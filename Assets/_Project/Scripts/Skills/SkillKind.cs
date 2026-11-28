@@ -63,6 +63,18 @@ public static class SkillKinds
         _ => "Power",
     };
 
+    /// <summary>
+    /// The kind's own colour, the same on the bar's slots, the book's cards and the detail pane (UX pass 2026-11-28, after V Rising's
+    /// typed slots: what a slot takes is read from its colour before any word).
+    /// </summary>
+    public static UnityEngine.Color Colour(SkillKind kind) => kind switch
+    {
+        SkillKind.Technique => new UnityEngine.Color(0.56f, 0.74f, 0.88f),
+        SkillKind.Ultimate => new UnityEngine.Color(0.96f, 0.48f, 0.26f),
+        SkillKind.Art => new UnityEngine.Color(0.86f, 0.72f, 0.42f),
+        _ => new UnityEngine.Color(0.72f, 0.58f, 0.92f),
+    };
+
     /// <summary>One line on what the kind is for and what pays for it.</summary>
     public static string Explain(SkillKind kind) => kind switch
     {
