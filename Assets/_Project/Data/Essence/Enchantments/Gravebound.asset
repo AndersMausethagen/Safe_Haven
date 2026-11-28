@@ -15,6 +15,7 @@ MonoBehaviour:
   id: gravebound
   displayName: Gravebound
   description: 'Barrow-iron in the weave: heavy and cold. +6 armour, 6% slower. Body armour only.'
+  icon: {fileID: 21300000, guid: 055c467d17b6d1543829eeb10091b425, type: 3}
   school: 1
   targets: 32
   cost:

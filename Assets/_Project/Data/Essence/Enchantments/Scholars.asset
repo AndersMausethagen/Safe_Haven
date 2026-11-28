@@ -15,6 +15,7 @@ MonoBehaviour:
   id: scholars
   displayName: Scholar's
   description: 'A bead of something old that listens: you learn a little faster.'
+  icon: {fileID: 21300000, guid: 49c824432c5caa74fa68e58157d3baf2, type: 3}
   school: 0
   targets: 512
   cost:

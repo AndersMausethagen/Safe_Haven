@@ -15,6 +15,7 @@ MonoBehaviour:
   id: thornguard
   displayName: Thornguard
   description: 'A shield that bites: a parried blow strikes back at the one who struck.'
+  icon: {fileID: 21300000, guid: 7788e18588af81f4cb03cad6dcec4355, type: 3}
   school: 0
   targets: 2048
   cost:

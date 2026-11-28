@@ -15,6 +15,7 @@ MonoBehaviour:
   id: bloodprice
   displayName: Blood-Price
   description: 'Old work that takes payment in blood: half the Focus you spend comes back, and 10 health is gone for good while worn.'
+  icon: {fileID: 21300000, guid: e35dfd94358a9c24a821e25e5a0dac5f, type: 3}
   school: 1
   targets: 513
   cost:

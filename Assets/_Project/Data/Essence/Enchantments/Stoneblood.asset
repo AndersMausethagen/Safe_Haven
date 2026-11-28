@@ -15,6 +15,7 @@ MonoBehaviour:
   id: stoneblood
   displayName: Stoneblood
   description: 'The Stone Troll''s blood remembers: brought low, your skin turns to stone.'
+  icon: {fileID: 21300000, guid: 08dedd59fe2acdf48acb31b4d743da5c, type: 3}
   school: 0
   targets: 512
   cost:

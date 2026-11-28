@@ -15,6 +15,7 @@ MonoBehaviour:
   id: stormcall
   displayName: Stormcall
   description: 'The staff remembers lightning: a bolt leaps to a second creature.'
+  icon: {fileID: 21300000, guid: b321abca44e18054abc29fba6bb61cea, type: 3}
   school: 0
   targets: 8192
   cost:

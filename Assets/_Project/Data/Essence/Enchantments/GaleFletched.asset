@@ -15,6 +15,7 @@ MonoBehaviour:
   id: galefletched
   displayName: Gale-Fletched
   description: 'The wind is on your side of the bow: faster draws, harder arrows.'
+  icon: {fileID: 21300000, guid: b6467915af75d9043bd7d2516b2918ea, type: 3}
   school: 0
   targets: 4096
   cost:

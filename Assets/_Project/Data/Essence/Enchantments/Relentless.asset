@@ -15,6 +15,7 @@ MonoBehaviour:
   id: relentless
   displayName: Relentless
   description: Every blow in a row wears a creature's footing more than the last.
+  icon: {fileID: 21300000, guid: c1ba91a059eed77448e1f4b6b07515b1, type: 3}
   school: 0
   targets: 1
   cost:

@@ -15,12 +15,20 @@ MonoBehaviour:
   id: relic.rimetouched
   displayName: Rime-Touched
   description: Cold to hold, and colder to be struck by.
+  icon: {fileID: 21300000, guid: 5f25525d1d3e2734ca2b17caa7060065, type: 3}
   school: 2
   targets: 1
   cost: []
   bonuses: []
   effects:
   - rid: 287758281410609421
+  knownFromStart: 0
+  knownInOldSaves: 0
+  source: 0
+  tier: 1
+  requiredRunecraft: 0
+  great: 0
+  sourceHint: 
   references:
     version: 2
     RefIds:

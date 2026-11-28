@@ -15,6 +15,7 @@ MonoBehaviour:
   id: mossgrown
   displayName: Mossgrown
   description: 'Moss takes root in the seams and holds you together: +4% health.'
+  icon: {fileID: 21300000, guid: 3cfaae14cf42d9c4d963f26ad0810032, type: 3}
   school: 0
   targets: 6
   cost:

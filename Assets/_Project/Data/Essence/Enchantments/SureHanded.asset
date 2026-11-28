@@ -15,6 +15,7 @@ MonoBehaviour:
   id: surehanded
   displayName: Sure-Handed
   description: It finds the gap in the bark.
+  icon: {fileID: 21300000, guid: f4777b7e052e2b04f931c0e93cdc1aa4, type: 3}
   school: 0
   targets: 1
   cost:

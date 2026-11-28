@@ -15,6 +15,7 @@ MonoBehaviour:
   id: spellsung
   displayName: Spellsung
   description: 'The staff hums before it is asked: spells hit harder and cost less stamina.'
+  icon: {fileID: 21300000, guid: c0e555f0b672fe746b76bada29b66b3f, type: 3}
   school: 0
   targets: 8192
   cost:

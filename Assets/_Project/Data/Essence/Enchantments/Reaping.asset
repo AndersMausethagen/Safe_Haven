@@ -15,6 +15,7 @@ MonoBehaviour:
   id: reaping
   displayName: Reaping
   description: Whatever the forest gave them, it takes back with interest.
+  icon: {fileID: 21300000, guid: e94ee4ae627ebab45967579fee75c029, type: 3}
   school: 1
   targets: 5
   cost:

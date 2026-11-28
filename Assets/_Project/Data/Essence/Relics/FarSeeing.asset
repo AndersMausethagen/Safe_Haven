@@ -15,12 +15,20 @@ MonoBehaviour:
   id: relic.farseeing
   displayName: Far-Seeing
   description: The mist seems to step aside for it.
+  icon: {fileID: 21300000, guid: f52bda53836493c4b847c96b8e2a37e7, type: 3}
   school: 2
   targets: 6
   cost: []
   bonuses: []
   effects:
   - rid: 287758281410609419
+  knownFromStart: 0
+  knownInOldSaves: 0
+  source: 0
+  tier: 1
+  requiredRunecraft: 0
+  great: 0
+  sourceHint: 
   references:
     version: 2
     RefIds:

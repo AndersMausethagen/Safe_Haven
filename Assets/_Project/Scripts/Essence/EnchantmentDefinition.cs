@@ -77,6 +77,8 @@ public sealed class EnchantmentDefinition : ScriptableObject
     [Tooltip("Goes before the item's name: Hearthbound Iron Helm. Falls back to the asset name when empty.")]
     [SerializeField] private string displayName;
     [SerializeField, TextArea(2, 3)] private string description;
+    [Tooltip("Its painted icon (Tools/LocalSpawn/enchantment_icons.json, --set enchantments): the altar's cards and the stage.")]
+    [SerializeField] private Sprite icon;
     [SerializeField] private EssenceSchool school;
     [SerializeField] private EnchantTarget targets;
     [SerializeField] private List<ResourceAmount> cost = new List<ResourceAmount>();
@@ -104,6 +106,7 @@ public sealed class EnchantmentDefinition : ScriptableObject
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public string Description => description;
+    public Sprite Icon => icon;
     public EssenceSchool School => school;
     public EnchantTarget Targets => targets;
     public IReadOnlyList<ResourceAmount> Cost => cost;

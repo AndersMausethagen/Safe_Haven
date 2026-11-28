@@ -15,6 +15,7 @@ MonoBehaviour:
   id: rootbinder
   displayName: Rootbinder
   description: 'The old troll''s moss in the grain: heavy blows root what they strike.'
+  icon: {fileID: 21300000, guid: 53a5b221a8f62a04e8951538c851caf0, type: 3}
   school: 0
   targets: 1
   cost:

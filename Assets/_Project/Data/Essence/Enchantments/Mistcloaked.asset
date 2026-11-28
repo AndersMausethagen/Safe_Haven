@@ -15,6 +15,7 @@ MonoBehaviour:
   id: mistcloaked
   displayName: Mistcloaked
   description: 'A perfect dodge leaves mist behind, and you in it: an ambush is possible again.'
+  icon: {fileID: 21300000, guid: 527137f7495e1e041b32b63d10801adf, type: 3}
   school: 0
   targets: 1536
   cost:

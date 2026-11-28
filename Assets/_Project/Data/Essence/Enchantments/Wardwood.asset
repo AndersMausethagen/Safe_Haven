@@ -15,6 +15,7 @@ MonoBehaviour:
   id: wardwood
   displayName: Wardwood
   description: 'The shield drinks the blow: blocking costs less stamina.'
+  icon: {fileID: 21300000, guid: 099450d4d6933d64e9d399cb749bc1a9, type: 3}
   school: 0
   targets: 2048
   cost:

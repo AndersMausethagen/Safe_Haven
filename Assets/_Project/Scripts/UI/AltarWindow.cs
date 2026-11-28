@@ -119,7 +119,12 @@ public sealed class AltarWindow : MonoBehaviour
             detail = Label("Detail", rect, 66f, 31f, width - 76f, 24f, 16f, style.Muted);
         }
 
-        public void Bind(string shownTitle, string shownDetail, Sprite picture, bool selected, bool dim)
+        public void Bind(string shownTitle, string shownDetail, Sprite picture, bool selected, bool dim) =>
+            Bind(shownTitle, shownDetail, picture, selected, dim, null, false);
+
+        /// <summary>A row with its picture, its frame in <paramref name="kind"/>'s colour (a great, cursed or relic enchantment), and the
+        /// picture as a dark shape when <paramref name="unknown"/> (not learned yet: a goal).</summary>
+        public void Bind(string shownTitle, string shownDetail, Sprite picture, bool selected, bool dim, Color? kind, bool unknown)
         {
             UIStyle style = UIStyle.Current;
             float left = picture != null ? 66f : 16f;
@@ -130,9 +135,11 @@ public sealed class AltarWindow : MonoBehaviour
             detail.text = shownDetail;
             icon.gameObject.SetActive(picture != null);
             icon.sprite = picture;
-            // The chosen row lit and rimmed in gold, the rest dark leather with a faint rim.
+            icon.color = unknown ? new Color(0.46f, 0.42f, 0.37f, 0.75f) : Color.white;
+            // The chosen row lit and rimmed, the rest dark leather with a faint rim, both in the row's kind's colour.
+            Color edge = kind ?? style.Accent;
             fill.color = selected ? Color.Lerp(style.Inset, style.AccentDeep, 0.4f) : style.Inset;
-            rim.color = selected ? style.Accent : HearthKit.Faded(style.Accent, 0.2f);
+            rim.color = selected ? edge : HearthKit.Faded(edge, kind.HasValue ? 0.5f : 0.2f);
         }
     }
 
@@ -257,6 +264,14 @@ public sealed class AltarWindow : MonoBehaviour
             SettlementSettings settings = SettlementSettings.Current;
             float share = settlement.PurificationQueued > 0 ? settlement.PurificationProgress / settings.SecondsPerBatch : 0f;
             KitBar.Set(queueFill, queueFillImage, Mathf.Clamp01(share), UIStyle.Current.Accent);
+            if (purifyStage != null)
+            {
+                // Red going to green as the batch comes clean; the cursed essence's picture on it.
+                UIStyle style = UIStyle.Current;
+                purifyStage.Working = settlement.PurificationQueued > 0 ? Mathf.Clamp01(share) : 0f;
+                ResourceDefinition shownEssence = share > 0.5f ? settings.PurifiedEssence : settings.CursedEssence;
+                purifyStage.Show(shownEssence != null ? shownEssence.Icon : null, settlement.PurificationQueued > 0 ? Color.Lerp(style.Danger, style.Good, share) : style.Danger);
+            }
         }
     }
 
@@ -350,20 +365,59 @@ public sealed class AltarWindow : MonoBehaviour
         subjectRows.Show(subjects.Count, (row, i) => row.Bind(subjects[i].Title, subjects[i].Detail, subjects[i].Icon, i == subjectIndex, false));
         List<AltarOffer> offers = subjects.Count > 0 ? subjects[subjectIndex].Offers : new List<AltarOffer>();
         offerIndex = Mathf.Clamp(offerIndex, 0, Mathf.Max(0, offers.Count - 1));
-        offerRows.Show(offers.Count, (row, i) => row.Bind(offers[i].Done ? $"{offers[i].Title}  <size=75%>Done</size>" : offers[i].Title, offers[i].Detail, null, i == offerIndex, offers[i].Done));
+        offerRows.Show(offers.Count, (row, i) => row.Bind(offers[i].Done ? $"{offers[i].Title}  <size=75%>Done</size>" : offers[i].Title, offers[i].Detail,
+            offers[i].Picture, i == offerIndex, offers[i].Done, KindColour(offers[i].Kind), offers[i].Kind == AltarOfferKind.Unknown));
         DrawOffer(offers.Count > 0 ? offers[offerIndex] : null, subjects.Count > 0 ? subjects[subjectIndex].Icon : null);
     }
 
-    // The chosen offer, under the picture of what it is worked on (none for a skill without one).
+    // An offer's kind as a colour: a great one bright gold, a cursed one red, a relic's old bronze, an unknown one grey; null for plain.
+    private static Color? KindColour(AltarOfferKind kind)
+    {
+        UIStyle style = UIStyle.Current;
+        switch (kind)
+        {
+            case AltarOfferKind.Great: return style.AccentBright;
+            case AltarOfferKind.Cursed: return style.Danger;
+            case AltarOfferKind.Relic: return new Color(0.55f, 0.72f, 0.52f);
+            case AltarOfferKind.Unknown: return style.Inactive;
+            default: return null;
+        }
+    }
+
+    // The chosen offer: on the stage (its own picture, else what it is worked on) in its kind's colour, its words, cost and button below.
     private void DrawOffer(AltarOffer offer, Sprite picture)
     {
+        UIStyle style = UIStyle.Current;
+        if (offer != shownOffer && offer != null && shownOffer != null)
+        {
+            stage.Selected();
+        }
+
         shownOffer = offer;
         bool any = offer != null;
-        bool framed = any && picture != null;
-        offerIconFrame.gameObject.SetActive(framed);
-        offerIcon.sprite = picture;
-        offerEffect.rectTransform.anchoredPosition = new Vector2(framed ? OfferX + 66f : OfferX, -(BodyTop + 8f));
-        offerEffect.rectTransform.sizeDelta = new Vector2(framed ? OfferWidth - 66f : OfferWidth, offerEffect.rectTransform.sizeDelta.y);
+        Sprite shown = any && offer.Picture != null && offer.Kind != AltarOfferKind.Unknown ? offer.Picture : picture;
+        Color colour = any && page == Page.Enchant ? KindColour(offer.Kind) ?? style.Accent : page == Page.Skills ? style.AccentBright : style.Accent;
+        stage.Show(any ? shown : null, colour);
+        // Empowering and deepening are steps: how many are held, of how many, as pips under the ring.
+        List<AltarOffer> steps = subjects.Count > subjectIndex ? subjects[subjectIndex].Offers : null;
+        int held = 0, total = 0;
+        if (steps != null && page != Page.Enchant)
+        {
+            foreach (AltarOffer step in steps)
+            {
+                // A skill's choices are not ranks.
+                if (page == Page.Skills && step.Kind == AltarOfferKind.Great)
+                {
+                    continue;
+                }
+
+                total++;
+                held += step.Done ? 1 : 0;
+            }
+        }
+
+        stage.SetPips(held, total);
+        offerIconFrame.gameObject.SetActive(false);
         offerEffect.gameObject.SetActive(any);
         costHeading.gameObject.SetActive(any);
         offerCost.gameObject.SetActive(any);
@@ -377,7 +431,8 @@ public sealed class AltarWindow : MonoBehaviour
         offerEffect.text = offer.Effect;
         offerCost.text = CostLines(offer.Cost);
         offerProblem.text = offer.Problem ?? "";
-        applyLabel.text = offer.Verb;
+        applyLabel.richText = true;
+        applyLabel.text = offer.Problem == null ? $"{offer.Verb}  <size=70%>hold</size>" : offer.Verb;
         applyButton.interactable = offer.Problem == null;
     }
 
@@ -432,7 +487,12 @@ public sealed class AltarWindow : MonoBehaviour
         {
             shownOffer.Apply?.Invoke();
             Read();
-            offerIndex = FirstOpenOffer();
+            // A level or a rank goes on to the next step; an enchantment stays chosen, so what was carved is what is seen.
+            if (page != Page.Enchant)
+            {
+                offerIndex = FirstOpenOffer();
+            }
+
             Read();
         }
     }
@@ -501,6 +561,8 @@ public sealed class AltarWindow : MonoBehaviour
         AddButton("Purify One", page, Margin, BodyTop + 170f, 180f, UIRole.Kind.Button, () => Purify(1), out purifyOne).text = "Purify one";
         purifyAllLabel = AddButton("Purify All", page, Margin + 192f, BodyTop + 170f, 240f, UIRole.Kind.PrimaryButton, () => Purify(SettlementSettings.Current.MaxQueuedBatches), out purifyAll);
         warningLine = Paragraph("Warning", page, Margin, BodyTop + 232f, 560f, 56f, 19f, style.Warning);
+        // The essence on its own stage: cursed red at rest, its ring turning toward purified green while the queue works.
+        purifyStage = AltarStage.Build((RectTransform)page, Margin + 190f, BodyTop + 292f, 180f);
 
         Hairline(page, 624f, BodyTop, 1f, BodyBottom - BodyTop, style);
         Heading("What essence buys", page, 644f, BodyTop, 552f, style);
@@ -530,6 +592,14 @@ public sealed class AltarWindow : MonoBehaviour
     {
         if (AltarWork.Purify(viewer, batches))
         {
+            // Purifying is done often: the sound carries it (Path of Exile's lesson), no ceremony.
+            if (AltarFeel.Current.Purify != null)
+            {
+                AudioManager.Play(AltarFeel.Current.Purify, viewer != null ? viewer.transform.position : Vector3.zero);
+            }
+
+            purifyStage?.Pulse(batches > 1 ? AltarMoment.Large : AltarMoment.Small, batches > 1 ? $"{batches} batches to the queue" : "One batch to the queue");
+
             Read();
         }
     }
@@ -559,12 +629,40 @@ public sealed class AltarWindow : MonoBehaviour
         offerIcon = inner.gameObject.AddComponent<Image>();
         offerIcon.preserveAspect = true;
         offerIcon.raycastTarget = false;
-        offerEffect = Paragraph("Effect", page, OfferX, BodyTop + 8f, OfferWidth, 240f, 19f, style.Text);
-        costHeading = Heading("Cost", page, 864f, BodyTop + 258f, 316f, style);
-        offerCost = Paragraph("Costs", page, 864f, BodyTop + 288f, 316f, 84f, 19f, style.Text);
-        offerProblem = Paragraph("Problem", page, 864f, BodyTop + 374f, 316f, 42f, 17f, style.Warning);
+        // The stage (Docs/AltarUXResearch_2026-11-28.md): what is worked on, large in its ring of runes, over its words and cost.
+        const float stageSize = 170f;
+        float cardX = 848f, cardWidth = Width - Margin - 848f;
+        stage = AltarStage.Build((RectTransform)page, cardX + (cardWidth - stageSize) * 0.5f, BodyTop + 4f, stageSize);
+        offerEffect = Paragraph("Effect", page, OfferX, BodyTop + 182f, OfferWidth, 92f, 17f, style.Text);
+        offerEffect.enableAutoSizing = true;
+        offerEffect.fontSizeMin = 13f;
+        offerEffect.fontSizeMax = 17f;
+        costHeading = Heading("Cost", page, 864f, BodyTop + 280f, 316f, style);
+        offerCost = Paragraph("Costs", page, 864f, BodyTop + 308f, 316f, 72f, 18f, style.Text);
+        offerProblem = Paragraph("Problem", page, 864f, BodyTop + 382f, 316f, 40f, 16f, style.Warning);
         applyLabel = AddButton("Apply", page, 848f, BodyBottom - 48f, Width - Margin - 848f, UIRole.Kind.PrimaryButton, Apply, out applyButton);
+        // Held, not clicked: the stage charges while it is held and answers when it is done.
+        stage.Attach(applyButton, () => shownOffer != null && shownOffer.Problem == null, Apply,
+            () => (shownOffer != null ? shownOffer.Moment : AltarMoment.Small, ResultLine()));
     }
+
+    // What the stage says when a working is done.
+    private string ResultLine()
+    {
+        if (shownOffer == null || subjectIndex >= subjects.Count)
+        {
+            return "";
+        }
+
+        string what = StripTags(shownOffer.Title);
+        string subject = StripTags(subjects[subjectIndex].Title);
+        return page == Page.Empower ? $"{subject} {what}" : page == Page.Enchant ? $"{what} is carved" : $"{subject}: {what}";
+    }
+
+    private static string StripTags(string text) => System.Text.RegularExpressions.Regex.Replace(text ?? "", "<[^>]+>", "").Trim();
+
+    private AltarStage stage;
+    private AltarStage purifyStage;
 
     private static float HorizontalDistance(Vector3 a, Vector3 b)
     {

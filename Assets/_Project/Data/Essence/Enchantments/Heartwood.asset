@@ -15,6 +15,7 @@ MonoBehaviour:
   id: heartwood
   displayName: Heartwood
   description: 'Cut from what grew under the roots: a kill with a weapon art gives its Focus back.'
+  icon: {fileID: 21300000, guid: 49e5922f122d2b144a423fc9d60e746f, type: 3}
   school: 0
   targets: 1
   cost:

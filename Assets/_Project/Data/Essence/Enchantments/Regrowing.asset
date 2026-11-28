@@ -15,6 +15,7 @@ MonoBehaviour:
   id: regrowing
   displayName: Regrowing
   description: 'What the Regrowing ones do to wounds: striking back wins more of a hit back.'
+  icon: {fileID: 21300000, guid: 6385e0416b588554197b97b4e6983bd8, type: 3}
   school: 0
   targets: 1536
   cost:

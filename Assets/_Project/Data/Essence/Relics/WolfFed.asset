@@ -15,6 +15,7 @@ MonoBehaviour:
   id: relic.wolffed
   displayName: Wolf-Fed
   description: It takes something from every death, and shares it with you.
+  icon: {fileID: 21300000, guid: 6635309521a8f5341bd3fd6a28c75ce6, type: 3}
   school: 2
   targets: 1
   cost: []
@@ -24,6 +25,13 @@ MonoBehaviour:
     value: -10
   effects:
   - rid: 287758281410609414
+  knownFromStart: 0
+  knownInOldSaves: 0
+  source: 0
+  tier: 1
+  requiredRunecraft: 0
+  great: 0
+  sourceHint: 
   references:
     version: 2
     RefIds:

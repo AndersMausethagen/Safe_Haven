@@ -15,6 +15,7 @@ MonoBehaviour:
   id: ironhide
   displayName: Ironhide
   description: 'The hide of the Ironhide elites, worked into iron: +5 armour, 4% slower. Body armour only.'
+  icon: {fileID: 21300000, guid: 7b3fc82e77164c44ca1200487e8bd98f, type: 3}
   school: 1
   targets: 32
   cost:

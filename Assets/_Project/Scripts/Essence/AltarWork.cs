@@ -19,6 +19,30 @@ public sealed class AltarOffer
     public string Problem;
     /// <summary>Pays and does it.</summary>
     public Action Apply;
+    /// <summary>Its own picture (an enchantment's painted icon), or null: the window shows the subject's.</summary>
+    public Sprite Picture;
+    /// <summary>What it is, for its frame's colour (Docs/AltarUXResearch_2026-11-28.md).</summary>
+    public AltarOfferKind Kind;
+    /// <summary>How big its moment is when it is done: a step, a working that matters, or a great one.</summary>
+    public AltarMoment Moment;
+}
+
+/// <summary>An offer's kind at the altar, read by its frame: a plain one, a great one, a cursed one, a relic's, not yet known.</summary>
+public enum AltarOfferKind
+{
+    Plain = 0,
+    Great = 1,
+    Cursed = 2,
+    Relic = 3,
+    Unknown = 4,
+}
+
+/// <summary>How much ceremony a working gets (Diablo IV: a short pulse for a step, the long reveal only for what matters).</summary>
+public enum AltarMoment
+{
+    Small = 0,
+    Large = 1,
+    Milestone = 2,
 }
 
 /// <summary>Something at the altar to work on: a piece of gear or a skill, with what can be done to it.</summary>
@@ -156,6 +180,8 @@ public static class AltarWork
                     Verb = $"Empower to +{level}",
                     Cost = GearPower.EmpowerCost(stack.Item, level, recipe, purified, settings),
                     Done = level <= stack.Empower,
+                    // The first level is a step; the higher ones matter more, the last is a milestone.
+                    Moment = level >= settings.EmpowerLevels.Count ? AltarMoment.Milestone : level > 1 ? AltarMoment.Large : AltarMoment.Small,
                 };
                 offer.Problem = offer.Done ? "It already holds this." : level > stack.Empower + 1 ? $"Reach +{stack.Empower + 1} first." : Missing(user, offer.Cost);
                 ItemDefinition priced = stack.Item;
@@ -260,6 +286,11 @@ public static class AltarWork
                      (cursed ? "\nRaw Cursed Essence: stronger, and it always takes its price." : ""),
             Verb = stack.Enchantment != null ? $"Replace {stack.Enchantment.DisplayName}" : "Enchant",
             Done = stack.Enchantment == enchantment,
+            Picture = enchantment.Icon,
+            Kind = !known ? AltarOfferKind.Unknown : enchantment.IsRelic ? AltarOfferKind.Relic : cursed ? AltarOfferKind.Cursed
+                : enchantment.IsGreat ? AltarOfferKind.Great : AltarOfferKind.Plain,
+            // An enchantment always matters; a great or cursed one is a milestone.
+            Moment = enchantment.IsGreat || cursed ? AltarMoment.Milestone : AltarMoment.Large,
         };
         offer.Cost.Resources.AddRange(enchantment.Cost);
         offer.Problem = offer.Done ? "It already carries this."
@@ -370,6 +401,8 @@ public static class AltarWork
                              $"Cooldown {skill.Cooldown * (1f - step.cooldownCut):0.#} s. Power counts for its damage, healing and buffs.",
                     Verb = $"Deepen to rank {Roman(target)}",
                     Done = target <= rank,
+                    Picture = skill.Icon,
+                    Moment = target >= settings.SkillRanks.Count ? AltarMoment.Milestone : AltarMoment.Large,
                 };
                 // Mastery: an ability cast often enough earns the rank without essence.
                 int uses = GameSession.Progress.UsesOf(skill);
@@ -433,6 +466,9 @@ public static class AltarWork
                          $"{Roman(option.rank)}; free to change here.</color>",
                 Verb = taken ? "Chosen" : replaced != null ? "Change to this" : "Choose",
                 Done = taken,
+                Picture = skill.Icon,
+                Kind = AltarOfferKind.Great,
+                Moment = AltarMoment.Large,
             };
             if (replaced != null)
             {

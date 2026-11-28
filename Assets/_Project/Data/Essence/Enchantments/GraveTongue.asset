@@ -15,6 +15,7 @@ MonoBehaviour:
   id: gravetongue
   displayName: Grave-Tongue
   description: 'It speaks to the dead, and they answer: far more Cursed Essence, and the living notice you sooner.'
+  icon: {fileID: 21300000, guid: 3f87f1e43fbb14242bc40fca284d9ca5, type: 3}
   school: 1
   targets: 1024
   cost:

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f49be10ecb19bfa4999d0fb8f2a99154, type: 3}
+  m_Name: AltarFeel
+  m_EditorClassIdentifier: SafeHaven::AltarFeel
+  charge: {fileID: 11400000, guid: 187a03f14186e8643a3ee84a9e0864ce, type: 2}
+  cancel: {fileID: 11400000, guid: a0dc84c4388dc9a49aeb6a00a1710fff, type: 2}
+  commitSmall: {fileID: 11400000, guid: bf059b5c2b4d2824883e6681b28a25fe, type: 2}
+  commitLarge: {fileID: 11400000, guid: 1606ad561b8793c4ea7e2b49290621e8, type: 2}
+  commitMilestone: {fileID: 11400000, guid: 4846b5e294a70914fbd09dce1df0a7fd, type: 2}
+  tick: {fileID: 11400000, guid: 824f373c547a4cb4a811ae2f29932a77, type: 2}
+  select: {fileID: 11400000, guid: 7073619245ec68f49b2d44abb0b7797e, type: 2}
+  purify: {fileID: 11400000, guid: e72715ebb538dea4e9eea2099e4408d9, type: 2}
+  glyphRing: {fileID: 21300000, guid: 3884be9274133e840b503cec1fc068de, type: 3}
+  glow: {fileID: 21300000, guid: 91848034d135cb943b47d8f5bb4f96c0, type: 3}
+  spark: {fileID: 21300000, guid: b50b4ca7c531c8e4bacc50aad7153361, type: 3}
+  shock: {fileID: 21300000, guid: 8d4b5534ff90fdc439f095de63d001fa, type: 3}
+  holdSeconds: 0.7
+  ringTurn: 8
+  sparks: 12

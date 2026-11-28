@@ -15,6 +15,7 @@ MonoBehaviour:
   id: vengeful
   displayName: Vengeful
   description: 'What you kill doesn''t go quietly: it bursts, and hurts what stood beside it.'
+  icon: {fileID: 21300000, guid: 6aa441ea2085814498a19a2b159b3487, type: 3}
   school: 0
   targets: 1
   cost:

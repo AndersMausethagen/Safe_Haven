@@ -15,6 +15,7 @@ MonoBehaviour:
   id: ridersheel
   displayName: Rider's Heel
   description: 'A horse knows these boots: galloping costs it less.'
+  icon: {fileID: 21300000, guid: e7e6cc9eae43f4b4dae7c158d2dc0d71, type: 3}
   school: 0
   targets: 256
   cost:

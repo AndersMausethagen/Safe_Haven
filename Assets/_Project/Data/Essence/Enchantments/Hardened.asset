@@ -15,6 +15,7 @@ MonoBehaviour:
   id: hardened
   displayName: Hardened
   description: 'The helm turns a point aside: stabbing blows hurt you less.'
+  icon: {fileID: 21300000, guid: f41905955bab98d44a016f0ea78ceb94, type: 3}
   school: 0
   targets: 16
   cost:

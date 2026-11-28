@@ -15,6 +15,7 @@ MonoBehaviour:
   id: relic.twiceburied
   displayName: Twice-Buried
   description: Someone has already died in this, and it didn't take.
+  icon: {fileID: 21300000, guid: de21d89d398acad458085f055ad9169b, type: 3}
   school: 2
   targets: 6
   cost: []
@@ -24,6 +25,13 @@ MonoBehaviour:
     value: -5
   effects:
   - rid: 287758281410609416
+  knownFromStart: 0
+  knownInOldSaves: 0
+  source: 0
+  tier: 1
+  requiredRunecraft: 0
+  great: 0
+  sourceHint: 
   references:
     version: 2
     RefIds:

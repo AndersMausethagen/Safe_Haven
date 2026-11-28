@@ -51,12 +51,17 @@ public sealed class JournalTests
         var progress = new CharacterProgress();
         var shelves = JournalContent.Creatures(Settings, progress, out string summary);
         Assert.IsEmpty(shelves[0].Entries, "Nothing has been met yet.");
+        // Its name and pages stay unwritten; since the UX pass of 2026-11-28 its shape shows, as a silhouette (a goal, not a blank).
+        int checkedEntries = 0;
         foreach (HavenEntry entry in shelves[1].Entries)
         {
             Assert.AreEqual(JournalContent.UnknownName, entry.Name);
-            Assert.IsNull(entry.Icon);
+            Assert.IsTrue(entry.Icon == null || entry.Silhouette, "an unmet creature's picture is only its shape");
             Assert.IsEmpty(entry.Details);
+            checkedEntries++;
         }
+
+        Assert.Greater(checkedEntries, 0);
 
         MonsterDefinition wolf = Settings.Creatures[0];
         progress.NoteMet(wolf.Id);

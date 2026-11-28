@@ -15,6 +15,7 @@ MonoBehaviour:
   id: hunterseye
   displayName: Hunter's Eye
   description: 'The arrow finds the soft place: arrows hit harder.'
+  icon: {fileID: 21300000, guid: 1345eb2baf508754a8366bb896416368, type: 3}
   school: 0
   targets: 1024
   cost:

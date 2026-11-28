@@ -15,6 +15,7 @@ MonoBehaviour:
   id: greedy
   displayName: Greedy
   description: It tears out more than it should.
+  icon: {fileID: 21300000, guid: 49f6ecc58c7bb0942b4153a53327a291, type: 3}
   school: 1
   targets: 8
   cost:

@@ -205,14 +205,20 @@ public static class JournalContent
             }
             else
             {
+                // Its shape only, dark, and where it is said to be (UX pass 2026-11-28, Hades' codex: a page not yet written is a goal,
+                // not a blank); its name and everything else wait until it is met.
+                bool told = !string.IsNullOrWhiteSpace(creature.JournalHabitat);
                 unknown.Entries.Add(new HavenEntry
                 {
                     Key = creature,
                     Name = UnknownName,
-                    Line = "Not met yet",
+                    Line = told ? "Not met yet: its shape is known" : "Not met yet",
+                    Icon = creature.Portrait,
+                    Silhouette = true,
                     State = HavenEntryState.Locked,
                     Status = "Not met yet",
-                    Description = "Nothing is written here yet. Whatever it is, you haven't met it and lived to write it down.",
+                    Description = told ? $"Nothing is written here yet, but the tales say where to look: {creature.JournalHabitat}"
+                        : "Nothing is written here yet. Whatever it is, you haven't met it and lived to write it down.",
                 });
             }
         }

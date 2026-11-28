@@ -15,6 +15,7 @@ MonoBehaviour:
   id: softshod
   displayName: Soft-Shod
   description: 'Steps like moss on moss: sneaking, you make less noise.'
+  icon: {fileID: 21300000, guid: b11633eecb8dc7447a3860d9dcee240a, type: 3}
   school: 0
   targets: 256
   cost:

@@ -15,6 +15,7 @@ MonoBehaviour:
   id: keen
   displayName: Keen
   description: 'An edge that wants the gap in the armour: critical hits strike harder.'
+  icon: {fileID: 21300000, guid: 3688c270acd473f4c918ecdba32247b5, type: 3}
   school: 0
   targets: 1
   cost:

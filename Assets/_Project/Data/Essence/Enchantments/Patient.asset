@@ -15,6 +15,7 @@ MonoBehaviour:
   id: patient
   displayName: Patient
   description: It takes what is offered and wears slowly.
+  icon: {fileID: 21300000, guid: 5e734babb23f6d149b9c6dcf851bf3f4, type: 3}
   school: 0
   targets: 8
   cost:

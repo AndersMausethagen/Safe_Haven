@@ -15,6 +15,7 @@ MonoBehaviour:
   id: frostwarded
   displayName: Frostwarded
   description: The cold finds nothing to hold on to.
+  icon: {fileID: 21300000, guid: f11489832a5337244a71e90071a24689, type: 3}
   school: 0
   targets: 6
   cost:

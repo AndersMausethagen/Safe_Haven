@@ -15,6 +15,7 @@ MonoBehaviour:
   id: watchful
   displayName: Watchful
   description: 'The Watchful ones see and are not seen: sneaking, you are seen and heard less.'
+  icon: {fileID: 21300000, guid: 1153ac0a20d35d24fa8ebbf9770258ce, type: 3}
   school: 0
   targets: 16
   cost:

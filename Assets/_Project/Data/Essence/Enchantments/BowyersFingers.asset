@@ -15,6 +15,7 @@ MonoBehaviour:
   id: bowyersfingers
   displayName: Bowyer's Fingers
   description: 'The string comes back to you sooner: bows draw faster.'
+  icon: {fileID: 21300000, guid: c2165bef79ef5d94694b53b6b5ec3fd4, type: 3}
   school: 0
   targets: 64
   cost:

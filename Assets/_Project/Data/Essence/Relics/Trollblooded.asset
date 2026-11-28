@@ -15,6 +15,7 @@ MonoBehaviour:
   id: relic.trollblooded
   displayName: Trollblooded
   description: 'It knits flesh the way moss covers stone: slowly, and without being asked.'
+  icon: {fileID: 21300000, guid: 25400c4197047e649ac76f7765a182af, type: 3}
   school: 2
   targets: 2
   cost: []
@@ -24,6 +25,13 @@ MonoBehaviour:
     value: -0.06
   effects:
   - rid: 287758281410609420
+  knownFromStart: 0
+  knownInOldSaves: 0
+  source: 0
+  tier: 1
+  requiredRunecraft: 0
+  great: 0
+  sourceHint: 
   references:
     version: 2
     RefIds:

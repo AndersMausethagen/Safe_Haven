@@ -15,6 +15,7 @@ MonoBehaviour:
   id: hearthbound
   displayName: Hearthbound
   description: The warmth of the home fire, worked into the seams.
+  icon: {fileID: 21300000, guid: 1e71cce18486fb845a80cb521dcbb5aa, type: 3}
   school: 0
   targets: 2050
   cost:

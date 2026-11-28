@@ -15,6 +15,7 @@ MonoBehaviour:
   id: bloodletting
   displayName: Bloodletting
   description: 'It cuts whoever holds it, a little, always: +10% damage, and 15 health.'
+  icon: {fileID: 21300000, guid: 09b4404ee857d784692e5894c6d3b6ac, type: 3}
   school: 1
   targets: 1
   cost:

@@ -15,6 +15,7 @@ MonoBehaviour:
   id: steadygrip
   displayName: Steady Grip
   description: 'Hands that don''t shake behind a guard: blocking costs less stamina.'
+  icon: {fileID: 21300000, guid: f97b084475389274d938753981ee188c, type: 3}
   school: 0
   targets: 64
   cost:
