@@ -46,8 +46,24 @@ public sealed class QuestTrackerView : MonoBehaviour
     private bool timed;
     private bool wasOnARaid;
 
+    private CanvasGroup fade;
+
     private void Update()
     {
+        // Out of the way while someone is talked to (The Witcher 3, Red Dead Redemption 2): the speaker's bubble and the answers sat
+        // over its lines (review 2026-11-28).
+        GameObject shown = panel != null ? panel : label != null ? label.gameObject : null;
+        if (shown != null)
+        {
+            if (fade == null && !shown.TryGetComponent(out fade))
+            {
+                fade = shown.AddComponent<CanvasGroup>();
+                fade.blocksRaycasts = false;
+            }
+
+            fade.alpha = Mathf.MoveTowards(fade.alpha, DialogueBox.IsOpen ? 0f : 1f, Time.unscaledDeltaTime * 4f);
+        }
+
         bool onARaid = RaidDirector.Current != null;
         if (onARaid != wasOnARaid || HudRules.Current != writtenFor)
         {

@@ -259,12 +259,13 @@ public sealed class StationUpgradeTab
         RectTransform frame = HearthKit.Card(rect, "Picture Frame", 12f, 12f, 76f, 76f, 0.55f, style.Panel, 1.6f);
         row.Picture = PictureOf(frame, 6f, 6f, 64f);
         float textX = 104f;
-        float textWidth = width - textX - 160f;
+        // Room for the effect to stay readable (review 2026-11-28: it shrank to about 10 px, "+2 queue" read as "-2").
+        float textWidth = width - textX - 136f;
         row.Name = CodeUI.Label("Name", rect, textX, 8f, textWidth, 30f, 20f, style.Text);
         style.Title(row.Name);
         row.Effect = CodeUI.Paragraph("Effect", rect, textX, 36f, textWidth, 34f, 14f, style.Muted);
         row.Effect.enableAutoSizing = true;
-        row.Effect.fontSizeMin = 11f;
+        row.Effect.fontSizeMin = 12.5f;
         row.Effect.fontSizeMax = 14f;
         row.Note = CodeUI.Label("Note", rect, textX, 70f, textWidth, 24f, 14f, style.Danger);
         for (int i = 0; i < 4; i++)
@@ -272,7 +273,7 @@ public sealed class StationUpgradeTab
             row.Chips.Add(Chip(rect, textX + i * 70f, 70f, 66f, 24f, 20f, 13f));
         }
 
-        row.Fit = new KitButton(rect, width - 146f, (RowHeight - 46f) * 0.5f, 132f, 46f, Choose, KitButtonShape.Compact);
+        row.Fit = new KitButton(rect, width - 124f, (RowHeight - 46f) * 0.5f, 112f, 46f, Choose, KitButtonShape.Compact);
         moduleRows.Add(row);
         return row;
     }

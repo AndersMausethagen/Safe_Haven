@@ -47,6 +47,8 @@ public sealed class DialogueChoice
     /// <summary>The quest this answer is about, in the colour of its rank.</summary>
     public readonly QuestDefinition Quest;
     public readonly QuestAnswer Does;
+    /// <summary>What is already so (their job now): not said again, but shown lit with "Now", not greyed as refused.</summary>
+    public bool Current { get; set; }
 
     public DialogueChoice(string label, string detail = null, bool enabled = true, QuestDefinition quest = null, QuestAnswer does = QuestAnswer.None)
     {
@@ -303,7 +305,7 @@ public sealed class DialogueBox : MonoBehaviour
         var answers = new List<DialogueChoice>();
         foreach (MenuAction action in page.Actions)
         {
-            answers.Add(new DialogueChoice(action.Label, action.Detail, action.Enabled, action.Quest, action.Does));
+            answers.Add(new DialogueChoice(action.Label, action.Detail, action.Enabled, action.Quest, action.Does) { Current = action.Current });
         }
 
         answers.Add(new DialogueChoice("Goodbye."));
@@ -415,6 +417,7 @@ public sealed class DialogueBox : MonoBehaviour
             // Measured only while shown (hidden, its preferred size is 0).
             buttons[i].gameObject.SetActive(true);
             label.text = $"<color={UIStyle.Current.AccentHex}>{i + 1}.</color> {GameInput.WithRebinds(choice.Label)}" +
+                         (choice.Current ? $"  <size=75%><color={UIStyle.Current.GoodHex}>Now</color></size>" : "") +
                          (under != null ? $"\n<size=75%>{under}</size>" : "");
             float rowHeight = Mathf.Max(AnswerRowHeight, label.GetPreferredValues(label.text, columnWidth - 14f, 0f).y + 10f);
             label.rectTransform.sizeDelta = new Vector2(columnWidth - 14f, rowHeight - 4f);
@@ -446,8 +449,8 @@ public sealed class DialogueBox : MonoBehaviour
                 DialogueChoice choice = answers[i];
                 buttons[i].interactable = choice.Enabled;
                 // Hearthline 3: dark leather, grey when it can't be said.
-                buttons[i].image.color = choice.Enabled ? UIStyle.Current.Inset : UIStyle.Current.Disabled;
-                buttonLabels[i].color = choice.Enabled ? Body : UIStyle.Current.Inactive;
+                buttons[i].image.color = choice.Enabled || choice.Current ? UIStyle.Current.Inset : UIStyle.Current.Disabled;
+                buttonLabels[i].color = choice.Enabled || choice.Current ? Body : UIStyle.Current.Inactive;
             }
         }
 

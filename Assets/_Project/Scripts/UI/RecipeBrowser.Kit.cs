@@ -180,7 +180,10 @@ public sealed partial class RecipeBrowser
         }
         if (makeLabel != null)
         {
-            makeLabel.text = amount > 1 ? $"{makeWord} ×{amount}" : makeWord;
+            // The maker's own word ("Queue" at a station, "Craft" by hand): the word read off the button when it was built was
+            // the prefab's "Craft", written back over "Queue".
+            string word = maker != null && !string.IsNullOrEmpty(maker.Verb) ? maker.Verb : makeWord;
+            makeLabel.text = amount > 1 ? $"{word} ×{amount}" : word;
         }
     }
 

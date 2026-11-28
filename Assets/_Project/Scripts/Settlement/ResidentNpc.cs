@@ -564,7 +564,7 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
             {
                 Assign(job, Player.Current != null ? Player.Current.gameObject : null);
                 DialogueBox.Current.Say(speaker, string.IsNullOrWhiteSpace(job.AcceptLine) ? DefaultAcceptLine : job.AcceptLine, afterAnswer);
-            }));
+            }) { Current = isCurrent });
         }
     }
 

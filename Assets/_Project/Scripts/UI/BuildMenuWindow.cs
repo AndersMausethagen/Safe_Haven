@@ -459,7 +459,9 @@ public sealed class BuildMenuWindow : MonoBehaviour
             }
 
             // What can't be built yet goes grey; what it is short of in red under it.
-            card.Name.color = card.Affordable ? style.Text : style.Inactive;
+            // A name stays readable when it can't be built yet: its picture dims and its need says why (review 2026-11-28: grey on
+            // brown read at about 2.5:1).
+            card.Name.color = card.Affordable ? style.Text : style.Muted;
             card.Cost.text = card.Building == null ? "" : card.Locked != null ? "Locked" : card.Affordable ? "Can build" : Short(card.Building, pool);
             card.Cost.color = card.Locked != null ? style.Warning : card.Affordable ? style.Good : style.Danger;
             Paint(card, i == selected);

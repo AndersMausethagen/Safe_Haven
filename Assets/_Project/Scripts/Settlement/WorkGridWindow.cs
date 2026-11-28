@@ -223,10 +223,13 @@ public sealed class WorkGridWindow : MonoBehaviour
                 bool mayTake = holds || open.Contains(job);
                 bool theirTrade = System.Array.IndexOf(record.Resident.Jobs, job) >= 0;
                 // A trade with no skill of its own (the Leader) shows no level: anyone may lead.
-                SetText(cell.Label, skill != null ? $"{ResidentTalents.Flames(ResidentTalents.PassionOf(record, skill))}{level}" : "-");
+                // Gold is only their work now; a trade with no room shows a lock (review 2026-11-28: a gold rim on their own trades read
+                // as "their work now" too, and a closed cell as an ordinary number on a darker ground).
+                string locked = mayTake || holds ? "" : HearthKit.InlineIcon("Lock", style.Muted) + " ";
+                SetText(cell.Label, locked + (skill != null ? $"{ResidentTalents.Flames(ResidentTalents.PassionOf(record, skill))}{level}" : "-"));
                 cell.Label.color = holds ? style.AccentBright : mayTake ? style.Text : style.Muted;
                 cell.Fill.color = holds ? style.ControlOn : mayTake ? style.Control : style.Disabled;
-                cell.Rim.color = holds ? style.Accent : theirTrade ? HearthKit.Faded(style.Accent, 0.6f) : HearthKit.Faded(style.Muted, 0.35f);
+                cell.Rim.color = holds ? style.Accent : HearthKit.Faded(style.Muted, theirTrade ? 0.55f : 0.35f);
                 cell.Button.interactable = mayTake && !holds && !record.IsAway;
                 cell.Why = holds ? "Their work now."
                     : record.IsAway ? "Away on a foray."
@@ -252,7 +255,7 @@ public sealed class WorkGridWindow : MonoBehaviour
     {
         if (row < 0 || row >= people.Count || column < 0 || column >= jobs.Count)
         {
-            hint.text = $"Their level in each trade's skill; {HearthKit.InlineIcon(ResidentTalents.PassionIcon)} what they love. Gold: their work now. Click to give them a trade.";
+            hint.text = $"Their level in each trade · {HearthKit.InlineIcon(ResidentTalents.PassionIcon)} loves it · gold: works there now · {HearthKit.InlineIcon("Lock")} no room. Click to give a trade.";
             return;
         }
 
