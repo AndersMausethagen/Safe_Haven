@@ -353,6 +353,23 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         }
     }
 
+    /// <summary>Stops every voice playing <paramref name="sound"/> now (a held charge let go: AltarStage).</summary>
+    public static void Stop(SoundDefinition sound)
+    {
+        if (Current == null || sound == null)
+        {
+            return;
+        }
+
+        foreach (KeyValuePair<AudioSource, SoundDefinition> entry in Current.playing)
+        {
+            if (entry.Value == sound && entry.Key != null && entry.Key.isPlaying)
+            {
+                entry.Key.Stop();
+            }
+        }
+    }
+
     /// <summary>
     /// Plays a sound for something of a given size, where 1 is the size it was made for: a bigger thing is lower, as it
     /// would be, and a smaller one higher and quieter. So one recording serves a sapling and an old oak.

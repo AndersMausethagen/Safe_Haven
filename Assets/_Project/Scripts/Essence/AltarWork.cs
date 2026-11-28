@@ -25,6 +25,12 @@ public sealed class AltarOffer
     public AltarOfferKind Kind;
     /// <summary>How big its moment is when it is done: a step, a working that matters, or a great one.</summary>
     public AltarMoment Moment;
+    /// <summary>Its name alone, for the stage's title and the line when it is done ("Sure-Handed"); empty: the window uses Effect.</summary>
+    public string Name = "";
+    /// <summary>What it does, short, as before → after where it raises something (rich text).</summary>
+    public string Summary = "";
+    /// <summary>A line of lore and the small print under it (what it fits, who carves it), muted.</summary>
+    public string Lore = "";
 }
 
 /// <summary>An offer's kind at the altar, read by its frame: a plain one, a great one, a cursed one, a relic's, not yet known.</summary>
@@ -182,6 +188,12 @@ public static class AltarWork
                     Done = level <= stack.Empower,
                     // The first level is a step; the higher ones matter more, the last is a milestone.
                     Moment = level >= settings.EmpowerLevels.Count ? AltarMoment.Milestone : level > 1 ? AltarMoment.Large : AltarMoment.Small,
+                    Name = $"{stack.Item.DisplayName} +{level}",
+                    // Before → after (Monster Hunter, Elden Ring): what the level before it gives, then this one.
+                    Summary = level > 1
+                        ? $"<color=#{Hex(UIStyle.Current.Muted)}>{ItemTooltipView.DescribeBonuses(GearPower.EmpowerBonuses(stack.Item, level - 1, settings))}</color>  →  <color=#{Hex(UIStyle.Current.Good)}>{ItemTooltipView.DescribeBonuses(bonuses)}</color>"
+                        : $"<color=#{Hex(UIStyle.Current.Muted)}>nothing</color>  →  <color=#{Hex(UIStyle.Current.Good)}>{ItemTooltipView.DescribeBonuses(bonuses)}</color>",
+                    Lore = "The essence is worked into what it was made from: the old work, made stronger.",
                 };
                 offer.Problem = offer.Done ? "It already holds this." : level > stack.Empower + 1 ? $"Reach +{stack.Empower + 1} first." : Missing(user, offer.Cost);
                 ItemDefinition priced = stack.Item;
@@ -261,6 +273,16 @@ public static class AltarWork
         return subjects;
     }
 
+    // Where an enchantment's inscription comes from, in a word, for its row.
+    private static string SourceWord(EnchantmentSource source) => source switch
+    {
+        EnchantmentSource.CarvedStone => "a carved stone",
+        EnchantmentSource.Elite => "an elite",
+        EnchantmentSource.Boss => "a great foe",
+        EnchantmentSource.Found => "caches and strange places",
+        _ => "known from the start",
+    };
+
     private static AltarOffer EnchantOffer(GameObject user, Held held, ItemStack stack, EnchantmentDefinition enchantment)
     {
         UIStyle style = UIStyle.Current;
@@ -276,7 +298,14 @@ public static class AltarWork
         var offer = new AltarOffer
         {
             Title = known ? enchantment.DisplayName + tags : $"<alpha=#88>{enchantment.DisplayName}{tags}",
-            Detail = known ? (what.Length > 0 ? what : StripTags(effects)) : $"Not known: {enchantment.SourceHint}",
+            // An unknown one's row names its source in a word (the whole hint is on the stage): the long hint was cut mid-word.
+            Detail = known ? (what.Length > 0 ? what : StripTags(effects)) : $"Not known · {SourceWord(enchantment.Source)}, tier {Roman(enchantment.Tier)}",
+            Name = enchantment.DisplayName,
+            Summary = (what.Length > 0 ? $"<color=#{Hex(style.Good)}>{what}</color>" : "") + (effects.Length > 0 ? (what.Length > 0 ? "\n" : "") + effects : ""),
+            Lore = (string.IsNullOrWhiteSpace(enchantment.Description) ? "" : $"<i>\"{enchantment.Description.Trim()}\"</i>\n") +
+                   $"<size=85%>Fits {enchantment.DescribeTargets()}." + (enchantment.RequiredRunecraft > 0 ? $" Needs Runecraft {enchantment.RequiredRunecraft}." : "") +
+                   (known ? "" : $" {enchantment.SourceHint}.") + (carver != null ? $" {carver.Resident.DisplayName} carves it for you." : "") +
+                   (once.Length > 0 ? " " + StripTags(once) : "") + (cursed ? " Raw Cursed Essence: stronger, and it takes its price." : "") + "</size>",
             Effect = $"<b>{enchantment.DisplayName}</b>{Lines(enchantment.Bonuses)}{(effects.Length > 0 ? "\n" + effects : "")}\n\n{enchantment.Description}" +
                      $"\n\n<alpha=#AA>Fits {enchantment.DescribeTargets()}." +
                      (enchantment.RequiredRunecraft > 0 ? $" Needs Runecraft {enchantment.RequiredRunecraft}." : "") +
@@ -403,6 +432,13 @@ public static class AltarWork
                     Done = target <= rank,
                     Picture = skill.Icon,
                     Moment = target >= settings.SkillRanks.Count ? AltarMoment.Milestone : AltarMoment.Large,
+                    Name = $"{skill.DisplayName}, rank {Roman(target)}",
+                    Summary = (target > 1
+                        ? $"<color=#{Hex(UIStyle.Current.Muted)}>+{settings.SkillRanks[target - 2].power * 100f:0}% power</color>  →  "
+                        : $"<color=#{Hex(UIStyle.Current.Muted)}>rank 0</color>  →  ") +
+                        $"<color=#{Hex(UIStyle.Current.Good)}>+{step.power * 100f:0}% power</color>\n" +
+                        $"Cooldown {skill.Cooldown * (1f - step.cooldownCut):0.#} s ({step.cooldownCut * 100f:0}% less)",
+                    Lore = "<size=85%>Power counts for its damage, healing and buffs.</size>",
                 };
                 // Mastery: an ability cast often enough earns the rank without essence.
                 int uses = GameSession.Progress.UsesOf(skill);
@@ -412,6 +448,7 @@ public static class AltarWork
                     // Short, as the row is one line: what it gives is on the right when it is picked.
                     offer.Detail = "Practised: free";
                     offer.Effect += $"\n<color=#{Hex(UIStyle.Current.Good)}>Practised: cast {uses} times, so no essence is needed.</color>";
+                    offer.Lore += $"\n<color=#{Hex(UIStyle.Current.Good)}>Practised: cast {uses} times, so no essence is needed.</color>";
                 }
                 else
                 {
@@ -419,6 +456,7 @@ public static class AltarWork
                     if (step.practisedUses > 0)
                     {
                         offer.Effect += $"\n<color=#{Hex(UIStyle.Current.Muted)}>Or free once cast {step.practisedUses} times ({uses} so far).</color>";
+                        offer.Lore += $"\n<size=85%><color=#{Hex(UIStyle.Current.Muted)}>Or free once cast {step.practisedUses} times ({uses} so far).</color></size>";
                     }
                 }
 
@@ -469,10 +507,14 @@ public static class AltarWork
                 Picture = skill.Icon,
                 Kind = AltarOfferKind.Great,
                 Moment = AltarMoment.Large,
+                Name = option.displayName,
+                Summary = option.description,
+                Lore = $"<size=85%>{skill.DisplayName}: one choice at rank {Roman(option.rank)}; free to change here.</size>",
             };
             if (replaced != null)
             {
                 offer.Effect += $"\n<color=#{Hex(UIStyle.Current.Muted)}>It replaces {replaced.displayName}.</color>";
+                offer.Lore += $"\n<size=85%>It replaces {replaced.displayName}.</size>";
             }
             offer.Problem = taken ? "Already chosen." : rank < option.rank ? $"Deepen to rank {Roman(option.rank)} first." : null;
             offer.Apply = () =>

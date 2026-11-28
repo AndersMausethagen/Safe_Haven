@@ -135,7 +135,8 @@ public sealed class AltarWindow : MonoBehaviour
             detail.text = shownDetail;
             icon.gameObject.SetActive(picture != null);
             icon.sprite = picture;
-            icon.color = unknown ? new Color(0.46f, 0.42f, 0.37f, 0.75f) : Color.white;
+            // Darker than a greyed one (review): an unknown inscription is a shape to find, not a choice to make.
+            icon.color = unknown ? new Color(0.2f, 0.18f, 0.16f, 0.9f) : Color.white;
             // The chosen row lit and rimmed, the rest dark leather with a faint rim, both in the row's kind's colour.
             Color edge = kind ?? style.Accent;
             fill.color = selected ? Color.Lerp(style.Inset, style.AccentDeep, 0.4f) : style.Inset;
@@ -169,6 +170,8 @@ public sealed class AltarWindow : MonoBehaviour
     private RowList offerRows;
     private TMP_Text emptyLine;
     private TMP_Text offerEffect;
+    private TMP_Text offerName;
+    private TMP_Text offerLore;
     private RectTransform offerIconFrame;
     private Image offerIcon;
     private TMP_Text costHeading;
@@ -419,6 +422,8 @@ public sealed class AltarWindow : MonoBehaviour
         stage.SetPips(held, total);
         offerIconFrame.gameObject.SetActive(false);
         offerEffect.gameObject.SetActive(any);
+        offerName.gameObject.SetActive(any);
+        offerLore.gameObject.SetActive(any);
         costHeading.gameObject.SetActive(any);
         offerCost.gameObject.SetActive(any);
         offerProblem.gameObject.SetActive(any);
@@ -428,7 +433,10 @@ public sealed class AltarWindow : MonoBehaviour
             return;
         }
 
-        offerEffect.text = offer.Effect;
+        bool split = !string.IsNullOrEmpty(offer.Name);
+        offerName.text = split ? offer.Name : "";
+        offerEffect.text = split ? offer.Summary : offer.Effect;
+        offerLore.text = split ? offer.Lore : "";
         offerCost.text = CostLines(offer.Cost);
         offerProblem.text = offer.Problem ?? "";
         applyLabel.richText = true;
@@ -533,6 +541,10 @@ public sealed class AltarWindow : MonoBehaviour
         // LocalSpawn art behind the header (title, essences), the band no taller than it, so nothing below moves.
         // Ending above the page line, which would otherwise sit on its gold rule; veiled so the essences read over candles.
         KitBanner.Show(panel, "Altar", 112f, 112f).Darken(0.45f);
+        // A dark plate under the essences (review: the numbers sat on the banner's candles and read poorly).
+        RectTransform plate = CodeUI.At("Essence Plate", panel, 846f, 26f, 300f, 90f);
+        plate.gameObject.AddComponent<Image>().color = new Color(0.04f, 0.035f, 0.03f, 0.72f);
+        plate.GetComponent<Image>().raycastTarget = false;
         cursedValue = Figure("Cursed", "Skull", 880f, style.Danger, style);
         purifiedValue = Figure("Purified", "Spark", 1020f, style.Good, style);
 
@@ -633,13 +645,34 @@ public sealed class AltarWindow : MonoBehaviour
         const float stageSize = 170f;
         float cardX = 848f, cardWidth = Width - Margin - 848f;
         stage = AltarStage.Build((RectTransform)page, cardX + (cardWidth - stageSize) * 0.5f, BodyTop + 4f, stageSize);
-        offerEffect = Paragraph("Effect", page, OfferX, BodyTop + 182f, OfferWidth, 92f, 17f, style.Text);
+        // Its name in the carved title face, what it does (before → after where it raises something), then its lore, muted
+        // (Docs/AltarUXResearch_2026-11-28.md, review: one block of mixed text read as a wall).
+        offerName = Label("Name", page, OfferX, BodyTop + 178f, OfferWidth, 30f, 22f, style.AccentBright);
+        style.Title(offerName);
+        offerName.color = style.AccentBright;
+        offerName.alignment = TextAlignmentOptions.Center;
+        offerName.enableAutoSizing = true;
+        offerName.fontSizeMin = 15f;
+        offerName.fontSizeMax = 22f;
+        offerEffect = Paragraph("Effect", page, OfferX, BodyTop + 210f, OfferWidth, 46f, 17f, style.Text);
+        offerEffect.alignment = TextAlignmentOptions.Top;
         offerEffect.enableAutoSizing = true;
-        offerEffect.fontSizeMin = 13f;
+        offerEffect.fontSizeMin = 12f;
         offerEffect.fontSizeMax = 17f;
-        costHeading = Heading("Cost", page, 864f, BodyTop + 280f, 316f, style);
-        offerCost = Paragraph("Costs", page, 864f, BodyTop + 308f, 316f, 72f, 18f, style.Text);
-        offerProblem = Paragraph("Problem", page, 864f, BodyTop + 382f, 316f, 40f, 16f, style.Warning);
+        offerLore = Paragraph("Lore", page, OfferX, BodyTop + 258f, OfferWidth, 48f, 15f, style.Muted);
+        offerLore.alignment = TextAlignmentOptions.Top;
+        offerLore.enableAutoSizing = true;
+        offerLore.fontSizeMin = 11f;
+        offerLore.fontSizeMax = 15f;
+        costHeading = Heading("Cost", page, 864f, BodyTop + 310f, 316f, style);
+        offerCost = Paragraph("Costs", page, 864f, BodyTop + 338f, 316f, 62f, 16f, style.Text);
+        offerCost.enableAutoSizing = true;
+        offerCost.fontSizeMin = 12f;
+        offerCost.fontSizeMax = 16f;
+        offerProblem = Paragraph("Problem", page, 864f, BodyTop + 398f, 316f, 22f, 15f, style.Warning);
+        offerProblem.enableAutoSizing = true;
+        offerProblem.fontSizeMin = 11f;
+        offerProblem.fontSizeMax = 15f;
         applyLabel = AddButton("Apply", page, 848f, BodyBottom - 48f, Width - Margin - 848f, UIRole.Kind.PrimaryButton, Apply, out applyButton);
         // Held, not clicked: the stage charges while it is held and answers when it is done.
         stage.Attach(applyButton, () => shownOffer != null && shownOffer.Problem == null, Apply,
@@ -654,9 +687,11 @@ public sealed class AltarWindow : MonoBehaviour
             return "";
         }
 
-        string what = StripTags(shownOffer.Title);
+        // Plain names: the row's title carries its kind's tags ("Great", "Cursed"), which read as part of the name here.
+        string what = StripTags(string.IsNullOrEmpty(shownOffer.Name) ? shownOffer.Title : shownOffer.Name);
         string subject = StripTags(subjects[subjectIndex].Title);
-        return page == Page.Empower ? $"{subject} {what}" : page == Page.Enchant ? $"{what} is carved" : $"{subject}: {what}";
+        return page == Page.Empower ? $"{what}" : page == Page.Enchant ? $"{what} carved into {subject}"
+            : shownOffer.Kind == AltarOfferKind.Great ? $"{subject}: {what}" : $"{what}";
     }
 
     private static string StripTags(string text) => System.Text.RegularExpressions.Regex.Replace(text ?? "", "<[^>]+>", "").Trim();

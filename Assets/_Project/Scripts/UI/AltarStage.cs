@@ -31,6 +31,10 @@ public sealed class AltarStage : MonoBehaviour
     private Image flash;
     private Image shock;
     private TMP_Text result;
+    private CanvasGroup resultCard;
+    private Image[] resultRules;
+    private float resultCardY;
+    private bool resultTicks;
     private Image holdFill;
     private Button button;
     private readonly List<Spark> sparks = new List<Spark>();
@@ -76,10 +80,36 @@ public sealed class AltarStage : MonoBehaviour
         flash = Layer("Flash", Feel.Glow, size * 1.4f);
         flash.color = Color.clear;
         shock.color = Color.clear;
-        result = CodeUI.Label("Result", stage, -size * 0.25f, size * 0.78f, size * 1.5f, 34f, 22f, UIStyle.Current.AccentBright, TextAlignmentOptions.Center);
+        // The result card (Docs/AltarUXResearch_2026-11-28.md, review): a dark plate across the ring's foot, so its words read over the
+        // sparks and glow; it rises in, ticks as it lands, stays and fades.
+        RectTransform plate = CodeUI.At("Result Card", stage, -size * 0.45f, size * 0.72f, size * 1.9f, 40f);
+        var plateImage = plate.gameObject.AddComponent<Image>();
+        plateImage.color = new Color(0.05f, 0.04f, 0.035f, 0.9f);
+        plateImage.raycastTarget = false;
+        // Thin rules of the kind's colour above and below (an Outline on a filled plate copies the whole fill in the rule's
+        // colour, which washed it gold).
+        resultRules = new[] { Rule(plate, 0f), Rule(plate, 38f) };
+        resultCard = plate.gameObject.AddComponent<CanvasGroup>();
+        resultCard.alpha = 0f;
+        resultCard.blocksRaycasts = false;
+        resultCardY = plate.anchoredPosition.y;
+        result = CodeUI.Label("Result", plate, 6f, 3f, size * 1.9f - 12f, 34f, 20f, UIStyle.Current.AccentBright, TextAlignmentOptions.Center);
         UIStyle.Current.Title(result);
+        result.color = UIStyle.Current.AccentBright;
         result.richText = true;
+        result.enableAutoSizing = true;
+        result.fontSizeMin = 14f;
+        result.fontSizeMax = 20f;
+        result.fontStyle = FontStyles.Bold;
         result.text = "";
+    }
+
+    private static Image Rule(RectTransform plate, float y)
+    {
+        RectTransform rect = CodeUI.At("Rule", plate, 0f, y, plate.rect.width, 2f);
+        var image = rect.gameObject.AddComponent<Image>();
+        image.raycastTarget = false;
+        return image;
     }
 
     private Image Layer(string name, Sprite sprite, float size)
@@ -182,6 +212,7 @@ public sealed class AltarStage : MonoBehaviour
         holding = false;
         if (held > 0.05f)
         {
+            AudioManager.Stop(Feel.Charge);
             Play(Feel.Cancel);
         }
     }
@@ -229,13 +260,25 @@ public sealed class AltarStage : MonoBehaviour
     private void Commit()
     {
         (AltarMoment moment, string line) = describe != null ? describe() : (AltarMoment.Small, "");
+        AudioManager.Stop(Feel.Charge);
         commit?.Invoke();
         lastMoment = moment;
         sinceCommit = 0f;
         Play(Feel.CommitFor(moment));
         Burst(Feel.SparksFor(moment));
+        ShowResult(line, true);
+    }
+
+    private void ShowResult(string line, bool ticks)
+    {
         result.text = line ?? "";
-        resultAge = 0f;
+        foreach (Image rule in resultRules)
+        {
+            rule.color = HearthKit.Faded(tint, 0.85f);
+        }
+        resultTicks = ticks && !string.IsNullOrEmpty(line);
+        resultAge = string.IsNullOrEmpty(line) ? -1f : 0f;
+        resultCard.alpha = 0f;
     }
 
     // The picture punched up and back: up fast, a little past rest, and settled.
@@ -342,12 +385,19 @@ public sealed class AltarStage : MonoBehaviour
             return;
         }
 
+        float before = resultAge;
         resultAge += dt;
-        // Rises into place, stays, fades.
+        // Rises into place, ticks as it lands, stays, fades.
         float rise = Mathf.Clamp01(resultAge / 0.3f);
-        float fade = resultAge < 2.2f ? 1f : Mathf.Max(0f, 1f - (resultAge - 2.2f) / 0.6f);
-        result.alpha = rise * fade;
-        result.rectTransform.anchoredPosition = new Vector2(result.rectTransform.anchoredPosition.x, -stage.rect.height * 0.78f + (1f - rise) * -14f);
+        if (before < 0.3f && resultAge >= 0.3f && resultTicks)
+        {
+            Play(Feel.Tick);
+        }
+
+        float fade = resultAge < 2.6f ? 1f : Mathf.Max(0f, 1f - (resultAge - 2.6f) / 0.6f);
+        resultCard.alpha = rise * fade;
+        RectTransform plate = (RectTransform)resultCard.transform;
+        plate.anchoredPosition = new Vector2(plate.anchoredPosition.x, resultCardY - (1f - rise) * 14f);
         if (fade <= 0f)
         {
             resultAge = -1f;
@@ -361,8 +411,8 @@ public sealed class AltarStage : MonoBehaviour
         lastMoment = moment;
         sinceCommit = 0f;
         Burst(Feel.SparksFor(moment));
-        result.text = line ?? "";
-        resultAge = 0f;
+        // Purifying is done often: its own sound carries it, no tick on top.
+        ShowResult(line, false);
     }
 
     /// <summary>A working under way (the purifying queue), 0 to 1: the ring turns with it.</summary>
