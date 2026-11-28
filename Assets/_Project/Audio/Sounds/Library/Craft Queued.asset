@@ -15,8 +15,10 @@ MonoBehaviour:
   displayName: 
   caption: 
   clips:
-  - {fileID: 8300000, guid: 3bd94058d615b46468e9dfb91bdfe402, type: 3}
-  - {fileID: 8300000, guid: bbaf744bcebc12a4db2e264d462097de, type: 3}
+  - {fileID: 8300000, guid: 2a12586bfc527874591b9d8d51fc5e93, type: 3}
+  - {fileID: 8300000, guid: 5cd5ce50840863f4dac9219caa8d9a30, type: 3}
+  - {fileID: 8300000, guid: 749513ecf2d350448a29153218b55bea, type: 3}
+  - {fileID: 8300000, guid: fac95419382a04242b3d073a6a029f4a, type: 3}
   channel: 2
   volume: 0.45
   volumeVariation: 0.05

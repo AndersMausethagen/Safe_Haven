@@ -7,7 +7,7 @@ using UnityEngine.UI;
 /// Added to every button UIRole paints, at runtime. Only runs while it is moving.
 /// </summary>
 [DisallowMultipleComponent]
-public sealed class UIPress : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
+public sealed class UIPress : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler, ISelectHandler
 {
     private const float Hover = 1.03f;
     private const float Held = 0.95f;
@@ -46,19 +46,27 @@ public sealed class UIPress : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     private static float lastHover;
 
+    // No sound for the mouse: the button's lift says it is under the pointer (the user, 2026-11-28: "remove hover for the mouse,
+    // keep it for the controller"). On a controller (the stick's pointer in windows, PadCursor, or a selection moved in a
+    // conversation or a menu) each step onto a button ticks.
     public void OnPointerEnter(PointerEventData eventData)
     {
-        // A soft tick, never more than one a moment, so sweeping over a row murmurs instead of rattling.
-        if (Time.unscaledTime - lastHover > 0.06f && TryGetComponent(out Selectable target) && target.IsInteractable()
-            && AudioManager.Sounds != null && AudioManager.Sounds.Hover != null)
+        Tick();
+        over = true;
+        Aim(Live ? Hover : 1f);
+    }
+
+    public void OnSelect(BaseEventData eventData) => Tick();
+
+    private void Tick()
+    {
+        // A soft tick, never more than one a moment, so a sweep down a list murmurs instead of rattling.
+        if (GameInput.UsingGamepad && Time.unscaledTime - lastHover > 0.06f && Live && AudioManager.Sounds != null && AudioManager.Sounds.Hover != null)
         {
             lastHover = Time.unscaledTime;
             Vector3 at = Player.Current != null ? Player.Current.transform.position : Camera.main != null ? Camera.main.transform.position : Vector3.zero;
             AudioManager.Play(AudioManager.Sounds.Hover, at);
         }
-
-        over = true;
-        Aim(Live ? Hover : 1f);
     }
 
     public void OnPointerExit(PointerEventData eventData)
