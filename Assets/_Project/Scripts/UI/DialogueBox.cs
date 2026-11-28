@@ -118,7 +118,7 @@ public sealed class DialogueBox : MonoBehaviour
     private const float PanelHeight = 212f;
     // Hearthline 3: nearly solid (see-through, the walnut went muddy over the sunlit meadow).
     private const float PanelAlpha = 0.94f;
-    private const float BubbleAnswersWidth = 330f;
+    private const float BubbleAnswersWidth = 400f;
     private const float AnswerRowHeight = 40f;
     private const float AnswerRowStep = 45f;
     // A subtitle stays for its reading time: a second plus letters at this pace, within these bounds.
@@ -138,6 +138,7 @@ public sealed class DialogueBox : MonoBehaviour
 
     private readonly List<Button> buttons = new List<Button>();
     private readonly List<TMP_Text> buttonLabels = new List<TMP_Text>();
+    private readonly List<LayoutElement> rowLayouts = new List<LayoutElement>();
     private UIWindow window;
     // Hides the whole box while another window (the bag, the journal) is open over it: windows sort lower than this canvas.
     private CanvasGroup cover;
@@ -401,11 +402,34 @@ public sealed class DialogueBox : MonoBehaviour
             AddAnswerRow();
         }
 
-        // Up to four answers fit the box; more make it taller, growing upwards. With a bubble the box is only the answers:
-        // a narrow column (nothing at all when there are none; the bubble has the hint).
-        float height = bubbled ? count * AnswerRowStep + 30f : Mathf.Max(PanelHeight, count * AnswerRowStep + 30f);
-        ((RectTransform)content.transform).sizeDelta = new Vector2(bubbled ? BubbleAnswersWidth : PanelWidth, height);
-        answerColumn.sizeDelta = new Vector2(answerColumn.sizeDelta.x, height - 30f);
+        // Each answer's words first: its row is as tall as they need (a long answer wrapped into the row below it: the UX pass of
+        // 2026-11-28), its detail or quest on a line of its own under it.
+        float columnWidth = bubbled ? BubbleAnswersWidth - 40f : 258f;
+        float rowsHeight = 0f;
+        for (int i = 0; i < count; i++)
+        {
+            DialogueChoice choice = answers[i];
+            string tag = choice.QuestTag();
+            string under = tag ?? (string.IsNullOrWhiteSpace(choice.Detail) ? null : $"<alpha=#99>{choice.Detail}");
+            TMP_Text label = buttonLabels[i];
+            // Measured only while shown (hidden, its preferred size is 0).
+            buttons[i].gameObject.SetActive(true);
+            label.text = $"<color={UIStyle.Current.AccentHex}>{i + 1}.</color> {GameInput.WithRebinds(choice.Label)}" +
+                         (under != null ? $"\n<size=75%>{under}</size>" : "");
+            float rowHeight = Mathf.Max(AnswerRowHeight, label.GetPreferredValues(label.text, columnWidth - 14f, 0f).y + 10f);
+            label.rectTransform.sizeDelta = new Vector2(columnWidth - 14f, rowHeight - 4f);
+            rowLayouts[i].preferredHeight = rowHeight;
+            rowsHeight += rowHeight + (i > 0 ? AnswerRowStep - AnswerRowHeight : 0f);
+        }
+
+        // Up to four answers fit the box; more make it taller, growing upwards. With a bubble the box is only the answers, at the
+        // screen's lower right (The Witcher 3's place for them): under the speaker they grew up into the bubble and hid the first.
+        float height = bubbled ? rowsHeight + 30f : Mathf.Max(PanelHeight, rowsHeight + 30f);
+        var box = (RectTransform)content.transform;
+        box.sizeDelta = new Vector2(bubbled ? BubbleAnswersWidth : PanelWidth, height);
+        float half = transform is RectTransform screen ? screen.rect.width * 0.5f : 640f;
+        box.anchoredPosition = new Vector2(bubbled ? Mathf.Max(0f, half - BubbleAnswersWidth * 0.5f - 60f) : 0f, 45f);
+        answerColumn.sizeDelta = new Vector2(columnWidth, height - 30f);
         answerColumn.anchoredPosition = new Vector2(bubbled ? -BubbleAnswersWidth / 2f : -160f, 0f);
         panelBackground.enabled = !bubbled || count > 0;
         panelRim.enabled = panelBackground.enabled;
@@ -424,10 +448,6 @@ public sealed class DialogueBox : MonoBehaviour
                 // Hearthline 3: dark leather, grey when it can't be said.
                 buttons[i].image.color = choice.Enabled ? UIStyle.Current.Inset : UIStyle.Current.Disabled;
                 buttonLabels[i].color = choice.Enabled ? Body : UIStyle.Current.Inactive;
-                string tag = choice.QuestTag();
-                buttonLabels[i].text = $"<color={UIStyle.Current.AccentHex}>{i + 1}.</color> {GameInput.WithRebinds(choice.Label)}" +
-                                       (tag != null ? $"\n<size=75%>{tag}</size>" :
-                                       string.IsNullOrWhiteSpace(choice.Detail) ? "" : $"  <size=75%><alpha=#99>{choice.Detail}</size>");
             }
         }
 
@@ -936,6 +956,7 @@ public sealed class DialogueBox : MonoBehaviour
         row.transform.SetParent(answerColumn, false);
         var element = row.AddComponent<LayoutElement>();
         element.preferredHeight = AnswerRowHeight;
+        rowLayouts.Add(element);
         var image = HearthKit.Sliced(row.AddComponent<Image>(), UIStyle.Current.Card, 1.6f);
         var button = row.AddComponent<Button>();
         button.targetGraphic = image;
