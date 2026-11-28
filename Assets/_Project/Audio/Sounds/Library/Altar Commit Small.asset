@@ -15,7 +15,8 @@ MonoBehaviour:
   displayName: Altar Commit Small
   caption: 'altar: commit small'
   clips:
-  - {fileID: 8300000, guid: 866204a8be2b8874fb0e9b9c58c1ff54, type: 3}
+  - {fileID: 8300000, guid: 633b4c4ee29e1ab49ba2705c2493c0b3, type: 3}
+  - {fileID: 8300000, guid: 45409ac15b0c1fd478730099a9404015, type: 3}
   channel: 2
   volume: 0.8
   volumeVariation: 0.1

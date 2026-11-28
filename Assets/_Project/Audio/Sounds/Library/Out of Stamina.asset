@@ -15,8 +15,7 @@ MonoBehaviour:
   displayName: Out of Stamina
   caption: Out of breath
   clips:
-  - {fileID: 8300000, guid: ee92e2ab68d1c43468a011b9a0e685b7, type: 3}
-  - {fileID: 8300000, guid: d6b5ca97e3d68e941872883b172a8c87, type: 3}
+  - {fileID: 8300000, guid: 91fe35de94b8950489fa6dc1de109199, type: 3}
   channel: 2
   volume: 0.25
   volumeVariation: 0.1

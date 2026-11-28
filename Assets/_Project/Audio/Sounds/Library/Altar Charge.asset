@@ -15,7 +15,8 @@ MonoBehaviour:
   displayName: Altar Charge
   caption: 'altar: charge'
   clips:
-  - {fileID: 8300000, guid: 1e24716617a323843857787a4291c96d, type: 3}
+  - {fileID: 8300000, guid: 8837424a898454042aff24f4da675a22, type: 3}
+  - {fileID: 8300000, guid: 6e8f6af094f19d64083590cd3b593dec, type: 3}
   channel: 2
   volume: 0.8
   volumeVariation: 0.1

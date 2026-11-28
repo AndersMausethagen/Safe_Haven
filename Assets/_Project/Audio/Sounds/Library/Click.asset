@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: Click
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Click
+  caption: 
   clips:
-  - {fileID: 8300000, guid: e22c7399ca24bbd4d850f53c177d3193, type: 3}
-  - {fileID: 8300000, guid: 34f1147a134dd2247859548cdddbad46, type: 3}
-  - {fileID: 8300000, guid: 7a8bcce2a48098e49bb9ee376de900d5, type: 3}
+  - {fileID: 8300000, guid: 4bb62535209afbd4ebd1b57ccc8e0846, type: 3}
+  - {fileID: 8300000, guid: 4e12df9239df5164794a2fbfd1cdc288, type: 3}
   channel: 2
   volume: 0.17
   volumeVariation: 0.1
@@ -27,3 +27,4 @@ MonoBehaviour:
   maxAtOnce: 2
   minimumGap: 0.03
   priority: 2
+  takesTheMix: 0

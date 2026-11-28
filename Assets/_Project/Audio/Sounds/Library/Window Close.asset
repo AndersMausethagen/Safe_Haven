@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: Window Close
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Window Close
+  caption: 
   clips:
-  - {fileID: 8300000, guid: e669871a8f2cb314dbcaf789592585a0, type: 3}
-  - {fileID: 8300000, guid: 86a52fa576320284391cbbe84c444506, type: 3}
+  - {fileID: 8300000, guid: 7ff354b26026de84793885687d3bbe85, type: 3}
+  - {fileID: 8300000, guid: 132d762a3185c41458830be7006c010f, type: 3}
   channel: 2
   volume: 0.3
   volumeVariation: 0.1
@@ -26,3 +27,4 @@ MonoBehaviour:
   maxAtOnce: 1
   minimumGap: 0.03
   priority: 1
+  takesTheMix: 0

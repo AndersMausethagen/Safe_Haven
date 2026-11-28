@@ -15,8 +15,8 @@ MonoBehaviour:
   displayName: Counter Ready
   caption: Counter ready
   clips:
-  - {fileID: 8300000, guid: 1af65f8d23a569348ae1ab3adf4f3a65, type: 3}
-  - {fileID: 8300000, guid: 518f3ff21486fd9419268dd6b8ff271c, type: 3}
+  - {fileID: 8300000, guid: 365a2817f82a7ea4d85f5b79827c447e, type: 3}
+  - {fileID: 8300000, guid: 0eaac78b1d7c7bf4f9c5c129eae3cd47, type: 3}
   channel: 2
   volume: 0.41
   volumeVariation: 0.1

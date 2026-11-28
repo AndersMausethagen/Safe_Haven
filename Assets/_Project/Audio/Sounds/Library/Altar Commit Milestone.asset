@@ -15,7 +15,8 @@ MonoBehaviour:
   displayName: Altar Commit Milestone
   caption: 'altar: commit milestone'
   clips:
-  - {fileID: 8300000, guid: 8468caef4c07f9f488eb99fabea0d883, type: 3}
+  - {fileID: 8300000, guid: 36000807737f3614381290c728e960e8, type: 3}
+  - {fileID: 8300000, guid: b09b890846ef6cb41a0f4db583ae06a0, type: 3}
   channel: 2
   volume: 0.8
   volumeVariation: 0.1

@@ -15,7 +15,7 @@ MonoBehaviour:
   displayName: Altar Tick
   caption: 'altar: tick'
   clips:
-  - {fileID: 8300000, guid: e3bb62740794eca479d471a63c65ad62, type: 3}
+  - {fileID: 8300000, guid: 4f8092b897059a4448a1a899bf8b7ffe, type: 3}
   channel: 2
   volume: 0.8
   volumeVariation: 0.1

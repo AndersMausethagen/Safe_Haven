@@ -15,7 +15,7 @@ MonoBehaviour:
   displayName: Altar Cancel
   caption: 'altar: cancel'
   clips:
-  - {fileID: 8300000, guid: 867291ea61f7a0d48ba73d608edd48cb, type: 3}
+  - {fileID: 8300000, guid: b6c234ff4c3088245926337eb968e192, type: 3}
   channel: 2
   volume: 0.8
   volumeVariation: 0.1

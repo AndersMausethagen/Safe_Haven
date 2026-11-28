@@ -15,7 +15,8 @@ MonoBehaviour:
   displayName: Altar Select
   caption: 'altar: select'
   clips:
-  - {fileID: 8300000, guid: 0c0f266dc63aadd489b935db598b10b6, type: 3}
+  - {fileID: 8300000, guid: f5b9726d394411e4599683bbe1bd3382, type: 3}
+  - {fileID: 8300000, guid: 2440759d15abed149918d28b081f0e6e, type: 3}
   channel: 2
   volume: 0.8
   volumeVariation: 0.1

@@ -1,8 +1,9 @@
 using UnityEngine;
 
 /// <summary>
-/// How tiers are shown everywhere: as Roman numerals with one color per tier, so resources, items, tools and recipes
-/// all agree. Tier 0 contains hand-picked starting materials; Tier I introduces tools.
+/// How tiers are shown everywhere: as Roman numerals in one neutral bone colour, so resources, items, tools and recipes all
+/// agree, and colour is left to rarity alone (the user, 2026-11-28: the tiers' white-green-blue-purple-orange was the rarity
+/// scale, so "Common · Tier II" read as Uncommon). Tier 0 contains hand-picked starting materials; Tier I introduces tools.
 /// </summary>
 public static class Tiers
 {
@@ -11,14 +12,17 @@ public static class Tiers
 
     private static readonly string[] Numerals = { "0", "I", "II", "III", "IV", "V" };
 
+    private static readonly Color Bone = new Color(0.88f, 0.82f, 0.68f);
+
+    // The numeral carries the tier; tier 0, the starting materials, a little dimmer.
     private static readonly Color[] Colors =
     {
-        new Color(0.6f, 0.6f, 0.6f),
-        new Color(0.86f, 0.86f, 0.86f),
-        new Color(0.45f, 0.85f, 0.45f),
-        new Color(0.45f, 0.65f, 1f),
-        new Color(0.78f, 0.48f, 1f),
-        new Color(1f, 0.72f, 0.25f),
+        new Color(0.62f, 0.59f, 0.53f),
+        Bone,
+        Bone,
+        Bone,
+        Bone,
+        Bone,
     };
 
     public static string ToRoman(int tier)

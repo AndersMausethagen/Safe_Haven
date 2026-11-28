@@ -15,7 +15,7 @@ MonoBehaviour:
   displayName: Altar Purify
   caption: 'altar: purify'
   clips:
-  - {fileID: 8300000, guid: da33e2aa6dd6a2748b05a10384f2bf6e, type: 3}
+  - {fileID: 8300000, guid: dfd721573d0190842941f22756348604, type: 3}
   channel: 2
   volume: 0.8
   volumeVariation: 0.1
