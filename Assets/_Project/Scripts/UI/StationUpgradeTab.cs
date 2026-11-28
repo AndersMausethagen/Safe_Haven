@@ -317,7 +317,8 @@ public sealed class StationUpgradeTab
             List<string> opens = crafting != null ? BuildingUnlocks.OpenedBy(definition, shownTier, crafting.Buildings) : new List<string>();
             if (opens.Count > 0)
             {
-                lines.Add((null, "House", $"Opens {string.Join(", ", opens)}"));
+                // Two by name and a count, as "Makes" does: five names ran off the line ("Dry-s").
+                lines.Add((null, "House", $"Opens {string.Join(", ", opens.Take(2))}{(opens.Count > 2 ? $" and {opens.Count - 2} more" : "")}"));
             }
 
             foreach (BuildingModuleDefinition module in shown.unlocksModules.Where(m => m != null))

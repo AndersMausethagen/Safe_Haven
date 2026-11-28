@@ -64,7 +64,10 @@ public sealed class UIWindow : MonoBehaviour
     private void Update()
     {
         // The screen or the UI size changed while open (a window dragged, the option moved): fit again.
-        if (IsOpen && (Screen.width != fittedWidth || Screen.height != fittedHeight || !Mathf.Approximately(fittedRoom, RoomHeight())))
+        // Or the window grew after it opened (the Smithy laid out its banner and tabs after opening, fitted at its smaller size, and
+        // ran off a 720-high screen: the UX pass of 2026-11-28).
+        if (IsOpen && (Screen.width != fittedWidth || Screen.height != fittedHeight || !Mathf.Approximately(fittedRoom, RoomHeight())
+                       || (content.transform is RectTransform grown && grown.rect.size != fittedSize)))
         {
             FitToScreen();
         }
@@ -194,6 +197,7 @@ public sealed class UIWindow : MonoBehaviour
     private int fittedWidth = -1;
     private int fittedHeight = -1;
     private float fittedRoom = -1f;
+    private Vector2 fittedSize;
     private readonly System.Collections.Generic.List<RectTransform> shrunk = new System.Collections.Generic.List<RectTransform>();
 
     private RectTransform Room()
@@ -213,6 +217,7 @@ public sealed class UIWindow : MonoBehaviour
         fittedWidth = Screen.width;
         fittedHeight = Screen.height;
         fittedRoom = RoomHeight();
+        fittedSize = content.transform is RectTransform measured ? measured.rect.size : Vector2.zero;
         RectTransform room = Room();
         if (room == null || !(content.transform is RectTransform box))
         {

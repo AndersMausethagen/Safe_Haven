@@ -83,7 +83,19 @@ public sealed class RecipeRowView : MonoBehaviour, IPointerClickHandler, IPointe
     // what is missing, the first of it and how many more (the detail pane lists them all).
     private static string Shortfall(string problem)
     {
-        if (string.IsNullOrEmpty(problem) || !problem.StartsWith("Need ", System.StringComparison.Ordinal))
+        if (string.IsNullOrEmpty(problem))
+        {
+            return problem;
+        }
+
+        // An aside in brackets is the detail pane's ("Needs the Charcoal Clamp fitted here (the Upgrade tab)" ran off the row).
+        int aside = problem.IndexOf(" (", System.StringComparison.Ordinal);
+        if (aside > 0)
+        {
+            problem = problem.Substring(0, aside);
+        }
+
+        if (!problem.StartsWith("Need ", System.StringComparison.Ordinal))
         {
             return problem;
         }
@@ -108,6 +120,14 @@ public sealed class RecipeRowView : MonoBehaviour, IPointerClickHandler, IPointe
         tierLabel.text = recipe.Tier > 1 ? Tiers.ToRoman(recipe.Tier) : "";
         tierLabel.color = Tiers.ColorOf(recipe.Tier);
         string status = canMake ? $"Can make {count}" : Shortfall(problem);
+        if (!statusLabel.enableAutoSizing)
+        {
+            // Shrinks a little to fit its line rather than being cut.
+            statusLabel.fontSizeMax = statusLabel.fontSize;
+            statusLabel.fontSizeMin = Mathf.Max(11f, statusLabel.fontSize - 4f);
+            statusLabel.enableAutoSizing = true;
+        }
+
         statusLabel.text = waiting > 0 ? $"{waiting} queued  ·  {status}" : status;
         statusLabel.color = canMake ? style.Good : muted ? style.Muted : style.Warning;
         Paint();

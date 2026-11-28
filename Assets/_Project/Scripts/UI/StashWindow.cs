@@ -431,9 +431,42 @@ public sealed partial class StashWindow : MonoBehaviour
         RefreshResources();
     }
 
+    // The essences and materials as pictures with their counts (the UX pass of 2026-11-28: "In storage: Life Orb 7 · Cursed
+    // Essence 13 · ..." was a line of words), in storage beside what is carried, where the line was.
+    private KitHaul storedHaul;
+    private KitHaul carriedHaul;
+
     private void RefreshResources()
     {
-        resourcesLabel.text = HearthKit.ToneNumbers($"<b>In storage:</b>  {Describe(GameSession.Stash.Resources)}\n<b>Carried:</b>  {Describe(carried)}");
+        if (storedHaul == null && resourcesLabel != null && resourcesLabel.transform.parent is RectTransform panel)
+        {
+            Vector2 at = resourcesLabel.rectTransform.anchoredPosition;
+            float half = (resourcesLabel.rectTransform.rect.width - 24f) * 0.5f;
+            storedHaul = new KitHaul(CodeUI.At("Stored Resources", panel, at.x, -at.y, half, 120f), "Haul", 0f, 46f);
+            carriedHaul = new KitHaul(CodeUI.At("Carried Resources", panel, at.x + half + 24f, -at.y, half, 120f), "Haul", 0f, 46f);
+            resourcesLabel.gameObject.SetActive(false);
+        }
+
+        if (storedHaul == null)
+        {
+            resourcesLabel.text = HearthKit.ToneNumbers($"<b>In storage:</b>  {Describe(GameSession.Stash.Resources)}\n<b>Carried:</b>  {Describe(carried)}");
+            return;
+        }
+
+        UIStyle style = UIStyle.Current;
+        storedHaul.Show("In storage", "Lock", style.Good, "", System.Array.Empty<ItemAmount>(), Sorted(GameSession.Stash.Resources), "Nothing stored yet.", rows: 1);
+        carriedHaul.Show("Carried", "Bags", style.Accent, "", System.Array.Empty<ItemAmount>(), Sorted(carried), "Nothing carried.", rows: 1);
+    }
+
+    private static List<ResourceAmount> Sorted(ResourceStorage storage)
+    {
+        var amounts = storage != null ? new List<ResourceAmount>(storage.StoredAmounts) : new List<ResourceAmount>();
+        amounts.Sort((a, b) =>
+        {
+            int result = a.Resource.Tier.CompareTo(b.Resource.Tier);
+            return result != 0 ? result : string.CompareOrdinal(a.Resource.DisplayName, b.Resource.DisplayName);
+        });
+        return amounts;
     }
 
     private static string Describe(ResourceStorage storage)
