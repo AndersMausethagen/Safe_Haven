@@ -62,6 +62,8 @@ public sealed class HomePortalMenu
                 if (action.Label.StartsWith("Plan a raid") || action.Label.StartsWith("Follow"))
                 {
                     action.Icon = "Lead";
+                    // Going through is what most visits are for: a picture card of the place beyond (PortalWindow), not one row of eight.
+                    action.Picture = raid.Raid != null ? raid.Raid.PlaceArtwork : null;
                 }
                 else if (action.Label.StartsWith("Improve") || action.Label.StartsWith("Repair") || action.Label.StartsWith("Wake"))
                 {

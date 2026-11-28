@@ -24,6 +24,25 @@ public sealed class AudioSystemTests
     }
 
     [Test]
+    public void WhatIsMade_SoundsOfWhereItIsMade_ElseTheCommonSound()
+    {
+        var settings = ScriptableObject.CreateInstance<AudioSettingsDefinition>();
+        SoundDefinition common = Sound(Clip("common"));
+        SoundDefinition metal = Sound(Clip("metal"));
+        var so = new SerializedObject(settings);
+        so.FindProperty("crafted").objectReferenceValue = common;
+        SerializedProperty list = so.FindProperty("craftedAt");
+        list.arraySize = 1;
+        list.GetArrayElementAtIndex(0).FindPropertyRelative("station").enumValueIndex = System.Array.IndexOf(System.Enum.GetValues(typeof(CraftingStationType)), CraftingStationType.Anvil);
+        list.GetArrayElementAtIndex(0).FindPropertyRelative("sound").objectReferenceValue = metal;
+        so.ApplyModifiedPropertiesWithoutUndo();
+
+        Assert.AreSame(metal, settings.CraftedAt(CraftingStationType.Anvil), "the Smithy's things sound of metal");
+        Assert.AreSame(common, settings.CraftedAt(CraftingStationType.Kitchen), "a station with no sound of its own falls back to Crafted");
+        Assert.AreSame(common, settings.CraftedAt(CraftingStationType.None), "by hand too");
+    }
+
+    [Test]
     public void ASound_NeverPlaysTheSameClipTwiceRunning()
     {
         AudioClip a = Clip("a");

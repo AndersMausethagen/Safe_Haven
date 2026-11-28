@@ -160,6 +160,13 @@ public sealed class KitPictureCard
     // A picture not yet open: darker and nearly without colour, as the kit's greyed faces.
     private static readonly Color Dimmed = new Color(0.66f, 0.64f, 0.62f, 1f);
 
+    /// <summary>Its picture as a dark shape (something to find, not yet known: the altar's codex), after SetLook.</summary>
+    public void SetSilhouette()
+    {
+        picture.color = new Color(0.16f, 0.14f, 0.13f, 0.95f);
+        painting.color = picture.color;
+    }
+
     public void SetActive(bool shown) => root.gameObject.SetActive(shown);
 
     /// <summary>Moves it to a place in its parent, from the parent's top left.</summary>

@@ -17,6 +17,10 @@ public sealed class AltarFeel : GameSettings<AltarFeel>
     [SerializeField] private SoundDefinition tick;
     [SerializeField] private SoundDefinition select;
     [SerializeField] private SoundDefinition purify;
+    [Tooltip("A low loop under the window while it is open (the altar's own presence), faded in and out; empty for none.")]
+    [SerializeField] private SoundDefinition ambience;
+    [Tooltip("How loud the ambience plays, of its sound's own volume and the Ambience channel.")]
+    [SerializeField, Range(0f, 1f)] private float ambienceVolume = 0.45f;
 
     [Header("Shapes")]
     [SerializeField] private Sprite glyphRing;
@@ -37,6 +41,8 @@ public sealed class AltarFeel : GameSettings<AltarFeel>
     public SoundDefinition Tick => tick;
     public SoundDefinition Select => select;
     public SoundDefinition Purify => purify;
+    public SoundDefinition Ambience => ambience;
+    public float AmbienceVolume => ambienceVolume;
     public Sprite GlyphRing => glyphRing;
     public Sprite Glow => glow;
     public Sprite Spark => spark;

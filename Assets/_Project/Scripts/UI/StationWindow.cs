@@ -431,7 +431,8 @@ public sealed class StationWindow : MonoBehaviour
                 UIMotion.Flash(progressImage, Color.white, 0.4f);
             }
 
-            UIMotion.Sound(AudioManager.Sounds != null ? AudioManager.Sounds.Crafted : null);
+            // The station's own sound of making (metal at the Smithy, wood at the Woodcutter's Lodge): AudioSettings › Crafted At.
+            UIMotion.Sound(AudioManager.Sounds != null ? AudioManager.Sounds.CraftedAt(station != null ? station.Type : CraftingStationType.None) : null);
         }
 
         shownOutput = queue.OutputAmount;

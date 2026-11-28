@@ -137,6 +137,8 @@ public sealed class PortalWindow : MonoBehaviour
         taskQuest = CodeUI.Label("Quest", task, 56f, 38f, RightWidth - 200f, 24f, 16f, style.Accent);
         taskDistance = CodeUI.Label("Distance", task, RightWidth - 150f, 0f, 130f, 70f, 19f, style.AccentBright, TextAlignmentOptions.MidlineRight);
 
+        BuildPictureCard(style);
+
         haven = HearthKit.Card(panel, "Haven", RightX, 500f, RightWidth, 88f, 0.55f, style.Panel, 1.3f);
         var havenFill = haven.GetComponent<Image>();
         havenFill.raycastTarget = true;
@@ -172,6 +174,60 @@ public sealed class PortalWindow : MonoBehaviour
                 done?.Invoke();
             }
         };
+    }
+
+    // A choice with a painting (MenuAction.Picture: going through, with the place beyond) as a card of its own above the rows
+    // (the review of 2026-11-28: eight brown rows of words, the user's own complaint).
+    private const float PictureCardHeight = 112f;
+    private RectTransform pictureCard;
+    private Image pictureCardArt;
+    private AspectRatioFitter pictureCardFit;
+    private TMP_Text pictureCardTitle;
+    private TMP_Text pictureCardLine;
+    private Button pictureCardButton;
+    private MenuAction pictureAction;
+
+    private void BuildPictureCard(UIStyle style)
+    {
+        pictureCard = HearthKit.Card(panel, "Picture Card", RightX, 0f, RightWidth, PictureCardHeight, 0.7f, style.Panel, 1.3f);
+        var fill = pictureCard.GetComponent<Image>();
+        fill.raycastTarget = true;
+        pictureCardButton = pictureCard.gameObject.AddComponent<Button>();
+        pictureCardButton.targetGraphic = fill;
+        HearthKit.Tint(pictureCardButton);
+        UIHighlight.On(pictureCard.gameObject);
+        pictureCardButton.onClick.AddListener(() => Choose(pictureAction));
+        RectTransform frame = CodeUI.At("Art Frame", pictureCard, 6f, 6f, 188f, PictureCardHeight - 12f);
+        frame.gameObject.AddComponent<RectMask2D>();
+        RectTransform art = CodeUI.Box("Art", frame, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+        pictureCardArt = art.gameObject.AddComponent<Image>();
+        pictureCardArt.raycastTarget = false;
+        pictureCardFit = art.gameObject.AddComponent<AspectRatioFitter>();
+        pictureCardFit.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+        pictureCardTitle = CodeUI.Label("Title", pictureCard, 210f, 20f, RightWidth - 226f, 36f, 24f, style.Text);
+        style.Title(pictureCardTitle);
+        pictureCardTitle.fontStyle = FontStyles.Bold;
+        pictureCardLine = CodeUI.Paragraph("Line", pictureCard, 210f, 58f, RightWidth - 226f, 44f, 16f, style.Muted);
+        pictureCard.gameObject.SetActive(false);
+    }
+
+    private float ShowPictureCard(MenuAction action, float y)
+    {
+        pictureAction = action;
+        pictureCard.gameObject.SetActive(action != null);
+        if (action == null)
+        {
+            return y;
+        }
+
+        pictureCardArt.sprite = action.Picture;
+        pictureCardFit.aspectRatio = action.Picture != null ? action.Picture.rect.width / Mathf.Max(1f, action.Picture.rect.height) : 1.5f;
+        pictureCardTitle.text = action.Label;
+        pictureCardTitle.color = action.Enabled ? UIStyle.Current.Text : UIStyle.Current.Inactive;
+        pictureCardLine.text = GameInput.WithRebinds(action.Detail ?? "");
+        pictureCardButton.interactable = action.Enabled;
+        pictureCard.anchoredPosition = new Vector2(RightX, -y);
+        return y + PictureCardHeight + 12f;
     }
 
     private void Update()
@@ -227,6 +283,7 @@ public sealed class PortalWindow : MonoBehaviour
         y = ShowTask(y);
 
         havenAction = null;
+        MenuAction pictured = null;
         var shown = new List<MenuAction>();
         foreach (MenuAction action in page.Actions)
         {
@@ -234,11 +291,17 @@ public sealed class PortalWindow : MonoBehaviour
             {
                 havenAction = action;
             }
+            else if (pictured == null && action.Picture != null)
+            {
+                pictured = action;
+            }
             else
             {
                 shown.Add(action);
             }
         }
+
+        y = ShowPictureCard(pictured, y);
 
         while (rows.Count < shown.Count)
         {

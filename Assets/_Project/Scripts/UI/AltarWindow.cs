@@ -22,6 +22,7 @@ public sealed class AltarWindow : MonoBehaviour
         Empower = 1,
         Enchant = 2,
         Skills = 3,
+        Codex = 4,
     }
 
     private const float Width = 1240f;
@@ -36,7 +37,7 @@ public sealed class AltarWindow : MonoBehaviour
     private const float OfferX = 864f;
     private const float OfferWidth = Width - Margin - 16f - OfferX;
 
-    private static readonly string[] PageNames = { "Purify", "Empower", "Enchant", "Abilities" };
+    private static readonly string[] PageNames = { "Purify", "Empower", "Enchant", "Abilities", "Codex" };
 
     private static readonly string[] PageLines =
     {
@@ -44,6 +45,7 @@ public sealed class AltarWindow : MonoBehaviour
         "Strengthen the gear you trust. It takes essence and the materials the item was made from.",
         "One enchantment to an item. Purified is safe. Cursed is stronger, and takes its price.",
         "Deepen a skill you know: more power, a shorter cooldown.",
+        "Every inscription known, and the shapes of those still to find.",
     };
 
     /// <summary>A scrolling list of rows, kept and reused as the page is read again.</summary>
@@ -284,8 +286,47 @@ public sealed class AltarWindow : MonoBehaviour
         }
     }
 
+    // The altar's presence while its window is open (AltarFeel.Ambience): a loop on the Ambience channel, faded in and out
+    // (the UX pass of 2026-11-28: the window was silent but for its clicks).
+    private AudioSource ambience;
+    private bool ambienceWanted;
+
+    private void UpdateAmbience()
+    {
+        AltarFeel feel = AltarFeel.Current;
+        if (feel == null || feel.Ambience == null)
+        {
+            return;
+        }
+
+        if (ambience == null)
+        {
+            ambience = gameObject.AddComponent<AudioSource>();
+            ambience.loop = true;
+            ambience.spatialBlend = 0f;
+            ambience.playOnAwake = false;
+            ambience.volume = 0f;
+        }
+
+        float target = ambienceWanted ? feel.Ambience.Volume * feel.AmbienceVolume * AudioManager.ChannelVolume(AudioChannel.Ambience) : 0f;
+        if (ambienceWanted && !ambience.isPlaying)
+        {
+            ambience.clip = feel.Ambience.PickClip();
+            ambience.Play();
+        }
+
+        ambience.volume = Mathf.MoveTowards(ambience.volume, target, Time.unscaledDeltaTime * 0.6f);
+        if (!ambienceWanted && ambience.isPlaying && ambience.volume <= 0.001f)
+        {
+            ambience.Stop();
+        }
+    }
+
+    private void LateUpdate() => UpdateAmbience();
+
     private void OnOpenChanged(bool open)
     {
+        ambienceWanted = open;
         if (!open)
         {
             viewer = null;
@@ -311,10 +352,15 @@ public sealed class AltarWindow : MonoBehaviour
         panel.localScale = Vector3.one * Mathf.Min(1f, (screen.width - ScreenMargin) / Width, (screen.height - ScreenMargin) / Height);
         DrawHeader();
         purifyPage.SetActive(page == Page.Purify);
-        workPage.SetActive(page != Page.Purify);
+        workPage.SetActive(page != Page.Purify && page != Page.Codex);
+        codexPage.SetActive(page == Page.Codex);
         if (page == Page.Purify)
         {
             DrawPurify();
+        }
+        else if (page == Page.Codex)
+        {
+            DrawCodex();
         }
         else
         {
@@ -332,6 +378,152 @@ public sealed class AltarWindow : MonoBehaviour
         pageTitle.text = PageNames[(int)page];
         pageLine.text = PageLines[(int)page];
         tabs.Show((int)page);
+        DrawBadges();
+    }
+
+    // ----- The codex: every enchantment as a picture, known ones lit in their kind's rim, unknown ones a dark shape with where they
+    // are found (the review of 2026-11-28; Diablo IV's codex of power). Scrolls; the one under the pointer is told below. -----
+    private const float CodexCard = 84f;
+    private GameObject codexPage;
+    private RectTransform codexContent;
+    private TMP_Text codexCount;
+    private TMP_Text codexTold;
+    private readonly List<KitPictureCard> codexCards = new List<KitPictureCard>();
+    private readonly List<EnchantmentDefinition> codexShown = new List<EnchantmentDefinition>();
+
+    private void BuildCodexPage(UIStyle style)
+    {
+        codexPage = Stretch("Codex Page", panel).gameObject;
+        Transform page = codexPage.transform;
+        Heading("Inscriptions", page, Margin, BodyTop, 500f, style);
+        codexCount = Label("Count", page, Width - Margin - 300f, BodyTop, 300f, 30f, 18f, style.Muted);
+        codexCount.alignment = TextAlignmentOptions.Right;
+        RectTransform view = CodeUI.At("View", page, Margin, BodyTop + 36f, Width - Margin * 2f, BodyBottom - BodyTop - 110f);
+        view.gameObject.AddComponent<RectMask2D>();
+        view.gameObject.AddComponent<Image>().color = Color.clear;
+        codexContent = CodeUI.At("Content", view, 0f, 0f, Width - Margin * 2f, 10f);
+        var scroll = view.gameObject.AddComponent<ScrollRect>();
+        scroll.content = codexContent;
+        scroll.horizontal = false;
+        scroll.movementType = ScrollRect.MovementType.Clamped;
+        scroll.scrollSensitivity = 30f;
+        codexTold = Paragraph("Told", page, Margin, BodyBottom - 66f, Width - Margin * 2f, 60f, 17f, style.Text);
+        codexTold.richText = true;
+    }
+
+    private void DrawCodex()
+    {
+        UIStyle style = UIStyle.Current;
+        codexShown.Clear();
+        foreach (EnchantmentDefinition enchantment in EssenceSettings.Current.Enchantments)
+        {
+            if (enchantment != null)
+            {
+                codexShown.Add(enchantment);
+            }
+        }
+
+        // Known first, then by tier and name, as the Enchant tab lists them.
+        codexShown.Sort((a, b) =>
+        {
+            int known = GameSession.Progress.Knows(b).CompareTo(GameSession.Progress.Knows(a));
+            return known != 0 ? known : a.Tier != b.Tier ? a.Tier.CompareTo(b.Tier) : string.CompareOrdinal(a.DisplayName, b.DisplayName);
+        });
+
+        float width = Width - Margin * 2f;
+        int perRow = Mathf.Max(1, Mathf.FloorToInt((width + 10f) / (CodexCard + 22f)));
+        float step = (width - CodexCard) / Mathf.Max(1, perRow - 1);
+        int knownCount = 0;
+        for (int i = 0; i < codexShown.Count; i++)
+        {
+            if (i >= codexCards.Count)
+            {
+                int index = i;
+                var made = new KitPictureCard(codexContent, "Inscription " + i, CodexCard, CodexCard, 2, 13f, () => TellCodex(index), () => TellCodex(-1));
+                codexCards.Add(made);
+            }
+
+            EnchantmentDefinition enchantment = codexShown[i];
+            bool known = GameSession.Progress.Knows(enchantment);
+            knownCount += known ? 1 : 0;
+            KitPictureCard card = codexCards[i];
+            card.SetActive(true);
+            card.Place(i % perRow * step, i / perRow * (card.Height + 12f));
+            card.ShowPicture(enchantment.Icon, "Spark");
+            card.SetName(known ? enchantment.DisplayName : "?");
+            AltarOfferKind kind = !known ? AltarOfferKind.Unknown : enchantment.IsRelic ? AltarOfferKind.Relic
+                : enchantment.School == EssenceSchool.Cursed ? AltarOfferKind.Cursed : enchantment.IsGreat ? AltarOfferKind.Great : AltarOfferKind.Plain;
+            card.SetLook(!known, KindColour(kind));
+            if (!known)
+            {
+                card.SetSilhouette();
+            }
+
+            card.SetBadge(Roman(enchantment.Tier));
+        }
+
+        for (int i = codexShown.Count; i < codexCards.Count; i++)
+        {
+            codexCards[i].SetActive(false);
+        }
+
+        int rows = (codexShown.Count + perRow - 1) / perRow;
+        codexContent.sizeDelta = new Vector2(codexContent.sizeDelta.x, rows * (CodexCard + 50f));
+        codexCount.text = $"{knownCount} of {codexShown.Count} known";
+        if (string.IsNullOrEmpty(codexTold.text))
+        {
+            codexTold.text = $"<color=#{ColorUtility.ToHtmlStringRGB(style.Muted)}>Point at an inscription to read it. Unknown ones are learned from their inscriptions, read at home.</color>";
+        }
+    }
+
+    private static string Roman(int tier) => Tiers.ToRoman(tier);
+
+    private void TellCodex(int index)
+    {
+        UIStyle style = UIStyle.Current;
+        if (index < 0 || index >= codexShown.Count)
+        {
+            codexTold.text = "";
+            return;
+        }
+
+        EnchantmentDefinition enchantment = codexShown[index];
+        bool known = GameSession.Progress.Knows(enchantment);
+        string what = enchantment.Bonuses.Count > 0 ? ItemTooltipView.DescribeBonuses(enchantment.Bonuses) : "";
+        codexTold.text = known
+            ? $"<b>{enchantment.DisplayName}</b>  <color=#{ColorUtility.ToHtmlStringRGB(style.Good)}>{what}</color>  <i><color=#{ColorUtility.ToHtmlStringRGB(style.Muted)}>{enchantment.Description}</color></i>\n" +
+              $"<size=85%>Fits {enchantment.DescribeTargets()}.</size>"
+            : $"<b>Not known yet</b>, tier {Roman(enchantment.Tier)}.  {enchantment.SourceHint}: its inscription teaches it, read at home.";
+    }
+
+    // What can be done on each tab now, as a count after its name (the UX pass of 2026-11-28): gear with a next level paid for,
+    // abilities with a next rank. Read every two seconds, the lists being made whole each time.
+    private float nextBadges;
+
+    private void DrawBadges()
+    {
+        if (Time.unscaledTime < nextBadges || viewer == null)
+        {
+            return;
+        }
+
+        nextBadges = Time.unscaledTime + 2f;
+        tabs.SetBadge((int)Page.Empower, Ready(AltarWork.Empowering(viewer)));
+        tabs.SetBadge((int)Page.Skills, Ready(AltarWork.Deepening(viewer)));
+    }
+
+    private static int Ready(List<AltarSubject> subjects)
+    {
+        int ready = 0;
+        foreach (AltarSubject subject in subjects)
+        {
+            if (subject.Offers.Exists(offer => !offer.Done && offer.Problem == null && offer.Kind != AltarOfferKind.Great))
+            {
+                ready++;
+            }
+        }
+
+        return ready;
     }
 
     private void DrawPurify()
@@ -528,6 +720,7 @@ public sealed class AltarWindow : MonoBehaviour
         BuildHeader(style);
         BuildPurifyPage(style);
         BuildWorkPage(style);
+        BuildCodexPage(style);
         HearthKit.CloseButton(panel, Width - 66f, 18f, () => window.Close());
 
         window = root.gameObject.AddComponent<UIWindow>();

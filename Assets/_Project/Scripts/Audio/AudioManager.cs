@@ -659,7 +659,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
             case GameEventKind.QuestCompleted:
                 return gameEvent.Subject is QuestDefinition completed && completed.AnnounceCompletion ? settings.QuestCompleted : null;
             case GameEventKind.Crafted:
-                return gameEvent.ByPlayer ? settings.Crafted : null;
+                return gameEvent.ByPlayer ? settings.CraftedAt(StationOf(gameEvent.Subject, gameEvent.Actor)) : null;
             case GameEventKind.Built:
                 return settings.Built;
             case GameEventKind.Consumed:
@@ -667,6 +667,26 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
             default:
                 return null;
         }
+    }
+
+    // Where what was made is made (its recipe's station), so it sounds of its making: by hand when no recipe of the maker's makes it.
+    private static CraftingStationType StationOf(Object made, GameObject maker)
+    {
+        PlayerCrafting crafting = maker != null ? maker.GetComponent<PlayerCrafting>() : null;
+        if (crafting == null || made == null)
+        {
+            return CraftingStationType.None;
+        }
+
+        foreach (RecipeDefinition recipe in crafting.Recipes)
+        {
+            if (recipe != null && recipe.OutputDefinition == made)
+            {
+                return recipe.Station;
+            }
+        }
+
+        return CraftingStationType.None;
     }
 
     /// <summary>The sound an object makes when it dies: its own, else its data's, else the default for its kind.</summary>

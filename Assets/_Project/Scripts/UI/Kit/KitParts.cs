@@ -208,6 +208,30 @@ public sealed class KitTabs
 
     public bool IsVisible(int index) => index >= 0 && index < tabs.Count && tabs[index].rect.gameObject.activeSelf;
 
+    private readonly Dictionary<int, string> names = new Dictionary<int, string>();
+
+    /// <summary>A count after a tab's name, small in the accent ("Empower 2": what can be done there now); 0 shows the name alone.</summary>
+    public void SetBadge(int index, int count)
+    {
+        if (index < 0 || index >= tabs.Count)
+        {
+            return;
+        }
+
+        TMP_Text label = tabs[index].label;
+        if (!names.TryGetValue(index, out string name))
+        {
+            name = label.text;
+            names[index] = name;
+        }
+
+        string text = count > 0 ? $"{name} <size=75%><color=#{ColorUtility.ToHtmlStringRGB(UIStyle.Current.AccentBright)}>{count}</color></size>" : name;
+        if (label.text != text)
+        {
+            label.text = text;
+        }
+    }
+
     /// <summary>The tabs' rects, for PadTabs (where the bumpers' glyphs go).</summary>
     public List<RectTransform> Rects => tabs.ConvertAll(tab => tab.rect);
 

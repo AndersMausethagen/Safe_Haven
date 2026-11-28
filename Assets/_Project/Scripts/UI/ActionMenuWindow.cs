@@ -51,6 +51,8 @@ public sealed class MenuAction
     /// <summary>What is already so (their job now, a comfort built): not chosen again, but shown lit with a gold rim rather than
     /// greyed as if refused.</summary>
     public bool Current { get; set; }
+    /// <summary>A painting for a window that gives this choice a picture card (the portal's "Plan a raid"); null for none.</summary>
+    public Sprite Picture { get; set; }
 }
 
 /// <summary>Things a MenuPage shows as cards with their pictures and counts (KitHaul): a heading, then each item and essence.</summary>

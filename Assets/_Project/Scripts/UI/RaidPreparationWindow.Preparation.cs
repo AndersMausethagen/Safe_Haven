@@ -266,7 +266,17 @@ public sealed partial class RaidPreparationWindow
             Color colour = score >= plan.Difficulty.recommendedGearScore ? style.Good : score >= plan.Difficulty.minimumGearScore ? style.Accent : style.Warning;
             gearLabel.text = $"Your gear <color={UIStyle.Hex(colour)}>{score}</color>  ·  recommended {plan.Difficulty.recommendedGearScore}"
                              + "\n" + FightingSkillLine(plan.Difficulty.tier, style);
-            Stack(gearLabel, y, 46f);
+            // On a line of its own under the tier buttons, at full width and left-aligned (the UX pass of 2026-11-28: beside them its
+            // start ran behind the last buttons, and fitted beside them it shrank past reading).
+            Stack(gearLabel, y + 54f, 46f);
+            RectTransform gear = gearLabel.rectTransform;
+            gear.anchoredPosition = new Vector2(RightColumn, gear.anchoredPosition.y);
+            gear.sizeDelta = new Vector2(ColumnWidth, gear.sizeDelta.y);
+            gearLabel.alignment = TextAlignmentOptions.TopLeft;
+            gearLabel.enableAutoSizing = true;
+            gearLabel.fontSizeMin = 14f;
+            gearLabel.fontSizeMax = 17f;
+            y += 50f;
         }
 
         y += 54f;

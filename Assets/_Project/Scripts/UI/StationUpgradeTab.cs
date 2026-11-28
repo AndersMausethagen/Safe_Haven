@@ -41,6 +41,9 @@ public sealed class StationUpgradeTab
     private TMP_Text tierLine;
     private TMP_Text flavour;
     private readonly List<(GameObject root, Image icon, TMP_Text text)> brings = new List<(GameObject, Image, TMP_Text)>();
+    private readonly List<Image[]> bringStrips = new List<Image[]>();
+    private const int StripMost = 6;
+    private const float StripStep = 32f;
     private GameObject costBox;
     private TMP_Text costHeading;
     private int bringsFit;
@@ -164,6 +167,15 @@ public sealed class StationUpgradeTab
             text.fontSizeMin = 13f;
             text.fontSizeMax = 17f;
             brings.Add((row.gameObject, icon, text));
+            // A row of what it makes or opens, as pictures (the review of 2026-11-28: "Makes X, Y and 12 more" was a sentence).
+            var strip = new Image[StripMost];
+            for (int k = 0; k < StripMost; k++)
+            {
+                strip[k] = PictureOf(row, 42f + k * StripStep, 2f, 28f);
+                strip[k].gameObject.SetActive(false);
+            }
+
+            bringStrips.Add(strip);
         }
 
         RectTransform costRect = CodeUI.At("Cost Heading", left, 0f, costTop, LeftWidth, 34f);
@@ -303,6 +315,8 @@ public sealed class StationUpgradeTab
 
         // What it brings, each with its picture.
         var lines = new List<(Sprite picture, string icon, string text)>();
+        // A line's pictures, by its words: shown as a row of icons with the count after them.
+        var strips = new Dictionary<string, List<Sprite>>();
         if (shown != null && (next != null || raising))
         {
             List<RecipeDefinition> makes = crafting != null && definition.Station != CraftingStationType.None
@@ -311,15 +325,19 @@ public sealed class StationUpgradeTab
             if (makes.Count > 0)
             {
                 string names = string.Join(", ", makes.Take(2).Select(r => r.DisplayName));
-                lines.Add((makes[0].Output != null ? makes[0].Output.Icon : makes[0].OutputResource != null ? makes[0].OutputResource.Icon : null, "Hammer",
-                    $"Makes {names}{(makes.Count > 2 ? $" and {makes.Count - 2} more" : "")}"));
+                string line = $"Makes {names}{(makes.Count > 2 ? $" and {makes.Count - 2} more" : "")}";
+                lines.Add((makes[0].Output != null ? makes[0].Output.Icon : makes[0].OutputResource != null ? makes[0].OutputResource.Icon : null, "Hammer", line));
+                strips[line] = makes.Select(r => r.OutputIcon).Where(icon => icon != null).ToList();
             }
 
             List<string> opens = crafting != null ? BuildingUnlocks.OpenedBy(definition, shownTier, crafting.Buildings) : new List<string>();
             if (opens.Count > 0)
             {
                 // Two by name and a count, as "Makes" does: five names ran off the line ("Dry-s").
-                lines.Add((null, "House", $"Opens {string.Join(", ", opens.Take(2))}{(opens.Count > 2 ? $" and {opens.Count - 2} more" : "")}"));
+                string line = $"Opens {string.Join(", ", opens.Take(2))}{(opens.Count > 2 ? $" and {opens.Count - 2} more" : "")}";
+                lines.Add((null, "House", line));
+                strips[line] = opens.Select(name => crafting.Buildings.FirstOrDefault(b => b != null && b.DisplayName == name))
+                    .Where(b => b != null && b.Icon != null).Select(b => b.Icon).ToList();
             }
 
             foreach (BuildingModuleDefinition module in shown.unlocksModules.Where(m => m != null))
@@ -363,6 +381,31 @@ public sealed class StationUpgradeTab
             brings[i].icon.color = lines[i].picture != null ? Color.white : blocked ? style.Danger : HearthKit.IconColour(lines[i].icon);
             brings[i].text.text = blocked ? lines[i].text : HearthKit.ToneNumbers(lines[i].text);
             brings[i].text.color = blocked ? style.Danger : style.Text;
+
+            // With pictures: its icons in a row (their names on the line's words below, as before, but short), the rest counted.
+            Image[] strip = bringStrips[i];
+            bool pictured = strips.TryGetValue(lines[i].text, out List<Sprite> icons) && icons.Count > 1;
+            int count = pictured ? Mathf.Min(icons.Count, StripMost) : 0;
+            // Read as "Makes 14" then the pictures: the verb and the count first, the icons after them.
+            const float wordsWidth = 92f;
+            for (int k = 0; k < strip.Length; k++)
+            {
+                strip[k].gameObject.SetActive(k < count);
+                if (k < count)
+                {
+                    strip[k].sprite = icons[k];
+                    strip[k].color = Color.white;
+                    strip[k].rectTransform.anchoredPosition = new Vector2(42f + wordsWidth + k * StripStep, strip[k].rectTransform.anchoredPosition.y);
+                }
+            }
+
+            RectTransform words = brings[i].text.rectTransform;
+            words.sizeDelta = new Vector2(pictured ? wordsWidth : LeftWidth - Pad * 2f - 42f, words.sizeDelta.y);
+            if (pictured)
+            {
+                string verb = lines[i].text.Split(' ')[0];
+                brings[i].text.text = $"{verb} <color=#{ColorUtility.ToHtmlStringRGB(UIStyle.Current.AccentBright)}>{icons.Count}</color>";
+            }
         }
 
         // Each material against what it costs, or the scaffold's progress.

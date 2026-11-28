@@ -37,6 +37,20 @@ public static class RaidReportFacts
 
     /// <summary>The facts in reading order, grouped. <paramref name="eventPicture"/> finds an event's painting from its line ("The Troll
     /// Wedding: Watch unseen"), or null.</summary>
+    // The face of what brought the player down, by the name the report keeps (a creature's; a named one, a Lost One, has none here).
+    private static Sprite PortraitOf(string broughtDownBy)
+    {
+        foreach (MonsterDefinition creature in Resources.FindObjectsOfTypeAll<MonsterDefinition>())
+        {
+            if (creature != null && creature.Portrait != null && string.Equals(creature.DisplayName, broughtDownBy, System.StringComparison.OrdinalIgnoreCase))
+            {
+                return creature.Portrait;
+            }
+        }
+
+        return null;
+    }
+
     public static List<ReportFact> For(RaidReport report, System.Func<string, Sprite> eventPicture = null)
     {
         var facts = new List<ReportFact>();
@@ -50,7 +64,8 @@ public static class RaidReportFacts
         {
             string line = !string.IsNullOrEmpty(report.KillerAdvice) ? report.KillerAdvice
                 : report.LastBlows != null && report.LastBlows.Count > 0 ? "The last blows: " + string.Join("; ", report.LastBlows) : "";
-            facts.Add(new ReportFact { Group = People, Icon = "Skull", Title = $"Brought down by {CreatureRecords.ByWhom(report.BroughtDownBy)}", Line = line, Tone = FactTone.Bad });
+            facts.Add(new ReportFact { Group = People, Icon = "Skull", Picture = PortraitOf(report.BroughtDownBy),
+                Title = $"Brought down by {CreatureRecords.ByWhom(report.BroughtDownBy)}", Line = line, Tone = FactTone.Bad });
         }
 
         if (!report.Extracted)

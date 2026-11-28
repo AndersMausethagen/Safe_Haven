@@ -118,7 +118,11 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     [Header("World Sounds")]
     [SerializeField] private SoundDefinition questStarted;
     [SerializeField] private SoundDefinition questCompleted;
+    [Tooltip("Something made, where no station below has its own sound.")]
     [SerializeField] private SoundDefinition crafted;
+    [Tooltip("What is made has its own sound by where it is made (the user, 2026-11-28: \"what we make must have its own sound " +
+             "based on what we are making\"): metal at the Smithy, wood at the Woodcutter's Lodge, and so on. A station not listed uses Crafted.")]
+    [SerializeField] private List<StationSound> craftedAt = new List<StationSound>();
     [SerializeField] private SoundDefinition built;
     [Tooltip("Eating or drinking.")]
     [SerializeField] private SoundDefinition consumed;
@@ -247,6 +251,28 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     public SoundDefinition QuestStarted => questStarted;
     public SoundDefinition QuestCompleted => questCompleted;
     public SoundDefinition Crafted => crafted;
+
+    /// <summary>One station's sound for what is made there.</summary>
+    [System.Serializable]
+    public struct StationSound
+    {
+        public CraftingStationType station;
+        public SoundDefinition sound;
+    }
+
+    /// <summary>The sound of something made at <paramref name="station"/>: its own, else Crafted.</summary>
+    public SoundDefinition CraftedAt(CraftingStationType station)
+    {
+        foreach (StationSound entry in craftedAt)
+        {
+            if (entry.station == station && entry.sound != null)
+            {
+                return entry.sound;
+            }
+        }
+
+        return crafted;
+    }
     public SoundDefinition Built => built;
     public SoundDefinition Consumed => consumed;
     public SoundDefinition ItemDropped => itemDropped;

@@ -18,14 +18,22 @@ public sealed class KitHaul
     private readonly TMP_Text heading;
     private readonly TMP_Text empty;
     private readonly float cardSize;
+    // Each card's name under it, when asked (storage: "pictures with names", the review of 2026-11-28).
+    private readonly bool named;
+    private const float NameHeight = 30f;
     private readonly List<(GameObject root, Image icon, Image rim, TMP_Text count, TMP_Text more)> cards =
         new List<(GameObject, Image, Image, TMP_Text, TMP_Text)>();
+    private readonly List<TMP_Text> names = new List<TMP_Text>();
+
+    private float Step => cardSize + Gap + (named ? NameHeight : 0f);
 
     /// <param name="parent">What it is laid in; it fills the parent's width from <paramref name="y"/> down.</param>
-    public KitHaul(RectTransform parent, string name, float y, float cardSize)
+    /// <param name="named">Each thing's name under its card.</param>
+    public KitHaul(RectTransform parent, string name, float y, float cardSize, bool named = false)
     {
         UIStyle style = UIStyle.Current;
         this.cardSize = cardSize;
+        this.named = named;
         root = CodeUI.At(name, parent, 0f, y, 0f, 0f);
         root.anchorMin = new Vector2(0f, 1f);
         root.anchorMax = new Vector2(1f, 1f);
@@ -62,12 +70,12 @@ public sealed class KitHaul
         root.gameObject.SetActive(true);
         heading.text = (icon != null ? HearthKit.InlineIcon(icon, tint) + "  " : "") + title;
 
-        var shown = new List<(Sprite picture, Color rim, int amount)>();
+        var shown = new List<(Sprite picture, Color rim, int amount, string name)>();
         foreach (ItemAmount item in items)
         {
             if (item.Item != null && item.Amount > 0)
             {
-                shown.Add((item.Item.Icon, item.Item.Rarity > ItemRarity.Common ? Rarity.ColorOf(item.Item.Rarity) : HearthKit.Faded(style.Accent, 0.45f), item.Amount));
+                shown.Add((item.Item.Icon, item.Item.Rarity > ItemRarity.Common ? Rarity.ColorOf(item.Item.Rarity) : HearthKit.Faded(style.Accent, 0.45f), item.Amount, item.Item.DisplayName));
             }
         }
 
@@ -75,7 +83,7 @@ public sealed class KitHaul
         {
             if (resource.Resource != null && resource.Amount > 0)
             {
-                shown.Add((resource.Resource.Icon, HearthKit.Faded(style.Accent, 0.45f), resource.Amount));
+                shown.Add((resource.Resource.Icon, HearthKit.Faded(style.Accent, 0.45f), resource.Amount, resource.Resource.DisplayName));
             }
         }
 
@@ -103,8 +111,13 @@ public sealed class KitHaul
 
             var card = cards[i];
             card.root.SetActive(true);
-            ((RectTransform)card.root.transform).anchoredPosition = new Vector2(i % perRow * (cardSize + Gap), -(HeadingHeight + 4f + i / perRow * (cardSize + Gap)));
+            ((RectTransform)card.root.transform).anchoredPosition = new Vector2(i % perRow * (cardSize + Gap), -(HeadingHeight + 4f + i / perRow * Step));
             bool last = rest > 0 && i == cardsShown - 1;
+            if (named)
+            {
+                names[i].gameObject.SetActive(true);
+                names[i].text = last ? "" : shown[i].name;
+            }
             card.icon.enabled = !last && shown[i].picture != null;
             card.icon.sprite = last ? null : shown[i].picture;
             card.rim.color = last ? HearthKit.Faded(style.Accent, 0.3f) : shown[i].rim;
@@ -116,7 +129,7 @@ public sealed class KitHaul
 
         HideCards(cardsShown);
         int rowsUsed = (cardsShown + perRow - 1) / perRow;
-        return HeadingHeight + 4f + rowsUsed * (cardSize + Gap);
+        return HeadingHeight + 4f + rowsUsed * Step;
     }
 
     private void HideCards(int from)
@@ -125,6 +138,18 @@ public sealed class KitHaul
         {
             cards[i].root.SetActive(false);
         }
+    }
+
+    // The name under the card, a part of the card so it moves and hides with it: two short lines, small.
+    private TMP_Text NameUnder(RectTransform card)
+    {
+        TMP_Text label = CodeUI.Label("Name", card, -4f, cardSize + 2f, cardSize + 8f, NameHeight, 12f, UIStyle.Current.Muted, TextAlignmentOptions.Top);
+        label.textWrappingMode = TextWrappingModes.Normal;
+        label.enableAutoSizing = true;
+        label.fontSizeMin = 10f;
+        label.fontSizeMax = 12f;
+        label.raycastTarget = false;
+        return label;
     }
 
     private (GameObject, Image, Image, TMP_Text, TMP_Text) MakeCard(int index)
@@ -149,6 +174,11 @@ public sealed class KitHaul
         more.fontStyle = FontStyles.Bold;
         more.textWrappingMode = TextWrappingModes.Normal;
         rim.transform.SetAsLastSibling();
+        if (named)
+        {
+            names.Add(NameUnder(card));
+        }
+
         return (card.gameObject, icon, rim, count, more);
     }
 

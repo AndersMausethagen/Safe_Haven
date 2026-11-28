@@ -442,8 +442,8 @@ public sealed partial class StashWindow : MonoBehaviour
         {
             Vector2 at = resourcesLabel.rectTransform.anchoredPosition;
             float half = (resourcesLabel.rectTransform.rect.width - 24f) * 0.5f;
-            storedHaul = new KitHaul(CodeUI.At("Stored Resources", panel, at.x, -at.y, half, 120f), "Haul", 0f, 46f);
-            carriedHaul = new KitHaul(CodeUI.At("Carried Resources", panel, at.x + half + 24f, -at.y, half, 120f), "Haul", 0f, 46f);
+            storedHaul = new KitHaul(CodeUI.At("Stored Resources", panel, at.x, -at.y, half, 120f), "Haul", 0f, 46f, named: true);
+            carriedHaul = new KitHaul(CodeUI.At("Carried Resources", panel, at.x + half + 24f, -at.y, half, 120f), "Haul", 0f, 46f, named: true);
             resourcesLabel.gameObject.SetActive(false);
         }
 
