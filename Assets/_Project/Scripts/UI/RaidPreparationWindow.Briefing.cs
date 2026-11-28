@@ -257,6 +257,30 @@ public sealed partial class RaidPreparationWindow
             });
         }
 
+        // The traders' asks (Docs/TradeResearch_2026-11-28.md): brought to the Trading Post the next time they are here. One's own only.
+        if (!HavenVisit.IsVisiting && GameSession.Home != null)
+        {
+            foreach (TraderDefinition trader in TradeSettings.Current.Traders)
+            {
+                TraderDefinition.Ask ask = trader != null && GameSession.Home.Trade.Knows(trader.Id) ? TradeFavours.AskOf(trader, GameSession.Home.Trade.Of(trader.Id)) : null;
+                if (ask == null)
+                {
+                    continue;
+                }
+
+                int home = TradeFavours.AtHome(ask, bag != null ? bag.Container : null, GameSession.Stash != null ? GameSession.Stash.Items : null);
+                string reward = ask.reward != null && ask.rewardCount > 0 ? $"{ask.rewardCount} {ask.reward.DisplayName} and " : "";
+                eventFaces.Add(new CardFace
+                {
+                    Name = $"{trader.DisplayName} asks", Picture = ask.wanted.Icon, Icon = trader.Icon,
+                    Badge = $"×{ask.count}", Rim = home >= ask.count ? style.Good : (Color?)null,
+                    TipTitle = $"{trader.DisplayName} asks for {ask.count} {ask.wanted.DisplayName}", TipColour = style.Accent,
+                    TipBody = $"{home}/{ask.count} home. Bring them to the Trading Post when {trader.DisplayName} is there, for {reward}standing.",
+                    TipIcon = ask.wanted.Icon,
+                });
+            }
+        }
+
         Player player = plan.Player != null ? plan.Player.GetComponent<Player>() : null;
         List<WantedAtHome.Want> wants = player != null ? WantedAtHome.Now(player) : new List<WantedAtHome.Want>();
         for (int i = 0; i < wants.Count && i < MaxWantedCards; i++)

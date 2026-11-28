@@ -1,0 +1,185 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 278934ec54fed364aae18f7db25acfc6, type: 3}
+  m_Name: Tinker
+  m_EditorClassIdentifier: SafeHaven::TraderDefinition
+  id: tinker
+  displayName: Hallgerd the Tinker
+  greeting: '"Bring me what''s broken. Old iron, bent blades. I make it sing again."'
+  icon: Hammer
+  visitChance: 0
+  trustedVisitChance: 0
+  everyNthRaid: 3
+  fromRaid: 0
+  smithyTier: 1
+  hereFirst: 0
+  onlyAfterDark: 0
+  buysKinds: 0000000004000000i
+  alsoBuys:
+  - {fileID: 11400000, guid: a9f806359436036488427616ef8b8c44, type: 2}
+  - {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
+  - {fileID: 11400000, guid: fdf61b2bcc4fcfb47b96885b254e02e6, type: 2}
+  - {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
+  - {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+  - {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
+  - {fileID: 11400000, guid: b35295da40fa97843a2ce4d780d32456, type: 2}
+  - {fileID: 11400000, guid: eb3d99f0c55775f478920e3c7839296b, type: 2}
+  - {fileID: 11400000, guid: 9faf976b90b38d34fad782fa94d8970b, type: 2}
+  - {fileID: 11400000, guid: ae2b31c30cd17f44297a7cf3ef8c35df, type: 2}
+  - {fileID: 11400000, guid: 8e4b25b050fb23840a86f61b5a5b074c, type: 2}
+  - {fileID: 11400000, guid: 96459a8d9566ae74cb04ee74d08a597b, type: 2}
+  refuses: []
+  refusesWord: 
+  refusalLine: She has no use for food or finery.
+  plainGearShare: 0.5
+  dealsInCoin: 1
+  pack: 300
+  packPerTier: 120
+  stock:
+  - item: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
+    least: 6
+    most: 12
+    chance: 1
+    smithyTier: 1
+    standingTier: 0
+  - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+    least: 6
+    most: 12
+    chance: 0.8
+    smithyTier: 2
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
+    least: 2
+    most: 4
+    chance: 0.5
+    smithyTier: 3
+    standingTier: 1
+  - item: {fileID: 11400000, guid: d4d2a84b7c6083a4dba750243db7aae9, type: 2}
+    least: 10
+    most: 20
+    chance: 0.6
+    smithyTier: 1
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 00ba07c192ec91a41bcdfd19fad1cca8, type: 2}
+    least: 1
+    most: 1
+    chance: 0.5
+    smithyTier: 1
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 174bdf8b6dd19c743a0a229e1ad4c35f, type: 2}
+    least: 1
+    most: 1
+    chance: 0.5
+    smithyTier: 1
+    standingTier: 0
+  - item: {fileID: 11400000, guid: ed349bbf77e6cd94b8d5604d335dbb99, type: 2}
+    least: 1
+    most: 1
+    chance: 0.5
+    smithyTier: 1
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 38a660d3ebd97e848ad357ec4f3afb8b, type: 2}
+    least: 1
+    most: 1
+    chance: 0.5
+    smithyTier: 2
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 44bb107354f1ab642ad103daabd39268, type: 2}
+    least: 1
+    most: 1
+    chance: 0.5
+    smithyTier: 2
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 6cc78258fdf4f6d439ac16b7956a97fe, type: 2}
+    least: 1
+    most: 1
+    chance: 0.5
+    smithyTier: 2
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 0dfb05089b661eb458b2f970761e95b4, type: 2}
+    least: 1
+    most: 2
+    chance: 0.7
+    smithyTier: 2
+    standingTier: 0
+  - item: {fileID: 11400000, guid: c1b0820dabd6ea743a1ab412a359310c, type: 2}
+    least: 1
+    most: 1
+    chance: 0.3
+    smithyTier: 1
+    standingTier: 1
+  - item: {fileID: 11400000, guid: 4a00889f8a6944449a33bdc6f69186a9, type: 2}
+    least: 1
+    most: 1
+    chance: 0.4
+    smithyTier: 1
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 5d540e3d0ccff3f448c44b3f5ebe25ed, type: 2}
+    least: 20
+    most: 40
+    chance: 0.6
+    smithyTier: 1
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 7a38aff532c72f74bb08cd06c1c3376a, type: 2}
+    least: 1
+    most: 1
+    chance: 0.35
+    smithyTier: 1
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 5b62859d111deea49b045373b4d1ae83, type: 2}
+    least: 1
+    most: 1
+    chance: 0.35
+    smithyTier: 2
+    standingTier: 1
+  - item: {fileID: 11400000, guid: 86f8c5f7fb3e1ce4781732db39580ccb, type: 2}
+    least: 1
+    most: 1
+    chance: 0.25
+    smithyTier: 2
+    standingTier: 2
+  wants:
+  - {fileID: 11400000, guid: b35295da40fa97843a2ce4d780d32456, type: 2}
+  - {fileID: 11400000, guid: eb3d99f0c55775f478920e3c7839296b, type: 2}
+  - {fileID: 11400000, guid: 9faf976b90b38d34fad782fa94d8970b, type: 2}
+  - {fileID: 11400000, guid: ae2b31c30cd17f44297a7cf3ef8c35df, type: 2}
+  - {fileID: 11400000, guid: 8e4b25b050fb23840a86f61b5a5b074c, type: 2}
+  - {fileID: 11400000, guid: 96459a8d9566ae74cb04ee74d08a597b, type: 2}
+  - {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+  wantsPerVisit: 2
+  asks:
+  - id: t_ingots
+    wanted: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+    count: 8
+    reward: {fileID: 11400000, guid: 0dfb05089b661eb458b2f970761e95b4, type: 2}
+    rewardCount: 1
+    standing: 15
+    smithyTier: 2
+    thanks: Good bloom in these. You've a decent forge.
+  - id: t_pots
+    wanted: {fileID: 11400000, guid: eb3d99f0c55775f478920e3c7839296b, type: 2}
+    count: 2
+    reward: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
+    rewardCount: 6
+    standing: 15
+    smithyTier: 1
+    thanks: Old copper melts sweetest.
+  - id: t_axe
+    wanted: {fileID: 11400000, guid: 38a660d3ebd97e848ad357ec4f3afb8b, type: 2}
+    count: 1
+    reward: {fileID: 11400000, guid: c1b0820dabd6ea743a1ab412a359310c, type: 2}
+    rewardCount: 1
+    standing: 15
+    smithyTier: 2
+    thanks: A fair edge. Take these, you'll want them at the anvil.
+  giftWeight: 1
+  haggleWord: Haggle

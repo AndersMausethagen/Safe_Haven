@@ -972,6 +972,8 @@ Restore, discover, rescue, deliver, negotiate, escort, gather, investigate, and 
 
 Trade may rely on materials, favors, or cleverly negotiated bargains rather than a huge currency economy. Askeladden-inspired encounters allow dialogue, riddles, and unexpected item uses. Show the likely cost or risk of bargain options where fairness requires it.
 
+**The Trading Post (built November 28, 2026; `Docs/TradeResearch_2026-11-28.md`).** Three traders come with the homecomings: Knut the Pedlar (most homecomings; materials, food, valuables, good work), Hallgerd the Tinker (every third raid once the Smithy stands; gear, tools, metal, junk finds, plain gear for scrap) and the Hidden Folk (rarely, after the third raid, only after dark; odd and old things, raid charms; they refuse iron and coin). Trade is barter in one window: goods for goods, with Tarnished Coin making up the balance either way. Prices follow standing (Stranger, Known, Trusted, Friend), make and wear, what a trader wants this visit, and how much of a thing they have already been sold; nothing bought can be sold back at a gain. Each trader posts an ask (shown in the raid planner) for a reward and standing, and a haggle can be tried once a visit, its odds and cost shown first. Not yet: Hidden Folk bargains paid in something other than goods, a trader to see at the post, a trader's lost cart found on a raid.
+
 ### 17.4 Reactive world
 
 NPC rumors can forecast events, cleansed shrines can affect future raid chances, and boss victories can alter routes or village dialogue. Prioritize reactivity visible within one or two play sessions rather than expensive branching content hidden from most players.

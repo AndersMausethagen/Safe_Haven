@@ -24,6 +24,8 @@ public sealed class SaveCoverageTests
     {
         ["Quests.entries"] = "QuestTests, QuestPacingTests (status, counts, rewards waiting)",
         ["Settlement.Territory.holds"] = "TerritoryTests.TheLands_SurviveASave",
+        // Traders by their real ids, with stock of real items: the probe's filler gives neither.
+        ["Settlement.Trade.traders"] = "TradeTests.TheTraders_SurviveASave",
         ["Settlement.Plunder"] = "DeathRulesTests.TheRulesAndThePlunder_AreSaved_AndOldSavesAreNormal (its leader and items)",
         // People (Docs/PeopleResearch_2026-11-23.md): kit is a real item's stack, passions only Passion's values and standings only
         // pairs of ids, none of which the probe's filler gives; each is round-tripped in its own test.

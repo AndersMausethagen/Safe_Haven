@@ -165,16 +165,23 @@ public sealed class HavenProgressionTests
     }
 
     [Test]
-    public void TheCaravan_DealsInThingsThatExist_AndKeepsToTheLadder()
+    public void TheTraders_DealInThingsThatExist_AndKeepToTheLadder()
     {
         TradeSettings trade = TradeSettings.Current;
         Assert.NotNull(trade.Coin);
-        Assert.IsNotEmpty(trade.Sales);
-        foreach (TradeSettings.Offer offer in trade.Offers)
+        int checkedEntries = 0;
+        foreach (TraderDefinition trader in trade.Traders)
         {
-            Assert.NotNull(offer.item);
-            Assert.LessOrEqual(offer.item.Tier, offer.smithyTier + 2, $"{offer.item.name} climbs ahead of the Smithy");
+            Assert.NotNull(trader);
+            foreach (TraderDefinition.StockEntry entry in trader.Stock)
+            {
+                Assert.NotNull(entry.item, $"{trader.name} has an empty stock entry");
+                Assert.LessOrEqual(entry.item.Tier, entry.smithyTier + 2, $"{trader.name}'s {entry.item.name} climbs ahead of the Smithy");
+                checkedEntries++;
+            }
         }
+
+        Assert.Greater(checkedEntries, 0);
     }
 
     [Test]

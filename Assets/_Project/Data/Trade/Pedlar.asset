@@ -1,0 +1,250 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 278934ec54fed364aae18f7db25acfc6, type: 3}
+  m_Name: Pedlar
+  m_EditorClassIdentifier: SafeHaven::TraderDefinition
+  id: pedlar
+  displayName: Knut the Pedlar
+  greeting: '"Ore, hides, a bit of everything. And I''ll take what the woods give you."'
+  icon: Wheel
+  visitChance: 0.75
+  trustedVisitChance: 0.9
+  everyNthRaid: 0
+  fromRaid: 0
+  smithyTier: 0
+  hereFirst: 1
+  onlyAfterDark: 0
+  buysKinds: 0200000005000000010000000000000004000000i
+  alsoBuys: []
+  refuses:
+  - {fileID: 11400000, guid: 3bc5c06eef042084b9fc28865091670b, type: 2}
+  - {fileID: 11400000, guid: 9f085f39a2da68c45b58d2db986835f4, type: 2}
+  - {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
+  - {fileID: 11400000, guid: 10c81a33462696a469286ca0416bb78e, type: 2}
+  refusesWord: 
+  refusalLine: 
+  plainGearShare: 0
+  dealsInCoin: 1
+  pack: 400
+  packPerTier: 150
+  stock:
+  - item: {fileID: 11400000, guid: a9f806359436036488427616ef8b8c44, type: 2}
+    least: 10
+    most: 18
+    chance: 1
+    smithyTier: 0
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 4c7e3b0b4de138843be249872ebf3393, type: 2}
+    least: 5
+    most: 8
+    chance: 1
+    smithyTier: 1
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 183fddc5567e8b8479fcb1618e73496c, type: 2}
+    least: 4
+    most: 6
+    chance: 1
+    smithyTier: 1
+    standingTier: 0
+  - item: {fileID: 11400000, guid: acb3416df6dae1b439a8b3945c3f098e, type: 2}
+    least: 4
+    most: 6
+    chance: 1
+    smithyTier: 0
+    standingTier: 0
+  - item: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
+    least: 10
+    most: 18
+    chance: 1
+    smithyTier: 2
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 8f121a970bae6f54dbcc8ff5e2c2a48e, type: 2}
+    least: 1
+    most: 2
+    chance: 1
+    smithyTier: 2
+    standingTier: 0
+  - item: {fileID: 11400000, guid: fdf61b2bcc4fcfb47b96885b254e02e6, type: 2}
+    least: 3
+    most: 6
+    chance: 1
+    smithyTier: 3
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 03656529f70038c47baa4a9103025a81, type: 2}
+    least: 1
+    most: 1
+    chance: 1
+    smithyTier: 3
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 50d6dfa982b3a264980eaec31b4aae11, type: 2}
+    least: 1
+    most: 1
+    chance: 1
+    smithyTier: 3
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 1b426c80d20dbcd4ea2e82901b9dbfb9, type: 2}
+    least: 1
+    most: 1
+    chance: 1
+    smithyTier: 3
+    standingTier: 0
+  - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
+    least: 1
+    most: 1
+    chance: 1
+    smithyTier: 4
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 5148bc82bfb79f94ca5482ed8e4ea69f, type: 2}
+    least: 2
+    most: 4
+    chance: 1
+    smithyTier: 0
+    standingTier: 0
+  - item: {fileID: 11400000, guid: b07b0deedefdd4e4b819b7506154af44, type: 2}
+    least: 1
+    most: 2
+    chance: 1
+    smithyTier: 2
+    standingTier: 0
+  - item: {fileID: 11400000, guid: a740a2c1da7fe61468d2d309b7b21fb0, type: 2}
+    least: 1
+    most: 2
+    chance: 1
+    smithyTier: 2
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 7a7fe539c225ffa48a608e7af98d39e4, type: 2}
+    least: 3
+    most: 6
+    chance: 0.8
+    smithyTier: 0
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 7400170a621d51d43a051a8899ec5b20, type: 2}
+    least: 2
+    most: 4
+    chance: 0.7
+    smithyTier: 0
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 05a3b8e12c05cb548b40065962d3b860, type: 2}
+    least: 4
+    most: 8
+    chance: 0.6
+    smithyTier: 0
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 3b62415dd6630ea4ca86bcf751d2891a, type: 2}
+    least: 1
+    most: 2
+    chance: 0.5
+    smithyTier: 1
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 9fd41ebfb0b7848419e49298716c7565, type: 2}
+    least: 1
+    most: 2
+    chance: 0.4
+    smithyTier: 0
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 79744f7a29634cb408f4829b51ec5918, type: 2}
+    least: 1
+    most: 1
+    chance: 0.3
+    smithyTier: 0
+    standingTier: 0
+  - item: {fileID: 11400000, guid: a8a7979be2e352645ba8a1b8612ae37c, type: 2}
+    least: 1
+    most: 1
+    chance: 0.3
+    smithyTier: 1
+    standingTier: 1
+  - item: {fileID: 11400000, guid: ff9d97d9d45a99f439a3df21add6df1a, type: 2}
+    least: 1
+    most: 1
+    chance: 0.25
+    smithyTier: 1
+    standingTier: 1
+  - item: {fileID: 11400000, guid: 255dad5d884b7fe4390846d2c97ef008, type: 2}
+    least: 1
+    most: 1
+    chance: 0.25
+    smithyTier: 0
+    standingTier: 1
+  - item: {fileID: 11400000, guid: d50ecf78aa2823b4da064d9faffa84ab, type: 2}
+    least: 1
+    most: 1
+    chance: 0.25
+    smithyTier: 0
+    standingTier: 1
+  - item: {fileID: 11400000, guid: 8d5b54b026c1a5945abb106b44ae1a3e, type: 2}
+    least: 1
+    most: 1
+    chance: 0.25
+    smithyTier: 0
+    standingTier: 1
+  - item: {fileID: 11400000, guid: 8c6f621e5beff16449d36ccc6e4168e4, type: 2}
+    least: 1
+    most: 1
+    chance: 0.2
+    smithyTier: 0
+    standingTier: 2
+  - item: {fileID: 11400000, guid: b8203c3a14fd7044081911ebb8031635, type: 2}
+    least: 1
+    most: 1
+    chance: 0.2
+    smithyTier: 0
+    standingTier: 2
+  wants:
+  - {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
+  - {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
+  - {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+  - {fileID: 11400000, guid: 5b9dacc5b9eb6cc44b9e831ab423c051, type: 2}
+  - {fileID: 11400000, guid: 7b474eec64e460840bbcadb1a0fa3cf8, type: 2}
+  - {fileID: 11400000, guid: 1dd65120c9bb0304c8a45a8012af934c, type: 2}
+  - {fileID: 11400000, guid: 8ae780c7423381b4bae5edf4e4beabc9, type: 2}
+  - {fileID: 11400000, guid: d223892dc77348c4e921cc0139490553, type: 2}
+  - {fileID: 11400000, guid: 8dbb4db9361b13f4d9df890da55ab723, type: 2}
+  - {fileID: 11400000, guid: bc8014e1fda9522409926dc1b279a7df, type: 2}
+  - {fileID: 11400000, guid: 47784c8fa821e504d9388dda49fde2c1, type: 2}
+  - {fileID: 11400000, guid: bb670a5310dbb494296de3c93180cebd, type: 2}
+  wantsPerVisit: 2
+  asks:
+  - id: p_linen
+    wanted: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+    count: 6
+    reward: {fileID: 11400000, guid: d0c7b274979b4ad46a9f3bf89b8cfa64, type: 2}
+    rewardCount: 2
+    standing: 15
+    smithyTier: 0
+    thanks: Good weave. The coast folk will pay for this.
+  - id: p_planks
+    wanted: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
+    count: 10
+    reward: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
+    rewardCount: 12
+    standing: 15
+    smithyTier: 1
+    thanks: Straight and dry. A cart wants mending, down the road.
+  - id: p_boar
+    wanted: {fileID: 11400000, guid: 8dbb4db9361b13f4d9df890da55ab723, type: 2}
+    count: 8
+    reward: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+    rewardCount: 3
+    standing: 15
+    smithyTier: 0
+    thanks: That'll feed the road for a week.
+  - id: p_leather
+    wanted: {fileID: 11400000, guid: 5b9dacc5b9eb6cc44b9e831ab423c051, type: 2}
+    count: 5
+    reward: {fileID: 11400000, guid: 4a00889f8a6944449a33bdc6f69186a9, type: 2}
+    rewardCount: 1
+    standing: 15
+    smithyTier: 1
+    thanks: Well cured. Here, a pack for your trouble.
+  giftWeight: 1
+  haggleWord: Haggle

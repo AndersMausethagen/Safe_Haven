@@ -1,0 +1,176 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 278934ec54fed364aae18f7db25acfc6, type: 3}
+  m_Name: HiddenFolk
+  m_EditorClassIdentifier: SafeHaven::TraderDefinition
+  id: hidden_folk
+  displayName: The Hidden Folk
+  greeting: Tall, fair, and somehow never quite there when you look straight at them.
+  icon: Eye
+  visitChance: 0.2
+  trustedVisitChance: 0.35
+  everyNthRaid: 0
+  fromRaid: 3
+  smithyTier: 0
+  hereFirst: 0
+  onlyAfterDark: 1
+  buysKinds: 05000000i
+  alsoBuys:
+  - {fileID: 11400000, guid: 1dd65120c9bb0304c8a45a8012af934c, type: 2}
+  - {fileID: 11400000, guid: 3424566669e19bc489098ff49fc1cd94, type: 2}
+  - {fileID: 11400000, guid: 4f0ad2fc96d35f9458f41cc859ab82a9, type: 2}
+  - {fileID: 11400000, guid: a8a861b083501ca4b9075a3301be4179, type: 2}
+  - {fileID: 11400000, guid: 8ae780c7423381b4bae5edf4e4beabc9, type: 2}
+  - {fileID: 11400000, guid: 34fa458137110d444aa8c6b83d409af1, type: 2}
+  - {fileID: 11400000, guid: d799dc8161ff2854dae1eedf4b74fb09, type: 2}
+  - {fileID: 11400000, guid: bb670a5310dbb494296de3c93180cebd, type: 2}
+  - {fileID: 11400000, guid: 74c0a8be248a5264aaf67f85d390ee8b, type: 2}
+  - {fileID: 11400000, guid: 56e2fd4d1b777f24ca26e167686a976c, type: 2}
+  - {fileID: 11400000, guid: a05ec5c068d801f4ca366a23e00a7460, type: 2}
+  - {fileID: 11400000, guid: c7138267f80f6644fb98ef1cc46e7dab, type: 2}
+  - {fileID: 11400000, guid: 5ba06c1f22013654e91c4c7947b89f3a, type: 2}
+  - {fileID: 11400000, guid: 4d806f8c540dab745a40eaf702d37208, type: 2}
+  - {fileID: 11400000, guid: 5023814a107d1c54a9f8112067a132a0, type: 2}
+  - {fileID: 11400000, guid: c64928309e5e1174ca29510d8cf2b8ee, type: 2}
+  - {fileID: 11400000, guid: be33534fe22e92d4da7e71d0c79c6e14, type: 2}
+  - {fileID: 11400000, guid: ae22b153092c1c747b502abc286670d3, type: 2}
+  - {fileID: 11400000, guid: 879892b28cd655c4eb0dc5e67595c810, type: 2}
+  - {fileID: 11400000, guid: b07b0deedefdd4e4b819b7506154af44, type: 2}
+  - {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+  - {fileID: 11400000, guid: 60f197d85a8882842b5afeddf2230847, type: 2}
+  - {fileID: 11400000, guid: c1a0e8dc56608934790b8f29d7fba0bd, type: 2}
+  - {fileID: 11400000, guid: 15d1c587fc1b8f34696d9b01c733b94e, type: 2}
+  refuses: []
+  refusesWord: iron
+  refusalLine: They draw back from anything of iron, and take no coin.
+  plainGearShare: 0
+  dealsInCoin: 0
+  pack: 250
+  packPerTier: 100
+  stock:
+  - item: {fileID: 11400000, guid: 09430d0392f27ec40a8d0489ec683073, type: 2}
+    least: 1
+    most: 1
+    chance: 0.6
+    smithyTier: 0
+    standingTier: 0
+  - item: {fileID: 11400000, guid: c16c6e5687072684f98624510f9c6be6, type: 2}
+    least: 1
+    most: 1
+    chance: 0.5
+    smithyTier: 0
+    standingTier: 0
+  - item: {fileID: 11400000, guid: a167bc765cfa5094491385117d4c09e9, type: 2}
+    least: 1
+    most: 1
+    chance: 0.4
+    smithyTier: 0
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 66e70a4a8a960b649aebd518ae29a921, type: 2}
+    least: 1
+    most: 1
+    chance: 0.4
+    smithyTier: 0
+    standingTier: 1
+  - item: {fileID: 11400000, guid: 2fce3ba0ebc77694bbee5fd6731eaab4, type: 2}
+    least: 1
+    most: 1
+    chance: 0.25
+    smithyTier: 0
+    standingTier: 2
+  - item: {fileID: 11400000, guid: 0540766d3e030b04fa14088f02d2c425, type: 2}
+    least: 2
+    most: 4
+    chance: 0.8
+    smithyTier: 0
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 8e6ede873458c364388be7d413735f64, type: 2}
+    least: 1
+    most: 2
+    chance: 0.5
+    smithyTier: 1
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 9a93dba1b3ed82043b5fe010e9766d67, type: 2}
+    least: 1
+    most: 2
+    chance: 0.5
+    smithyTier: 0
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 56e2fd4d1b777f24ca26e167686a976c, type: 2}
+    least: 3
+    most: 6
+    chance: 0.6
+    smithyTier: 0
+    standingTier: 0
+  - item: {fileID: 11400000, guid: b1c908dc52f27d245ac297b292dc261b, type: 2}
+    least: 1
+    most: 1
+    chance: 0.3
+    smithyTier: 0
+    standingTier: 0
+  - item: {fileID: 11400000, guid: fdf61b2bcc4fcfb47b96885b254e02e6, type: 2}
+    least: 2
+    most: 3
+    chance: 0.35
+    smithyTier: 3
+    standingTier: 1
+  - item: {fileID: 11400000, guid: fe3807eed98ffec4787bc4f558229114, type: 2}
+    least: 1
+    most: 1
+    chance: 0.2
+    smithyTier: 1
+    standingTier: 2
+  - item: {fileID: 11400000, guid: 9fd41ebfb0b7848419e49298716c7565, type: 2}
+    least: 1
+    most: 2
+    chance: 0.4
+    smithyTier: 0
+    standingTier: 0
+  - item: {fileID: 11400000, guid: 06321fa18cb018b4abc8432713f21aab, type: 2}
+    least: 1
+    most: 2
+    chance: 0.4
+    smithyTier: 0
+    standingTier: 0
+  wants:
+  - {fileID: 11400000, guid: 34fa458137110d444aa8c6b83d409af1, type: 2}
+  - {fileID: 11400000, guid: 3424566669e19bc489098ff49fc1cd94, type: 2}
+  - {fileID: 11400000, guid: a8a861b083501ca4b9075a3301be4179, type: 2}
+  - {fileID: 11400000, guid: 4f0ad2fc96d35f9458f41cc859ab82a9, type: 2}
+  wantsPerVisit: 1
+  asks:
+  - id: h_porridge
+    wanted: {fileID: 11400000, guid: 34fa458137110d444aa8c6b83d409af1, type: 2}
+    count: 2
+    reward: {fileID: 11400000, guid: 66e70a4a8a960b649aebd518ae29a921, type: 2}
+    rewardCount: 1
+    standing: 20
+    smithyTier: 0
+    thanks: A bowl for us, as in the old days. We remember.
+  - id: h_mead
+    wanted: {fileID: 11400000, guid: 3424566669e19bc489098ff49fc1cd94, type: 2}
+    count: 2
+    reward: {fileID: 11400000, guid: c16c6e5687072684f98624510f9c6be6, type: 2}
+    rewardCount: 1
+    standing: 20
+    smithyTier: 0
+    thanks: Sweet. You keep the old courtesies.
+  - id: h_fiddle
+    wanted: {fileID: 11400000, guid: 5023814a107d1c54a9f8112067a132a0, type: 2}
+    count: 1
+    reward: {fileID: 11400000, guid: 09430d0392f27ec40a8d0489ec683073, type: 2}
+    rewardCount: 2
+    standing: 20
+    smithyTier: 0
+    thanks: Ah. He played well, once.
+  giftWeight: 2
+  haggleWord: Trade riddles

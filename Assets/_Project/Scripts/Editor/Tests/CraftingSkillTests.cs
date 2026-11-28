@@ -116,13 +116,16 @@ public sealed class CraftingSkillTests
     }
 
     [Test]
-    public void TheCaravan_PaysForGoodWork_AndNothingForPlain()
+    public void ThePedlar_PaysForGoodWork_AndNothingForPlain()
     {
         TradeSettings trade = TradeSettings.Current;
+        TraderDefinition pedlar = trade.FindTrader("pedlar");
+        Assert.NotNull(pedlar);
         var plain = new ItemStack(Item("IronGreatsword"), 1);
-        Assert.AreEqual(0, trade.CoinsFor(plain));
-        Assert.Greater(trade.CoinsFor(plain.WithQuality(ItemQuality.Fine)), 0);
-        Assert.Greater(trade.CoinsFor(plain.WithQuality(ItemQuality.Masterwork)), trade.CoinsFor(plain.WithQuality(ItemQuality.Fine)));
+        Assert.AreEqual(0f, TradeRules.SellPrice(plain, pedlar, null, trade));
+        Assert.Greater(TradeRules.SellPrice(plain.WithQuality(ItemQuality.Fine), pedlar, null, trade), 0f);
+        Assert.Greater(TradeRules.SellPrice(plain.WithQuality(ItemQuality.Masterwork), pedlar, null, trade),
+            TradeRules.SellPrice(plain.WithQuality(ItemQuality.Fine), pedlar, null, trade));
     }
 
     [Test]

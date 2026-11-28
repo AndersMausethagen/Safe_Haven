@@ -338,6 +338,9 @@ public sealed class SettlementState : IHavenView
     /// <summary>The Haven's hold on the regions round it (Territory): which are claimed, how firmly, and the forest's push.</summary>
     public TerritoryState Territory { get; private set; } = new TerritoryState();
 
+    /// <summary>What the traders at the Trading Post remember of the Haven (TradeState): standing, visits, packs, asks.</summary>
+    public TradeState Trade { get; private set; } = new TradeState();
+
     /// <summary>Spreads (positive) or eases (negative) the blight.</summary>
     public void ChangeBlight(float by)
     {
@@ -1105,6 +1108,8 @@ public sealed class SettlementState : IHavenView
         SuccessfulExtractions++;
         WardStrain = Math.Max(0, WardStrain - 1);
         tradeBought.Clear();
+        // The traders forget a share of what they were sold: a flooded price comes back (Docs/TradeResearch_2026-11-28.md).
+        Trade.AfterRaid(TradeSettings.Current.ForgetPerRaid);
         foreach (ResidentRecord record in residents)
         {
             record.TaughtSinceRaid = false;

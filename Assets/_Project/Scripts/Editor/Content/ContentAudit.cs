@@ -28,7 +28,7 @@ public static class ContentAudit
         "GatheringNodeDefinition.yields", "GatheringNodeDefinition.burstYields", "ChoppableTree.wood", "TreeChoppingSettings.woodByTier",
         "TreeChoppingSettings.limbingItem", "FishingSettings.fish", "FireflyProfile.catchable", "HavenRequestDefinition.reward",
         "QuestDefinition.rewardItems", "RaidDefinition.difficulties[].eliteLoot", "RaidEventDefinition.choices[].outcomes",
-        "RelicSettings.gear", "TerritorySettings.regions[].tithe", "TradeSettings.offers", "TransportDefinition.kit",
+        "RelicSettings.gear", "TerritorySettings.regions[].tithe", "TraderDefinition.stock[].item", "TraderDefinition.asks[].reward", "TransportDefinition.kit",
         "WaterSource.fillItem", "SurvivalSettings.openWaterFillItem", "PrologueDefinition.startingArmor", "PrologueDefinition.startingBackpack", "PrologueDefinition.sticks",
         "PrologueDefinition.stones", "ItemWorldObject.definition", "RaidLayoutRules.pondFillItem",
         // What is left to take once at a Haven place (PlaceFind).
@@ -55,7 +55,7 @@ public static class ContentAudit
     private static readonly string[] ItemUses =
     {
         "RecipeDefinition.itemCost", "BuildingDefinition.constructionItems", "BuildingDefinition.upgrades[].cost",
-        "RaidEventDefinition.choices[].cost", "HavenRequestDefinition.wanted", "SettlementSettings.portalLevels",
+        "RaidEventDefinition.choices[].cost", "HavenRequestDefinition.wanted", "SettlementSettings.portalLevels", "TraderDefinition.asks[].wanted",
         "QuestDefinition.objectives", "FishingSettings.bait", "LanternDefinition.refill", "JobDefinition.workTool", "TerritorySettings.pactRune",
         // Raising an outpost (Outposts).
         "TerritorySettings.outpostCost",
@@ -85,7 +85,7 @@ public static class ContentAudit
     private static readonly string[] ItemNeither =
     {
         "ContentDatabase.items", "CompanionDefinition.arrow", "CompanionDefinition.weapon", "RaidDefinition.likelyItems", "TradeSettings.coin",
-        "TradeSettings.sales", "RaidRumourDefinition.teaches",
+        "TraderDefinition.alsoBuys", "TraderDefinition.refuses", "TraderDefinition.wants", "RaidRumourDefinition.teaches",
         // Only shown in a resident's hand: the woodcutter's axe at a ring, the Farmer's water on the way back (nothing made or spent).
         "WorkerSettings.fellingTool", "FarmSettings.waterCarried",
         // Only shown in a mason's hand at a quarry ring; the stores counted along the top of the Keeper's view.

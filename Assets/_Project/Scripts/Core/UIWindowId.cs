@@ -58,4 +58,6 @@ public enum UIWindowId
     WorkGrid = 25,
     /// <summary>What a slain creature carried, opened by looting its body (LootWindow, LootableRemains).</summary>
     Loot = 26,
+    /// <summary>The barter with a trader at the Trading Post (TradeWindow).</summary>
+    Trade = 27,
 }

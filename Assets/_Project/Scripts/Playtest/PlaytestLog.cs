@@ -143,6 +143,9 @@ public static class PlaytestLog
     public const string CameHome = "CameHome";
     /// <summary>The Haven's breakfast at dawn (ResidentMeals): subject the food's id, amount how many were eaten, detail "hungry N".</summary>
     public const string Eaten = "Eaten";
+    /// <summary>A deal at the Trading Post (TradeWindow): subject the trader's id, amount the worth given, detail the worth taken and
+    /// the coin each way; or a haggle ("haggle Won/Lost") or an ask brought ("ask id", amount how many).</summary>
+    public const string Trade = "Trade";
     /// <summary>A stay at home ended (a raid began): subject what the player was doing (build, craft, gather, walk, idle, window, keeper),
     /// amount the seconds spent at it.</summary>
     public const string HomeStay = "HomeStay";

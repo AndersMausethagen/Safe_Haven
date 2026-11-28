@@ -343,6 +343,8 @@ public static class SaveMapper
             into.tradeBought.Add(new TradeSaveData { offer = bought.Key, count = bought.Value });
         }
 
+        WriteTraders(settlement.Trade, into);
+
         foreach (ResidentRecord record in settlement.Residents)
         {
             into.residents.Add(new ResidentSaveData { id = record.Resident.Id, workPaused = record.PausedByPlayer, job = record.Job != null ? record.Job.Id : "", raidsAlong = record.RaidsAlong, killsAlong = record.KillsAlong, timesHelpedUp = record.TimesHelpedUp, memory = (int)record.Memory, remembers = ToSaved(record.Remembers), forgotten = ToSaved(record.Forgotten), stranger = record.IsStranger, comingBack = (int)record.ComingBack, allCameBack = record.AllCameBack, workDone = record.WorkDone, taughtSinceRaid = record.TaughtSinceRaid, home = record.Home ?? "", homeChosen = record.HomeChosen ?? "", workplace = record.Workplace ?? "", workQueue = record.WorkQueue ?? "", haulDone = record.HaulDone, workGear = record.WorkGear != null ? record.WorkGear.Id : "", wishMet = record.WishMet, meal = (int)record.Meal, bruised = record.Bruised , talents = TalentsOf(record.Talents), marks = new List<string>(record.Marks), deeds = Pairs(record.Deeds), feelings = Pairs(record.Feelings), bond = record.Bond, inspiration = (int)record.Inspiration, inspiredOn = record.InspiredOn, kitWeapon = KitSlot(record.KitWeapon), kitBody = KitSlot(record.KitBody) });
@@ -476,6 +478,8 @@ public static class SaveMapper
                 settlement.RestoreBought(bought.offer, bought.count);
             }
         }
+
+        ReadTraders(saved, settlement.Trade);
 
         // Older saves never planned a second breach: it comes the usual distance from where the game stands.
         int nextBreachAt = saved.nextBreachAt > 0 || (BreachStatus)saved.breach != BreachStatus.Won
@@ -1461,6 +1465,69 @@ public static class SaveMapper
         }
 
         return found;
+    }
+
+    private static void WriteTraders(TradeState trade, SettlementSaveData into)
+    {
+        into.tradeRolled = trade.RolledAt >= 0;
+        into.tradeRolledAt = Math.Max(0, trade.RolledAt);
+        foreach (TradeState.Trader trader in trade.Traders)
+        {
+            var saved = new TraderSaveData
+            {
+                id = trader.Id, standing = trader.Standing, ask = trader.Ask, askPostedAt = trader.AskPostedAt, asksAnswered = trader.AsksAnswered,
+                visitAt = trader.VisitAt, visits = trader.Visits, haggle = (int)trader.Haggle, taken = trader.Taken,
+            };
+            foreach (KeyValuePair<string, float> sold in trader.Sold)
+            {
+                saved.soldItems.Add(sold.Key);
+                saved.soldUnits.Add(sold.Value);
+            }
+
+            foreach (TradeState.StockLine line in trader.Stock)
+            {
+                saved.stock.Add(new TradeSaveData { offer = line.Item, count = line.Left });
+            }
+
+            saved.wanted.AddRange(trader.Wanted);
+            into.traders.Add(saved);
+        }
+    }
+
+    private static void ReadTraders(SettlementSaveData saved, TradeState into)
+    {
+        var traders = new List<TradeState.Trader>();
+        foreach (TraderSaveData trader in saved.traders ?? new List<TraderSaveData>())
+        {
+            if (trader == null || string.IsNullOrEmpty(trader.id))
+            {
+                continue;
+            }
+
+            var record = new TradeState.Trader
+            {
+                Id = trader.id, Standing = Math.Max(0f, Math.Min(100f, trader.standing)), Ask = string.IsNullOrEmpty(trader.ask) ? null : trader.ask,
+                AskPostedAt = trader.askPostedAt, AsksAnswered = trader.asksAnswered, VisitAt = trader.visitAt, Visits = trader.visits,
+                Haggle = (HaggleResult)trader.haggle, Taken = trader.taken,
+            };
+            for (int i = 0; trader.soldItems != null && trader.soldUnits != null && i < trader.soldItems.Count && i < trader.soldUnits.Count; i++)
+            {
+                record.Sold[trader.soldItems[i]] = trader.soldUnits[i];
+            }
+
+            foreach (TradeSaveData line in trader.stock ?? new List<TradeSaveData>())
+            {
+                if (line != null && !string.IsNullOrEmpty(line.offer) && line.count > 0)
+                {
+                    record.Stock.Add(new TradeState.StockLine { Item = line.offer, Left = line.count });
+                }
+            }
+
+            record.Wanted.AddRange(trader.wanted ?? new List<string>());
+            traders.Add(record);
+        }
+
+        into.Restore(saved.tradeRolled ? saved.tradeRolledAt : -1, traders);
     }
 
     private static TerritorySaveData WriteTerritory(TerritoryState territory)

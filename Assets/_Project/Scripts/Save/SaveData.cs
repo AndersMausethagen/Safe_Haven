@@ -73,6 +73,26 @@ public sealed class TradeSaveData
     public int count;
 }
 
+/// <summary>What a trader remembers (TradeState.Trader): standing, what they were sold, their ask and their visit.</summary>
+[Serializable]
+public sealed class TraderSaveData
+{
+    public string id;
+    public float standing;
+    public List<string> soldItems = new List<string>();
+    public List<float> soldUnits = new List<float>();
+    public string ask;
+    public int askPostedAt;
+    public int asksAnswered;
+    public int visitAt = -1;
+    public int visits;
+    public List<TradeSaveData> stock = new List<TradeSaveData>();
+    public List<string> wanted = new List<string>();
+    /// <summary>A HaggleResult.</summary>
+    public int haggle;
+    public float taken;
+}
+
 [Serializable]
 public sealed class SettlementSaveData
 {
@@ -162,6 +182,11 @@ public sealed class SettlementSaveData
     public int portalLevel;
     /// <summary>What was bought at the Trading Post since the last raid survived. Missing in older saves.</summary>
     public List<TradeSaveData> tradeBought = new List<TradeSaveData>();
+    /// <summary>The traders at the Trading Post (TradeState). Missing in older saves: they start fresh.</summary>
+    public List<TraderSaveData> traders = new List<TraderSaveData>();
+    /// <summary>Whether the traders' visits have been rolled, and for which homecoming (TradeState.RolledAt). Missing in older saves.</summary>
+    public bool tradeRolled;
+    public int tradeRolledAt;
     /// <summary>Every crafting station's queue and output slot. Missing in older saves.</summary>
     public List<StationSaveData> stations = new List<StationSaveData>();
 }
