@@ -813,7 +813,7 @@ public sealed class AltarWindow : MonoBehaviour
                 AudioManager.Play(AltarFeel.Current.Purify, viewer != null ? viewer.transform.position : Vector3.zero);
             }
 
-            purifyStage?.Pulse(batches > 1 ? AltarMoment.Large : AltarMoment.Small, batches > 1 ? $"{batches} batches to the queue" : "One batch to the queue");
+            if (purifyStage != null) purifyStage.Pulse(batches > 1 ? AltarMoment.Large : AltarMoment.Small, batches > 1 ? $"{batches} batches to the queue" : "One batch to the queue");
 
             Read();
         }

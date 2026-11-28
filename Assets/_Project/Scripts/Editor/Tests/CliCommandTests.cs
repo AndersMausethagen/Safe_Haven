@@ -57,7 +57,8 @@ public class CliCommandTests
         StringAssert.Contains("Data/Gathering/IronOre.asset", refs);
     }
 
-    [Test]
+    // A scan of every asset: 208 s on 2026-11-28 with the day's new icons and sounds, past NUnit's 180 s default.
+    [Test, Timeout(600000)]
     public void HealthRunsEveryPage()
     {
         string report = ContentCliCommands.Health(limit: 0);

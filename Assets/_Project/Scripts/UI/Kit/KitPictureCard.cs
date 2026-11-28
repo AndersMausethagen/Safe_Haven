@@ -131,7 +131,8 @@ public sealed class KitPictureCard
         }
 
         // Sized to its words (hidden text measures nothing: then the plate keeps its last size).
-        float words = badgeLabel.GetPreferredValues(text).x;
+        // Measured only with a font: none while the game goes back to the menu (TMP's measuring threw there: QuitToMenuLiveTests).
+        float words = badgeLabel.font != null && badgeLabel.isActiveAndEnabled ? badgeLabel.GetPreferredValues(text).x : 0f;
         if (words <= 0f)
         {
             // Hidden text measures nothing (a window not yet open): judged from its letters instead.

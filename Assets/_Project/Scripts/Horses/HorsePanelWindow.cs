@@ -93,7 +93,13 @@ public sealed class HorsePanelWindow : MonoBehaviour
     private readonly KitFactRow[] historyRows = new KitFactRow[7];
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForNewPlaySession() => current = null;
+    private static void ResetForNewPlaySession()
+    {
+        current = null;
+        measured = null;
+        measuredAt = -1f;
+        measuredNeck = 1.45f;
+    }
 
     /// <summary>True while it is open.</summary>
     public static bool IsOpen => current != null && current.window != null && current.window.IsOpen;

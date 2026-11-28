@@ -549,7 +549,10 @@ public sealed class PauseMenu : MonoBehaviour
                 JournalWindow.Create();
             }
 
-            UIStateManager.Current?.RequestToggle(id);
+            if (UIStateManager.Current != null)
+            {
+                UIStateManager.Current.RequestToggle(id);
+            }
         });
         jumps.Add((card, id, shown, key));
     }
