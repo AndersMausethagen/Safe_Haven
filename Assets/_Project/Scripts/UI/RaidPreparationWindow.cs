@@ -380,7 +380,15 @@ public sealed partial class RaidPreparationWindow : MonoBehaviour
         titleLabel.text = raid != null ? raid.DisplayName : "The portal is dormant";
         ShowPlace(raid != null ? raid.PlaceArtwork : null);
         descriptionLabel.text = raid != null ? raid.Description : "";
-        briefing.SetActive(raid != null);
+        bool kitShown = leftPage == LeftPage.Kit;
+        leftTabs.Show((int)leftPage);
+        briefing.SetActive(raid != null && !kitShown);
+        kitPage.SetActive(kitShown);
+        if (kitShown)
+        {
+            DrawKit();
+        }
+
         preparation.SetActive(raid != null && !closed);
         stats.SetActive(raid != null && !closed);
         lockedNote.gameObject.SetActive(closed);
@@ -391,7 +399,10 @@ public sealed partial class RaidPreparationWindow : MonoBehaviour
         }
 
         RaidTimeOfDay timeOfDay = plan.TimeOfDay;
-        DrawBriefing(raid, timeOfDay, closed);
+        if (!kitShown)
+        {
+            DrawBriefing(raid, timeOfDay, closed);
+        }
         if (closed)
         {
             lockedNote.text = raid.LockedText;

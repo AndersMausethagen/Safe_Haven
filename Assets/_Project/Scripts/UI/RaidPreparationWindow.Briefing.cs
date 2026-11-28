@@ -75,8 +75,9 @@ public sealed partial class RaidPreparationWindow
     // A place that can't be reached has no run to tell of, only what is known of it.
     private void DrawBriefing(RaidDefinition raid, RaidTimeOfDay timeOfDay, bool closed)
     {
-        float y = BodyTop;
-        int chipRows = DrawChips(raid, timeOfDay, closed, BodyTop + HeadingHeight);
+        // Under the column's two pages' tabs (The place / Your kit: RaidPreparationWindow.Kit).
+        float y = LeftTop;
+        int chipRows = DrawChips(raid, timeOfDay, closed, LeftTop + HeadingHeight);
         bool anyChip = chipRows > 0;
         CollectEvents(raid, closed);
         CollectDangers(raid);

@@ -48,6 +48,7 @@ public sealed partial class RaidPreparationWindow
         lockedNote.color = style.Muted;
         BuildStats(style);
         BuildFooter(style);
+        BuildKit(style);
         BuildTooltip(style);
     }
 
