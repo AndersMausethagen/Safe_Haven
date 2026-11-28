@@ -429,6 +429,18 @@ public sealed class OptionsScreen : MonoBehaviour
         discardButton.interactable = count > 0;
         saveLabel.text = count > 0 ? $"Save Changes ({count})" : "Save Changes";
         saveLabel.color = count > 0 ? style.AccentBright : OptionsWidgets.Muted;
+        // Discard looks as unavailable as Save while there is nothing to throw away (design review 2026-11-28: it stood out the most).
+        TMP_Text discardLabel = discardButton.GetComponentInChildren<TMP_Text>();
+        if (discardLabel != null)
+        {
+            discardLabel.color = count > 0 ? style.Text : OptionsWidgets.Muted;
+        }
+
+        Transform discardRim = discardButton.transform.Find("Rim");
+        if (discardRim != null)
+        {
+            discardRim.GetComponent<Image>().color = HearthKit.Faded(style.Accent, count > 0 ? 0.6f : 0.3f);
+        }
         // While changes wait, Save is the one lit: a gold rim round it.
         Transform saveRim = saveButton.transform.Find("Rim");
         if (saveRim != null)

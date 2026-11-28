@@ -450,6 +450,43 @@ public sealed class ItemTooltipView : MonoBehaviour
         position.x = Mathf.Min(position.x, bounds.xMax - size.x);
         position.y = Mathf.Max(position.y, bounds.yMin + size.y);
         panel.anchoredPosition = position;
+        KeepOnScreen();
+    }
+
+    // And inside the screen: a window shrunk to fit it (UIWindow.FitToScreen) or reaching past it left a tall tooltip's foot cut off
+    // under the screen's edge (UX pass 2026-11-28, a sword's tooltip in the bag). Measured in world space against the root canvas.
+    private readonly Vector3[] tipCorners = new Vector3[4];
+    private readonly Vector3[] screenCorners = new Vector3[4];
+
+    private void KeepOnScreen()
+    {
+        Canvas canvas = panel.GetComponentInParent<Canvas>();
+        if (canvas == null || !(canvas.rootCanvas.transform is RectTransform screen) || !(panel.parent is RectTransform parent))
+        {
+            return;
+        }
+
+        panel.GetWorldCorners(tipCorners);
+        screen.GetWorldCorners(screenCorners);
+        Vector3 shift = Vector3.zero;
+        if (tipCorners[0].y < screenCorners[0].y)
+        {
+            shift.y = screenCorners[0].y - tipCorners[0].y;
+        }
+        else if (tipCorners[1].y > screenCorners[1].y)
+        {
+            shift.y = screenCorners[1].y - tipCorners[1].y;
+        }
+
+        if (tipCorners[2].x > screenCorners[2].x)
+        {
+            shift.x = screenCorners[2].x - tipCorners[2].x;
+        }
+
+        if (shift != Vector3.zero)
+        {
+            panel.anchoredPosition += (Vector2)parent.InverseTransformVector(shift);
+        }
     }
 
     // Against what is worn in the slot it would go to: an arrow up in green, down in red, nothing when it is the same.

@@ -248,6 +248,7 @@ public sealed class SavesScreen : MonoBehaviour
 
         List<SaveSlotInfo> saves = SaveGameService.ListSaves();
         newestShown = false;
+        firstLoad = null;
         emptyLine.gameObject.SetActive(saves.Count == 0);
         foreach (SaveSlotInfo save in saves)
         {
@@ -262,11 +263,15 @@ public sealed class SavesScreen : MonoBehaviour
             ShowStatus(problem);
         }
 
+        // A pad starts on the newest game's Load (design review 2026-11-28: nothing was selected, so a controller had no cursor); a mouse
+        // keeps no selection.
         if (EventSystem.current != null)
         {
-            EventSystem.current.SetSelectedGameObject(null);
+            EventSystem.current.SetSelectedGameObject(InputDevices.UsingGamepad && firstLoad != null && firstLoad.interactable ? firstLoad.gameObject : null);
         }
     }
+
+    private Button firstLoad;
 
     private void AddRow(SaveSlotInfo save)
     {
@@ -295,6 +300,11 @@ public sealed class SavesScreen : MonoBehaviour
         Action<string, Action, bool, Color?> add = (label, clicked, enabled, tone) =>
         {
             Button button = OptionsWidgets.Button(label, row, label, 20f, clicked, out TMP_Text text);
+            if (label == "Load" && firstLoad == null)
+            {
+                firstLoad = button;
+            }
+
             OptionsWidgets.Place((RectTransform)button.transform, new Vector2(1f, 0.5f), new Vector2(ActionWidth, 56f), new Vector2(x, 0f));
             button.interactable = enabled;
             if (tone.HasValue && enabled)

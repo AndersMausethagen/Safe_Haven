@@ -99,7 +99,8 @@ public static class CameraStyleRules
         {
             case CameraStyleOverride.TopDown: return "Top-down";
             case CameraStyleOverride.Action: return "Action";
-            default: return "Your choice";
+            // It follows Camera Style above (design review 2026-11-28: "Your choice" said nothing of what it does).
+            default: return "As Camera Style";
         }
     }
 }

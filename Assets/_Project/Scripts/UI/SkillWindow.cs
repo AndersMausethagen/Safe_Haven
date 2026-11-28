@@ -75,6 +75,7 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
     private readonly List<Image> bookRims = new List<Image>();
     private Button equipButton;
     private float bodyHeight = 160f;
+    private RectTransform detailView;
 
     private bool Knows(SkillDefinition skill) => skill != null && skills.IsKnown(skill);
 
@@ -437,7 +438,8 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
             : "Or click a slot of its colour on the bar.";
         equipButton.gameObject.SetActive(known && equipped < 0);
         // Without the button, the words take its room.
-        detailBody.rectTransform.sizeDelta = new Vector2(DetailWidth - 36f, bodyHeight + (equipButton.gameObject.activeSelf ? 0f : 50f));
+        detailView.sizeDelta = new Vector2(DetailWidth - 36f, bodyHeight + (equipButton.gameObject.activeSelf ? 0f : 50f));
+        detailBody.rectTransform.anchoredPosition = Vector2.zero;
     }
 
     private void BuildDetail()
@@ -456,11 +458,20 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
         detailKind = CodeUI.Label("Kind", detail, 14f, 154f, DetailWidth - 28f, 22f, 15f, style.Muted, TextAlignmentOptions.Center);
         detailKind.richText = true;
         HearthKit.Rule(detail, 24f, 184f, DetailWidth - 48f);
-        detailBody = CodeUI.Paragraph("Words", detail, 18f, 194f, DetailWidth - 36f, 160f, 14f, style.Text);
+        // The words scroll when they are longer than the pane (design review 2026-11-28: a long art's last line was cut mid-word).
+        detailView = CodeUI.At("Words View", detail, 18f, 194f, DetailWidth - 36f, 160f);
+        detailView.gameObject.AddComponent<RectMask2D>();
+        detailView.gameObject.AddComponent<Image>().color = Color.clear;
+        detailBody = CodeUI.Paragraph("Words", detailView, 0f, 0f, DetailWidth - 36f, 0f, 14f, style.Text);
         detailBody.richText = true;
-        detailBody.enableAutoSizing = true;
-        detailBody.fontSizeMin = 12f;
-        detailBody.fontSizeMax = 14f;
+        detailBody.overflowMode = TextOverflowModes.Overflow;
+        detailBody.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        var wordsScroll = detailView.gameObject.AddComponent<ScrollRect>();
+        wordsScroll.viewport = detailView;
+        wordsScroll.content = detailBody.rectTransform;
+        wordsScroll.horizontal = false;
+        wordsScroll.movementType = ScrollRect.MovementType.Clamped;
+        wordsScroll.scrollSensitivity = 30f;
         detailHint = CodeUI.Paragraph("Hint", detail, 18f, 360f, DetailWidth - 36f, 34f, 13f, style.Muted);
         TMP_Text equip = CodeUI.AddButton("Equip", detail, (DetailWidth - 180f) * 0.5f, 300f, 180f, UIRole.Kind.PrimaryButton, () => EquipSelected(-1), out equipButton);
         equip.text = "Put on the bar";

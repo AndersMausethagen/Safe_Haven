@@ -417,16 +417,17 @@ public sealed partial class ItemInventoryWindow : MonoBehaviour, IItemSlotHandle
         }
 
         string key = GameInput.KeyLabel(GameInput.QuickItems);
+        // Short, one line each way (UX pass 2026-11-28: three wrapped lines of keys under every tooltip).
         string quick = inventory.Quick.Contains(stack.Item)
-            ? $"<color={UIStyle.Current.AccentHex}>On the quickbar (hold {key}). {key}: take it off.</color>"
-            : $"<color={UIStyle.Current.MutedHex}>{key}: add to the quickbar (hold {key} to use it anywhere).</color>";
+            ? $"<color={UIStyle.Current.AccentHex}>On the quickbar</color> <color={UIStyle.Current.MutedHex}>({key}: off)</color>"
+            : $"<color={UIStyle.Current.MutedHex}>{key}: quickbar</color>";
         PlayerSkills skills = Player.Current != null ? Player.Current.Skills : null;
         int onBar = skills != null ? skills.Loadout.IndexOf(stack.Item) : -1;
         string first = PlayerInputHandler.SkillKeyLabel(0), last = PlayerInputHandler.SkillKeyLabel(SkillLoadout.SlotCount - 1);
         string bar = onBar >= 0
-            ? $"<color={UIStyle.Current.AccentHex}>On the skill bar ({PlayerInputHandler.SkillKeyLabel(onBar)}). {PlayerInputHandler.SkillKeyLabel(onBar)}: take it off.</color>"
-            : $"<color={UIStyle.Current.MutedHex}>{first}-{last}: put it on the skill bar.</color>";
-        return quick + "\n" + bar;
+            ? $"<color={UIStyle.Current.AccentHex}>On the skill bar ({PlayerInputHandler.SkillKeyLabel(onBar)})</color>"
+            : $"<color={UIStyle.Current.MutedHex}>{first}-{last}: skill bar</color>";
+        return quick + $"<color={UIStyle.Current.MutedHex}>  ·  </color>" + bar;
     }
 
     private void ToggleOnSkillBar(ItemStack stack, int slot)

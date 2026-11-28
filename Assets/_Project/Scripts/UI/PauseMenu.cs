@@ -626,7 +626,8 @@ public sealed class PauseMenu : MonoBehaviour
             : "";
     }
 
-    private void Confirm(string message, string primaryLabel, Action primary, string secondaryLabel = null, Action secondary = null)
+    private void Confirm(string message, string primaryLabel, Action primary, string secondaryLabel = null, Action secondary = null,
+        string thirdLabel = null, Action third = null)
     {
         confirmMessage.text = message;
         confirmPrimaryLabel.text = primaryLabel;
@@ -638,7 +639,42 @@ public sealed class PauseMenu : MonoBehaviour
             confirmSecondaryLabel.text = secondaryLabel;
         }
 
+        // A third way (quitting: save first, or leave to the menu or the desktop without saving): the second button's twin, made once.
+        if (third != null && confirmThirdButton == null)
+        {
+            confirmThirdButton = Instantiate(confirmSecondaryButton, confirmSecondaryButton.transform.parent);
+            confirmThirdButton.name = "Confirm Third";
+            confirmThirdButton.transform.SetSiblingIndex(confirmSecondaryButton.transform.GetSiblingIndex() + 1);
+            confirmThirdButton.onClick = new Button.ButtonClickedEvent();
+            confirmThirdButton.onClick.AddListener(() => confirmThird?.Invoke());
+            confirmThirdLabel = confirmThirdButton.GetComponentInChildren<TMP_Text>();
+        }
+
+        confirmThird = third;
+        if (confirmThirdButton != null)
+        {
+            confirmThirdButton.gameObject.SetActive(third != null);
+            confirmThirdLabel.text = thirdLabel ?? "";
+        }
+
         ShowPage(confirmPage);
+    }
+
+    private Button confirmThirdButton;
+    private TMP_Text confirmThirdLabel;
+    private Action confirmThird;
+
+    private void SaveAndQuit()
+    {
+        if (SaveGameService.TrySave(out string problem))
+        {
+            QuitToMainMenu();
+        }
+        else
+        {
+            ShowMain();
+            statusLabel.text = $"<color={UIStyle.Current.DangerHex}>{problem}</color>";
+        }
     }
 
     private void OnConfirmPrimary() => confirmPrimary?.Invoke();
@@ -671,8 +707,16 @@ public sealed class PauseMenu : MonoBehaviour
 
     private void AskQuit()
     {
-        // What leaving costs, said plainly, and buttons that say where they go (design review 2026-11-28).
+        // What leaving costs, said plainly, and buttons that say where they go (design review 2026-11-28). Where the game can be saved,
+        // saving on the way out comes first (Diablo IV, Valheim, BG3), with the two ways to leave without it after.
         string saved = DescribeLastSave();
+        if (GameSession.ActiveRaid == null && SaveGameService.CheckPlayerSave() == null)
+        {
+            Confirm($"Quit the game?\n<color={UIStyle.Current.MutedHex}>{saved}</color>", "Save and Quit to Main Menu", SaveAndQuit,
+                "Quit to Main Menu without saving", QuitToMainMenu, "Quit to Desktop without saving", QuitToDesktop);
+            return;
+        }
+
         Confirm(GameSession.ActiveRaid != null
                 ? "Leave the raid?\nYou fall here: everything you carry is lost, except your safe pocket, and your gear wears. You wake at the portal next time."
                 : $"Quit the game?\nWhat happened since your last save is lost.{(string.IsNullOrEmpty(saved) ? "" : $"\n<color={UIStyle.Current.MutedHex}>{saved}</color>")}",
