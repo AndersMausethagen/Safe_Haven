@@ -372,7 +372,10 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
         // frames sat beside five filled ones all game (the HUD review of 2026-11-18). Faded, not removed, so every key keeps its place.
         // The ability book (K, UIWindowId.Skills) too: that is where the bar is arranged, and its empty slots say what kind they take.
         bool showEmpty = HudRules.ShowsEverything || ItemDrag.Active || SkillsWindow.IsOpen
-            || (UIStateManager.Current != null && UIStateManager.Current.IsOpen(UIWindowId.Skills));
+            || (UIStateManager.Current != null && (UIStateManager.Current.IsOpen(UIWindowId.Skills)
+                // With the bag open the bar is shown so a hovered item can go on it by its number: its empty slots are the targets
+                // (design review 2026-11-28: one slot and nothing to aim at).
+                || UIStateManager.Current.IsOpen(UIWindowId.Items)));
         for (int i = 0; i < slots.Length; i++)
         {
             UpdateSlot(slots[i], skills.Loadout.Get(i));

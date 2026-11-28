@@ -550,6 +550,48 @@ public sealed partial class ItemInventoryWindow : MonoBehaviour, IItemSlotHandle
         {
             BuildGrid(pocketGrid, pocket, pocketSlots, "Pocket ");
             ShowAll(pocket, pocketSlots);
+            FramePocket();
+        }
+    }
+
+    // UX pass 2026-11-28 (Docs/MenuUXResearch_2026-11-28.md §1, Tarkov's secure container): the safe pocket in a gold frame of its own,
+    // its line beside its slots, not over them (the pocket grows to three slots: the prefab's line lay across the second and third).
+    private RectTransform pocketFrame;
+
+    private void FramePocket()
+    {
+        var layout = pocketGrid.GetComponent<GridLayoutGroup>();
+        if (layout == null)
+        {
+            return;
+        }
+
+        int count = pocket.SlotCount;
+        float width = layout.padding.left + count * layout.cellSize.x + (count - 1) * layout.spacing.x;
+        float height = layout.padding.top + layout.cellSize.y;
+        if (pocketFrame == null)
+        {
+            pocketFrame = CodeUI.At("Pocket Frame", pocketGrid, 0f, 0f, 0f, 0f);
+            pocketFrame.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+            Image rim = HearthKit.Rim(pocketFrame, 0.9f, 1f);
+            rim.color = UIStyle.Current.AccentBright;
+        }
+
+        pocketFrame.anchoredPosition = new Vector2(-4f, 4f);
+        pocketFrame.sizeDelta = new Vector2(width + 8f, height + 8f);
+        pocketFrame.SetAsLastSibling();
+        if (transform.Find("Pocket Hint") is RectTransform hint && hint.TryGetComponent(out TMP_Text words))
+        {
+            // Measured in the hint's parent from the pocket's top left corner, then laid from that parent's top left.
+            var room = (RectTransform)hint.parent;
+            Vector3[] corners = new Vector3[4];
+            pocketGrid.GetWorldCorners(corners);
+            Vector3 topLeft = room.InverseTransformPoint(corners[1]);
+            hint.anchorMin = hint.anchorMax = hint.pivot = new Vector2(0f, 1f);
+            hint.anchoredPosition = new Vector2(topLeft.x - room.rect.xMin + width + 18f, topLeft.y - room.rect.yMax - (height - hint.sizeDelta.y) * 0.5f);
+            hint.sizeDelta = new Vector2(Mathf.Max(160f, 300f - width), hint.sizeDelta.y);
+            words.text = "Kept even if you fall.";
+            words.color = UIStyle.Current.Muted;
         }
     }
 
@@ -648,8 +690,10 @@ public sealed partial class ItemInventoryWindow : MonoBehaviour, IItemSlotHandle
         for (int i = 0; i < tools.Length; i++)
         {
             int tier = ItemInventory.GatheringTier(inventory.gameObject, tools[i]);
+            // No tool is said as such, muted ("Axe 0" read as how many axes were carried; design review 2026-11-28).
             builder.Append(i > 0 ? "    " : "").Append(HearthKit.InlineIcon(tools[i].ToString())).Append(' ').Append(tools[i]).Append(' ')
-                .Append($"<color=#{ColorUtility.ToHtmlStringRGB(Tiers.ColorOf(tier))}>{Tiers.ToRoman(tier)}</color>");
+                .Append(tier > 0 ? $"<color=#{ColorUtility.ToHtmlStringRGB(Tiers.ColorOf(tier))}>{Tiers.ToRoman(tier)}</color>"
+                    : $"<color={UIStyle.Current.MutedHex}>none</color>");
         }
 
         int used = 0;
@@ -738,7 +782,31 @@ public sealed partial class ItemInventoryWindow : MonoBehaviour, IItemSlotHandle
     {
         if (recipeFooter != null)
         {
+            PlaceFooter();
             recipeFooter.text = text;
         }
+    }
+
+    // The crafting hint lay behind the recipe list and the detail pane, only a sliver of it seen between them (design review
+    // 2026-11-28): it goes to the foot of the bag's side, where there is room, once.
+    private bool footerPlaced;
+
+    private void PlaceFooter()
+    {
+        if (footerPlaced)
+        {
+            return;
+        }
+
+        footerPlaced = true;
+        var rect = recipeFooter.rectTransform;
+        rect.SetParent(transform, false);
+        rect.anchorMin = rect.anchorMax = rect.pivot = Vector2.zero;
+        rect.anchoredPosition = new Vector2(40f, 236f); // above the skill bar, which shows with the bag
+        rect.sizeDelta = new Vector2(680f, 44f);
+        recipeFooter.alignment = TMPro.TextAlignmentOptions.BottomLeft;
+        recipeFooter.textWrappingMode = TMPro.TextWrappingModes.Normal;
+        recipeFooter.color = UIStyle.Current.Muted;
+        recipeFooter.fontSize = Mathf.Min(recipeFooter.fontSize, 16f);
     }
 }

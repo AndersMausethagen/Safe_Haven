@@ -61,6 +61,8 @@ public sealed partial class SkillsWindow : MonoBehaviour
     private TMP_Text skillAbout;
     private TMP_Text skillBonuses;
     private TMP_Text milestoneHeading;
+    private RectTransform levelFill;
+    private Image levelFillImage;
     private Button insightStep;
     private Button insightAll;
     private TMP_Text insightStepLabel;
@@ -299,6 +301,8 @@ public sealed partial class SkillsWindow : MonoBehaviour
         skillIcon = Icon("Skill Icon", panel, DetailX, 114f, 42f, null);
         skillName = CodeUI.Label("Skill Name", panel, DetailX + 52f, 116f, DetailWidth - 52f, 40f, 30f, style.Accent);
         skillExperience = CodeUI.Label("Skill Experience", panel, DetailX, 156f, DetailWidth, 28f, 18f, style.Muted);
+        // UX pass 2026-11-28 (Docs/MenuUXResearch_2026-11-28.md §4): the way to the next level as a bar beside the name, seen before read.
+        levelFill = KitBar.Make(panel, DetailX + DetailWidth - 240f, 132f, 240f, 10f, out levelFillImage);
         skillAbout = CodeUI.Paragraph("Skill About", panel, DetailX, 186f, DetailWidth, 72f, 17f, style.Text);
         skillAbout.richText = true;
         skillBonuses = CodeUI.Paragraph("Skill Bonuses", panel, DetailX, 258f, DetailWidth, 44f, 17f, style.Text);
@@ -580,6 +584,10 @@ public sealed partial class SkillsWindow : MonoBehaviour
         skillExperience.text = needed > 0
             ? $"{towards} / {needed} to level {skillLevel + 1}   ·   {progress.ExperienceOf(selected)} experience in all"
             : $"Highest level   ·   {progress.ExperienceOf(selected)} experience in all";
+        if (levelFill != null)
+        {
+            KitBar.Set(levelFill, levelFillImage, needed > 0 ? Mathf.Clamp01(towards / (float)needed) : 1f, style.Accent);
+        }
         string trained = string.IsNullOrWhiteSpace(selected.TrainedBy) ? "" : $"<color={style.MutedHex}>Trained by {selected.TrainedBy}.</color>  ";
         skillAbout.text = trained + selected.Description + Boosts(selected, settings, style) + Flourishes(selected, skillLevel, style);
         skillBonuses.text = $"Now: {DescribeLevel(selected, skillLevel, settings, style)}\n" +
@@ -595,6 +603,7 @@ public sealed partial class SkillsWindow : MonoBehaviour
         }
 
         IReadOnlyList<ProficiencyDefinition.Milestone> reached = selected.Milestones;
+        bool nextMarked = false;
         for (int i = 0; i < milestones.Count; i++)
         {
             (TMP_Text level, PerkCard first, PerkCard second) = milestones[i];
@@ -612,6 +621,14 @@ public sealed partial class SkillsWindow : MonoBehaviour
             PerkDefinition chosen = progress.ChosenAt(milestone);
             level.text = milestone.level.ToString();
             level.color = open ? style.Accent : style.Muted;
+            // The next one to reach says so: the goal among the milestones ahead (Dragonwilds, OSRS: "next" before "later").
+            if (!open && !nextMarked)
+            {
+                nextMarked = true;
+                level.richText = true;
+                level.text = $"{milestone.level}\n<size=50%>NEXT</size>";
+                level.color = style.AccentBright;
+            }
             ShowCard(first, milestone.first, open, chosen, style);
             ShowCard(second, milestone.second, open, chosen, style);
         }

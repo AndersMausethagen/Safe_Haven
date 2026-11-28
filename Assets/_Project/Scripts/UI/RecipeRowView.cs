@@ -79,6 +79,19 @@ public sealed class RecipeRowView : MonoBehaviour, IPointerClickHandler, IPointe
     /// <summary>Shows the recipe. A count above zero says how many can be made; otherwise the problem does.</summary>
     /// <param name="muted">The ordinary state of a list: materials still to gather, or a recipe made at another station. What can be made should stand out, not this.</param>
     /// <param name="waiting">How many are already on their way.</param>
+    // What a row says it lacks, in the room it has: "Need 5 Grey Stone, 6 Wood" was cut mid-word and read as the whole cost. It says
+    // what is missing, the first of it and how many more (the detail pane lists them all).
+    private static string Shortfall(string problem)
+    {
+        if (string.IsNullOrEmpty(problem) || !problem.StartsWith("Need ", System.StringComparison.Ordinal))
+        {
+            return problem;
+        }
+
+        string[] parts = problem.Substring(5).TrimEnd('.').Split(new[] { ", " }, System.StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length == 0 ? problem : parts.Length == 1 ? $"Missing {parts[0]}" : $"Missing {parts[0]} +{parts.Length - 1}";
+    }
+
     public void Show(RecipeDefinition recipe, int count, string problem, bool selected, bool muted, int waiting)
     {
         Recipe = recipe;
@@ -91,9 +104,10 @@ public sealed class RecipeRowView : MonoBehaviour, IPointerClickHandler, IPointe
         icon.color = canMake ? Color.white : DimIcon;
         nameLabel.text = recipe.OutputAmount > 1 ? $"{recipe.DisplayName} ×{recipe.OutputAmount}" : recipe.DisplayName;
         nameLabel.color = canMake ? style.Text : style.Inactive;
-        tierLabel.text = Tiers.ToRoman(recipe.Tier);
+        // Tier I is every early recipe's: its lone "I" at the row's edge read as a stray bar (design review 2026-11-28).
+        tierLabel.text = recipe.Tier > 1 ? Tiers.ToRoman(recipe.Tier) : "";
         tierLabel.color = Tiers.ColorOf(recipe.Tier);
-        string status = canMake ? $"Can make {count}" : problem;
+        string status = canMake ? $"Can make {count}" : Shortfall(problem);
         statusLabel.text = waiting > 0 ? $"{waiting} queued  ·  {status}" : status;
         statusLabel.color = canMake ? style.Good : muted ? style.Muted : style.Warning;
         Paint();

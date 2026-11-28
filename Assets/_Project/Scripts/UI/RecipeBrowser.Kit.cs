@@ -171,7 +171,13 @@ public sealed partial class RecipeBrowser
         amountLabel.text = amount.ToString();
         fewer.interactable = amount > 1;
         more.interactable = amount < most;
-        amountLabel.transform.parent.gameObject.SetActive(selected != null && !elsewhere.Contains(selected));
+        // The amount picker only when there is a choice to make: one or none to make, it stood dead in the pane (design review 2026-11-28).
+        int could = selected != null && maker != null && !elsewhere.Contains(selected) ? maker.HowMany(selected) : 0;
+        amountLabel.transform.parent.gameObject.SetActive(selected != null && !elsewhere.Contains(selected) && could > 1);
+        if (makeAllButton != null)
+        {
+            makeAllButton.gameObject.SetActive(could > 1);
+        }
         if (makeLabel != null)
         {
             makeLabel.text = amount > 1 ? $"{makeWord} ×{amount}" : makeWord;
