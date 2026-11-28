@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -191,6 +191,11 @@ public sealed class PauseMenu : MonoBehaviour
             GamePause.Request(this);
             statusLabel.text = "";
             ShowMain();
+            // Resume is one press away: Continue is selected, so Enter, A or Start goes back to the game (§7 of the menu research).
+            if (UnityEngine.EventSystems.EventSystem.current != null)
+            {
+                UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(continueButton.gameObject);
+            }
         }
         else
         {
@@ -441,11 +446,161 @@ public sealed class PauseMenu : MonoBehaviour
         optionsButton.interactable = !leaving;
         quitButton.interactable = !leaving;
         RefreshCoop();
+        RefreshNow();
 
         if (string.IsNullOrEmpty(statusLabel.text))
         {
             statusLabel.text = saveProblem ?? DescribeLastSave();
         }
+    }
+
+    // ----- Now: what the player was doing, and the other windows a click away -----
+    // UX pass 2026-11-28 (Docs/MenuUXResearch_2026-11-28.md §7, Hunt: Showdown's 2025 menu): beside the buttons, the quest on top of the
+    // tracker with its next step, and picture tiles to the other windows with their keys, so the pause menu is a place to pick up from.
+
+    private RectTransform nowCard;
+    private TMP_Text nowGoal;
+    private TMP_Text nowStep;
+    private TMP_Text nowKicker;
+    private readonly System.Collections.Generic.List<(KitPictureCard card, UIWindowId id, Func<bool> shown, InputAction key)> jumps =
+        new System.Collections.Generic.List<(KitPictureCard, UIWindowId, Func<bool>, InputAction)>();
+
+    private void BuildNow()
+    {
+        if (nowCard != null || !(mainPage.transform is RectTransform page) || Player.Current == null)
+        {
+            return;
+        }
+
+        UIStyle style = UIStyle.Current;
+        const float width = 360f;
+        nowCard = HearthKit.Card(page, "Now", 0f, 0f, width, 420f, 0.45f, style.Panel);
+        // Beside the page's buttons, outside whatever lays them out.
+        nowCard.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+        nowCard.anchorMin = nowCard.anchorMax = new Vector2(1f, 1f);
+        nowCard.pivot = new Vector2(0f, 1f);
+        nowCard.anchoredPosition = new Vector2(48f, 0f);
+        HearthKit.Ground(nowCard);
+        nowKicker = CodeUI.Label("Kicker", nowCard, 20f, 18f, width - 40f, 16f, 12f, style.Accent);
+        TMP_Text kicker = nowKicker;
+        kicker.characterSpacing = 8f;
+        nowGoal = CodeUI.Label("Goal", nowCard, 20f, 38f, width - 40f, 30f, 21f, style.Text);
+        style.Title(nowGoal);
+        nowGoal.enableAutoSizing = true;
+        nowGoal.fontSizeMin = 15f;
+        nowGoal.fontSizeMax = 21f;
+        nowStep = CodeUI.Paragraph("Step", nowCard, 20f, 70f, width - 40f, 44f, 15f, style.Muted);
+        nowStep.richText = true;
+        HearthKit.Rule(nowCard, 20f, 122f, width - 40f);
+        TMP_Text go = CodeUI.Label("Go", nowCard, 20f, 132f, width - 40f, 16f, 12f, style.Accent);
+        go.text = "GO TO";
+        go.characterSpacing = 8f;
+
+        // The menu's box and the card centred as one pair (design review: the box stayed centred and the card hung off to the right).
+        foreach (UIRole role in page.GetComponentsInParent<UIRole>(true))
+        {
+            if (role.Role == UIRole.Kind.Window && role.transform is RectTransform box && box != page)
+            {
+                box.anchoredPosition -= new Vector2((48f + width) * 0.5f, 0f);
+                break;
+            }
+        }
+
+        // Continue is the one to press: the primary look (design review: it looked like the other seven).
+        if (continueButton.TryGetComponent(out UIRole continueRole))
+        {
+            continueRole.Set(UIRole.Kind.PrimaryButton);
+        }
+
+        Jump("Bag", "Bags", UIWindowId.Items, GameInput.Inventory, () => true);
+        Jump("Character", "Heart", UIWindowId.Character, GameInput.Character, () => true);
+        Jump("Skills", "Spark", UIWindowId.Skills, GameInput.Skills, () => true);
+        Jump("Skill levels", "Stats", UIWindowId.Proficiencies, GameInput.Talents, () => true);
+        Jump("Haven", "House", UIWindowId.Haven, GameInput.Haven, () => Place.AtHome);
+        Jump("Journal", "Book", UIWindowId.Journal, GameInput.Journal, () => true);
+    }
+
+    private void Jump(string name, string icon, UIWindowId id, InputAction key, Func<bool> shown)
+    {
+        var card = new KitPictureCard(nowCard, name, 100f, 64f, 1, 14f, null, null);
+        card.ShowPicture(null, icon);
+        card.SetName(name);
+        card.SetBadge(key != null ? GameInput.KeyLabel(key) : "");
+        Button button = card.Root.gameObject.AddComponent<Button>();
+        button.transition = Selectable.Transition.None;
+        // Lit when pointed at or selected on a pad (design review: the tiles gave no sign of either).
+        UIHighlight.On(card.Root.gameObject);
+        button.onClick.AddListener(() =>
+        {
+            Close();
+            if (id == UIWindowId.Journal)
+            {
+                JournalWindow.Create();
+            }
+
+            UIStateManager.Current?.RequestToggle(id);
+        });
+        jumps.Add((card, id, shown, key));
+    }
+
+    private void RefreshNow()
+    {
+        BuildNow();
+        if (nowCard == null)
+        {
+            return;
+        }
+
+        // The quest on top of the tracker (pinned, else by its order: the main story first), and its first open step.
+        QuestLog.Entry top = null;
+        string pinned = GameSession.Progress != null ? GameSession.Progress.Journal.PinnedQuest : null;
+        foreach (QuestLog.Entry entry in GameSession.Quests.Entries)
+        {
+            if ((entry.Status == QuestStatus.Active || entry.Status == QuestStatus.ReadyToTurnIn)
+                && (top == null || QuestTrackerView.InTrackerOrder(entry, top, pinned) < 0))
+            {
+                top = entry;
+            }
+        }
+
+        // Where and when, then the quest: a raid's time left, or home (design review: the kicker named a place and showed a quest).
+        nowKicker.text = RaidDirector.Current != null && RaidDirector.Current.Session != null
+            ? $"ON A RAID  ·  {RaidStats.FormatTime(RaidDirector.Current.Session.TimeRemaining)} LEFT"
+            : Place.OnRaid ? "ON A RAID" : HavenVisit.IsVisiting ? "IN A FRIEND'S HAVEN" : "AT HOME";
+        nowGoal.text = top != null ? top.Quest.DisplayName : "No quest on hand";
+        string step = "";
+        if (top != null && top.Status == QuestStatus.ReadyToTurnIn)
+        {
+            step = $"Return to {top.Quest.TurnInTo}.";
+        }
+        else if (top != null)
+        {
+            for (int i = 0; i < top.Counts.Length && step.Length == 0; i++)
+            {
+                if (!top.IsObjectiveDone(i) && top.IsObjectiveOpen(i))
+                {
+                    QuestObjective objective = top.Quest.Objectives[i];
+                    step = objective.Amount > 1 ? $"{objective.Describe()}  {top.Counts[i]}/{objective.Amount}" : objective.Describe();
+                }
+            }
+        }
+
+        nowStep.text = string.IsNullOrEmpty(step) ? GameInput.Keys("The Journal ({key:Journal}) holds what has been told.") : HearthKit.ToneNumbers(GameInput.Keys(step));
+        int shown = 0;
+        foreach ((KitPictureCard card, UIWindowId _, Func<bool> show, InputAction key) in jumps)
+        {
+            // The key as bound now; on a pad none (the pad cursor picks the tile): a rebind or a pad showed the old letter.
+            card.SetBadge(key != null && !InputDevices.UsingGamepad ? GameInput.KeyLabel(key) : "");
+            bool on = show();
+            card.SetActive(on);
+            if (on)
+            {
+                card.Place(20f + shown % 3 * 112f, 156f + shown / 3 * 108f);
+                shown++;
+            }
+        }
+
+        nowCard.sizeDelta = new Vector2(nowCard.sizeDelta.x, 156f + Mathf.CeilToInt(shown / 3f) * 108f + 8f);
     }
 
     private static string DescribeLastSave()
