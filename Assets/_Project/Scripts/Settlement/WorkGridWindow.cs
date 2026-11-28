@@ -31,6 +31,7 @@ public sealed class WorkGridWindow : MonoBehaviour
     private RectTransform content;
     private TMP_Text hint;
     private readonly List<TMP_Text> rowNames = new List<TMP_Text>();
+    private readonly List<Image> rowFaces = new List<Image>();
     private readonly List<TMP_Text> columnNames = new List<TMP_Text>();
     private readonly Cell[,] cells = new Cell[MostRows, MostColumns];
     private readonly List<ResidentRecord> people = new List<ResidentRecord>();
@@ -106,7 +107,13 @@ public sealed class WorkGridWindow : MonoBehaviour
         for (int row = 0; row < MostRows; row++)
         {
             float y = Top + row * RowStep;
-            rowNames.Add(CodeUI.Label("Person " + row, panel, CornerClear, y + 8f, NameWidth + Margin - CornerClear - 4f, 28f, 18f, style.Text));
+            // Their face before their name (the UX pass of 2026-11-28: a column of names only).
+            RectTransform face = CodeUI.At("Face " + row, panel, CornerClear, y + 2f, CellHeight - 4f, CellHeight - 4f);
+            Image picture = face.gameObject.AddComponent<Image>();
+            picture.preserveAspect = true;
+            picture.raycastTarget = false;
+            rowFaces.Add(picture);
+            rowNames.Add(CodeUI.Label("Person " + row, panel, CornerClear + CellHeight + 4f, y + 8f, NameWidth + Margin - CornerClear - CellHeight - 8f, 28f, 18f, style.Text));
             for (int column = 0; column < MostColumns; column++)
             {
                 cells[row, column] = MakeCell(Margin + NameWidth + column * (CellWidth + 4f), y, row, column, style);
@@ -195,6 +202,10 @@ public sealed class WorkGridWindow : MonoBehaviour
         {
             ResidentRecord record = row < people.Count ? people[row] : null;
             SetText(rowNames[row], record != null ? record.Resident.DisplayName + (record.IsAway ? " (away)" : "") : "");
+            Sprite face = record != null ? record.Resident.Portrait : null;
+            rowFaces[row].sprite = face;
+            rowFaces[row].enabled = face != null;
+            rowFaces[row].color = record != null && record.IsAway ? new Color(1f, 1f, 1f, 0.45f) : Color.white;
             List<JobDefinition> open = record != null ? here.JobsOpenTo(record.Resident) : null;
             for (int column = 0; column < MostColumns; column++)
             {
